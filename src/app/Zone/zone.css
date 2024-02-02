@@ -1,0 +1,54 @@
+.css-levciy-MuiTablePagination-displayedRows {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.43;
+  letter-spacing: 0.01071em;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  display: none;
+}
+
+.css-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar
+  .MuiTablePagination-actions {
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  margin-left: 20px;
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: gray;
+  border-radius: 7px;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  /* border-width: 1px !important; */
+  border-color: #d3d3d3 !important;
+  outline: #00b56c;
+}
+
+.MuiOutlinedInput-notchedOutline:hover {
+  /* border-width: 1px !important; */
+  border: #00b56c !important;
+}
+
+.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #00b56c !important;
+}
+/* .icon_delete_edit {
+  margin-left: 73%;
+} */
+
+/* @media (max-width: 550px) {
+  .icon_delete_edit {
+    margin-left: 10%;
+    margin-top: 14px !important;
+  }
+} */

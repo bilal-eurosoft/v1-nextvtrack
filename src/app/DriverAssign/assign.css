@@ -1,0 +1,44 @@
+.MuiOutlinedInput-notchedOutline {
+  /* border-width: 1px !important; */
+  border-color: #d3d3d3 !important;
+  outline: #00b56c;
+}
+
+.MuiOutlinedInput-notchedOutline:hover {
+  /* border-width: 1px !important; */
+  border: #00b56c !important;
+}
+
+.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #00b56c !important;
+}
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #29303b;
+  border-radius: 7px;
+}
+
+.popup_style {
+  width: 40%;
+}
+@media (max-width: 1200px) and (min-width: 810px) {
+  .popup_style {
+    width: 65%;
+  }
+}
+
+@media (max-width: 800px) and (min-width: 510px) {
+  .popup_style {
+    width: 80%;
+  }
+}
+
+@media (max-width: 500px) {
+  .popup_style {
+    width: 90%;
+    margin-top: 30%;
+  }
+}

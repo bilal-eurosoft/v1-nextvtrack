@@ -1,0 +1,108 @@
+.MuiPickersDatePickerRoot-toolbar {
+  align-items: flex-start !important;
+  flex-direction: column !important;
+  background-color: #00b56c !important;
+}
+
+.MuiPickersDay-daySelected {
+  color: #fff !important;
+  font-weight: 500 !important;
+  background-color: #00b56c !important;
+}
+/* p.MuiTypography-root.MuiTypography-body2.MuiTypography-colorInherit {
+  color: #3b413f;
+} */
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: rgb(227, 224, 224);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #29303b;
+  border-radius: 7px;
+}
+
+/* Handle on hover */
+/* .Select_box::-webkit-scrollbar-thumb:hover {
+  background: #00b56c;
+} */
+
+.leaflet-touch .leaflet-bar a {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  color: #00b56c;
+}
+
+input[type="checkbox"]:hover {
+  outline: 1px auto #00b56c;
+  cursor: pointer;
+}
+.MuiOutlinedInput-notchedOutline {
+  border-color: #d3d3d3 !important;
+  outline: #00b56c;
+}
+
+.MuiOutlinedInput-notchedOutline:hover {
+  /* border-width: 1px !important; */
+  border: #00b56c !important;
+}
+
+.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #00b56c !important;
+}
+
+#trips_handle {
+  height: 50em;
+}
+/* .css-i4bv87-MuiSvgIcon-root {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  -webkit-transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  font-size: 1.5rem;
+} */
+@media (max-width: 450px) {
+  #trips_handle {
+    height: 12em;
+    overflow-y: scroll;
+  }
+}
+#speed_meter {
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  right: 1%;
+  display: flex;
+  justify-content: end;
+}
+@media (max-width: 850px) and (min-width: 510px) {
+  #speed_meter {
+    position: absolute;
+    top: 25%;
+    left: 5%;
+    right: 10%;
+    display: flex;
+    justify-content: end;
+  }
+}
+@media (max-width: 500px) {
+  #speed_meter {
+    position: absolute;
+    top: 25%;
+    left: 5%;
+    right: 10%;
+    display: flex;
+    justify-content: end;
+  }
+}
