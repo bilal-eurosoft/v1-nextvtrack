@@ -1,0 +1,40 @@
+.MuiPickersDatePickerRoot-toolbar {
+  align-items: flex-start !important;
+  flex-direction: column !important;
+  background-color: #00b56c !important;
+}
+
+.MuiPickersDay-daySelected {
+  color: #fff !important;
+  font-weight: 500 !important;
+  background-color: #00b56c !important;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  border-color: #d3d3d3 !important;
+  outline: #00b56c;
+}
+
+.MuiOutlinedInput-notchedOutline:hover {
+  /* border-width: 1px !important; */
+  border: #00b56c !important;
+}
+
+.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #00b56c !important;
+}
+
+.MuiFormHelperText-root.Mui-error {
+  color: #2f2b2b;
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: rgb(227, 224, 224);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #29303b;
+  border-radius: 7px;
+}

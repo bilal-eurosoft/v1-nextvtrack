@@ -35,6 +35,8 @@ const LiveSidebar = ({
     setSearchData({ ...searchData, [name]: value });
   };
 
+  console.log("filter", searchData);
+
   useEffect(() => {
     (async function () {
       if (session) {
@@ -78,9 +80,7 @@ const LiveSidebar = ({
 
     const filtered = carData
       .filter((data) =>
-        data.vehicleReg
-          .toLowerCase()
-          .startsWith(searchData.search.toLowerCase())
+        data.vehicleReg.toLowerCase().includes(searchData.search.toLowerCase())
       )
       .map((item: any) => {
         const i = zoneLatlog.findIndex((zone: any) => {
@@ -111,12 +111,9 @@ const LiveSidebar = ({
   };
   console.log("filteredData", filteredData);
   return (
-    <div
-      className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-4  col-span-4"
-      // style={{ height: "50em" }}
-    >
-      <div className="grid grid-cols-12 bg-white py-3 pe-1 lg:gap-1 gap-3 ">
-        <div className="lg:col-span-7 lg:col-span-7 md:col-span-5 sm:col-span-5 col-span-5 sticky top-0">
+    <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-4  col-span-4 main_sider_bar">
+      <div className="grid grid-cols-12 bg-white py-3 pe-1 lg:gap-4 gap-3 search_live_tracking">
+        <div className="lg:col-span-5 w-full  md:col-span-5 sm:col-span-5 col-span-6 sticky top-0">
           <div className="grid grid-cols-12">
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1">
               <svg
@@ -145,7 +142,7 @@ const LiveSidebar = ({
             </div>
           </div>
         </div>
-        <div className="lg:col-span-5 md:col-span-7  sm:col-span-5 col-span-58  w-full">
+        <div className="flex text-center lg:col-span-7  md:col-span-7  sm:col-span-5 col-span-5  w-full">
           <button
             className="text-center mx-auto text-md font-bold text-green mt-1"
             onClick={toggleLiveCars}
@@ -155,8 +152,8 @@ const LiveSidebar = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 text-center border-y-2  border-green bg-zoneTabelBg py-4 text-white">
-        <div className="lg:col-span-1">
+      <div className="grid grid-cols-2 text-center border-y-2  border-green bg-zoneTabelBg py-4 text-white vehicle_summary">
+        <div className="lg:col-span-1 w-full">
           <p className="text-md mt-1 text-black font-popins ">
             <b>Vehicle Summary:</b>
           </p>
@@ -231,17 +228,16 @@ const LiveSidebar = ({
             >
               <div
                 key={item?.IMEI}
-                className="grid lg:grid-cols-3 grid-cols-3 text-center py-2"
+                className="grid lg:grid-cols-12 grid-cols-3 text-center py-2 gap-0"
               >
-                <div className="lg:col-span-1 col-span-1">
-                  <div
-                    className=" font-popins font-bold"
-                    style={{ fontSize: "20px" }}
-                  >
+                <div className="lg:col-span-5 ">
+                  <div className=" font-popins font-bold text-start w-full lg:text-2xl text-1xl">
                     {item.gps.speed === 0 && item.ignition === 0 ? (
-                      <p className="text-red ">{item?.vehicleReg}</p>
+                      <p className="text-red text-start">{item?.vehicleReg}</p>
                     ) : item.gps.speed > 0 && item.ignition === 1 ? (
-                      <p className="text-green">{item?.vehicleReg}</p>
+                      <p className="text-green text-start">
+                        {item?.vehicleReg}
+                      </p>
                     ) : (
                       <p
                         className={`
@@ -257,7 +253,7 @@ const LiveSidebar = ({
                     )}
                   </div>
                 </div>
-                <div className="lg:col-span-1 col-span-1">
+                <div className="lg:col-span-4 col-span-1">
                   {item.gps.speed === 0 && item.ignition === 0 ? (
                     <>
                       <button className="text-white bg-red p-1 -mt-1 shadow-lg">
@@ -277,11 +273,10 @@ const LiveSidebar = ({
                       }  p-1 -mt-1 shadow-md`}
                     >
                       {item?.vehicleStatus}
-                      {/* Pause */}
                     </button>
                   )}
                 </div>
-                <div className="lg:col-span-1 col-span-1">
+                <div className="lg:col-span-3 col-span-1">
                   <div className="grid grid-cols-4">
                     <div className="lg:col-span-3 col-span-2 font-bold">
                       {item.gps.speedWithUnitDesc}
@@ -302,8 +297,8 @@ const LiveSidebar = ({
                 </div>
               </div>
 
-              <div className="lg:text-start md:text-start sm:text-start text-center px-4  mt-1  text-md border-b-2 font-bold border-green text-labelColor">
-                <h1 className="font-popins "> {item.timestamp}</h1>
+              <div className="lg:text-start md:text-start sm:text-start text-center   mt-1  text-md border-b-2 font-bold border-green text-labelColor">
+                <h1 className="font-popins text-start"> {item.timestamp}</h1>
                 <p className="text-labelColor">{item.zone}</p>
                 <p>{item.DriverName}</p>
 
@@ -317,9 +312,6 @@ const LiveSidebar = ({
             </div>
           );
         })}
-        {/* {zoneList.map((item) => {
-          return <h2>{item.zoneName}</h2>;
-        })} */}
       </div>
     </div>
   );

@@ -20,22 +20,71 @@ input[type="checkbox"]:hover {
 }
 
 #scroll_side_bar {
-  height: calc(91vh - 100px); /* Dynamic height calculation */
+  height: 82vh; /* Dynamic height calculation */
   overflow-y: auto; /* Add a vertical scrollbar if content exceeds the container height */
   border: 1px solid #ccc; /* Optional: Add a border for visual clarity */
   padding: 10px;
 }
 #maps {
-  height: calc(100vh - 75px); /* Dynamic height calculation */
+  height: 93vh; /* Dynamic height calculation */
   /* overflow-y: auto; Add a vertical scrollbar if content exceeds the container height */
   /* border: 1px solid #ccc; /Optional: Add a border for visual clarity */
   padding: 10px;
 }
+.search_live_tracking {
+  height: 5vh;
+}
+.vehicle_summary {
+  height: 6vh;
+}
+.main_sider_bar {
+  height: 93vh;
+}
+@media (max-width: 1000px) and (min-width: 750px) {
+  .main_sider_bar {
+    height: 87.5vh;
+  }
+  .search_live_tracking {
+    height: 5vh;
+  }
+  .vehicle_summary {
+    height: 5vh;
+  }
+  #scroll_side_bar {
+    height: 77.5vh;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
+  #maps {
+    height: 87.5vh;
+    padding: 10px;
+  }
+}
+
 @media (max-width: 450px) {
   #scroll_side_bar {
     height: 20vh;
   }
   #maps {
-    height: 50vh;
+    height: 38vh;
+  }
+}
+
+@media (max-width: 750px) {
+  #maps {
+    height: 38vh;
+  }
+  .search_live_tracking {
+    height: auto;
+  }
+  .vehicle_summary {
+    height: auto;
+  }
+  #scroll_side_bar {
+    height: 20vh;
+  }
+  .main_sider_bar {
+    height: 38vh;
   }
 }

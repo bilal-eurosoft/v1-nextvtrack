@@ -146,13 +146,6 @@ export default function DriverProfile() {
     vehicleListData();
   }, []);
 
-  const handleSearch = (event: any) => {
-    const newSearchTerm = event.target.value;
-    setInputs(newSearchTerm);
-  };
-  const handleCloseInput = () => {
-    setInputs("");
-  };
   const handleDelete = async (data: any) => {
     const payLoad: any = {
       id: data.id,
@@ -276,20 +269,9 @@ export default function DriverProfile() {
     // await vehicleListData();
     // console.log("Updated Data from API:", updatedData);
   };
-  const handleChangeCheckbox = (e: any) => {
-    // const filterData = DriverData.filter((items) => items.id == item);
-    setIsColor(e.target.value);
-  };
-  console.log("color", isColor);
+
   return (
     <div>
-      {data.map((item: any, index) => {
-        return (
-          <div key={index}>
-            <p>{item.driverfirstName}</p>
-          </div>
-        );
-      })}
       <p className="bg-green px-4 py-1 border-t border-bgLight text-black text-center text-2xl text-white font-bold font-popins">
         InActive Drivers List
       </p>
@@ -364,215 +346,7 @@ export default function DriverProfile() {
             </div>
           </div> */}
         </div>
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          open={open}
-          onClose={handleClose}
-          closeAfterTransition
-          slots={{ backdrop: Backdrop }}
-          slotProps={{
-            backdrop: {
-              timeout: 500,
-            },
-          }}
-        >
-          <Fade in={open}>
-            <Box sx={style}>
-              <Typography
-                id="transition-modal-title"
-                variant="h6"
-                component="h2"
-                className="text-black"
-              >
-                <div className="grid grid-cols-12 bg-green">
-                  <div className="col-span-11">
-                    <p className="  p-3 text-white w-full ">Add Driver</p>
-                  </div>
-                  <div className="col-span-1">
-                    <svg
-                      className="h-6 w-6 text-labelColor mt-3"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      {" "}
-                      <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                      <line x1="18" y1="6" x2="6" y2="18" />{" "}
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </div>
-                </div>
-              </Typography>
-              <form onSubmit={handleDriverSubmit}>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <div
-                    className="grid grid-cols-12 m-6 mt-8 gap-8 "
-                    style={{ display: "flex", justifyContent: "center" }}
-                  >
-                    <div className="lg:col-span-3 col-span-1 ">
-                      <label className="text-sm text-labelColor">
-                        First Name
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.driverfirstName}
-                        className="border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out "
-                        onChange={(e: any) =>
-                          handleChangeDriver("driverfirstName", e)
-                        }
-                      />
-                    </div>
-                    <div className="lg:col-span-3 col-span-1 ">
-                      <label className="text-sm text-labelColor">
-                        Middle Name
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.driverMiddleName}
-                        className="border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out "
-                        onChange={(e: any) =>
-                          handleChangeDriver("driverMiddleName", e)
-                        }
-                      />
-                    </div>
-                    <div className="lg:col-span-3 col-span-1 ">
-                      <label className="text-sm text-labelColor">
-                        <span className="text-red">*</span> Last Name
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.driverLastName}
-                        className="border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out "
-                        onChange={(e: any) =>
-                          handleChangeDriver("driverLastName", e)
-                        }
-                      />
-                    </div>
-                  </div>
 
-                  <div
-                    className="grid grid-cols-12 m-6 mt-8 gap-8 "
-                    style={{ display: "flex", justifyContent: "center" }}
-                  >
-                    <div className="lg:col-span-3 col-span-1 ">
-                      <label className="text-sm text-labelColor">
-                        Driver Number
-                      </label>
-                      <input
-                        value={formData.driverNo}
-                        type="text"
-                        className="border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out "
-                        onChange={(e: any) => handleChangeDriver("driverNo", e)}
-                      />
-                    </div>
-                    <div className="lg:col-span-3 col-span-1 ">
-                      <label className="text-sm text-labelColor">
-                        Contact Number
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.driverContact}
-                        className="border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out "
-                        onChange={(e: any) =>
-                          handleChangeDriver("driverContact", e)
-                        }
-                      />
-                    </div>
-                    <div className="lg:col-span-3 col-span-1 ">
-                      <label className="text-sm text-labelColor">
-                        ID Number
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.driverIdNo}
-                        className="border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out "
-                        onChange={(e: any) =>
-                          handleChangeDriver("driverIdNo", e)
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div
-                    className="grid grid-cols-12 m-6 mt-8 gap-8 "
-                    style={{ display: "flex", justifyContent: "start" }}
-                  >
-                    <div className="lg:col-span-2 col-span-1 ">
-                      <label className="text-sm text-labelColor ">
-                        RFID
-                        <input
-                          type="checkbox"
-                          onClick={() => setShowCardNumber(!showCardNumber)}
-                          style={{ accentColor: "green" }}
-                          className="border border-green  outline-green  cursor-pointer ms-4  "
-                        />
-                      </label>
-                    </div>
-                    {showCardNumber ? (
-                      <div className="lg:col-span-3 col-span-1 ">
-                        <label className="text-sm text-labelColor">
-                          Card Number
-                        </label>
-                        <br></br>
-                        <input
-                          type="text"
-                          value={formData.driverRFIDCardNumber}
-                          className="border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out "
-                          onChange={(e: any) =>
-                            handleChangeDriver("driverRFIDCardNumber", e)
-                          }
-                        />
-                      </div>
-                    ) : (
-                      ""
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-12 m-6 mt-8 gap-8 ">
-                    <div className="col-span-6 col-span-1 ">
-                      <label className="text-sm text-labelColor">
-                        Address 1
-                      </label>
-                      <br></br>
-                      <textarea
-                        value={formData.driverAddress1}
-                        className="w-full border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out h-20 "
-                        onChange={(e: any) =>
-                          handleChangeDriver("driverAddress1", e)
-                        }
-                      ></textarea>
-                      <button
-                        className="bg-green text-white px-10 mt-8 py-2 rounded-sm"
-                        type="submit"
-                      >
-                        Submit
-                      </button>
-                    </div>
-                    <div className="col-span-6 col-span-1 ">
-                      <label className="text-sm text-labelColor">
-                        Address 2
-                      </label>
-                      <br></br>
-                      <textarea
-                        value={formData.driverAddress2}
-                        className="w-full border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out h-20 "
-                        onChange={(e: any) =>
-                          handleChangeDriver("driverAddress2", e)
-                        }
-                      ></textarea>
-                    </div>
-                  </div>
-                </Typography>
-              </form>
-            </Box>
-          </Fade>
-        </Modal>
         <TableContainer component={Paper}>
           <Table aria-label="custom pagination table">
             <TableHead>
@@ -585,46 +359,85 @@ export default function DriverProfile() {
                     onChange={handleChangeCheckbox}
                   />
                 </TableCell> */}
-                <TableCell align="center" colSpan={2} id="table_head_inactive">
-                  Driver Number
+                <TableCell
+                  align="center"
+                  className="font-popins  font-bold text-black"
+                  colSpan={2}
+                  id="table_head_inactive"
+                >
+                  S.NO
                 </TableCell>
-                <TableCell align="center" colSpan={2} id="table_head_inactive">
+                <TableCell
+                  align="center"
+                  className="font-popins  font-bold text-black"
+                  colSpan={2}
+                  id="table_head_inactive"
+                >
                   First Name
                 </TableCell>
-                <TableCell align="center" colSpan={2} id="table_head_inactive">
-                  Middle Name
-                </TableCell>
-                <TableCell align="center" colSpan={2} id="table_head_inactive">
+                <TableCell
+                  align="center"
+                  className="font-popins  font-bold text-black"
+                  colSpan={2}
+                  id="table_head_inactive"
+                >
                   Last Name
                 </TableCell>
-                <TableCell align="center" colSpan={2} id="table_head_inactive">
+                <TableCell
+                  align="center"
+                  className="font-popins  font-bold text-black"
+                  colSpan={2}
+                  id="table_head_inactive"
+                >
                   Driver ID
                 </TableCell>
-                <TableCell align="center" colSpan={2} id="table_head_inactive">
-                  Driver Contact
+                <TableCell
+                  align="center"
+                  className="font-popins  font-bold text-black"
+                  colSpan={2}
+                  id="table_head_inactive"
+                >
+                  Driver Contact.NO
                 </TableCell>
-                <TableCell align="center" colSpan={2} id="table_head_inactive">
-                  Driver Card
+                <TableCell
+                  align="center"
+                  className="font-popins  font-bold text-black"
+                  colSpan={2}
+                  id="table_head_inactive"
+                >
+                  RFID Card
                 </TableCell>
-                <TableCell align="center" colSpan={2} id="table_head_inactive">
-                  Driver Address 1
-                </TableCell>
-                <TableCell align="center" colSpan={2} id="table_head_inactive">
-                  Driver Address 2
+                <TableCell
+                  align="center"
+                  className="font-popins  font-bold text-black"
+                  colSpan={2}
+                  id="table_head_inactive"
+                >
+                  Address
                 </TableCell>
                 {/* <TableCell align="center" colSpan={2}>
                   Driver Availaibilty
                 </TableCell> */}
-                <TableCell align="center" colSpan={2} id="table_head_inactive">
+                <TableCell
+                  align="center"
+                  className="font-popins  font-bold text-black"
+                  colSpan={2}
+                  id="table_head_inactive"
+                >
                   Status
                 </TableCell>
-                <TableCell align="center" colSpan={2} id="table_head_inactive">
+                <TableCell
+                  align="center"
+                  className="font-popins  font-bold text-black"
+                  colSpan={2}
+                  id="table_head_inactive"
+                >
                   Actions
                 </TableCell>{" "}
               </TableRow>
             </TableHead>
             <TableBody className="bg-bgLight cursor-pointer ">
-              {result.map((row: any) => (
+              {result.map((row: any, index: any) => (
                 <TableRow
                   className="hover:bg-bgHoverTabel"
                   // style={{ backgroundColor: isColor == "on" ? "gray" : "" }}
@@ -654,7 +467,7 @@ export default function DriverProfile() {
                     className="
                   table_text_inactive"
                   >
-                    {row.driverNo}
+                    {index + 1}
                   </TableCell>
                   <TableCell
                     align="center"
@@ -664,14 +477,7 @@ export default function DriverProfile() {
                   >
                     {row.driverfirstName}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    colSpan={2}
-                    className="
-                  table_text_inactive"
-                  >
-                    {row.driverMiddleName}
-                  </TableCell>
+
                   <TableCell
                     align="center"
                     colSpan={2}
@@ -712,14 +518,7 @@ export default function DriverProfile() {
                   >
                     {row.driverAddress1}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    colSpan={2}
-                    className="
-                  table_text_inactive"
-                  >
-                    {row.driverAddress2}
-                  </TableCell>
+
                   {/* <TableCell align="center" colSpan={2}>
                     {row.isAvailable === true ? "Available" : "Not Available"}
                   </TableCell> */}
@@ -738,10 +537,6 @@ export default function DriverProfile() {
                     className="
                   table_text_inactive"
                   >
-                    <button className="text-green hover:border-green border-b border-bgLight">
-                      Edit
-                    </button>{" "}
-                    &nbsp;&nbsp;&nbsp;&nbsp;{" "}
                     {row.isDeleted ? (
                       <button
                         className="text-green hover:border-green border-b border-bgLight"

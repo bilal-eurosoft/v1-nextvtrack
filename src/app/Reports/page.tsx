@@ -7,6 +7,13 @@ import React, { useEffect, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import DateFnsMomemtUtils from "@date-io/moment";
+import "./report.css";
+
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
 
 import {
   IgnitionReportByTrip,
@@ -16,7 +23,16 @@ import {
   IgnitionReportByDetailReport,
   IgnitionReportByIdlingActivity,
 } from "@/utils/API_CALLS";
-import { MenuList } from "@mui/material";
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 50,
+    },
+  },
+};
 
 export default function Reports() {
   const { data: session } = useSession();
@@ -70,6 +86,7 @@ export default function Reports() {
   const formattedTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 
   const parsedDateTime = new Date(currentTime);
+  const currenTDates = new Date();
   var moment = require("moment");
   const formattedDateTime = `${parsedDateTime
     .toISOString()
@@ -97,13 +114,13 @@ export default function Reports() {
   const handleEnddateChange = (value: any) => {
     setenddate(value);
   };
-  const handleCustomDateChange = (fieldName: string, date: any) => {
+  const handleCustomDateChange = (fieldName: string, e: any) => {
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
-      [fieldName]: date,
+      [fieldName]: e.toISOString().split("T")[0],
     }));
-    setstartdate(date);
-    setenddate(date);
+    setstartdate(e);
+    setenddate(e);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -294,7 +311,7 @@ export default function Reports() {
       >
         <div className="bg-green-50 mt-20">
           <div className="grid grid-cols-1">
-            <p className="bg-green px-4 py-3 rounded-md text-white">
+            <p className="bg-green text-center font-popins font-bold text-xl px-4 py-3 rounded-md text-white">
               Reports Filter{" "}
             </p>
           </div>
@@ -308,47 +325,56 @@ export default function Reports() {
                 </div>
                 <div className="col-span-8">
                   <Select
-                    className="h-8 text-sm text-gray w-full outline-green"
+                    className="h-8 text-sm w-full text-gray  outline-green"
                     name="reportType"
                     value={Ignitionreport.reportType}
                     onChange={handleInputChange}
                     displayEmpty
+                    MenuProps={MenuProps}
+                    renderValue={(value: any) => (
+                      <span
+                        style={{
+                          color: value === 0 ? "black" : "normal",
+                          fontSize: value === 0 ? "15px" : "normal",
+                          paddingLeft: isCustomPeriod ? "10px" : "5px",
+                        }}
+                      >
+                        {value === 0 ? "Select Report Type" : value}
+                      </span>
+                    )}
                   >
-                    <MenuItem value="" disabled hidden>
-                      Select Report Type
-                    </MenuItem>
                     <MenuItem
-                      className="hover:bg-green hover:text-white text-sm"
+                      className="hover:bg-green w-full hover:text-white text-sm"
                       value="Trip"
                     >
                       Trip
                     </MenuItem>
                     <MenuItem
-                      className="hover:bg-green hover:text-white text-sm"
+                      className="hover:bg-green w-full hover:text-white text-sm"
                       value="DailyActivity"
                     >
                       Daily Activity
                     </MenuItem>
                     <MenuItem
-                      className="hover:bg-green hover:text-white text-sm"
+                      className="hover:bg-green w-full hover:text-white text-sm"
                       value="Ignition"
                     >
                       Ignition
                     </MenuItem>
                     <MenuItem
-                      className="hover:bg-green hover:text-white text-sm"
+                      className="hover:bg-green w-full hover:text-white text-sm"
                       value="Events"
                     >
                       Events
                     </MenuItem>
                     <MenuItem
-                      className="hover:bg-green hover:text-white text-sm"
+                      className="hover:bg-green w-full hover:text-white text-sm"
                       value="DetailReportByStreet"
                     >
                       Detail Report By Street
                     </MenuItem>
                     <MenuItem
-                      className="hover:bg-green hover:text-white text-sm"
+                      className="hover:bg-green w-full hover:text-white text-sm"
                       value="IdlingActivity"
                     >
                       Idling Activity
@@ -362,17 +388,26 @@ export default function Reports() {
               <label className="text-labelColor">
                 Vehicle: &nbsp;&nbsp;
                 <Select
-                  className="h-8 lg:w-4/6 w-full text-labelColor outline-green border border-grayLight px-1e"
+                  className="h-8 lg:w-4/6 w-full text-labelColor outline-green px-1e"
                   name="VehicleReg"
                   value={Ignitionreport.VehicleReg}
                   onChange={handleInputChange}
                   displayEmpty
+                  MenuProps={MenuProps}
+                  style={{
+                    paddingLeft: isCustomPeriod ? "10px" : "5px",
+                    paddingTop: isCustomPeriod ? "5px" : "2px",
+                  }}
                 >
                   <MenuItem value="" disabled hidden>
                     Select Vehicle Name
                   </MenuItem>
                   {vehicleList?.data?.map((item: DeviceAttach) => (
-                    <MenuItem key={item.id} value={item.vehicleReg}>
+                    <MenuItem
+                      className="hover:bg-green hover:text-white w-full text-start"
+                      key={item.id}
+                      value={item.vehicleReg}
+                    >
                       {item.vehicleNo} (Reg#{item.vehicleReg})
                     </MenuItem>
                   ))}
@@ -446,8 +481,20 @@ export default function Reports() {
             <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-2 mt-5 mb-8  grid-cols-2 pt-5 px-10 gap-2 flex justify-center ">
               <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4 ">
                 <label className="text-labelColor">
-                  From Date: &nbsp;&nbsp;
-                  <input
+                  From Date: &nbsp;&nbsp;&nbsp;
+                  <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
+                    <KeyboardDatePicker
+                      format="MM/DD/yyyy"
+                      value={Ignitionreport.fromDateTime}
+                      onChange={(e) =>
+                        handleCustomDateChange("fromDateTime", e)
+                      }
+                      variant="inline"
+                      maxDate={currenTDates}
+                      className="xl:w-80  lg:w-80 w-auto"
+                    />
+                  </MuiPickersUtilsProvider>
+                  {/* <input
                     type="date"
                     className="ms-1 h-8 lg:w-4/6 w-full  text-labelColor  outline-green border border-grayLight px-1"
                     name="fromDateTime"
@@ -458,22 +505,33 @@ export default function Reports() {
                     onChange={(e) =>
                       handleCustomDateChange("fromDateTime", e.target.value)
                     }
-                  />
+                  /> */}
                 </label>
               </div>
-              <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4 ">
-                <label className="text-labelColor">
-                  To Date: &nbsp;&nbsp;
-                  <input
-                    type="date"
-                    className="h-8 lg:w-4/6 w-full  text-labelColor  outline-green border border-grayLight px-1"
-                    name="toDateTime"
-                    // onChange={handleEnddateChange}
-                    onChange={(e) =>
-                      handleCustomDateChange("toDateTime", e.target.value)
+              <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4 w-full ">
+                <label className="text-labelColor "></label>
+                To Date: &nbsp;&nbsp;&nbsp;
+                <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
+                  <KeyboardDatePicker
+                    format="MM/DD/yyyy"
+                    value={Ignitionreport.toDateTime}
+                    onChange={(newDate: any) =>
+                      handleCustomDateChange("toDateTime", newDate)
                     }
+                    variant="inline"
+                    maxDate={currenTDates}
+                    className="xl:w-80  lg:w-80 w-auto"
+                    // style={{ width: "70%" }}
                   />
-                </label>
+                </MuiPickersUtilsProvider>
+                {/* <input
+                  type="date"
+                  className="h-8 lg:w-4/6 w-full  text-labelColor  outline-green border border-grayLight px-1"
+                  name="toDateTime"
+                  onChange={(e) =>
+                    handleCustomDateChange("toDateTime", e.target.value)
+                  }
+                /> */}
               </div>
             </div>
           )}
