@@ -10,6 +10,7 @@ import { ClientSettings } from "@/types/clientSettings";
 import { useSession } from "next-auth/react";
 import { getZoneListByClientId } from "@/utils/API_CALLS";
 import { Marker, Popup } from "react-leaflet";
+import L, { LatLng } from 'leaflet';
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((module) => module.MapContainer),
@@ -35,12 +36,18 @@ const DynamicCarMap = ({
   selectedVehicle,
   setIsActiveColor,
   setSelectedVehicle,
+  showAllVehicles,
+  setunselectVehicles,
+  unselectVehicles
 }: {
   carData: VehicleData[];
   clientSettings: ClientSettings[];
   selectedVehicle: VehicleData | null; // Make sure it can handle null values
   setIsActiveColor: any;
   setSelectedVehicle: any;
+  showAllVehicles: any;
+  setunselectVehicles: any;
+  unselectVehicles: any;
 }) => {
   const clientMapSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Map"
@@ -49,10 +56,13 @@ const DynamicCarMap = ({
   const clientZoomSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Zoom"
   )[0]?.PropertyValue;
-  let mapCoordinates: [number, number] = [0, 0];
+  /*  let mapCoordinates: [number, number] = [0, 0]; */
   const { data: session } = useSession();
+
   const [zoneList, setZoneList] = useState<zonelistType[]>([]);
   const [showZones, setShowZones] = useState(false);
+  const [mapCoordinates, setMapCoordinates] = useState<LatLng | null>(null);
+  const [zoom, setZoom] = useState(10);
   useEffect(() => {
     (async function () {
       if (session) {
@@ -65,23 +75,32 @@ const DynamicCarMap = ({
     })();
   }, []);
 
-  if (!clientMapSettings) {
-    return <>{/* Map Loadidsng... */}</>;
-  }
 
-  const regex = /lat:([^,]+),lng:([^}]+)/;
-  const match = clientMapSettings.match(regex);
+  useEffect(() => {
+    const regex = /lat:([^,]+),lng:([^}]+)/;
+    if (clientMapSettings) {
+      const match = clientMapSettings.match(regex);
 
-  if (match) {
-    const lat = parseFloat(match[1]);
-    const lng = parseFloat(match[2]);
-    mapCoordinates = [lat, lng];
-  }
-  let zoom = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
+      if (match) {
+        const lat = parseFloat(match[1]);
+        const lng = parseFloat(match[2]);
+        setMapCoordinates(new LatLng(lat, lng));
+      }
+    }
+    let zoomLevel = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
+    setZoom(zoomLevel)
+  }, [clientMapSettings])
+
   const handleClear = () => {
     setIsActiveColor("");
     // setSelectedVehicle(null);
   };
+
+
+
+
+
+
   return (
     <>
       <div className="xl:col-span-4 lg:col-span-3  md:col-span-3  sm:col-span-5 col-span-4 ">
@@ -92,7 +111,9 @@ const DynamicCarMap = ({
               center={mapCoordinates}
               className=" z-0"
               zoom={zoom}
+
             >
+
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
@@ -142,6 +163,11 @@ const DynamicCarMap = ({
                 carData={carData}
                 clientSettings={clientSettings}
                 selectedVehicle={selectedVehicle}
+                mapCoordinates={mapCoordinates}
+                setSelectedVehicle={setSelectedVehicle}
+                showAllVehicles={showAllVehicles}
+                setunselectVehicles={setunselectVehicles}
+                unselectVehicles={unselectVehicles}
               />
             </MapContainer>
           )}

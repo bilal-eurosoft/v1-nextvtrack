@@ -123,7 +123,7 @@ export default function Zone() {
           (GeoFenceType === "" ||
             (zone.GeoFenceType !== undefined &&
               zone.GeoFenceType.toLowerCase() ===
-                GeoFenceType.toLowerCase())) &&
+              GeoFenceType.toLowerCase())) &&
           (zoneType === "" ||
             (zone.zoneType !== undefined &&
               zone.zoneType.toLowerCase() === zoneType.toLowerCase()))
@@ -309,7 +309,7 @@ export default function Zone() {
       console.log(error);
     }
   }
-  allZone();
+  // allZone();
 
   // async function deleteSelectedZones(zoneId: any) {
   // try {
@@ -586,11 +586,10 @@ export default function Zone() {
             <br></br>
             <span
               id="Circle"
-              className={`inline-flex items-center mt-2 border rounded-md border-grayLight px-2 h-8 text-md font-popins text-black font-medium cursor-pointer shadow-md hover:shadow-gray transition duration-500 cursor-pointer  ${
-                selectedZoneTypeCircle && "bg-green text-white "
-              } transition duration-300`}
+              className={`inline-flex items-center mt-2 border rounded-md border-grayLight px-2 h-8 text-md font-popins text-black font-medium cursor-pointer shadow-md hover:shadow-gray transition duration-500 cursor-pointer  ${selectedZoneTypeCircle && "bg-green text-white "
+                } transition duration-300`}
               onClick={() => handleClickZoneType("Circle")}
-              // title="Click to select Circle"
+            // title="Click to select Circle"
             >
               <RadioButtonUncheckedIcon
                 className="mr-2"
@@ -601,11 +600,10 @@ export default function Zone() {
 
             <span
               id="Polygon"
-              className={`inline-flex items-center mt-2 border rounded-md border-grayLight px-2 h-8 text-md font-popins text-black font-medium cursor-pointer shadow-md hover:shadow-gray transition duration-500 cursor-pointer mx-5  ${
-                selectedZoneTypPolyGone && "bg-green text-white"
-              } transition duration-300`}
+              className={`inline-flex items-center mt-2 border rounded-md border-grayLight px-2 h-8 text-md font-popins text-black font-medium cursor-pointer shadow-md hover:shadow-gray transition duration-500 cursor-pointer mx-5  ${selectedZoneTypPolyGone && "bg-green text-white"
+                } transition duration-300`}
               onClick={() => handleClickZoneType("Polygon")}
-              // title="Click to select Polygon"
+            // title="Click to select Polygon"
             >
               <RadioButtonUncheckedIcon className="mr-2" /> Polygon
             </span>

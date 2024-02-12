@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Loading from "@/app/loading";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -108,9 +108,12 @@ export default function RootLayout({
 
   const { data: session } = useSession();
 
-  if (!session) {
-    router.push("http://localhost:3010/login");
-  }
+
+  useEffect(() => {
+    if (!session) {
+      router.push("http://localhost:3010/login");
+    }
+  }, [session, router]);
 
   const handleClick = (item: any) => {
     setSelectedColor(item);
@@ -125,7 +128,7 @@ export default function RootLayout({
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  console.log("selectedColor", session);
+
   return (
     // <div className={inter.className}>
     <div>

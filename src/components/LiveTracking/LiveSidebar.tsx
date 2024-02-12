@@ -13,6 +13,9 @@ const LiveSidebar = ({
   setSelectedVehicle,
   activeColor,
   setIsActiveColor,
+  setshowAllVehicles,
+  setunselectVehicles,
+  unselectVehicles
 }: {
   carData: VehicleData[];
   countPause: Number;
@@ -21,15 +24,16 @@ const LiveSidebar = ({
   setSelectedVehicle: any;
   activeColor: any;
   setIsActiveColor: any;
+  setshowAllVehicles: any;
+  setunselectVehicles: any;
+  unselectVehicles: any;
 }) => {
   const { data: session } = useSession();
   const [searchData, setSearchData] = useState({
     search: "",
   });
   const [filteredData, setFilteredData] = useState<any>([]);
-
   const [zoneList, setZoneList] = useState<zonelistType[]>([]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSearchData({ ...searchData, [name]: value });
@@ -46,7 +50,6 @@ const LiveSidebar = ({
       }
     })();
   }, [session]);
-
   function isPointInPolygon(point: any, polygon: any) {
     let intersections = 0;
     for (let i = 0; i < polygon.length; i++) {
@@ -75,12 +78,9 @@ const LiveSidebar = ({
         return undefined;
       }
     });
-
     const filtered = carData
       .filter((data) =>
-        data.vehicleReg
-          .toLowerCase()
-          .startsWith(searchData.search.toLowerCase())
+        data.vehicleReg.toLowerCase().includes(searchData.search.toLowerCase())
       )
       .map((item: any) => {
         const i = zoneLatlog.findIndex((zone: any) => {
@@ -91,32 +91,29 @@ const LiveSidebar = ({
             );
           }
         });
-
         if (i != -1) {
           item.zone = zoneList[i].zoneName;
         }
         return item;
       });
-
     setFilteredData(filtered);
   }, [searchData.search, carData]);
   const toggleLiveCars = () => {
     setSelectedVehicle(null);
+    setshowAllVehicles(true)
+    setunselectVehicles(false)
     setIsActiveColor(0);
   };
-
   const handleClickVehicle = (item: any) => {
     setSelectedVehicle(item);
+    setshowAllVehicles(false)
     setIsActiveColor(item.vehicleId);
   };
-  console.log("filteredData", filteredData);
+  console.log("filter", filteredData)
   return (
-    <div
-      className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-4  col-span-4"
-      // style={{ height: "50em" }}
-    >
-      <div className="grid grid-cols-12 bg-white py-3 pe-1 lg:gap-1 gap-3 ">
-        <div className="lg:col-span-7 lg:col-span-7 md:col-span-5 sm:col-span-5 col-span-5 sticky top-0">
+    <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-4  col-span-4 main_sider_bar">
+      <div className="grid grid-cols-12 bg-white py-3 pe-1 lg:gap-4 gap-3 search_live_tracking">
+        <div className="lg:col-span-5 w-full  md:col-span-5 sm:col-span-5 col-span-6 sticky top-0">
           <div className="grid grid-cols-12">
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1">
               <svg
@@ -132,7 +129,6 @@ const LiveSidebar = ({
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </div>
-
             <div className="lg:col-span-11 md:col-span-11 sm:col-span-10  col-span-11 ms-2">
               <input
                 type="text"
@@ -145,7 +141,7 @@ const LiveSidebar = ({
             </div>
           </div>
         </div>
-        <div className="lg:col-span-5 md:col-span-7  sm:col-span-5 col-span-58  w-full">
+        <div className="flex text-center lg:col-span-7  md:col-span-7  sm:col-span-5 col-span-5  w-full">
           <button
             className="text-center mx-auto text-md font-bold text-green mt-1"
             onClick={toggleLiveCars}
@@ -154,14 +150,12 @@ const LiveSidebar = ({
           </button>
         </div>
       </div>
-
-      <div className="grid grid-cols-2 text-center border-y-2  border-green bg-zoneTabelBg py-4 text-white">
-        <div className="lg:col-span-1">
+      <div className="grid grid-cols-2 text-center border-y-2  border-green bg-zoneTabelBg py-4 text-white vehicle_summary">
+        <div className="lg:col-span-1 w-full">
           <p className="text-md mt-1 text-black font-popins ">
             <b>Vehicle Summary:</b>
           </p>
         </div>
-
         <div className="lg:col-span-1">
           <div className="grid grid-cols-10">
             <div className="lg:col-span-1">
@@ -177,10 +171,8 @@ const LiveSidebar = ({
                 <circle cx="12" cy="12" r="10" />
               </svg>
             </div>
-
             <div className="lg:col-span-1 text-black font-popins font-bold">{`${countMoving}`}</div>
             <div className="lg:col-span-1"></div>
-
             <div className="lg:col-span-1">
               <svg
                 className="h-6 w-3 text-yellow mr-2"
@@ -194,10 +186,8 @@ const LiveSidebar = ({
                 <circle cx="12" cy="12" r="10" />
               </svg>
             </div>
-
             <div className="lg:col-span-1 text-black font-popins font-bold">{`${countPause}`}</div>
             <div className="lg:col-span-1"></div>
-
             <div className="lg:col-span-1">
               <svg
                 className="h-6 w-3 text-red mr-2"
@@ -211,12 +201,10 @@ const LiveSidebar = ({
                 <circle cx="12" cy="12" r="10" />
               </svg>
             </div>
-
             <div className="lg:col-span-1 text-black font-popins font-bold">{`${countParked}`}</div>
           </div>
         </div>
       </div>
-
       <div className="overflow-y-scroll bg-zoneTabelBg" id="scroll_side_bar">
         {filteredData?.map((item: VehicleData, index: any) => {
           return (
@@ -231,25 +219,23 @@ const LiveSidebar = ({
             >
               <div
                 key={item?.IMEI}
-                className="grid lg:grid-cols-3 grid-cols-3 text-center py-2"
+                className="grid lg:grid-cols-12 grid-cols-3 text-center py-2 gap-0"
               >
-                <div className="lg:col-span-1 col-span-1">
-                  <div
-                    className=" font-popins font-bold"
-                    style={{ fontSize: "20px" }}
-                  >
+                <div className="lg:col-span-5 ">
+                  <div className=" font-popins font-bold text-start w-full lg:text-2xl text-1xl">
                     {item.gps.speed === 0 && item.ignition === 0 ? (
-                      <p className="text-red ">{item?.vehicleReg}</p>
+                      <p className="text-red text-start">{item?.vehicleReg}</p>
                     ) : item.gps.speed > 0 && item.ignition === 1 ? (
-                      <p className="text-green">{item?.vehicleReg}</p>
+                      <p className="text-green text-start">
+                        {item?.vehicleReg}
+                      </p>
                     ) : (
                       <p
                         className={`
-                      ${
-                        item?.vehicleStatus == "Hybrid"
-                          ? "text-black"
-                          : "text-yellow "
-                      }
+                      ${item?.vehicleStatus == "Hybrid"
+                            ? "text-black"
+                            : "text-yellow "
+                          }
                       `}
                       >
                         {item?.vehicleReg}
@@ -257,7 +243,7 @@ const LiveSidebar = ({
                     )}
                   </div>
                 </div>
-                <div className="lg:col-span-1 col-span-1">
+                <div className="lg:col-span-4 col-span-1">
                   {item.gps.speed === 0 && item.ignition === 0 ? (
                     <>
                       <button className="text-white bg-red p-1 -mt-1 shadow-lg">
@@ -270,18 +256,16 @@ const LiveSidebar = ({
                     </button>
                   ) : (
                     <button
-                      className={` ${
-                        item?.vehicleStatus == "Hybrid"
-                          ? "bg-white text-black "
-                          : "bg-yellow text-white"
-                      }  p-1 -mt-1 shadow-md`}
+                      className={` ${item?.vehicleStatus == "Hybrid"
+                        ? "bg-white text-black "
+                        : "bg-yellow text-white"
+                        }  p-1 -mt-1 shadow-md`}
                     >
                       {item?.vehicleStatus}
-                      {/* Pause */}
                     </button>
                   )}
                 </div>
-                <div className="lg:col-span-1 col-span-1">
+                <div className="lg:col-span-3 col-span-1">
                   <div className="grid grid-cols-4">
                     <div className="lg:col-span-3 col-span-2 font-bold">
                       {item.gps.speedWithUnitDesc}
@@ -301,12 +285,15 @@ const LiveSidebar = ({
                   </div>
                 </div>
               </div>
-
-              <div className="lg:text-start md:text-start sm:text-start text-center px-4  mt-1  text-md border-b-2 font-bold border-green text-labelColor">
-                <h1 className="font-popins "> {item.timestamp}</h1>
+              <div className="lg:text-start md:text-start sm:text-start text-center   mt-1  text-md border-b-2 font-bold border-green text-labelColor">
+                <h1 className="font-popins text-start"> {item.timestamp}</h1>
                 <p className="text-labelColor">{item.zone}</p>
-                <p>{item.DriverName}</p>
-
+                {/* <p> */}
+                {item.DriverName && (
+                  <p>Driver Name: {item.DriverName.replace("undefine", "")}</p>
+                )}
+                {/* {item.DriverName.replace("undefine", "")} */}
+                {/* </p> */}
                 <span className="text-labelColor">
                   {item?.OSM?.address?.neighbourhood}
                   {item?.OSM?.address?.road}
@@ -317,12 +304,8 @@ const LiveSidebar = ({
             </div>
           );
         })}
-        {/* {zoneList.map((item) => {
-          return <h2>{item.zoneName}</h2>;
-        })} */}
       </div>
     </div>
   );
 };
-
 export default LiveSidebar;
