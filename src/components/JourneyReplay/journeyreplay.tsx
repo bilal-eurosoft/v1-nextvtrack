@@ -238,7 +238,7 @@ export default function journeyReplayComp() {
     }
   };
   console.log("isDynamicTime", isDynamicTime);
-  const pauseTick = () => {
+  const pauseTick = async () => {
     setIsPlaying(false);
     setPauseBtn(false);
     setStopBtn(true);
@@ -246,24 +246,6 @@ export default function journeyReplayComp() {
     setstopVehicle(false);
     setIsPauseColor(true);
     setIsPaused(true);
-
-    // setStopVehicle(true);
-    // setStopVehicle(true)
-
-    // if (carMovementInterval) {
-    //   clearInterval(carMovementInterval);
-    //   setCarMovementInterval(undefined);
-    // }
-  };
-  const stopTick = async () => {
-    setIsPlaying(false);
-    setIsPaused(false);
-    setPlayBtn(true);
-    setPauseBtn(false);
-    setIsPauseColor(false);
-    setStopBtn(false);
-    setstopVehicle(true);
-    setProgressWidth(0);
     if (polylinedata.length > 0) {
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
     }
@@ -281,7 +263,26 @@ export default function journeyReplayComp() {
       );
       setTripAddressData(Dataresponse);
     }
+    // setStopVehicle(true);
+    // setStopVehicle(true)
+
+    // if (carMovementInterval) {
+    //   clearInterval(carMovementInterval);
+    //   setCarMovementInterval(undefined);
+    // }
   };
+  const stopTick = async () => {
+    setIsPlaying(false);
+    setIsPaused(false);
+    setPlayBtn(true);
+    setPauseBtn(false);
+    setIsPauseColor(false);
+    setStopBtn(false);
+    setstopVehicle(true);
+    setProgressWidth(0);
+  };
+
+  console.log("TripAddressData", TripAddressData);
   useEffect(() => {
     if (isPlaying && !isPaused) {
       const totalSteps = TravelHistoryresponse.length - 1;
@@ -1866,7 +1867,7 @@ export default function journeyReplayComp() {
                           onClick={() => handleClickStopCar(item)}
                           className="cursor-pointer"
                         >
-                          <p className="text-gray px-3 py-3 text-sm">
+                          <p className="text-black font-popins px-3 py-3 text-sm">
                             {item?.address}
                           </p>
 

@@ -537,7 +537,7 @@ export default function Reports() {
           )}
           <div className="text-white h-20 flex justify-center items-center">
             <button
-              className={`bg-green py-2 px-5 mb-5
+              className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500
                         ${
                           (Ignitionreport.reportType &&
                             Ignitionreport.VehicleReg &&
@@ -563,7 +563,7 @@ export default function Reports() {
               //   !Ignitionreport.toDateTime
               // }
             >
-              Submits
+              Submit
             </button>
           </div>
         </div>

@@ -300,7 +300,13 @@ const LiveSidebar = ({
               <div className="lg:text-start md:text-start sm:text-start text-center   mt-1  text-md border-b-2 font-bold border-green text-labelColor">
                 <h1 className="font-popins text-start"> {item.timestamp}</h1>
                 <p className="text-labelColor">{item.zone}</p>
-                <p>{item.DriverName}</p>
+                {/* <p> */}
+                {item.DriverName && (
+                  <p>Driver Name: {item.DriverName.replace("undefine", "")}</p>
+                )}
+
+                {/* {item.DriverName.replace("undefine", "")} */}
+                {/* </p> */}
 
                 <span className="text-labelColor">
                   {item?.OSM?.address?.neighbourhood}

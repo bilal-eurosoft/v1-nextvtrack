@@ -413,10 +413,13 @@ export default function DriverProfile() {
   };
 
   return (
-    <div>
-      <Paper sx={{ width: "98%" }} className="bg-green-50 ms-3 mr-3 mt-3">
+    <div className="main_driver">
+      <p className="bg-green px-4 py-1   text-center text-2xl text-white font-bold font-popins drivers_text">
+        Assign Driver
+      </p>
+      <Paper sx={{ width: "98%" }} className="bg-green-50 ms-3 mr-3">
         {/* <Button>Add New Driver</Button> */}
-        <div className="flex lg: justify-center sm:justify-start">
+        <div className="flex lg: justify-center items-center sm:justify-start drivers_add_popup">
           <button
             onClick={handleOpen}
             className="bg-[#00B56C] px-4 py-1 m-5 text-white rounded-md"
@@ -555,84 +558,130 @@ export default function DriverProfile() {
             </Box>
           </Fade>
         </Modal>
-        <TableContainer sx={{ height: 640 }}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center" colSpan={2}>
-                  Driver Number
-                </TableCell>
-                <TableCell align="center" colSpan={2}>
-                  First Name
-                </TableCell>
-                <TableCell align="center" colSpan={2}>
-                  Middle Name
-                </TableCell>
-                <TableCell align="center" colSpan={2}>
-                  Last Name
-                </TableCell>
-                <TableCell align="center" colSpan={2}>
-                  Driver ID
-                </TableCell>
-                <TableCell align="center" colSpan={2}>
-                  Driver Contact
-                </TableCell>
-                <TableCell align="center" colSpan={2}>
-                  Vehicle No
-                </TableCell>
-                <TableCell align="center" colSpan={2}>
-                  Driver Address 1
-                </TableCell>
-                <TableCell align="center" colSpan={2}>
-                  Driver Address 2
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody className="bg-bgLight cursor-pointer  ">
-              {getAllAsignData?.data?.map((row: any) => (
-                <TableRow className="hover:bg-bgHoverTabel w-full">
-                  <TableCell align="center" colSpan={2}>
-                    {row?.DriverDetails?.driverNo}
-                  </TableCell>
-                  <TableCell align="center" colSpan={2}>
-                    {" "}
-                    {row?.DriverDetails?.driverfirstName}
-                  </TableCell>
-
-                  <TableCell align="center" colSpan={2}>
-                    {row?.DriverDetails?.driverMiddleName}
-                  </TableCell>
-                  <TableCell align="center" colSpan={2}>
-                    {row?.DriverDetails?.driverLastName}
-                  </TableCell>
-                  <TableCell align="center" colSpan={2}>
-                    {row?.DriverDetails?.driverIdNo}
-                  </TableCell>
-                  <TableCell>{row?.DriverDetails?.driverIdNo}</TableCell>
-                  <TableCell align="center">
-                    {row?.DriverDetails?.driverContact}
-                  </TableCell>
-                  <TableCell align="center" colSpan={2}>
-                    {row?.vehicleDetails?.vehicleReg}
-                  </TableCell>
-                  <TableCell align="center" colSpan={2}>
-                    {row?.DriverDetails?.driverAddress2}
-                  </TableCell>
-
+        <TableContainer>
+          <div className="table_driver_profile">
+            <Table stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow>
                   <TableCell
                     align="center"
                     colSpan={2}
-                    onClick={() => handleDeasign(row.id)}
+                    id="table_head"
+                    className="font-popins  font-bold text-black"
                   >
-                    Deasign
-                    {/* {row.DriverDetails.driverAddress2} */}
+                    Driver Number
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    colSpan={2}
+                    id="table_head"
+                    className="font-popins  font-bold text-black"
+                  >
+                    First Name
+                  </TableCell>
+                  {/* <TableCell align="center" colSpan={2}>
+                  Middle Name
+                </TableCell> */}
+                  <TableCell
+                    align="center"
+                    colSpan={2}
+                    id="table_head"
+                    className="font-popins  font-bold text-black"
+                  >
+                    Last Name
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    colSpan={2}
+                    id="table_head"
+                    className="font-popins  font-bold text-black"
+                  >
+                    Driver ID
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    colSpan={2}
+                    id="table_head"
+                    className="font-popins  font-bold text-black"
+                  >
+                    Driver Contact.NO
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    colSpan={2}
+                    id="table_head"
+                    className="font-popins  font-bold text-black"
+                  >
+                    Vehicle No
+                  </TableCell>
+                  {/* <TableCell align="center" colSpan={2}>
+                  Driver Address 1
+                </TableCell> */}
+                  <TableCell
+                    align="center"
+                    colSpan={2}
+                    id="table_head"
+                    className="font-popins  font-bold text-black"
+                  >
+                    Driver Address
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    colSpan={2}
+                    id="table_head"
+                    className="font-popins  font-bold text-black"
+                  >
+                    Action
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody className="bg-bgLight cursor-pointer  ">
+                {getAllAsignData?.data?.map((row: any) => (
+                  <TableRow className="hover:bg-bgHoverTabel w-full">
+                    <TableCell align="center" colSpan={2}>
+                      {row?.DriverDetails?.driverNo}
+                    </TableCell>
+                    <TableCell align="center" colSpan={2}>
+                      {" "}
+                      {row?.DriverDetails?.driverfirstName}
+                    </TableCell>
+                    {/* 
+                  <TableCell align="center" colSpan={2}>
+                    {row?.DriverDetails?.driverMiddleName}
+                  </TableCell> */}
+                    <TableCell align="center" colSpan={2}>
+                      {row?.DriverDetails?.driverLastName}
+                    </TableCell>
+                    <TableCell align="center" colSpan={2}>
+                      {row?.DriverDetails?.driverIdNo}
+                    </TableCell>
+                    <TableCell>{row?.DriverDetails?.driverIdNo}</TableCell>
+                    <TableCell align="center">
+                      {row?.DriverDetails?.driverContact}
+                    </TableCell>
+                    <TableCell align="center" colSpan={2}>
+                      {row?.vehicleDetails?.vehicleReg}
+                    </TableCell>
+                    <TableCell align="center" colSpan={2}>
+                      {row?.DriverDetails?.driverAddress1}
+                    </TableCell>
+
+                    <TableCell
+                      align="center"
+                      colSpan={2}
+                      onClick={() => handleDeasign(row.id)}
+                      className="text-green"
+                    >
+                      Deasign
+                      {/* {row.DriverDetails.driverAddress2} */}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </TableContainer>
-        {/* <TablePagination
+        <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
           count={rows.length}
@@ -640,7 +689,8 @@ export default function DriverProfile() {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-        /> */}
+          className="bg-bgLight table_pagination"
+        />
       </Paper>
     </div>
   );

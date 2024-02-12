@@ -528,7 +528,7 @@ export default function DriverProfile() {
         Driver Profile
       </p>
       <div className="grid xl:grid-cols-12 lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-2  p-4  bg-bgLight drivers_add_popup">
-        <div className="xl:col-span-8 lg:col-span-5 md:col-span-6 sm:col-span-1 lg:mb-0  ">
+        <div className="xl:col-span-8 lg:col-span-5 md:col-span-5  sm:col-span-1 lg:mb-0  ">
           <button
             onClick={handleOpen}
             className="bg-green px-4 py-1  text-white rounded-md font-popins font-bold"
@@ -538,24 +538,24 @@ export default function DriverProfile() {
 
           <button
             onClick={() => router.push("http://localhost:3010/ActiveDriver")}
-            className="bg-red px-4 py-1 mx-3  text-white rounded-md font-popins font-bold"
+            className="bg-red px-4 py-1 xl:mx-3 lg:mx-3  text-white rounded-md font-popins font-bold md:mt-2"
           >
             InActive Driver List
           </button>
         </div>
         <div
-          className="xl:col-span-2 lg:col-span-3 md:col-span-4 sm:grid-col-span-1   text-center"
+          className="xl:col-span-2 lg:col-span-3 md:col-span-3 sm:grid-col-span-1   text-center"
           // id="hover_bg"
         >
           <h1
-            style={{ fontSize: "19px" }}
-            className=" font-popins font-bold text-green pt-2"
+            // style={{ fontSize: "19px" }}
+            className=" font-popins font-bold xl:text-xl text-green pt-2"
           >
             Total Active Drivers: {DriverData.length}
           </h1>
         </div>
         <div
-          className="xl:col-span-2  lg:col-span-3 md:col-span-2 sm:grid-col-span-1 border-b border-grayLight  text-center lg:mx-5"
+          className="xl:col-span-2  lg:col-span-3 md:col-span-3 sm:grid-col-span-1 border-b border-grayLight  text-center lg:mx-5"
           id="hover_bg"
         >
           <div className="grid grid-cols-12">
@@ -577,7 +577,7 @@ export default function DriverProfile() {
                 <line x1="21" y1="21" x2="15" y2="15" />
               </svg>
             </div>
-            <div className="xl:col-span-10 lg:col-span-9 md:col-span-9">
+            <div className="xl:col-span-10 lg:col-span-9 md:col-span-9 col-span-9">
               <input
                 type="text"
                 className=" border-none outline-none bg-transparent "
@@ -587,7 +587,7 @@ export default function DriverProfile() {
               />
             </div>
             <div
-              className="col-span-1 cursor-pointer"
+              className="xl:col-span-1 lg:col-span-1 md:col-span-1 cursor-pointer"
               onClick={handleCloseInput}
             >
               <svg
