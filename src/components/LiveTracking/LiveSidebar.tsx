@@ -39,6 +39,8 @@ const LiveSidebar = ({
     setSearchData({ ...searchData, [name]: value });
   };
 
+  console.log("filter", searchData);
+
   useEffect(() => {
     (async function () {
       if (session) {

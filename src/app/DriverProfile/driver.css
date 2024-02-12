@@ -36,6 +36,28 @@
 .popup_style {
   width: 40%;
 }
+.main_driver {
+  height: 93vh;
+  /* background-color: rgb(21, 17, 17); */
+}
+.drivers_text {
+  height: 4vh;
+  border-top: 2px solid white !important;
+}
+.drivers_add_popup {
+  height: 6vh;
+}
+.table_driver_profile {
+  height: 77vh;
+  /* overflow-y: scroll; */
+}
+.table_pagination {
+  height: 6vh;
+}
+::-webkit-scrollbar-thumb {
+  background: #29303b;
+  border-radius: 7px;
+}
 @media (max-width: 1200px) and (min-width: 810px) {
   .popup_style {
     width: 65%;

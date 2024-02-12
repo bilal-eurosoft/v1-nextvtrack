@@ -4,6 +4,7 @@ import DateFnsMomemtUtils from "@date-io/moment";
 import { DatePicker } from "@material-ui/pickers";
 import BlinkingTime from "@/components/General/BlinkingTime";
 import axios from "axios";
+
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -163,6 +164,7 @@ export default function journeyReplayComp() {
   const [speedFactor, setSpeedFactor] = useState<any>(1);
   const [showZones, setShowZones] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isPauseColor, setIsPauseColor] = useState(false);
   const [TripAddressData, setTripAddressData] = useState("");
   const [stopDetails, setStopDetails] = useState<StopAddressData[]>([]);
   const [progressWidth, setProgressWidth] = useState<any>(0);
@@ -175,11 +177,16 @@ export default function journeyReplayComp() {
   const [currentDateDefault, setCurrentDateDefaul] = useState(false);
   const [currentToDateDefault, setCurrentToDateDefaul] = useState(false);
   const [isDynamicTime, setIsDynamicTime] = useState<any>([]);
-  const [stopVehicle, setStopVehicle] = useState(false);
+  const [stopVehicle, setstopVehicle] = useState(false);
   const [loading, setLoading] = useState(false);
   const [currentDates, setCurrentDates] = useState<any>(0);
   const [weekDataGrouped, setweekDataGrouped] = useState(false);
   const [weekData, setWeekData] = useState(false);
+  const [playbtn, setPlayBtn] = useState(false);
+  const [stopbtn, setStopBtn] = useState(false);
+  const [pausebtn, setPauseBtn] = useState(false);
+  const [activeTripColor, setactiveTripColor] = useState<any>("");
+
   const SetViewOnClick = ({ coords }: { coords: any }) => {
     if (isPaused) {
       setMapcenterToFly(null);
@@ -218,6 +225,11 @@ export default function journeyReplayComp() {
     setIsPlaying(true);
     setIsPaused(false);
     setSpeedFactor(1);
+    setPlayBtn(false);
+    setStopBtn(true);
+    setPauseBtn(true);
+    setstopVehicle(false);
+    setIsPauseColor(false);
 
     if (!carMovementInterval) {
       if (currentPositionIndex >= polylinedata.length) {
@@ -225,10 +237,16 @@ export default function journeyReplayComp() {
       }
     }
   };
-
-  const stopTick = () => {
+  console.log("isDynamicTime", isDynamicTime);
+  const pauseTick = () => {
     setIsPlaying(false);
-    setIsPaused(false);
+    setPauseBtn(false);
+    setStopBtn(true);
+    setPlayBtn(true);
+    setstopVehicle(false);
+    setIsPauseColor(true);
+    setIsPaused(true);
+
     // setStopVehicle(true);
     // setStopVehicle(true)
 
@@ -237,9 +255,15 @@ export default function journeyReplayComp() {
     //   setCarMovementInterval(undefined);
     // }
   };
-  const pauseTick = async () => {
+  const stopTick = async () => {
     setIsPlaying(false);
-    setIsPaused(true);
+    setIsPaused(false);
+    setPlayBtn(true);
+    setPauseBtn(false);
+    setIsPauseColor(false);
+    setStopBtn(false);
+    setstopVehicle(true);
+    setProgressWidth(0);
     if (polylinedata.length > 0) {
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
     }
@@ -335,7 +359,7 @@ export default function journeyReplayComp() {
     } else if (isPaused) {
       pauseTick();
     } else {
-      stopTick();
+      // stopTick();
     }
   }, [
     isPlaying,
@@ -636,6 +660,9 @@ export default function journeyReplayComp() {
   ) => {
     setlat(null);
     setlng(null);
+    setPlayBtn(true);
+    setStopBtn(true);
+    setPauseBtn(true);
     try {
       setIsPlaying(false);
       if (session) {
@@ -863,8 +890,10 @@ export default function journeyReplayComp() {
     return false;
   };
 
-  const handleGetItem = (item: any) => {
+  const handleGetItem = (item: any, index: any) => {
     setIsDynamicTime(item);
+    const filterData = dataresponse.find((items: any) => items.id === item.id);
+    setactiveTripColor(filterData);
   };
 
   // const selectOption: Option[] = vehicleList?.map((item: any) => {
@@ -972,7 +1001,10 @@ export default function journeyReplayComp() {
 
   return (
     <>
-      <div style={{ height: "90vh" }}>
+      <div className="main_journey">
+        <p className="bg-green px-4 py-1 border-t text-black text-center text-2xl text-white font-bold journey_heading">
+          Journey Replay
+        </p>
         {/* {groupedData?.map((item: any) => {
           return <div>{item?.EndingPoint}</div>;
         })} */}
@@ -997,8 +1029,8 @@ export default function journeyReplayComp() {
           })}
         </div> */}
         {/* <p className="bg-[#00B56C] px-4 py-1 text-white">JourneyReplay</p> */}
-        <div className="grid xl:grid-cols-10 lg:col-span-10 md:grid-cols-12  gap-5 px-4 text-start pt-4 bg-bgLight">
-          <div className="xl:col-span-1 lg:col-span-2 md:col-span-2  col-span-12 mt-2 ">
+        <div className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-5 px-4 text-start pt-4 bg-bgLight select_box_journey">
+          <div className="xl:col-span-1 lg:col-span-2 md:col-span-2  col-span-12  ">
             {/* <select
               id="select_box"
               className="   h-8 text-gray  w-full  outline-green border border-grayLight px-1 hover:border-green"
@@ -1041,14 +1073,19 @@ export default function journeyReplayComp() {
               name="VehicleReg"
               id="select_box_journey"
               displayEmpty
-              className="h-8 text-black font-popins font-bold w-full outline-green px-1"
+              className={`h-8 text-black font-popins font-bold w-full outline-green p-1 ${
+                getShowRadioButton
+                  ? "pt-2 text-black font-popins font-extrabold"
+                  : "pt-1.5 text-black font-popins  "
+              }`}
+              style={{ color: getShowRadioButton ? "black" : "" }}
             >
               <MenuItem value="" disabled selected hidden className="text-sm">
                 Select Vechile
               </MenuItem>
               {vehicleList?.data?.map((item: DeviceAttach) => (
                 <MenuItem
-                  className="hover:bg-green hover:text-white"
+                  className="hover:bg-green hover:text-white w-full text-start"
                   key={item.id}
                   value={item.vehicleReg}
                 >
@@ -1060,8 +1097,8 @@ export default function journeyReplayComp() {
 
           <div className="xl:col-span-3 lg:col-span-4 md:col-span-6 col-span-12     pt-2">
             {getShowRadioButton ? (
-              <div className="grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-2  -mt-5  grid-cols-2  px-10 gap-5 flex justify-center ">
-                <div className="lg:col-span-5 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0  ">
+              <div className="grid lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-12  -mt-5  grid-cols-12  xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2 flex justify-center ">
+                <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0  ">
                   <label className="text-green">From</label>
                   <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
                     <KeyboardDatePicker
@@ -1075,7 +1112,7 @@ export default function journeyReplayComp() {
                     />
                   </MuiPickersUtilsProvider>
                 </div>
-                <div className="lg:col-span-5 md:col-span-1 sm:col-span-1 col-span-2  ">
+                <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 ">
                   <label className="text-green">To</label>
                   <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
                     <KeyboardDatePicker
@@ -1091,7 +1128,7 @@ export default function journeyReplayComp() {
                     />
                   </MuiPickersUtilsProvider>
                 </div>
-                <div className="lg:col-span-1 ">
+                <div className="lg:col-span-1 col-span-1   ">
                   <button
                     className="text-green ms-5  text-2xl "
                     onClick={() => setShowRadioButton(false)}
@@ -1102,7 +1139,7 @@ export default function journeyReplayComp() {
               </div>
             ) : (
               <div
-                className="grid xl:grid-cols-11 lg:grid-cols-12  md:grid-cols-12 grid-cols-12 mt-1 "
+                className="grid xl:grid-cols-11 lg:grid-cols-12  md:grid-cols-12 grid-cols-12  "
                 // style={{ display: "flex", justifyContent: "start" }}
               >
                 <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2 col-span-3">
@@ -1236,18 +1273,18 @@ export default function journeyReplayComp() {
             )}
           </div>
 
-          <div className=" xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold h-16 flex justify-center items-center">
+          <div className=" xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold lg:-mt-4 xl:-mt-4 flex justify-center items-center">
             {clearMapData ? (
               <button
                 onClick={handleClickClear}
-                className={`bg-green py-2 px-8 mb-5 shadow-md`}
+                className={`bg-green py-2 px-8  rounded-md shadow-md  hover:shadow-gray transition duration-500 c`}
               >
                 Search
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
-                className={`bg-green py-2 px-8 mb-5 shadow-md`}
+                className={`bg-green py-2 px-8  rounded-md shadow-md  hover:shadow-gray transition duration-500 c`}
               >
                 Search
               </button>
@@ -1258,8 +1295,8 @@ export default function journeyReplayComp() {
             <div className="xl:col-span-1 lg:col-span-2 col-span-6  -mt-1 ">
               <div className="grid grid-cols-12  ">
                 <div className="col-span-2">
-                  <Image src={markerA} alt="harshIcon " className="h-6" />
-                  <Image src={markerB} alt="harshIcon " className="h-6 mt-1" />
+                  <Image src={markerA} alt="harshIcon" className="h-6" />
+                  <Image src={markerB} alt="harshIcon" className="h-6 mt-1" />
                 </div>
                 <div className="col-span-10 text-sm">
                   location Start
@@ -1310,9 +1347,9 @@ export default function journeyReplayComp() {
             )}
           </div>
         </div>
-        <div className="grid lg:grid-cols-5  sm:grid-cols-5 md:grid-cols-12 sm:grid-cols-12 grid-cols-1">
+        <div className="grid lg:grid-cols-5  sm:grid-cols-5 md:grid-cols-12 sm:grid-cols-12 grid-cols-1 journey_sidebar">
           <div className="xl:col-span-1 lg:col-span-2 md:col-span-5 sm:col-span-12 col-span-4 ">
-            <p className="bg-green px-4 py-1 text-white font-bold">
+            <p className="bg-green px-4 py-1 text-white font-bold journey_sidebar_text">
               Trips ({dataresponse?.length})
             </p>
             <div
@@ -1320,180 +1357,195 @@ export default function journeyReplayComp() {
               className="overflow-y-scroll overflow-x-hidden bg-bgLight "
             >
               {weekDataGrouped == true
-                ? Object.entries(groupedData).map(([date, items]: any) => (
-                    <div key={date}>
-                      <ul>
-                        <div>
-                          <Accordion className=" hover:bg-tripBg  cursor-pointer">
-                            <AccordionSummary
-                              expandIcon={<ExpandMoreIcon />}
-                              aria-controls="panel1a-content"
-                              id="panel1a-header"
-                            >
-                              <Typography>
-                                <b>
-                                  {date} &nbsp;&nbsp;&nbsp; (x{items.count})
-                                </b>
-                              </Typography>
-                            </AccordionSummary>
-                            {items?.trips?.map((item: any, index: any) => (
-                              <AccordionDetails
-                                key={index}
-                                onClick={() =>
-                                  handleDivClick(
-                                    item.fromDateTime,
-                                    item.toDateTime
-                                  )
-                                }
+                ? Object.entries(groupedData).map(
+                    ([date, items]: any, index) => (
+                      <div key={date}>
+                        <ul>
+                          <div>
+                            <Accordion className=" hover:bg-tripBg  cursor-pointer">
+                              <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="panel1a-content"
+                                id="panel1a-header"
                               >
                                 <Typography>
-                                  <div
-                                    className="py-5 hover:bg-tripBg  cursor-pointer"
-                                    onClick={() => handleGetItem(item)}
-                                  >
-                                    <div className="grid grid-cols-12 gap-10">
-                                      <div className="col-span-1">
-                                        <svg
-                                          className="h-8 w-8 text-green"
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          strokeWidth="2"
-                                          stroke="currentColor"
-                                          fill="none"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                        >
-                                          {" "}
-                                          <path
-                                            stroke="none"
-                                            d="M0 0h24v24H0z"
-                                          />{" "}
-                                          <circle cx="7" cy="17" r="2" />{" "}
-                                          <circle cx="17" cy="17" r="2" />{" "}
-                                          <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" />
-                                        </svg>
-                                      </div>
-                                      <div className="col-span-10 ">
-                                        <p className="text-start font-bold text-sm text-gray">
-                                          Duration: {item.TripDurationHr}{" "}
-                                          Hour(s) {item.TripDurationMins}{" "}
-                                          Minute(s)
-                                        </p>
-                                        <p className=" text-green text-start font-bold text-sm">
-                                          {" "}
-                                          Distance: {item.TotalDistance}
-                                        </p>
-                                      </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-12 gap-10 mt-5">
-                                      <div className="col-span-1">
-                                        <svg
-                                          className="h-8 w-8 text-green"
-                                          fill="none"
-                                          viewBox="0 0 24 24"
-                                          stroke="currentColor"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                          />
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                          />
-                                        </svg>
-                                        <div className=" border-l-2 h-10 border-green  mx-4 my-3"></div>
-                                      </div>
-                                      <div className="col-span-8 ">
-                                        <p className="text-start font-bold text-sm text-labelColor">
-                                          <span className="text-green">
-                                            {" "}
-                                            Location Start:dd
-                                          </span>{" "}
-                                          <br></br>{" "}
-                                          <span className="text-gray">
-                                            {item.StartingPoint}
-                                          </span>
-                                        </p>
-                                        <p className=" text-gray text-start font-bold text-sm">
-                                          {" "}
-                                          Trip Start: {
-                                            item.TripStartDateLabel
-                                          }{" "}
-                                          &nbsp;
-                                          {item.TripStartTimeLabel}
-                                        </p>
-                                      </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-12 gap-10">
-                                      <div className="col-span-1">
-                                        <svg
-                                          className="h-8 w-8 text-green"
-                                          fill="none"
-                                          viewBox="0 0 24 24"
-                                          stroke="currentColor"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                          />
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                          />
-                                        </svg>
-                                      </div>
-                                      <div className="col-span-8 ">
-                                        <div className="text-start font-bold text-sm text-labelColor">
-                                          <span className="text-green">
-                                            {" "}
-                                            Location End:
-                                          </span>{" "}
-                                          <br></br>
-                                          <span className="text-gray">
-                                            {" "}
-                                            {item.EndingPoint}
-                                          </span>
-                                        </div>
-                                        <p className=" text-gray text-start font-bold text-sm">
-                                          {" "}
-                                          Trip End:{item.TripEndDateLabel}{" "}
-                                          &nbsp;
-                                          {item.TripEndTimeLabel}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
+                                  <b>
+                                    {date} &nbsp;&nbsp;&nbsp; (x{items.count})
+                                  </b>
                                 </Typography>
-                              </AccordionDetails>
-                            ))}
-                          </Accordion>
-                        </div>
-                      </ul>
-                    </div>
-                  ))
+                              </AccordionSummary>
+                              {items?.trips?.map((item: any, index: any) => (
+                                <AccordionDetails
+                                  key={index}
+                                  onClick={() =>
+                                    handleDivClick(
+                                      item.fromDateTime,
+                                      item.toDateTime
+                                    )
+                                  }
+                                >
+                                  <Typography>
+                                    <div
+                                      className="py-5 hover:bg-tripBg  cursor-pointer"
+                                      onClick={() => handleGetItem(item, index)}
+                                      style={{
+                                        backgroundColor:
+                                          activeTripColor.id === item.id
+                                            ? "rgba(0, 0, 0, 0.08)"
+                                            : "",
+                                      }}
+                                    >
+                                      <div className="grid grid-cols-12 gap-10">
+                                        <div className="col-span-1">
+                                          <svg
+                                            className="h-8 w-8 text-green"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth="2"
+                                            stroke="currentColor"
+                                            fill="none"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          >
+                                            {" "}
+                                            <path
+                                              stroke="none"
+                                              d="M0 0h24v24H0z"
+                                            />{" "}
+                                            <circle cx="7" cy="17" r="2" />{" "}
+                                            <circle cx="17" cy="17" r="2" />{" "}
+                                            <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" />
+                                          </svg>
+                                        </div>
+                                        <div className="col-span-10 ">
+                                          <p className="text-start text-md   text-black font-popins font-semibold">
+                                            Duration: {item.TripDurationHr}{" "}
+                                            Hour(s) {item.TripDurationMins}{" "}
+                                            Minute(s)
+                                          </p>
+                                          <p className=" text-green text-start font-popins font-semibold text-sm">
+                                            {" "}
+                                            Distance: {item.TotalDistance}
+                                          </p>
+                                        </div>
+                                      </div>
+
+                                      <div className="grid grid-cols-12 gap-10 mt-5">
+                                        <div className="col-span-1">
+                                          <svg
+                                            className="h-8 w-8 text-green"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                          >
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth="2"
+                                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                            />
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth="2"
+                                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                            />
+                                          </svg>
+                                          <div className=" border-l-2 h-10 border-green  mx-4 my-3"></div>
+                                        </div>
+                                        <div className="col-span-8 ">
+                                          <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
+                                            <p className="text-green ">
+                                              {" "}
+                                              Location Start:
+                                            </p>{" "}
+                                            <p className="text-black text-sm font-popins">
+                                              {item.StartingPoint}
+                                            </p>
+                                          </p>
+                                          <p className=" text-black text-start font-semibold text-sm font-popins">
+                                            {" "}
+                                            Trip Start:{" "}
+                                            {item.TripStartDateLabel} &nbsp;
+                                            {item.TripStartTimeLabel}
+                                          </p>
+                                        </div>
+                                      </div>
+
+                                      <div className="grid grid-cols-12 gap-10">
+                                        <div className="col-span-1">
+                                          <svg
+                                            className="h-8 w-8 text-green"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                          >
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth="2"
+                                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                            />
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth="2"
+                                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                            />
+                                          </svg>
+                                        </div>
+                                        <div className="col-span-8 ">
+                                          <div className="text-start font-bold text-md text-labelColor">
+                                            <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
+                                              <span className="text-green">
+                                                {" "}
+                                                Location End:
+                                              </span>{" "}
+                                              <br></br>
+                                              <p className="text-black text-sm font-popins">
+                                                {" "}
+                                                {item.EndingPoint}
+                                              </p>
+                                            </p>
+                                          </div>
+                                          <p className=" text-black text-start font-semibold text-sm">
+                                            {" "}
+                                            Trip End:{
+                                              item.TripEndDateLabel
+                                            }{" "}
+                                            &nbsp;
+                                            {item.TripEndTimeLabel}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </Typography>
+                                </AccordionDetails>
+                              ))}
+                            </Accordion>
+                          </div>
+                        </ul>
+                      </div>
+                    )
+                  )
                 : dataresponse?.map((item: TripsByBucket, index: number) => (
                     <button
                       key={index}
-                      className=" my-2 "
+                      // className=" my-2 "
                       onClick={() =>
                         handleDivClick(item.fromDateTime, item.toDateTime)
                       }
                     >
                       <div
-                        className="py-5 hover:bg-tripBg px-5 cursor-pointer"
-                        onClick={() => handleGetItem(item)}
+                        className="py-5 hover:bg-tripBg px-5 cursor-pointer border-b"
+                        onClick={() => handleGetItem(item, index)}
+                        style={{
+                          backgroundColor:
+                            activeTripColor.id === item.id
+                              ? "rgba(0, 0, 0, 0.08)"
+                              : "",
+                        }}
                       >
                         <div className="grid grid-cols-12 gap-10">
                           <div className="col-span-1">
@@ -1516,11 +1568,11 @@ export default function journeyReplayComp() {
                             </svg>
                           </div>
                           <div className="col-span-10 ">
-                            <p className="text-start font-bold text-sm text-gray">
+                            <p className="text-start text-md   text-black font-popins font-semibold">
                               Duration: {item.TripDurationHr} Hour(s){" "}
                               {item.TripDurationMins} Minute(s)
                             </p>
-                            <p className=" text-green text-start font-bold text-sm">
+                            <p className=" text-green text-start font-popins font-semibold text-sm">
                               {" "}
                               Distance: {item.TotalDistance}
                             </p>
@@ -1551,17 +1603,14 @@ export default function journeyReplayComp() {
                             <div className=" border-l-2 h-10 border-green  mx-4 my-3"></div>
                           </div>
                           <div className="col-span-8 ">
-                            <p className="text-start font-bold text-sm lg:mr-0 md:mr-10  text-labelColor">
-                              <span className="text-green">
-                                {" "}
-                                Location Start:
-                              </span>{" "}
-                              <br></br>{" "}
-                              <span className="text-gray">
+                            <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
+                              <p className="text-green "> Location Start:</p>{" "}
+                              {/* <br></br>{" "} */}
+                              <p className="text-black text-sm font-popins">
                                 {item.StartingPoint}
-                              </span>
+                              </p>
                             </p>
-                            <p className=" text-gray text-start font-bold text-sm lg:mr-0 md:mr-10">
+                            <p className=" text-black font-popins text-start font-semibold text-sm lg:mr-0 md:mr-10">
                               {" "}
                               Trip Start: {item.TripStartDateLabel} &nbsp;
                               {item.TripStartTimeLabel}
@@ -1592,15 +1641,15 @@ export default function journeyReplayComp() {
                             </svg>
                           </div>
                           <div className="col-span-8 ">
-                            <p className="text-start lg:mr-0 md:mr-10 font-bold text-sm text-labelColor">
+                            <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
                               <span className="text-green"> Location End:</span>{" "}
                               <br></br>
-                              <span className="text-gray">
+                              <p className="text-black text-sm font-popins">
                                 {" "}
                                 {item.EndingPoint}
-                              </span>
+                              </p>
                             </p>
-                            <p className=" text-gray lg:mr-0 md:mr-10 text-start font-bold text-sm">
+                            <p className=" text-black  lg:mr-0 md:mr-10 text-start font-bold text-sm">
                               {" "}
                               Trip End:{item.TripEndDateLabel} &nbsp;
                               {item.TripEndTimeLabel}
@@ -1613,7 +1662,7 @@ export default function journeyReplayComp() {
             </div>
           </div>
           <div
-            className="xl:col-span-4 lg:col-span-3 md:col-span-7 sm:col-span-12 col-span-4"
+            className="xl:col-span-4 lg:col-span-3 md:col-span-7 sm:col-span-12 col-span-4 journey_map"
             style={{ position: "relative" }}
           >
             <div>
@@ -1622,8 +1671,7 @@ export default function journeyReplayComp() {
                   id="map"
                   zoom={zoom}
                   center={mapcenter}
-                  className="z-0"
-                  style={{ height: "calc(90vh - 100px)" }}
+                  className="z-0 journey_map"
                 >
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -1759,8 +1807,11 @@ export default function journeyReplayComp() {
 
             <div className="absolute lg:top-4 lg:left-20 lg:right-5 left-12 top-6 right-2 grid lg:grid-cols-10 md:grid-cols-10 sm:grid-cols-10 grid-cols-10 lg:mt-0  ">
               <div className="xl:col-span-2 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-5">
-                <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg">
-                  <div className="lg:col-span-10  md:col-span-10 sm:col-span-10 col-span-11">
+                <div
+                  className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg  rounded-md cursor-pointer"
+                  onClick={handleShowDetails}
+                >
+                  <div className="lg:col-span-11  md:col-span-10 sm:col-span-10 col-span-11">
                     <p className="text-white lg:px-3 ps-1 text-lg">
                       Stop Details ({stops.length})
                     </p>
@@ -1777,7 +1828,6 @@ export default function journeyReplayComp() {
                         fill="none"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        onClick={handleShowDetails}
                       >
                         {" "}
                         <path stroke="none" d="M0 0h24v24H0z" />{" "}
@@ -1794,7 +1844,7 @@ export default function journeyReplayComp() {
                         fill="none"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        onClick={handleShowDetails}
+                        // onClick={handleShowDetails}
                       >
                         {" "}
                         <path stroke="none" d="M0 0h24v24H0z" />{" "}
@@ -1847,27 +1897,33 @@ export default function journeyReplayComp() {
                 )}
               </div>
 
-              <div className="xl:col-span-7 lg:col-span-4 md:col-span-2 sm:col-span-4 "></div>
+              <div
+                className="xl:col-span-7 lg:col-span-3 md:col-span-2 sm:col-span-2
+              col-span-1 "
+              ></div>
 
-              <div className="xl:col-span-1 lg:col-span-2  md:col-span-3 sm-col-span-2 col-span-4 text-end  ">
+              <div className="xl:col-span-1 lg:col-span-3  md:col-span-3 sm-col-span-3 col-span-4 text-end  ">
                 <div
-                  className="grid xl:grid-cols-3  grid-cols-5 sm:grid-cols-3 bg-bgLight  py-3 shadow-lg"
+                  className="grid xl:grid-cols-12 lg:grid-cols-12  md:grid-cols-12   sm:grid-cols-12 grid-cols-12 bg-bgLight  py-3 shadow-lg rounded-md"
                   onClick={handleZoneClick}
                 >
-                  <div className="col-span-1  text-center ">
+                  <div className="xl:col-span-1"></div>
+                  <div className="xl:col-span-2 lg:col-span-2 md:col-span-1 sm:col-span-1  col-span-1 text-center ">
                     <input
                       type="checkbox"
                       onChange={handleChangeChecked}
                       checked={getCheckedInput}
-                      // style={{ accentColor: "green" }}
+                      style={{ accentColor: "green" }}
                     />
                   </div>
-                  <div className="lg:col-span-2 sm:col-span-2 col-span-4  lg:-ms-5">
-                    <button className="text-sm" onClick={handleChangeChecked}>
-                      <h1 className="xl:-ms-32 lg:-ms-24  sm:-ms-32 -ms-24">
-                        {" "}
-                        Show zones
-                      </h1>
+                  <div className="xl:col-span-8 lg:col-span-7 md:col-span-9 sm:col-span-9 col-span-9  ">
+                    <button
+                      className="text-sm font-popins font-bold"
+                      onClick={handleChangeChecked}
+                    >
+                      {/* <h1 className="xl:-ms-32 lg:-ms-24  sm:-ms-32 -ms-24 font-popins font-semibold"> */}{" "}
+                      Show zones
+                      {/* </h1> */}
                     </button>
                   </div>
                 </div>
@@ -1956,10 +2012,10 @@ export default function journeyReplayComp() {
               //   right: "5%",
               //   bottom: "0%",
               // }}
-              className="absolute xl:left-56 lg:left-10 xl:right-20 lg:right-10 xl:bottom-0 lg:bottom-24 md:bottom-8 bottom-2  left-1 right-3"
+              className="absolute xl:left-56 lg:left-10 xl:right-20 lg:right-10 xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8  bottom-2  left-1 right-3"
             >
               <div className="grid xl:grid-cols-7 lg:grid-cols-12 md:grid-12 grid-cols-12 lg:gap-5 gap-2 ">
-                <div className="xl:col-span-1 lg:col-span-3 md:col-span-4 col-span-4  ">
+                <div className="xl:col-span-1 lg:col-span-4 md:col-span-4 col-span-4  ">
                   <div className="bg-bgPlatBtn rounded-md">
                     <div className="lg:text-xl text-white font-medium text-center  py-2 text-md mx-1">
                       <BlinkingTime timezone={session?.timezone} />
@@ -1968,18 +2024,24 @@ export default function journeyReplayComp() {
                     <div className=" border-t border-white my-1 lg:w-32 mx-2"></div>
                     <div className="mt-3 pb-3 ms-1">
                       <Tooltip content="Pause" className="bg-black">
-                        <button onClick={stopTick}>
+                        <button
+                          onClick={() => pausebtn && pauseTick()}
+                          className={`${
+                            pausebtn ? "cursor-pointer" : "cursor-not-allowed"
+                          }`}
+                        >
                           <svg
                             className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6  mx-1 "
-                            style={{
-                              color: stopVehicle === true ? "gray" : "white",
-                            }}
+                            // style={{
+                            //   color: stopVehicle === true ? "gray" : "white",
+                            // }}
+                            style={{ color: isPauseColor ? "green" : "white" }}
+                            fill={isPauseColor ? "none" : "none"}
                             width="24"
                             height="24"
                             viewBox="0 0 24 24"
                             strokeWidth="2"
                             stroke="currentColor"
-                            fill="none"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                           >
@@ -1992,7 +2054,12 @@ export default function journeyReplayComp() {
                         </button>
                       </Tooltip>
                       <Tooltip content="Play" className="bg-black">
-                        <button onClick={tick}>
+                        <button
+                          onClick={() => playbtn && tick()}
+                          className={`${
+                            playbtn ? "cursor-pointer" : "cursor-not-allowed"
+                          }`}
+                        >
                           <svg
                             className="h-5 w-5  lg:mx-2  md:mx-3 sm:mx-3 mx-1"
                             viewBox="0 0 24 24"
@@ -2009,12 +2076,17 @@ export default function journeyReplayComp() {
                         </button>
                       </Tooltip>
                       <Tooltip content="Stop" className="bg-black">
-                        <button onClick={pauseTick}>
+                        <button
+                          onClick={() => stopbtn && stopTick()}
+                          className={`${
+                            stopbtn ? "cursor-pointer" : "cursor-not-allowed"
+                          }`}
+                        >
                           <svg
-                            className="h-4   w-4  lg:mx-2 md:mx-3 sm:mx-3 mx-1"
+                            className="h-4 w-4 lg:mx-2 md:mx-3 sm:mx-3 mx-1"
                             width="24"
-                            style={{ color: isPaused ? "green" : "white" }}
-                            fill={isPaused ? "green" : "white"}
+                            style={{ color: stopVehicle ? "green" : "white" }}
+                            fill={stopVehicle ? "green" : "white"}
                             height="24"
                             viewBox="0 0 24 24"
                             strokeWidth="2"
@@ -2034,8 +2106,8 @@ export default function journeyReplayComp() {
                 <div className="xl:col-span-4 lg:col-span-8 col-span-8   ">
                   <div className="grid lg:grid-cols-12 grid-cols-12 gap-1 lg:py-5 py-2 mt-8 pt-4 lg:pt-8 rounded-md  mx-2 px-5 bg-white">
                     <div
-                      className="lg:col-span-11 col-span-10"
-                      style={{ height: "4vh" }}
+                      className="lg:col-span-10 col-span-10"
+                      // style={{ height: "4vh" }}
                     >
                       <Slider
                         value={progressWidth}

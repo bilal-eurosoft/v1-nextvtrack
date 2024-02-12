@@ -368,11 +368,11 @@ export default function EditZoneComp() {
 
   return (
     <>
-      <div className="  shadow-lg bg-bgLight h-5/6  border-t text-white  ">
-        <p className="bg-green px-4 py-1 text-black text-center text-2xl text-white font-bold ">
+      <div className="  shadow-lg bg-bgLight  border-t text-white edit_zone_main  ">
+        <p className="bg-green px-4 py-1 text-black text-center text-2xl text-white font-bold edit_zone_text ">
           Edit Zone
         </p>
-        <div className="grid lg:grid-cols-6 sm:grid-cols-5 md:grid-cols-6 grid-cols-1 pt-8 ">
+        <div className="grid lg:grid-cols-6 sm:grid-cols-5 md:grid-cols-6 grid-cols-1  pt-8">
           <div className=" xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-4 col-span-4 bg-gray-200 mx-5">
             <form onSubmit={handleSave}>
               <label className="text-black text-md w-full font-popins font-medium">
@@ -439,7 +439,11 @@ export default function EditZoneComp() {
                 required
               />
               <div className="flex justify-center">
-                <div className="grid lg:grid-cols-2 grid-cols-2 bg-green w-24">
+                <div
+                  className="grid lg:grid-cols-2 grid-cols-2 bg-green w-24
+                rounded-md shadow-md  hover:shadow-gray transition duration-50
+                "
+                >
                   <div className="col-span-1">
                     <svg
                       className="h-10 py-3 w-full text-white"
@@ -469,18 +473,20 @@ export default function EditZoneComp() {
             </form>
           </div>
 
-          <div className="xl:col-span-5 lg:col-span-4 md:col-span-4 sm:col-span-5 col-span-4 mx-3 ">
-            <label className="text-black text-md font-popins font-medium">
-              please enter text to search{" "}
-            </label>
-            <input
-              type="text"
-              className="  block py-2 px-0 w-11/12 text-sm text-labelColor bg-white-10 border border-grayLight appearance-none px-3 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-green mb-5"
-              placeholder="Search"
-              required
-            />
+          <div className="xl:col-span-5 lg:col-span-4 md:col-span-4 sm:col-span-5 col-span-4 mx-3 edit-zone_map_child">
+            <div className="edit_zone_map_text">
+              <label className="text-black text-md font-popins font-medium">
+                please enter text to search{" "}
+              </label>
+              <input
+                type="text"
+                className="  block py-2 px-0 w-11/12 text-sm text-labelColor bg-white-10 border border-grayLight appearance-none px-3 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-green mb-5"
+                placeholder="Search"
+                required
+              />
+            </div>
 
-            <div className="grid lg:grid-cols-3 grid-cols-3 bg-green w-24">
+            <div className="grid lg:grid-cols-3 grid-cols-3 bg-green w-24 edit_zone_map_btn rounded-md shadow-md  hover:shadow-gray transition duration-500">
               <div className="col-span-1">
                 <svg
                   className="h-10 py-3 w-full text-white"
@@ -498,7 +504,7 @@ export default function EditZoneComp() {
               </div>
               <div className="col-span-2">
                 <button
-                  className="text-white font-popins font-bold h-10 bg-[#00B56C]    "
+                  className="text-white font-popins font-bold pt-2      "
                   type="submit"
                   onClick={handleredraw}
                 >
@@ -515,8 +521,7 @@ export default function EditZoneComp() {
                   <MapContainer
                     zoom={zoom}
                     center={mapcenter}
-                    className="z-10 "
-                    style={{ height: "45em" }}
+                    className="z-10 edit_zone_map_main"
                   >
                     <TileLayer
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

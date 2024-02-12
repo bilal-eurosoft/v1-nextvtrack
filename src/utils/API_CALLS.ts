@@ -393,9 +393,11 @@ export async function postDriverDataByClientId({
   newformdata,
 }: {
   token: string;
-  newformdata: zonelistType;
+  newformdata: any;
 }) {
   try {
+    const { driverRFIDCardNumber } = newformdata;
+    delete newformdata.driverRFIDCardNumbers;
     const response = await fetch(`${URL}/v2/Driver`, {
       method: "POST",
       headers: {
@@ -406,8 +408,35 @@ export async function postDriverDataByClientId({
       body: JSON.stringify(newformdata),
     });
     if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
+      throw new Error("Failed to add data from the API");
     }
+    const data = await response.json();
+    await AssignRfidtodriver(token, {
+      DriverId: data.data._id,
+      RFIDid: driverRFIDCardNumber,
+    });
+
+    return data;
+  } catch (error) {
+    console.log("Error fetching data", error);
+    return [];
+  }
+}
+export async function AssignRfidtodriver(token: any, payload: any) {
+  try {
+    const response = await fetch(`${URL}/AssignRfidToDriver`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to Assign rfid to driver");
+    }
+
     const data = await response.json();
 
     return data;
@@ -416,7 +445,6 @@ export async function postDriverDataByClientId({
     return [];
   }
 }
-
 export async function postDriverDataAssignByClientId({
   token,
   newformdata,

@@ -12,4 +12,15 @@
   padding-right: 16px;
   min-height: 56px;
   background-color: #00b56c;
+  height: 2vh;
+}
+
+#nav_height {
+  height: 7vh;
+}
+
+@media (max-width: 600px) {
+  #nav_height {
+    height: auto;
+  }
 }

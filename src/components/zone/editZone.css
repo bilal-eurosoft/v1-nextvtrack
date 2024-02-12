@@ -12,3 +12,76 @@
 .Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: #00b56c !important;
 }
+.edit_zone_main {
+  height: 93vh;
+}
+.edit_zone_text {
+  height: 4vh;
+}
+/* .edit_zone_map {
+  height: 88vh;
+} */
+.edit-zone_map_child {
+  height: 85vh;
+}
+.edit_zone_map_text {
+  height: 8vh;
+}
+.edit_zone_map_btn {
+  height: 3.5vh;
+}
+.edit_zone_map_main {
+  height: 70.5vh;
+}
+@media (max-width: 1000px) and (min-width: 750px) {
+  .edit_zone_main {
+    height: 87vh;
+  }
+  .edit_zone_text {
+    height: 4vh;
+  }
+  /* .edit_zone_map {
+    height: 88vh;
+  } */
+  .edit-zone_map_child {
+    height: 80vh;
+  }
+  .edit_zone_map_text {
+    height: 8vh;
+  }
+  .edit_zone_map_btn {
+    height: 3.7vh;
+  }
+  .edit_zone_map_main {
+    height: 65.5vh;
+  }
+}
+@media (max-width: 740px) {
+  .edit_zone_main {
+    height: 87vh;
+  }
+  .edit_zone_text {
+    height: 6vh !important;
+  }
+  /* .edit_zone_map {
+    height: 88vh;
+  } */
+  .edit-zone_map_child {
+    height: auto;
+  }
+  .edit_zone_map_text {
+    height: auto;
+  }
+  .edit_zone_map_btn {
+    height: auto;
+  }
+  .edit_zone_map_main {
+    height: 65.5vh;
+  }
+}
+.add_zone_main {
+  height: 93vh;
+}
+.add_zone_text {
+  height: 4vh;
+}
