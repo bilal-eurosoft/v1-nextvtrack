@@ -27,8 +27,8 @@ import {
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 
 const style = {
   position: "absolute" as "absolute",
@@ -96,6 +96,7 @@ export default function DriverProfile() {
   });
 
   const handleEdit = (id: any) => {
+    setShowCardNumber(true);
     setOpenEdit(true);
     const filterData: any = DriverData.find((item: any) => item.id == id);
     setSelectedData(filterData);
@@ -139,6 +140,10 @@ export default function DriverProfile() {
 
   const handleOpen = () => {
     setOpen(true);
+    RFid();
+  };
+  const AddDriverRfid = () => {
+    setShowCardNumber(!showCardNumber);
   };
 
   // const lastIndex = rowsPerPages * currentPage;
@@ -219,6 +224,40 @@ export default function DriverProfile() {
           postDriverDataByClientId({
             token: session?.accessToken,
             newformdata: newformdata,
+          }),
+          {
+            loading: "Saving data...",
+            success: "Data saved successfully!",
+            error: "Error saving data. Please try again.",
+          },
+          {
+            style: {
+              border: "1px solid #00B56C",
+              padding: "16px",
+              color: "#1A202C",
+            },
+            success: {
+              duration: 2000,
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            },
+            error: {
+              duration: 2000,
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            },
+          }
+        );
+        const response2 = await toast.promise(
+          AssignRfidtodriver(session?.accessToken, {
+            DriverId: selectedData.id,
+            RFIDid: getRfid?.find((i: any) => {
+              return i.RFIDCardNo === selectedData.driverRFIDCardNumber;
+            })._id,
           }),
           {
             loading: "Saving data...",
@@ -395,7 +434,7 @@ export default function DriverProfile() {
       driverAddress1: data.driverAddress1,
       driverAddress2: data.driverAddress2,
       driverRFIDCardNumber: data.driverRFIDCardNumber,
-      isAvailable: data.isAvailable,
+      isAvailable: false,
       isDeleted: true,
     };
 
@@ -637,7 +676,7 @@ export default function DriverProfile() {
                     Add Driver
                   </p>
                 </div>
-                <div className="col-span-1" onClick={handleClose}>
+                <div className="col-span-1 ms-5" onClick={handleClose}>
                   <svg
                     className="h-6 w-6 text-labelColor mt-3 cursor-pointer"
                     width="24"
@@ -730,16 +769,14 @@ export default function DriverProfile() {
                       // style={{ display: "flex", justifyContent: "start" }}
                     >
                       <div className="lg:col-span-3 col-span-1 w-full ">
-                        <label className="text-sm text-black font-popins font-medium ">
-                          RFID
-                          <input
-                            type="checkbox"
-                            onClick={() => setShowCardNumber(!showCardNumber)}
-                            style={{ accentColor: "green" }}
-                            className="border border-green  outline-green  cursor-pointer  ms-2 "
-                            checked={showCardNumber ? true : false}
-                          />
-                        </label>
+                        <label className="text-sm text-black font-popins font-medium "></label>
+                        RFID
+                        <input
+                          type="checkbox"
+                          onClick={AddDriverRfid}
+                          style={{ accentColor: "green" }}
+                          className="border border-green outline-green cursor-pointer ms-2"
+                        />
                       </div>
                       {showCardNumber ? (
                         <div
@@ -765,11 +802,16 @@ export default function DriverProfile() {
                             value={selectedRFID}
                             style={{ width: "100%" }}
                             className="h-6 "
+                            displayEmpty
                           >
+                            <MenuItem value="" selected hidden disabled>
+                              Select RFID
+                            </MenuItem>
                             {getRfid.map((item: any) => (
                               <MenuItem
                                 key={item?.RFIDCardNo}
                                 value={item?._id}
+                                className="hover:bg-green hover:text-white"
                               >
                                 {item?.RFIDCardNo}
                               </MenuItem>
@@ -802,7 +844,7 @@ export default function DriverProfile() {
                   </div>
                   <div className="lg:col-span-2 md:col-span-2 col-span-4  px-3 lg:-mt-0 md:-mt-0 sm:-mt-0  -mt-8">
                     <button
-                      className="bg-green text-white font-bold font-popins  w-full  py-2 rounded-sm"
+                      className="bg-green text-white font-bold font-popins  w-full  py-2  rounded-md shadow-md  hover:shadow-gray transition duration-500"
                       type="submit"
                       // disabled={}
                       style={{
@@ -861,7 +903,7 @@ export default function DriverProfile() {
                   </p>
                 </div>
                 <div
-                  className="col-span-1 cursor-pointer"
+                  className="col-span-1 ms-5 cursor-pointer"
                   onClick={handleCloseEdit}
                 >
                   <svg
@@ -998,12 +1040,13 @@ export default function DriverProfile() {
                     <br></br>
                     <textarea
                       value={singleFormData.driverAddress1}
-                      className="w-full border border-grayLight  outline-green hover:border-green w-full transition duration-700 ease-in-out h-16 "
+                      className="w-full border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out h-16 "
                       onChange={(e: any) =>
                         handleEditDriver("driverAddress1", e)
                       }
                     ></textarea>
                   </div>
+
                   {/* <div className="col-span-4">
                       <div
                         className="grid grid-cols-12   gap-4 "
@@ -1047,14 +1090,14 @@ export default function DriverProfile() {
                       <div className="lg:col-span-3 col-span-1 w-full ">
                         <label className="text-sm text-black font-popins font-medium ">
                           RFID
-                          <input
-                            type="checkbox"
-                            onClick={() => setShowCardNumber(!showCardNumber)}
-                            style={{ accentColor: "green" }}
-                            className="border border-green  outline-green  cursor-pointer  ms-2 "
-                            checked={showCardNumber ? false : true}
-                          />
                         </label>
+                        <input
+                          type="checkbox"
+                          onClick={() => setShowCardNumber(!showCardNumber)}
+                          style={{ accentColor: "green" }}
+                          className="border border-green  outline-green  cursor-pointer  ms-2 "
+                          checked={showCardNumber ? true : false}
+                        />
                       </div>
                       {showCardNumber ? (
                         <div
@@ -1090,7 +1133,12 @@ export default function DriverProfile() {
                                 onChange={(e: any) =>
                                   handleEditDriver("driverRFIDCardNumber", e)
                                 }
-                                style={{ width: "100%" }}
+                                style={{
+                                  width: "100%",
+                                  padding: "1%",
+                                  borderRadius: "5px",
+                                  border: "1px solid lightgray",
+                                }}
                                 className="h-6 text-black border  w-full  outline-green"
                               >
                                 <option
@@ -1155,7 +1203,7 @@ export default function DriverProfile() {
                       ></textarea> */}
                     <button
                       style={{ float: "right" }}
-                      className="bg-green text-white font-popins w-full font-bold lg:mt-12 mt-6  py-2 rounded-sm"
+                      className="bg-green text-white font-popins w-full font-bold lg:mt-12 mt-6  py-2 rounded-md shadow-md  hover:shadow-gray transition duration-500"
                       type="submit"
                     >
                       Submit
@@ -1279,7 +1327,7 @@ export default function DriverProfile() {
             <TableBody className="bg-bgLight cursor-pointer ">
               {result
                 .filter((row: any) => row.isDeleted === false)
-                ?.map((row: any, index) => (
+                ?.map((row: any, index: any) => (
                   <TableRow className="hover:bg-bgHoverTabel text-black">
                     <TableCell
                       align="center"
@@ -1368,7 +1416,13 @@ export default function DriverProfile() {
                       colSpan={2}
                       className="table_text"
                     >
-                      {row.isAvailable === true ? (
+                      <button
+                        className="text-white bg-green p-1 rounded-md shadow-md hover:shadow-gray transition duration-500 "
+                        onClick={() => handleEdit(row.id)}
+                      >
+                        <BorderColorIcon className="" />
+                      </button>
+                      {/* {row.isAvailable === false ? (
                         <button
                           className="text-white bg-green p-1 rounded-md shadow-md hover:shadow-gray transition duration-500 "
                           onClick={() => handleEdit(row.id)}
@@ -1382,7 +1436,7 @@ export default function DriverProfile() {
                         >
                           <BorderColorIcon className="" />
                         </button>
-                      )}{" "}
+                      )}{" "} */}
                       &nbsp;&nbsp;{" "}
                       {/* <button
                         onClick={() => handleDelete(row.id)}

@@ -1003,7 +1003,7 @@ export default function journeyReplayComp() {
   return (
     <>
       <div className="main_journey">
-        <p className="bg-green px-4 py-1 border-t text-black text-center text-2xl text-white font-bold journey_heading">
+        <p className="bg-green px-4 py-1 border-t  text-center text-2xl text-white font-bold journey_heading">
           Journey Replay
         </p>
         {/* {groupedData?.map((item: any) => {
@@ -1030,7 +1030,7 @@ export default function journeyReplayComp() {
           })}
         </div> */}
         {/* <p className="bg-[#00B56C] px-4 py-1 text-white">JourneyReplay</p> */}
-        <div className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-5 px-4 text-start pt-4 bg-bgLight select_box_journey">
+        <div className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-5 px-4 text-start  bg-bgLight select_box_journey">
           <div className="xl:col-span-1 lg:col-span-2 md:col-span-2  col-span-12  ">
             {/* <select
               id="select_box"
@@ -1274,7 +1274,7 @@ export default function journeyReplayComp() {
             )}
           </div>
 
-          <div className=" xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold lg:-mt-4 xl:-mt-4 flex justify-center items-center">
+          <div className=" xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold  flex justify-center items-center">
             {clearMapData ? (
               <button
                 onClick={handleClickClear}

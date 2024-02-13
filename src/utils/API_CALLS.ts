@@ -1,7 +1,7 @@
 import { IgnitionReport, replayreport } from "@/types/IgnitionReport";
 import { zonelistType } from "@/types/zoneType";
 
-var URL = "https://backend.vtracksolutions.com"; //"http://172.16.10.53:3001";
+var URL = "https://backend.vtracksolutions.com"; //""http://172.16.11.210:3001; //"http://172.16.11.210:3001";
 // https://backend.vtracksolutions.com
 export async function getVehicleDataByClientId(clientId: string) {
   try {
@@ -411,10 +411,10 @@ export async function postDriverDataByClientId({
       throw new Error("Failed to add data from the API");
     }
     const data = await response.json();
-    await AssignRfidtodriver(token, {
-      DriverId: data.data._id,
-      RFIDid: driverRFIDCardNumber,
-    });
+    // await AssignRfidtodriver(token, {
+    //   DriverId: data.data._id,
+    //   RFIDid: driverRFIDCardNumber,
+    // });
 
     return data;
   } catch (error) {
@@ -424,6 +424,7 @@ export async function postDriverDataByClientId({
 }
 export async function AssignRfidtodriver(token: any, payload: any) {
   try {
+    console.log(token, payload);
     const response = await fetch(`${URL}/AssignRfidToDriver`, {
       method: "POST",
       headers: {

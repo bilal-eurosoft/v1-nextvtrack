@@ -16,7 +16,7 @@ import { socket } from "@/utils/socket";
 import countCars from "@/utils/countCars";
 import LiveSidebar from "@/components/LiveTracking/LiveSidebar";
 import Image from "next/image";
-import logo from "../../../public/Images/logo.png";
+import logo from "../../../public/Images/loadinglogo.png";
 const LiveMap = dynamic(() => import("@/components/LiveTracking/LiveMap"), {
   loading: () => (
     <div>
@@ -55,7 +55,7 @@ const LiveTracking = () => {
   const [clientSettings, setClientSettings] = useState<ClientSettings[]>([]);
   const [zoneList, setZoneList] = useState<zonelistType[]>([]);
   const [activeColor, setIsActiveColor] = useState<any>("");
-
+  const [showAllVehicles, setshowAllVehicles] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
   const [isFirstTimeFetchedFromGraphQL, setIsFirstTimeFetchedFromGraphQL] =
     useState(false);
@@ -65,7 +65,7 @@ const LiveTracking = () => {
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleData | null>(
     null
   );
-
+  const [unselectVehicles, setunselectVehicles] = useState(false);
   // This useEffect is responsible for checking internet connection in the browser.
   useEffect(() => {
     setIsOnline(navigator.onLine);
@@ -191,6 +191,9 @@ const LiveTracking = () => {
           setSelectedVehicle={setSelectedVehicle}
           activeColor={activeColor}
           setIsActiveColor={setIsActiveColor}
+          setshowAllVehicles={setshowAllVehicles}
+          setunselectVehicles={setunselectVehicles}
+          unselectVehicles={unselectVehicles}
         />
 
         {carData?.current?.length !== 0 && (
@@ -200,6 +203,9 @@ const LiveTracking = () => {
             selectedVehicle={selectedVehicle}
             setSelectedVehicle={setSelectedVehicle}
             setIsActiveColor={setIsActiveColor}
+            showAllVehicles={showAllVehicles}
+            setunselectVehicles={setunselectVehicles}
+            unselectVehicles={unselectVehicles}
           />
         )}
       </div>

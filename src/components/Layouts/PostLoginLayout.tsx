@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Loading from "@/app/loading";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -107,9 +107,11 @@ export default function RootLayout({
 
   const { data: session }: { data: Session & MySessionData } = useSession();
 
-  if (!session) {
-    router.push("http://localhost:3010/login");
-  }
+  useEffect(() => {
+    if (!session) {
+      router.push("http://localhost:3010/login");
+    }
+  }, [session, router]);
 
   const handleClick = (item: any) => {
     setSelectedColor(item);
@@ -549,7 +551,7 @@ export default function RootLayout({
               <div className="flex items-center flex-shrink-0 text-white">
                 <Image
                   src={logo}
-                  className="lg:h-14 lg:w-52 w-20 h-6   lg:block md:block sm:block hidden  "
+                  className="xl:h-12 lg:h-14 lg:w-52 w-20 h-6   lg:block md:block sm:block hidden  "
                   alt=""
                 />
               </div>
@@ -797,7 +799,11 @@ export default function RootLayout({
 
               <div
                 className="grid lg:grid-cols-12 grid-cols-12  lg:gap-5 "
-                style={{ display: "flex", justifyContent: "end" }}
+                style={{
+                  display: "flex",
+                  justifyContent: "end",
+                  alignItems: "center",
+                }}
               >
                 <div className="lg:col-span-2  col-span-4  lg:mt-1 md:mt-3  sm:mt-3 mt-5 ">
                   <span className="text-black">

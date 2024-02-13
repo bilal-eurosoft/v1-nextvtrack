@@ -4,6 +4,20 @@
 #table_head {
   font-size: 18px;
 }
+.MuiOutlinedInput-notchedOutline {
+  /* border-width: 1px !important; */
+  border-color: #d3d3d3 !important;
+  outline: #00b56c;
+}
+
+.MuiOutlinedInput-notchedOutline:hover {
+  /* border-width: 1px !important; */
+  border: #00b56c !important;
+}
+
+.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #00b56c !important;
+}
 
 .css-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar {
   position: relative;

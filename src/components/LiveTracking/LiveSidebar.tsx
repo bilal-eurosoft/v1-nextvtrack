@@ -13,6 +13,9 @@ const LiveSidebar = ({
   setSelectedVehicle,
   activeColor,
   setIsActiveColor,
+  setshowAllVehicles,
+  setunselectVehicles,
+  unselectVehicles,
 }: {
   carData: VehicleData[];
   countPause: Number;
@@ -21,15 +24,16 @@ const LiveSidebar = ({
   setSelectedVehicle: any;
   activeColor: any;
   setIsActiveColor: any;
+  setshowAllVehicles: any;
+  setunselectVehicles: any;
+  unselectVehicles: any;
 }) => {
   const { data: session } = useSession();
   const [searchData, setSearchData] = useState({
     search: "",
   });
   const [filteredData, setFilteredData] = useState<any>([]);
-
   const [zoneList, setZoneList] = useState<zonelistType[]>([]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSearchData({ ...searchData, [name]: value });
@@ -48,7 +52,6 @@ const LiveSidebar = ({
       }
     })();
   }, [session]);
-
   function isPointInPolygon(point: any, polygon: any) {
     let intersections = 0;
     for (let i = 0; i < polygon.length; i++) {
@@ -77,7 +80,6 @@ const LiveSidebar = ({
         return undefined;
       }
     });
-
     const filtered = carData
       .filter((data) =>
         data.vehicleReg.toLowerCase().includes(searchData.search.toLowerCase())
@@ -91,25 +93,25 @@ const LiveSidebar = ({
             );
           }
         });
-
         if (i != -1) {
           item.zone = zoneList[i].zoneName;
         }
         return item;
       });
-
     setFilteredData(filtered);
   }, [searchData.search, carData]);
   const toggleLiveCars = () => {
     setSelectedVehicle(null);
+    setshowAllVehicles(true);
+    setunselectVehicles(false);
     setIsActiveColor(0);
   };
-
   const handleClickVehicle = (item: any) => {
     setSelectedVehicle(item);
+    setshowAllVehicles(false);
     setIsActiveColor(item.vehicleId);
   };
-  console.log("filteredData", filteredData);
+  console.log("filter", filteredData);
   return (
     <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-4  col-span-4 main_sider_bar">
       <div className="grid grid-cols-12 bg-white py-3 pe-1 lg:gap-4 gap-3 search_live_tracking">
@@ -129,7 +131,6 @@ const LiveSidebar = ({
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </div>
-
             <div className="lg:col-span-11 md:col-span-11 sm:col-span-10  col-span-11 ms-2">
               <input
                 type="text"
@@ -151,14 +152,12 @@ const LiveSidebar = ({
           </button>
         </div>
       </div>
-
       <div className="grid grid-cols-2 text-center border-y-2  border-green bg-zoneTabelBg py-4 text-white vehicle_summary">
         <div className="lg:col-span-1 w-full">
           <p className="text-md mt-1 text-black font-popins ">
             <b>Vehicle Summary:</b>
           </p>
         </div>
-
         <div className="lg:col-span-1">
           <div className="grid grid-cols-10">
             <div className="lg:col-span-1">
@@ -174,10 +173,8 @@ const LiveSidebar = ({
                 <circle cx="12" cy="12" r="10" />
               </svg>
             </div>
-
             <div className="lg:col-span-1 text-black font-popins font-bold">{`${countMoving}`}</div>
             <div className="lg:col-span-1"></div>
-
             <div className="lg:col-span-1">
               <svg
                 className="h-6 w-3 text-yellow mr-2"
@@ -191,10 +188,8 @@ const LiveSidebar = ({
                 <circle cx="12" cy="12" r="10" />
               </svg>
             </div>
-
             <div className="lg:col-span-1 text-black font-popins font-bold">{`${countPause}`}</div>
             <div className="lg:col-span-1"></div>
-
             <div className="lg:col-span-1">
               <svg
                 className="h-6 w-3 text-red mr-2"
@@ -208,12 +203,10 @@ const LiveSidebar = ({
                 <circle cx="12" cy="12" r="10" />
               </svg>
             </div>
-
             <div className="lg:col-span-1 text-black font-popins font-bold">{`${countParked}`}</div>
           </div>
         </div>
       </div>
-
       <div className="overflow-y-scroll bg-zoneTabelBg" id="scroll_side_bar">
         {filteredData?.map((item: VehicleData, index: any) => {
           return (
@@ -296,7 +289,6 @@ const LiveSidebar = ({
                   </div>
                 </div>
               </div>
-
               <div className="lg:text-start md:text-start sm:text-start text-center   mt-1  text-md border-b-2 font-bold border-green text-labelColor">
                 <h1 className="font-popins text-start"> {item.timestamp}</h1>
                 <p className="text-labelColor">{item.zone}</p>
@@ -304,10 +296,8 @@ const LiveSidebar = ({
                 {item.DriverName && (
                   <p>Driver Name: {item.DriverName.replace("undefine", "")}</p>
                 )}
-
                 {/* {item.DriverName.replace("undefine", "")} */}
                 {/* </p> */}
-
                 <span className="text-labelColor">
                   {item?.OSM?.address?.neighbourhood}
                   {item?.OSM?.address?.road}
@@ -322,5 +312,4 @@ const LiveSidebar = ({
     </div>
   );
 };
-
 export default LiveSidebar;
