@@ -10,6 +10,7 @@ import {
   getClientSettingByClinetIdAndToken,
   getVehicleDataByClientId,
   getZoneListByClientId,
+  getAllVehicleByUserId
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { socket } from "@/utils/socket";
@@ -65,6 +66,7 @@ const LiveTracking = () => {
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleData | null>(
     null
   );
+  const [userVehicle, setuserVehicle] = useState([]);
   const [unselectVehicles, setunselectVehicles] = useState(false)
   // This useEffect is responsible for checking internet connection in the browser.
   useEffect(() => {
@@ -88,6 +90,18 @@ const LiveTracking = () => {
   }, []);
 
   useEffect(() => {
+    async function userVehicles() {
+      if (session && session.userRole === "Controller") {
+        const data = await getAllVehicleByUserId({ token: session.accessToken, userId: session.userId });
+        console.log("data", data.data)
+        setuserVehicle(data.data);
+
+      }
+    }
+    userVehicles()
+  }, [])
+  const role = session?.userRole
+  useEffect(() => {
     (async function () {
       if (session?.clientId) {
         const clientVehicleData = await getVehicleDataByClientId(
@@ -100,7 +114,25 @@ const LiveTracking = () => {
           )?.cacheList;
           // call a filter function here to filter by IMEI and latest time stamp
           let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
-          carData.current = uniqueData;
+          // carData.current = uniqueData;
+          console.log("uniqueData", uniqueData)
+          let matchingVehicles;
+          if (role === "Controller") {
+            console.log("in ", userVehicle);
+            let vehicleIds = userVehicle.map((item: any) => item._id);
+            console.log("VehicleIds", vehicleIds);
+            // Filter carData.current based on vehicleIds
+            matchingVehicles = uniqueData.filter((vehicle) =>
+              vehicleIds.includes(vehicle.vehicleId)
+            );
+
+            console.log("matchingVehicles", matchingVehicles);
+            carData.current = matchingVehicles
+          }
+          else {
+            carData.current = uniqueData
+          }
+
           setIsFirstTimeFetchedFromGraphQL(true);
         }
 
@@ -113,7 +145,7 @@ const LiveTracking = () => {
         }
       }
     })();
-  }, [session]);
+  }, [session, userVehicle]);
 
   // This useEffect is responsible for fetching data from the GraphQL Server.
   // Runs if:
@@ -155,14 +187,36 @@ const LiveTracking = () => {
         socket.connect();
         socket.on(
           "message",
-          (data: { cacheList: VehicleData[] } | null | undefined) => {
+          async (data: { cacheList: VehicleData[] } | null | undefined) => {
             if (data === null || data === undefined) {
               return;
             }
+
             const uniqueData = uniqueDataByIMEIAndLatestTimestamp(
               data?.cacheList
             );
-            carData.current = uniqueData;
+            console.log("uniqueData 2", uniqueData)
+
+            let matchingVehicles;
+            if (role === "Controller") {
+              console.log("in  2", userVehicle);
+              let vehicleIds = userVehicle.map((item: any) => item._id);
+              console.log("VehicleIds 2", vehicleIds);
+              // Filter carData.current based on vehicleIds
+              matchingVehicles = uniqueData.filter((vehicle) =>
+                vehicleIds.includes(vehicle.vehicleId)
+              );
+
+              console.log("matchingVehicles 2", matchingVehicles);
+              carData.current = matchingVehicles
+            }
+            else {
+              carData.current = uniqueData
+            }
+            // carData.current = uniqueData;
+
+            //  console.log("carData.current", carData.current)
+
             setLastDataReceivedTimestamp(new Date());
           }
         );
@@ -176,7 +230,9 @@ const LiveTracking = () => {
     return () => {
       socket.disconnect();
     };
-  }, [isOnline, session?.clientId]);
+  }, [isOnline, session?.clientId, userVehicle]);
+
+
 
   const { countParked, countMoving, countPause } = countCars(carData?.current);
 

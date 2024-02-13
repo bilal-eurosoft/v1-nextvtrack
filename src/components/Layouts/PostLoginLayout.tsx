@@ -132,9 +132,9 @@ export default function RootLayout({
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  console.log("selectedColor", session);
+
   const pathname = usePathname();
-  console.log("pathname", pathname);
+
   return (
     // <div className={inter.className}>
     <div>
@@ -787,7 +787,8 @@ export default function RootLayout({
                     <span className="lg:text-1xl text-sm">
                       {" "}
                       <p className="text-white font-popins text-xl -mt-5 ">
-                        {session?.clientName}
+                        {session?.FullName}
+
                       </p>
                     </span>
                   </span>

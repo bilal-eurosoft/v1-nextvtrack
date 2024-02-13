@@ -39,7 +39,6 @@ const LiveSidebar = ({
     setSearchData({ ...searchData, [name]: value });
   };
 
-  console.log("filter", searchData);
 
   useEffect(() => {
     (async function () {
@@ -111,7 +110,7 @@ const LiveSidebar = ({
     setshowAllVehicles(false)
     setIsActiveColor(item.vehicleId);
   };
-  console.log("filter", filteredData)
+
   return (
     <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-4  col-span-4 main_sider_bar">
       <div className="grid grid-cols-12 bg-white py-3 pe-1 lg:gap-4 gap-3 search_live_tracking">

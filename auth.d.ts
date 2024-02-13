@@ -18,5 +18,6 @@ declare module 'next-auth' {
     iat: number
     exp: number
     jti: string
+    userRole: string
   }
 }
