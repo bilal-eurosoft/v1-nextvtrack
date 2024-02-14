@@ -246,10 +246,6 @@ export default function journeyReplayComp() {
     setstopVehicle(false);
     setIsPauseColor(true);
     setIsPaused(true);
-    if (polylinedata.length > 0) {
-      setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
-    }
-    setCurrentPositionIndex(0);
 
     if (carMovementInterval) {
       clearInterval(carMovementInterval);
@@ -263,13 +259,6 @@ export default function journeyReplayComp() {
       );
       setTripAddressData(Dataresponse);
     }
-    // setStopVehicle(true);
-    // setStopVehicle(true)
-
-    // if (carMovementInterval) {
-    //   clearInterval(carMovementInterval);
-    //   setCarMovementInterval(undefined);
-    // }
   };
   const stopTick = async () => {
     setIsPlaying(false);
@@ -280,9 +269,12 @@ export default function journeyReplayComp() {
     setStopBtn(false);
     setstopVehicle(true);
     setProgressWidth(0);
+    if (polylinedata.length > 0) {
+      setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
+    }
+    setCurrentPositionIndex(0);
   };
 
-  console.log("TripAddressData", TripAddressData);
   useEffect(() => {
     if (isPlaying && !isPaused) {
       const totalSteps = TravelHistoryresponse.length - 1;
@@ -983,15 +975,29 @@ export default function journeyReplayComp() {
   //     </div>
   //   ));
   // };
-
+  function getDayName(date: any) {
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    return days[date.getDay()];
+  }
   const groupedData: any = {};
 
   dataresponse?.map((item: any) => {
+    const tripDate = new Date(item.TripStartDateLabel);
+    const dayName = getDayName(tripDate);
     if (!groupedData[item.TripStartDateLabel]) {
       // If the date group doesn't exist, create it with an empty array and count set to 1
       groupedData[item.TripStartDateLabel] = {
         trips: [item],
         count: 1,
+        day: dayName,
       };
     } else {
       // If the date group already exists, push the trip and increment the count
@@ -1000,10 +1006,12 @@ export default function journeyReplayComp() {
     }
   });
 
+  console.log("group", groupedData);
+
   return (
     <>
       <div className="main_journey">
-        <p className="bg-green px-4 py-1 border-t  text-center text-2xl text-white font-bold journey_heading">
+        <p className="bg-green px-4 py-1 border-t text-black text-center text-2xl text-white font-bold journey_heading">
           Journey Replay
         </p>
         {/* {groupedData?.map((item: any) => {
@@ -1031,7 +1039,11 @@ export default function journeyReplayComp() {
         </div> */}
         {/* <p className="bg-[#00B56C] px-4 py-1 text-white">JourneyReplay</p> */}
         <div className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-5 px-4 text-start  bg-bgLight select_box_journey">
-          <div className="xl:col-span-1 lg:col-span-2 md:col-span-2  col-span-12  ">
+          <div
+            className="xl:col-span-1 lg:col-span-2 md:col-span-2  col-span-12
+
+          "
+          >
             {/* <select
               id="select_box"
               className="   h-8 text-gray  w-full  outline-green border border-grayLight px-1 hover:border-green"
@@ -1076,8 +1088,8 @@ export default function journeyReplayComp() {
               displayEmpty
               className={`h-8 text-black font-popins font-bold w-full outline-green p-1 ${
                 getShowRadioButton
-                  ? "pt-2 text-black font-popins font-extrabold"
-                  : "pt-1.5 text-black font-popins  "
+                  ? " text-black font-popins font-extrabold"
+                  : " text-black font-popins  "
               }`}
               style={{ color: getShowRadioButton ? "black" : "" }}
             >
@@ -1110,6 +1122,7 @@ export default function journeyReplayComp() {
                       }
                       variant="inline"
                       maxDate={currenTDates}
+                      autoOk
                     />
                   </MuiPickersUtilsProvider>
                 </div>
@@ -1126,6 +1139,7 @@ export default function journeyReplayComp() {
                       maxDate={currenTDates}
                       // maxDate={currenTDates}
                       // shouldDisableDate={(date) => !isCurrentDate(date)}
+                      autoOk
                     />
                   </MuiPickersUtilsProvider>
                 </div>
@@ -1274,7 +1288,7 @@ export default function journeyReplayComp() {
             )}
           </div>
 
-          <div className=" xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold  flex justify-center items-center">
+          <div className=" xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold flex justify-center items-center">
             {clearMapData ? (
               <button
                 onClick={handleClickClear}
@@ -1371,7 +1385,8 @@ export default function journeyReplayComp() {
                               >
                                 <Typography>
                                   <b>
-                                    {date} &nbsp;&nbsp;&nbsp; (x{items.count})
+                                    {date} &nbsp;&nbsp; (x
+                                    {items.count}) &nbsp;&nbsp; {items.day}{" "}
                                   </b>
                                 </Typography>
                               </AccordionSummary>
@@ -1429,6 +1444,7 @@ export default function journeyReplayComp() {
                                             {" "}
                                             Distance: {item.TotalDistance}
                                           </p>
+                                          <p>{item.DriverName}</p>
                                         </div>
                                       </div>
 
@@ -1576,6 +1592,11 @@ export default function journeyReplayComp() {
                             <p className=" text-green text-start font-popins font-semibold text-sm">
                               {" "}
                               Distance: {item.TotalDistance}
+                              {item?.DriverName && (
+                                <div>
+                                  <p> Driver: {item?.DriverName}</p>
+                                </div>
+                              )}
                             </p>
                           </div>
                         </div>

@@ -98,6 +98,7 @@ input[type="checkbox"]:hover {
   }
   .journey_heading {
     height: 4vh;
+    align-items: center;
   }
   .select_box_journey {
     height: 7vh;

@@ -114,10 +114,10 @@ export default function Reports() {
   const handleEnddateChange = (value: any) => {
     setenddate(value);
   };
-  const handleCustomDateChange = (fieldName: string, e: any) => {
+  const handleCustomDateChange = (key: string, e: any) => {
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
-      [fieldName]: e.toISOString().split("T")[0],
+      [key]: e.toISOString().split("T")[0],
     }));
     setstartdate(e);
     setenddate(e);
@@ -303,6 +303,7 @@ export default function Reports() {
       }
     }
   };
+
   return (
     <div>
       <form
@@ -318,12 +319,12 @@ export default function Reports() {
           <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-2 mt-5 mb-8  grid-cols-2 pt-5 px-10 gap-2 flex justify-center ">
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 ">
               <div className="grid grid-cols-12">
-                <div className="col-span-3">
+                <div className="lg:col-span-3 col-span-12">
                   <label className="text-labelColor">
                     Report Type: &nbsp;&nbsp;
                   </label>
                 </div>
-                <div className="col-span-8">
+                <div className="lg:col-span-8 col-span-12">
                   <Select
                     className="h-8 text-sm w-full text-gray  outline-green"
                     name="reportType"
@@ -492,6 +493,7 @@ export default function Reports() {
                       variant="inline"
                       maxDate={currenTDates}
                       className="xl:w-80  lg:w-80 w-auto"
+                      autoOk
                     />
                   </MuiPickersUtilsProvider>
                   {/* <input
@@ -513,6 +515,7 @@ export default function Reports() {
                 To Date: &nbsp;&nbsp;&nbsp;
                 <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
                   <KeyboardDatePicker
+                    style={{ border: "none" }}
                     format="MM/DD/yyyy"
                     value={Ignitionreport.toDateTime}
                     onChange={(newDate: any) =>
@@ -521,6 +524,7 @@ export default function Reports() {
                     variant="inline"
                     maxDate={currenTDates}
                     className="xl:w-80  lg:w-80 w-auto"
+                    autoOk
                     // style={{ width: "70%" }}
                   />
                 </MuiPickersUtilsProvider>

@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
-import logo from "../../../public/Images/loadinglogo.png";
+import logo from "../../../public/Images/logo.png";
+import loadings from "../../../public/Images/loadinglogo.png";
+
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -66,7 +68,11 @@ export default function LoginPage() {
               alignItems: "center",
             }}
           >
-            <Image src={logo} alt="" style={{ height: "4vh", width: "7%" }} />
+            <Image
+              src={loadings}
+              alt=""
+              style={{ height: "4vh", width: "7%" }}
+            />
             <br></br>
           </div>
           <div role="status">

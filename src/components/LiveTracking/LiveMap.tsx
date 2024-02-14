@@ -10,7 +10,7 @@ import { ClientSettings } from "@/types/clientSettings";
 import { useSession } from "next-auth/react";
 import { getZoneListByClientId } from "@/utils/API_CALLS";
 import { Marker, Popup } from "react-leaflet";
-import L, { LatLng } from 'leaflet';
+import L, { LatLng } from "leaflet";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((module) => module.MapContainer),
@@ -38,7 +38,7 @@ const DynamicCarMap = ({
   setSelectedVehicle,
   showAllVehicles,
   setunselectVehicles,
-  unselectVehicles
+  unselectVehicles,
 }: {
   carData: VehicleData[];
   clientSettings: ClientSettings[];
@@ -75,7 +75,6 @@ const DynamicCarMap = ({
     })();
   }, []);
 
-
   useEffect(() => {
     const regex = /lat:([^,]+),lng:([^}]+)/;
     if (clientMapSettings) {
@@ -88,18 +87,13 @@ const DynamicCarMap = ({
       }
     }
     let zoomLevel = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
-    setZoom(zoomLevel)
-  }, [clientMapSettings])
+    setZoom(zoomLevel);
+  }, [clientMapSettings]);
 
   const handleClear = () => {
     setIsActiveColor("");
     // setSelectedVehicle(null);
   };
-
-
-
-
-
 
   return (
     <>
@@ -111,9 +105,7 @@ const DynamicCarMap = ({
               center={mapCoordinates}
               className=" z-0"
               zoom={zoom}
-
             >
-
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
@@ -181,7 +173,7 @@ const DynamicCarMap = ({
                 className="mx-2  mt-1"
                 style={{ accentColor: "green" }}
               />
-              <button className="text-labelColor font-popins text-md font-bold">
+              <button className="text-labelColor font-popins text-sm font-bold">
                 Show Zones
               </button>
             </div>

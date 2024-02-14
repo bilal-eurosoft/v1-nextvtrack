@@ -38,3 +38,13 @@
   background: #29303b;
   border-radius: 7px;
 }
+.MuiInput-underline:after {
+  right: 0;
+  bottom: 0;
+  content: "";
+  position: absolute;
+  transform: scaleX(0);
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+  border-bottom: 1px solid #8a8c94 !important;
+  pointer-events: none;
+}

@@ -135,7 +135,7 @@ const LiveSidebar = ({
                 className="text-lg bg-transparent text-green w-full px-1  placeholder-green border-b  border-black outline-none w-full"
                 placeholder="Search"
                 required
-                onChange={handleInputChange}
+                onChange={handleInputChange} 
               />
             </div>
           </div>

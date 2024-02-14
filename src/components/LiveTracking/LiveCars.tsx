@@ -13,7 +13,7 @@ const LiveCars = ({
   setSelectedVehicle,
   showAllVehicles,
   setunselectVehicles,
-  unselectVehicles
+  unselectVehicles,
 }: {
   carData: VehicleData[];
   clientSettings: ClientSettings[];
@@ -39,7 +39,6 @@ const LiveCars = ({
 
     if (map) {
       if (selectedVehicle) {
-
         selectedVehicleCurrentData.current =
           carData.find((el) => el.IMEI === selectedVehicle?.IMEI) || null; // Assign null if selectedVehicle is not found
         if (selectedVehicleCurrentData.current) {
@@ -51,23 +50,19 @@ const LiveCars = ({
             18
           );
         }
-      }
-      else if (selectedVehicle == null && showAllVehicles === true) {
-
-
-
+      } else if (selectedVehicle == null && showAllVehicles === true) {
         if (!carData || carData.length === 0) return;
 
-        const positions: LatLng[] = carData.map(data => L.latLng(data.gps.latitude, data.gps.longitude));
+        const positions: LatLng[] = carData.map((data) =>
+          L.latLng(data.gps.latitude, data.gps.longitude)
+        );
 
         const bounds = L.latLngBounds(positions);
         var zoom;
-        var center: LatLng | undefined;;
+        var center: LatLng | undefined;
         if (bounds.isValid()) {
           center = bounds.getCenter();
           /*  setMapCoordinates(center); */
-
-
 
           const lats = carData.map((data) => data.gps.latitude);
           const lngs = carData.map((data) => data.gps.longitude);
@@ -87,16 +82,14 @@ const LiveCars = ({
           //setZoom(zoom)
         } else {
           center = L.latLng(0, 0); // You may adjust the default center as per your needs
-          zoom = 11; // 
+          zoom = 11; //
         }
 
-        setSelectedVehicle(false)
+        setSelectedVehicle(false);
         map.flyTo(center, zoom);
       }
-
     }
   }, [carData, selectedVehicle, map, clientMapSettings, clientZoomSettings]);
-
 
   const calculateIconSize = (latitude: number, longitude: number) => {
     let distance = 0;
@@ -155,24 +148,21 @@ const LiveCars = ({
 
   const handleMoveEnd = (event: any) => {
     if (unselectVehicles === true) {
-
-      setSelectedVehicle(null)
+      setSelectedVehicle(null);
     }
   };
 
   const handleClick = (event: any) => {
     if (selectedVehicle) {
-      setunselectVehicles(true)
+      setunselectVehicles(true);
     }
     if (unselectVehicles === true) {
-
-      setSelectedVehicle(null)
+      setSelectedVehicle(null);
     }
   };
   const handleZoomEnd = (event: any) => {
     if (unselectVehicles === true) {
-
-      setSelectedVehicle(null)
+      setSelectedVehicle(null);
     }
   };
 
@@ -180,8 +170,7 @@ const LiveCars = ({
     useMapEvents({
       moveend: handleMoveEnd,
       zoomend: handleZoomEnd,
-      click: handleClick
-
+      click: handleClick,
     });
     return null;
   }
@@ -201,7 +190,7 @@ const LiveCars = ({
           )}
         >
           <Tooltip direction="bottom" offset={[0, -10]} opacity={1} permanent>
-            <strong className="font-popins font-extrabold">{pos[index]}</strong>
+            <div className="font-popins font-extrabold">{pos[index]}</div>
           </Tooltip>
         </Marker>
       ))}

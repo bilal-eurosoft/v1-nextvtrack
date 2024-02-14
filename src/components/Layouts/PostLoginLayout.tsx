@@ -813,7 +813,6 @@ export default function RootLayout({
                       {" "}
                       <p className="text-white font-popins text-xl -mt-5 ">
                         {session?.FullName}
-
                       </p>
                     </span>
                   </span>
