@@ -109,7 +109,7 @@ export default function RootLayout({
 
   useEffect(() => {
     if (!session) {
-      router.push("http://localhost:3010/login");
+      router.push("/login");
     }
   }, [session, router]);
 
@@ -296,7 +296,7 @@ export default function RootLayout({
                   <br></br>
                   <span
                     className=" w-full text-white"
-                    onClick={() => router.push("http://localhost:3010/DualCam")}
+                    onClick={() => router.push("/DualCam")}
                   >
                     View Image And Video
                   </span>
@@ -711,9 +711,7 @@ export default function RootLayout({
                           <br></br>
                           <span
                             className=" w-full text-white"
-                            onClick={() =>
-                              router.push("http://localhost:3010/DualCam")
-                            }
+                            onClick={() => router.push("/DualCam")}
                           >
                             View Image And Video
                           </span>
@@ -772,9 +770,7 @@ export default function RootLayout({
                         <PopoverContent className="border-none  cursor-pointer bg-green">
                           <span
                             className=" w-full text-white"
-                            onClick={() =>
-                              router.push("http://localhost:3010/DriverProfile")
-                            }
+                            onClick={() => router.push("/DriverProfile")}
                           >
                             Driver Profile
                           </span>
@@ -782,9 +778,7 @@ export default function RootLayout({
                           <br></br>
                           <span
                             className=" w-full text-white"
-                            onClick={() =>
-                              router.push("http://localhost:3010/DriverAssign")
-                            }
+                            onClick={() => router.push("/DriverAssign")}
                           >
                             Assign Driver
                           </span>

@@ -576,7 +576,7 @@ export default function DriverProfile() {
           </button>
 
           <button
-            onClick={() => router.push("http://localhost:3010/ActiveDriver")}
+            onClick={() => router.push("/ActiveDriver")}
             className="bg-red px-4 py-1 xl:mx-3 lg:mx-3  text-white rounded-md font-popins font-bold md:mt-2"
           >
             InActive Driver List

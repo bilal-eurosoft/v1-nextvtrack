@@ -298,7 +298,7 @@ export default function EditZoneComp() {
 
         if (response.id !== null) {
           setTimeout(() => {
-            router.push("http://localhost:3010/Zone");
+            router.push("/Zone");
           }, 2000);
         }
       }

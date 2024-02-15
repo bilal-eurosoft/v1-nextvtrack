@@ -34,7 +34,7 @@ export default function LoginPage() {
     });
 
     if (data?.status === 200) {
-      router.push("http://localhost:3010/liveTracking");
+      router.push("/liveTracking");
     }
     setLoading(false);
   };
@@ -207,9 +207,7 @@ export default function LoginPage() {
               </div>
               <p
                 className="text-white font-popins text-sm mt-10 lg:mx-0 mx-8 cursor-pointer hover:text-red"
-                onClick={() =>
-                  router.push("http://localhost:3010/ForgetPassword")
-                }
+                onClick={() => router.push("/ForgetPassword")}
               >
                 <b> Forgot Password</b>
               </p>

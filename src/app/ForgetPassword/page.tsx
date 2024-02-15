@@ -180,7 +180,7 @@ export default function ForgetPassword() {
               </div>
               <p
                 className="text-white text-sm lg:mx-0 mx-5 cursor-pointer hover:text-red pb-0"
-                onClick={() => router.push("http://localhost:3010/login")}
+                onClick={() => router.push("/login")}
               >
                 <b> Back To Sign In</b>
               </p>

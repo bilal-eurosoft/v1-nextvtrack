@@ -240,7 +240,7 @@ export default function AddZoneComp() {
         if (response.id !== null) {
           // Delay the redirection by 4 seconds
           setTimeout(() => {
-            router.push("http://localhost:3010/Zone");
+            router.push("/Zone");
           }, 2000);
         }
       }
@@ -391,7 +391,7 @@ export default function AddZoneComp() {
                 <div className="col-span-2 ">
                   <button
                     className="ms-14  font-popins font-bold  h-10 bg-white text-labelColor px-6 rounded-md shadow-md  hover:shadow-gray transition duration-500"
-                    onClick={() => router.push("http://localhost:3010/Zone")}
+                    onClick={() => router.push("/Zone")}
                   >
                     Cancel
                   </button>
