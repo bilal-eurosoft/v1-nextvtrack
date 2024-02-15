@@ -189,7 +189,13 @@ const LiveCars = ({
             position[1]
           )}
         >
-          <Tooltip direction="bottom" offset={[0, -10]} opacity={1} permanent>
+          <Tooltip
+            // className="m-10"
+            direction="bottom"
+            offset={[0, -10]}
+            opacity={1}
+            permanent
+          >
             <div className="font-popins font-extrabold">{pos[index]}</div>
           </Tooltip>
         </Marker>

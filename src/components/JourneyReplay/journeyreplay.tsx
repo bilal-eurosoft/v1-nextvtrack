@@ -1006,12 +1006,10 @@ export default function journeyReplayComp() {
     }
   });
 
-  console.log("group", groupedData);
-
   return (
     <>
       <div className="main_journey">
-        <p className="bg-green px-4 py-1 border-t text-black text-center text-2xl text-white font-bold journey_heading">
+        <p className="bg-green px-4 py-1 border-t  text-center text-2xl text-white font-bold journey_heading">
           Journey Replay
         </p>
         {/* {groupedData?.map((item: any) => {

@@ -117,7 +117,6 @@ const LiveTracking = () => {
           // call a filter function here to filter by IMEI and latest time stamp
           let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
           // carData.current = uniqueData;
-          console.log("uniqueData", uniqueData);
           let matchingVehicles;
           if (role === "Controller") {
             console.log("in ", userVehicle);
@@ -196,7 +195,6 @@ const LiveTracking = () => {
             const uniqueData = uniqueDataByIMEIAndLatestTimestamp(
               data?.cacheList
             );
-            console.log("uniqueData 2", uniqueData);
 
             let matchingVehicles;
             if (role === "Controller") {

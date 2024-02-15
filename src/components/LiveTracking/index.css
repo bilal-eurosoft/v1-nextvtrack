@@ -9,9 +9,9 @@
   height: auto;
   margin-top: -1vw;
 } */
-/* .leaflet-marker-icon.custom-icon.leaflet-zoom-animated.leaflet-interactive {
-  margin-top: -46px !important;
-} */
+.leaflet-marker-icon.custom-icon.leaflet-zoom-animated.leaflet-interactive {
+  margin-top: -46px;
+}
 
 ::-webkit-scrollbar {
   width: 10px;

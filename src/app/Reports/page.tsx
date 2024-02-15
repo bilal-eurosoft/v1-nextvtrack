@@ -391,7 +391,7 @@ export default function Reports() {
                 <Select
                   className="h-8 lg:w-4/6 w-full text-labelColor outline-green px-1e"
                   name="VehicleReg"
-                  value={Ignitionreport.VehicleReg}
+                  value={Ignitionreport.vehicleNo}
                   onChange={handleInputChange}
                   displayEmpty
                   MenuProps={MenuProps}
@@ -410,6 +410,10 @@ export default function Reports() {
                       value={item.vehicleReg}
                     >
                       {item.vehicleNo} (Reg#{item.vehicleReg})
+                      {/* {item.vehicleNo}
+                      
+                      (Reg# */}
+                      {/* {item.vehicleReg} */}
                     </MenuItem>
                   ))}
                 </Select>
@@ -515,7 +519,6 @@ export default function Reports() {
                 To Date: &nbsp;&nbsp;&nbsp;
                 <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
                   <KeyboardDatePicker
-                    style={{ border: "none" }}
                     format="MM/DD/yyyy"
                     value={Ignitionreport.toDateTime}
                     onChange={(newDate: any) =>
