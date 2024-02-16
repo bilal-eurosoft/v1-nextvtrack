@@ -9,6 +9,20 @@
   font-weight: 500 !important;
   background-color: #00b56c !important;
 }
+.MuiFormHelperText-root.Mui-error {
+  color: #f44336;
+  display: none;
+}
+.MuiInput-underline:after {
+  right: 0;
+  bottom: 0;
+  content: "";
+  position: absolute;
+  transform: scaleX(0);
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+  border-bottom: 1px solid #8a8c94 !important;
+  pointer-events: none;
+}
 /* p.MuiTypography-root.MuiTypography-body2.MuiTypography-colorInherit {
   color: #3b413f;
 } */
@@ -102,6 +116,8 @@ input[type="checkbox"]:hover {
   }
   .select_box_journey {
     height: 7vh;
+    align-items: center;
+    padding-top: 2%;
   }
   .journey_sidebar {
     height: 76vh;

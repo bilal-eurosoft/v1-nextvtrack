@@ -124,7 +124,7 @@ export default function Zone() {
           (GeoFenceType === "" ||
             (zone.GeoFenceType !== undefined &&
               zone.GeoFenceType.toLowerCase() ===
-              GeoFenceType.toLowerCase())) &&
+                GeoFenceType.toLowerCase())) &&
           (zoneType === "" ||
             (zone.zoneType !== undefined &&
               zone.zoneType.toLowerCase() === zoneType.toLowerCase()))
@@ -587,10 +587,11 @@ export default function Zone() {
             <br></br>
             <span
               id="Circle"
-              className={`inline-flex items-center mt-2 border rounded-md border-grayLight px-2 h-8 text-md font-popins text-black font-medium cursor-pointer shadow-md hover:shadow-gray transition duration-500   ${selectedZoneTypeCircle && "bg-green text-white "
-                } transition duration-300`}
+              className={`inline-flex items-center mt-2 border rounded-md border-grayLight px-2 h-8 text-md font-popins text-black font-medium cursor-pointer shadow-md hover:shadow-gray transition duration-500   ${
+                selectedZoneTypeCircle && "bg-green text-white "
+              } transition duration-300`}
               onClick={() => handleClickZoneType("Circle")}
-            // title="Click to select Circle"
+              // title="Click to select Circle"
             >
               <RadioButtonUncheckedIcon
                 className="mr-2"
@@ -601,10 +602,11 @@ export default function Zone() {
 
             <span
               id="Polygon"
-              className={`inline-flex items-center mt-2 border rounded-md border-grayLight px-2 h-8 text-md font-popins text-black font-medium cursor-pointer shadow-md hover:shadow-gray transition duration-500  mx-5  ${selectedZoneTypPolyGone && "bg-green text-white"
-                } transition duration-300`}
+              className={`inline-flex items-center mt-2 border rounded-md border-grayLight px-2 h-8 text-md font-popins text-black font-medium cursor-pointer shadow-md hover:shadow-gray transition duration-500  mx-5  ${
+                selectedZoneTypPolyGone && "bg-green text-white"
+              } transition duration-300`}
               onClick={() => handleClickZoneType("Polygon")}
-            // title="Click to select Polygon"
+              // title="Click to select Polygon"
             >
               <HexagonIcon className="mr-2" /> Polygon
             </span>
@@ -734,7 +736,7 @@ export default function Zone() {
                 <div className="col-span-2 pt-1">
                   <button
                     className="text-white  font-popins font-bold -ms-2 h-10 bg-[#00B56C] px-2 text-md  "
-                  // onClick={handleClick}
+                    // onClick={handleClick}
                   >
                     Add Zone
                   </button>
@@ -892,7 +894,9 @@ export default function Zone() {
                 </>
               ) : filteredDataIsNotAvaialable === false ? (
                 <>
-                  <p>No data found</p>
+                  <p className="flex items-center justify-center mt-52">
+                    No data found
+                  </p>
                 </>
               ) : (
                 <>
@@ -1062,11 +1066,11 @@ export default function Zone() {
             <div className="-mt-3">
               <TablePagination
                 component="div"
-                rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
+                // rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
                 count={zoneList.length}
                 rowsPerPage={rowsPerPage}
-                page={currentPage} // Add this prop
-                onPageChange={handlePageChange} // Add this prop
+                page={currentPage}
+                onPageChange={handlePageChange}
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />
             </div>

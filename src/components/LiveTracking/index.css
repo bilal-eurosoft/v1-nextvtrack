@@ -7,10 +7,10 @@
 /* img {
   max-width: 100%;
   height: auto;
-  margin-top: -1vw;
+  margin-top: -0.5vw;
 } */
 .leaflet-marker-icon.custom-icon.leaflet-zoom-animated.leaflet-interactive {
-  margin-top: -46px;
+  margin-top: -45px !important;
 }
 
 ::-webkit-scrollbar {

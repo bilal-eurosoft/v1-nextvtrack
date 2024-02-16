@@ -11,13 +11,17 @@ const Loading = () => {
           alignItems: "center",
         }}
       >
-        <Image src={logo} alt="" style={{ height: "4vh", width: "7%" }} />
+        <Image
+          src={logo}
+          alt=""
+          style={{ height: "7vh", width: "12%", marginTop: "-3%" }}
+        />
         <br></br>
       </div>
       <div role="status">
         <svg
           aria-hidden="true"
-          className="inline fixed top-20 right-0 bottom-0 left-0 m-auto w-8 h-8  text-green animate-spin dark:text-green fill-black"
+          className="inline fixed top-20 right-0 bottom-0 left-0 m-auto w-12 h-12  text-green animate-spin dark:text-green fill-black"
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

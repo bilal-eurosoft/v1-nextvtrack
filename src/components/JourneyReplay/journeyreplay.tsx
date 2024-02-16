@@ -237,7 +237,6 @@ export default function journeyReplayComp() {
       }
     }
   };
-  console.log("isDynamicTime", isDynamicTime);
   const pauseTick = async () => {
     setIsPlaying(false);
     setPauseBtn(false);
@@ -866,7 +865,7 @@ export default function journeyReplayComp() {
     setCurrentDateDefaul(true);
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
-      [fieldName]: newDate?.toISOString().split("T")[0],
+      [fieldName]: newDate?.toISOString(),
     }));
   };
 
@@ -1111,6 +1110,7 @@ export default function journeyReplayComp() {
               <div className="grid lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-12  -mt-5  grid-cols-12  xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2 flex justify-center ">
                 <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0  ">
                   <label className="text-green">From</label>
+
                   <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
                     <KeyboardDatePicker
                       format="MM/DD/yyyy"
@@ -1319,7 +1319,7 @@ export default function journeyReplayComp() {
               </div>
             </div>
           )}
-          <div className="xl:col-span-1  lg:col-span-2 col-span-6 -mt-1 -ms-5 mb-3">
+          <div className="xl:col-span-1  lg:col-span-2 col-span-6 mt-1 -ms-5 mb-3">
             {TravelHistoryresponse.filter((item: any) => {
               return (
                 item.vehicleEvents.filter(
@@ -2130,7 +2130,7 @@ export default function journeyReplayComp() {
                       // style={{ height: "4vh" }}
                     >
                       <Slider
-                        value={progressWidth}
+                        value={currentPositionIndex}
                         // defaultValue={progressWidth}
                         // max={maxSliderValue}
                         // min={minSliderValue}
@@ -2140,6 +2140,8 @@ export default function journeyReplayComp() {
                           color: "#00B56C",
                           paddingBottom: "2%",
                         }}
+                        max={polylinedata.length}
+                        disabled={isPlaying ? false : true}
                         // style={{
                         //   backgroundColor: "lightgreen",
                         //   color: "red !important",

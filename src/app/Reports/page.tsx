@@ -23,6 +23,7 @@ import {
   IgnitionReportByDetailReport,
   IgnitionReportByIdlingActivity,
 } from "@/utils/API_CALLS";
+import { InputLabel } from "@mui/material";
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -117,7 +118,7 @@ export default function Reports() {
   const handleCustomDateChange = (key: string, e: any) => {
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
-      [key]: e.toISOString().split("T")[0],
+      [key]: e.toISOString(),
     }));
     setstartdate(e);
     setenddate(e);
@@ -386,38 +387,30 @@ export default function Reports() {
             </div>
 
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4">
-              <label className="text-labelColor">
-                Vehicle: &nbsp;&nbsp;
-                <Select
-                  className="h-8 lg:w-4/6 w-full text-labelColor outline-green px-1e"
-                  name="VehicleReg"
-                  value={Ignitionreport.vehicleNo}
-                  onChange={handleInputChange}
-                  displayEmpty
-                  MenuProps={MenuProps}
-                  style={{
-                    paddingLeft: isCustomPeriod ? "10px" : "5px",
-                    paddingTop: isCustomPeriod ? "5px" : "2px",
-                  }}
-                >
-                  <MenuItem value="" disabled hidden>
-                    Select Vehicle Name
+              <label className="text-labelColor">Vehicle: &nbsp;&nbsp;</label>
+              <Select
+                className="h-8 lg:w-4/6 w-full text-labelColor outline-green px-1e"
+                name="VehicleReg"
+                value={Ignitionreport.vehicleNo}
+                onChange={handleInputChange}
+                MenuProps={MenuProps}
+                style={{
+                  paddingLeft: isCustomPeriod ? "10px" : "5px",
+                  paddingTop: isCustomPeriod ? "5px" : "2px",
+                }}
+                displayEmpty
+              >
+                <InputLabel hidden>Select Vehicle Name</InputLabel>
+                {vehicleList?.data?.map((item: DeviceAttach) => (
+                  <MenuItem
+                    className="hover:bg-green hover:text-white w-full text-start"
+                    key={item.id}
+                    value={item.vehicleReg}
+                  >
+                    {item.vehicleNo} (Reg#{item.vehicleReg})
                   </MenuItem>
-                  {vehicleList?.data?.map((item: DeviceAttach) => (
-                    <MenuItem
-                      className="hover:bg-green hover:text-white w-full text-start"
-                      key={item.id}
-                      value={item.vehicleReg}
-                    >
-                      {item.vehicleNo} (Reg#{item.vehicleReg})
-                      {/* {item.vehicleNo}
-                      
-                      (Reg# */}
-                      {/* {item.vehicleReg} */}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </label>
+                ))}
+              </Select>
             </div>
           </div>
 

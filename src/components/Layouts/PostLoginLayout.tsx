@@ -155,7 +155,7 @@ export default function RootLayout({
                 content="Live Map"
               >
                 <svg
-                  className="w-20 h-14 py-3  border-y-2 mt-12  text-white text-white-10 dark:text-white"
+                  className="w-20 h-14 py-3 border-y-2 mt-12  text-white text-white-10 dark:text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -806,7 +806,7 @@ export default function RootLayout({
                     <span className="lg:text-1xl text-sm">
                       {" "}
                       <p className="text-white font-popins text-xl -mt-5 ">
-                        {session?.FullName}
+                        {session?.clientName}
                       </p>
                     </span>
                   </span>

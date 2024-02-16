@@ -135,7 +135,7 @@ const LiveSidebar = ({
                 className="text-lg bg-transparent text-green w-full px-1  placeholder-green border-b  border-black outline-none w-full"
                 placeholder="Search"
                 required
-                onChange={handleInputChange} 
+                onChange={handleInputChange}
               />
             </div>
           </div>
@@ -159,7 +159,7 @@ const LiveSidebar = ({
           <div className="grid grid-cols-10">
             <div className="lg:col-span-1">
               <svg
-                className="h-6 w-3 text-green mr-2"
+                className="h-6 w-3 text-black mr-2"
                 viewBox="0 0 24 24"
                 fill="green"
                 stroke="currentColor"
@@ -174,7 +174,7 @@ const LiveSidebar = ({
             <div className="lg:col-span-1"></div>
             <div className="lg:col-span-1">
               <svg
-                className="h-6 w-3 text-yellow mr-2"
+                className="h-6 w-3 text-black mr-2"
                 viewBox="0 0 24 24"
                 fill="yellow"
                 stroke="currentColor"
@@ -189,7 +189,7 @@ const LiveSidebar = ({
             <div className="lg:col-span-1"></div>
             <div className="lg:col-span-1">
               <svg
-                className="h-6 w-3 text-red mr-2"
+                className="h-6 w-3 text-black mr-2"
                 viewBox="0 0 24 24"
                 fill="red"
                 stroke="currentColor"
@@ -259,7 +259,7 @@ const LiveSidebar = ({
                       className={` ${
                         item?.vehicleStatus == "Hybrid"
                           ? "bg-white text-black "
-                          : "bg-yellow text-white"
+                          : "bg-yellow text-black font-bold"
                       }  p-1 -mt-1 shadow-md`}
                     >
                       {item?.vehicleStatus}
@@ -288,7 +288,7 @@ const LiveSidebar = ({
               </div>
               <div className="lg:text-start md:text-start sm:text-start text-center   mt-1  text-md border-b-2 font-bold border-green text-labelColor">
                 <h1 className="font-popins text-start"> {item.timestamp}</h1>
-                <p className="text-labelColor">{item.zone}</p>
+                {/* <p className="text-labelColor">{item.zone}</p> */}
                 {/* <p> */}
                 {item.DriverName && (
                   <p>Driver Name: {item.DriverName.replace("undefine", "")}</p>
