@@ -109,6 +109,8 @@ const LiveSidebar = ({
     setshowAllVehicles(false);
     setIsActiveColor(item.vehicleId);
   };
+
+
   return (
     <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-4  col-span-4 main_sider_bar">
       <div className="grid grid-cols-12 bg-white py-3 pe-1 lg:gap-4 gap-3 search_live_tracking">
@@ -206,6 +208,7 @@ const LiveSidebar = ({
       </div>
       <div className="overflow-y-scroll bg-zoneTabelBg" id="scroll_side_bar">
         {filteredData?.map((item: VehicleData, index: any) => {
+
           return (
             <div
               className="hover:bg-bgLight cursor-pointer pt-2"
@@ -222,20 +225,19 @@ const LiveSidebar = ({
               >
                 <div className="lg:col-span-5 ">
                   <div className=" font-popins font-bold text-start w-full lg:text-2xl text-1xl">
-                    {item.gps.speed === 0 && item.ignition === 0 ? (
+                    {item.vehicleStatus === "Parked" ? (
                       <p className="text-red text-start">{item?.vehicleReg}</p>
-                    ) : item.gps.speed > 0 && item.ignition === 1 ? (
+                    ) : item.vehicleStatus === "Moving" ? (
                       <p className="text-green text-start">
                         {item?.vehicleReg}
                       </p>
                     ) : (
                       <p
                         className={`
-                      ${
-                        item?.vehicleStatus == "Hybrid"
-                          ? "text-black"
-                          : "text-yellow "
-                      }
+                      ${item?.vehicleStatus == "Hybrid"
+                            ? "text-black"
+                            : "text-yellow "
+                          }
                       `}
                       >
                         {item?.vehicleReg}
@@ -244,27 +246,18 @@ const LiveSidebar = ({
                   </div>
                 </div>
                 <div className="lg:col-span-4 col-span-1">
-                  {item.gps.speed === 0 && item.ignition === 0 ? (
-                    <>
-                      <button className="text-white bg-red p-1 -mt-1 shadow-lg">
-                        Parked
-                      </button>
-                    </>
-                  ) : item.gps.speed > 0 && item.ignition === 1 ? (
-                    <button className="text-white bg-green p-1 -mt-1 shadow-lg">
-                      Moving
-                    </button>
-                  ) : (
-                    <button
-                      className={` ${
-                        item?.vehicleStatus == "Hybrid"
-                          ? "bg-white text-black "
-                          : "bg-yellow text-black font-bold"
+
+                  <button
+                    className={` ${item?.vehicleStatus == "Hybrid"
+                      ? "bg-white text-black "
+                      : item?.vehicleStatus == "Moving" ? "bg-green text-white font-bold"
+                        : item?.vehicleStatus == "Parked" ? "bg-red text-white font-bold" :
+                          "bg-yellow text-white font-bold"
                       }  p-1 -mt-1 shadow-md`}
-                    >
-                      {item?.vehicleStatus}
-                    </button>
-                  )}
+                  >
+                    {item?.vehicleStatus}
+                  </button>
+
                 </div>
                 <div className="lg:col-span-3 col-span-1">
                   <div className="grid grid-cols-4">
@@ -273,11 +266,13 @@ const LiveSidebar = ({
                     </div>
                     <div className="text-labelColor">
                       {session?.timezone !== undefined ? (
+
                         <ActiveStatus
                           currentTime={new Date().toLocaleString("en-US", {
                             timeZone: session.timezone,
                           })}
                           targetTime={item.timestamp}
+                          reg={item.vehicleReg}
                         />
                       ) : (
                         <p>Timezone is undefined</p>

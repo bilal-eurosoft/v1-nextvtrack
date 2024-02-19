@@ -54,6 +54,8 @@ export type VehicleData = {
   rearCameraString: string;
   frontCameraString: string;
   verifyDateTime: string;
+  vehicleColor: string;
+  vehicleTextColor: string;
   clientId: string;
   vehicleId: string;
   vehicleNo: string;
@@ -64,6 +66,8 @@ export type VehicleData = {
   vehicleEventList: any[]; // You can replace this with a more specific type if needed
   zoneName: String;
   zone: String;
+  timestampNotParsed: string;
+  color: string;
   vehicleStatus: string;
   DriverName: string;
 };
