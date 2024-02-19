@@ -125,14 +125,14 @@ const DynamicCarMap = ({
                       ]}
                       radius={radius}
                     >
-                      <Marker
+                      {/*  <Marker
                         position={[
                           Number(singleRecord.centerPoints.split(",")[0]),
                           Number(singleRecord.centerPoints.split(",")[1]),
                         ]}
                       >
                         <Popup>{singleRecord.zoneName}</Popup>
-                      </Marker>
+                      </Marker> */}
                       <Popup>{singleRecord.zoneName}</Popup>
                     </Circle>
                   ) : (
