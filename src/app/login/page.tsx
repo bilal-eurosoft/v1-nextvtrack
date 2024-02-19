@@ -9,6 +9,9 @@ import { useRouter } from "next/navigation";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import "./login.css";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export default function LoginPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -36,6 +39,11 @@ export default function LoginPage() {
     if (data?.status === 200) {
       router.push("/liveTracking");
     }
+    if (data?.status === 401) {
+      toast.error("Invalid Credential", {
+        position: "top-center",
+      });
+    }
     setLoading(false);
   };
   const handleShowPassword = () => {
@@ -58,6 +66,7 @@ export default function LoginPage() {
         // zIndex: "-1 !important",
       }}
     >
+      <ToastContainer />
       {loading ? (
         <div>
           <div

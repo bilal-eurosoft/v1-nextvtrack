@@ -314,7 +314,7 @@ export default function Reports() {
         <div className="bg-green-50 mt-20">
           <div className="grid grid-cols-1">
             <p className="bg-green text-center font-popins font-bold text-xl px-4 py-3 rounded-md text-white">
-              Reports Filter{" "}
+              Reports{" "}
             </p>
           </div>
           <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-2 mt-5 mb-8  grid-cols-2 pt-5 px-10 gap-2 flex justify-center ">
@@ -345,40 +345,25 @@ export default function Reports() {
                       </span>
                     )}
                   >
-                    <MenuItem
-                      className="hover:bg-green w-full hover:text-white text-sm"
-                      value="Trip"
-                    >
+                    <MenuItem id="report_select_hover" value="Trip">
                       Trip
                     </MenuItem>
-                    <MenuItem
-                      className="hover:bg-green w-full hover:text-white text-sm"
-                      value="DailyActivity"
-                    >
+                    <MenuItem id="report_select_hover" value="DailyActivity">
                       Daily Activity
                     </MenuItem>
-                    <MenuItem
-                      className="hover:bg-green w-full hover:text-white text-sm"
-                      value="Ignition"
-                    >
+                    <MenuItem id="report_select_hover" value="Ignition">
                       Ignition
                     </MenuItem>
-                    <MenuItem
-                      className="hover:bg-green w-full hover:text-white text-sm"
-                      value="Events"
-                    >
+                    <MenuItem id="report_select_hover" value="Events">
                       Events
                     </MenuItem>
                     <MenuItem
-                      className="hover:bg-green w-full hover:text-white text-sm"
+                      id="report_select_hover"
                       value="DetailReportByStreet"
                     >
                       Detail Report By Street
                     </MenuItem>
-                    <MenuItem
-                      className="hover:bg-green w-full hover:text-white text-sm"
-                      value="IdlingActivity"
-                    >
+                    <MenuItem id="report_select_hover" value="IdlingActivity">
                       Idling Activity
                     </MenuItem>
                   </Select>
@@ -403,7 +388,7 @@ export default function Reports() {
                 <InputLabel hidden>Select Vehicle Name</InputLabel>
                 {vehicleList?.data?.map((item: DeviceAttach) => (
                   <MenuItem
-                    className="hover:bg-green hover:text-white w-full text-start"
+                    id="report_select_hover"
                     key={item.id}
                     value={item.vehicleReg}
                   >
@@ -491,6 +476,7 @@ export default function Reports() {
                       maxDate={currenTDates}
                       className="xl:w-80  lg:w-80 w-auto"
                       autoOk
+                      inputProps={{ readOnly: true }}
                     />
                   </MuiPickersUtilsProvider>
                   {/* <input
@@ -521,6 +507,7 @@ export default function Reports() {
                     maxDate={currenTDates}
                     className="xl:w-80  lg:w-80 w-auto"
                     autoOk
+                    inputProps={{ readOnly: true }}
                     // style={{ width: "70%" }}
                   />
                 </MuiPickersUtilsProvider>

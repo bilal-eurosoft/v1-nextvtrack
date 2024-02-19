@@ -561,7 +561,7 @@ export default function DriverProfile() {
         <TableContainer>
           <div className="table_driver_profile">
             <Table stickyHeader aria-label="sticky table">
-              <TableHead>
+              <TableHead className="sticky top-0 bg-white z-10">
                 <TableRow>
                   <TableCell
                     align="center"
