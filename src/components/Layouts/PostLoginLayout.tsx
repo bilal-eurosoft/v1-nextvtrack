@@ -117,7 +117,6 @@ export default function RootLayout({
     }, 1000);
     return () => clearInterval(interval);
   }, [loginTime]); // Run effect when loginTime changes
-  console.log("session", session);
   const formatTime = (milliseconds: any) => {
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
@@ -823,14 +822,14 @@ export default function RootLayout({
                     &nbsp;
                     <span className="lg:text-1xl text-sm">
                       {" "}
-                      <p className="text-white font-popins text-xl -mt-5 ">
+                      <p className="text-white font-popins  text-2xl -mt-5 ">
                         {session?.clientName}
                       </p>
                     </span>
                   </span>
                 </div>
                 <div className="lg:col-span-4 md:col-span-4 sm:col-span-4 col-span-7 lg:mx-0 md:mx-4 sm:mx-4 mx-4  lg:mt-2 md:mt-4  sm:mt-4 mt-6">
-                  <a className=" lg:-mt-0 text-white font-popins text-lg ">
+                  <a className=" lg:-mt-0 text-white font-popins text-xl ">
                     <BlinkingTime timezone={session?.timezone} />
                   </a>
                 </div>

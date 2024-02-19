@@ -763,8 +763,8 @@ export default function Zone() {
           </TableCell> */}
                 <TableCell
                   align="left"
-                  className="border-r border-green text-white font-popins font-medium "
-                  style={{ fontSize: "20px" }}
+                  className="border-r border-green font-popins font-medium "
+                  style={{ fontSize: "20px", color: "white" }}
                 >
                   Zone Name
                 </TableCell>
@@ -784,8 +784,12 @@ export default function Zone() {
                 </TableCell>
                 <TableCell
                   align="left"
-                  className="border-r border-green text-center font-popins font-medium "
-                  style={{ fontSize: "20px", color: "white" }}
+                  className="border-r border-green font-popins font-medium "
+                  style={{
+                    fontSize: "20px",
+                    color: "white",
+                    textAlign: "center",
+                  }}
                 >
                   Action
                 </TableCell>

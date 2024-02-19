@@ -16,6 +16,8 @@ import { Polygon } from "react-leaflet/Polygon";
 import { Circle } from "react-leaflet/Circle";
 import { LayerGroup } from "leaflet";
 import { MenuItem, Select } from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
+
 import "./editZone.css";
 const MapContainer = dynamic(
   () => import("react-leaflet").then((module) => module.MapContainer),
@@ -240,7 +242,7 @@ export default function AddZoneComp() {
         if (response.id !== null) {
           // Delay the redirection by 4 seconds
           setTimeout(() => {
-            router.push("/Zone");
+            router.push("http://localhost:3010/Zone");
           }, 2000);
         }
       }
@@ -363,7 +365,7 @@ export default function AddZoneComp() {
               required
             />
             <div className="flex justify-start">
-              <div className="grid lg:grid-cols-6 grid-cols-6 bg-green shadow-md  w-24 rounded-md   hover:shadow-gray transition duration-500 ">
+              {/* <div className="grid lg:grid-cols-8 grid-cols-6 bg-green shadow-md  w-24 rounded-md   hover:shadow-gray transition duration-500 ">
                 <div className="col-span-2">
                   <svg
                     className="h-10 py-3 w-full text-white"
@@ -387,14 +389,72 @@ export default function AddZoneComp() {
                     Save
                   </button>
                 </div>
-
+                <div className="col-span-2">
+                  <ClearIcon />
+                </div>
                 <div className="col-span-2 ">
                   <button
-                    className="ms-14  font-popins font-bold  h-10 bg-white text-labelColor px-6 rounded-md shadow-md  hover:shadow-gray transition duration-500"
-                    onClick={() => router.push("/Zone")}
+                    className="ms-14  font-popins font-bold  h-10 bg-red text-white px-6 rounded-md shadow-md  hover:shadow-gray transition duration-500"
+                    onClick={() => router.push("http://localhost:3010/Zone")}
                   >
                     Cancel
                   </button>
+                </div>
+              </div> */}
+              <div
+                className="grid grid-cols-12  
+                "
+              >
+                <div
+                  className="col-span-5 bg-green 
+                rounded-md shadow-md  hover:shadow-gray transition duration-500"
+                >
+                  <div className="grid grid-cols-12 gap-2">
+                    <div className="col-span-1"></div>
+                    <div className="col-span-3 ">
+                      <svg
+                        className="h-10 py-2  w-full text-white"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                        <polyline points="17 21 17 13 7 13 7 21" />
+                        <polyline points="7 3 7 8 15 8" />
+                      </svg>
+                    </div>
+                    <div className="col-span-8">
+                      <button
+                        className="text-white font-popins font-bold h-10 bg-[#00B56C] "
+                        type="submit"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-span-1"></div>
+                <div
+                  className="col-span-5 bg-red
+                rounded-md shadow-md  hover:shadow-gray transition duration-500"
+                >
+                  <div className="grid grid-cols-12 gap-2">
+                    <div className="col-span-1"></div>
+                    <div className="col-span-3 ">
+                      <ClearIcon className="mt-2 font-bold" />
+                    </div>
+                    <div className="col-span-8">
+                      <button
+                        className="text-white font-popins font-bold h-10 bg-red "
+                        onClick={() => router.push("/Zone")}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

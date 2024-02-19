@@ -36,6 +36,7 @@ import Speedometer, {
 import {
   TravelHistoryByBucketV2,
   TripsByBucketAndVehicle,
+  getAllVehicleByUserId,
   getClientSettingByClinetIdAndToken,
   getCurrentAddress,
   getZoneListByClientId,
@@ -372,12 +373,22 @@ export default function journeyReplayComp() {
   useEffect(() => {
     const vehicleListData = async () => {
       try {
-        if (session?.userRole == "Admin" || session?.userRole == "Controller") {
-          const Data = await vehicleListByClientId({
-            token: session.accessToken,
-            clientId: session?.clientId,
-          });
-          setVehicleList(Data);
+        if (session?.userRole == "Admin" || session?.userRole == "SuperAmin") {
+          if (session) {
+            const Data = await vehicleListByClientId({
+              token: session.accessToken,
+              clientId: session?.clientId,
+            });
+            setVehicleList(Data);
+          }
+        } else {
+          if (session) {
+            const data = await getAllVehicleByUserId({
+              token: session.accessToken,
+              userId: session.userId,
+            });
+            setVehicleList(data);
+          }
         }
       } catch (error) {
         console.error("Error fetching zone data:", error);
@@ -1125,7 +1136,7 @@ export default function journeyReplayComp() {
           </MuiPickersUtilsProvider> */}
           <div className="xl:col-span-3 lg:col-span-4 md:col-span-6 col-span-12     pt-2">
             {getShowRadioButton ? (
-              <div className="grid lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-12  -mt-5  grid-cols-12  xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2 flex justify-center ">
+              <div className="grid lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-12  -mt-2  grid-cols-12  xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2 flex justify-center ">
                 <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0  ">
                   <label className="text-green">From</label>
 
@@ -1163,7 +1174,7 @@ export default function journeyReplayComp() {
                 </div>
                 <div className="lg:col-span-1 col-span-1   ">
                   <button
-                    className="text-green ms-5  text-2xl "
+                    className="text-green ms-5  text-2xl font-bold"
                     onClick={() => setShowRadioButton(false)}
                   >
                     x
@@ -1382,7 +1393,7 @@ export default function journeyReplayComp() {
         </div>
         <div className="grid lg:grid-cols-5  sm:grid-cols-5 md:grid-cols-12 sm:grid-cols-12 grid-cols-1 journey_sidebar">
           <div className="xl:col-span-1 lg:col-span-2 md:col-span-5 sm:col-span-12 col-span-4 ">
-            <p className="bg-green px-4 py-1 text-white font-bold journey_sidebar_text">
+            <p className="bg-green px-4 py-1 text-white font-semibold journey_sidebar_text">
               Trips ({dataresponse?.length})
             </p>
             <div
@@ -1409,7 +1420,7 @@ export default function journeyReplayComp() {
                                   width: "100%",
                                 }}
                               >
-                                <Typography>
+                                <Typography className="text-green">
                                   <b>
                                     {date} &nbsp;&nbsp; {items.day}
                                     &nbsp;&nbsp; &nbsp;&nbsp; (x
@@ -1435,7 +1446,7 @@ export default function journeyReplayComp() {
                                       style={{
                                         backgroundColor:
                                           activeTripColor.id === item.id
-                                            ? "rgba(0, 0, 0, 0.08)"
+                                            ? "#e1f0e3"
                                             : "",
                                       }}
                                     >
@@ -1587,9 +1598,7 @@ export default function journeyReplayComp() {
                         onClick={() => handleGetItem(item, index)}
                         style={{
                           backgroundColor:
-                            activeTripColor.id === item.id
-                              ? "rgba(0, 0, 0, 0.08)"
-                              : "",
+                            activeTripColor.id === item.id ? "#e1f0e3" : "",
                         }}
                       >
                         <div className="grid grid-cols-12 gap-10">

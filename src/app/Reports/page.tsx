@@ -1,5 +1,8 @@
 "use client";
-import { vehicleListByClientId } from "@/utils/API_CALLS";
+import {
+  getAllVehicleByUserId,
+  vehicleListByClientId,
+} from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { DeviceAttach } from "@/types/vehiclelistreports";
 import { IgnitionReport } from "@/types/IgnitionReport";
@@ -55,12 +58,20 @@ export default function Reports() {
   useEffect(() => {
     const vehicleListData = async () => {
       try {
-        if (session) {
+        if (session?.userRole == "Admin" || session?.userRole == "SuperAmin") {
           const Data = await vehicleListByClientId({
             token: session.accessToken,
             clientId: session?.clientId,
           });
           setVehicleList(Data);
+        } else {
+          if (session) {
+            const data = await getAllVehicleByUserId({
+              token: session.accessToken,
+              userId: session.userId,
+            });
+            setVehicleList(data);
+          }
         }
       } catch (error) {
         console.error("Error fetching zone data:", error);
@@ -92,7 +103,6 @@ export default function Reports() {
   const formattedDateTime = `${parsedDateTime
     .toISOString()
     .slice(0, 10)}TO${timeOnly}`;
-  console.log("inigintion", Ignitionreport);
 
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
@@ -147,16 +157,12 @@ export default function Reports() {
           yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
       }
       if (period === "week") {
-        //console.log("week is starting");
         const startOfWeek = moment().subtract(7, "days").startOf("day");
-        //console.log("start of week", startOfWeek);
         const oneday = moment().subtract(1, "day");
 
         startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        //console.log("start date time ", startDateTime);
         endDateTime =
           oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        //console.log("end date time", endDateTime);
       }
       if (period === "custom") {
         startDateTime =
