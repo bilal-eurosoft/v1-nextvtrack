@@ -185,6 +185,7 @@ export default function journeyReplayComp() {
   const [playbtn, setPlayBtn] = useState(false);
   const [stopbtn, setStopBtn] = useState(false);
   const [pausebtn, setPauseBtn] = useState(false);
+  const [stopDetailsOpen, setStopDetailsOpen] = useState(false);
   const [activeTripColor, setactiveTripColor] = useState<any>("");
 
   const SetViewOnClick = ({ coords }: { coords: any }) => {
@@ -371,7 +372,7 @@ export default function journeyReplayComp() {
   useEffect(() => {
     const vehicleListData = async () => {
       try {
-        if (session) {
+        if (session?.userRole == "Admin" || session?.userRole == "Controller") {
           const Data = await vehicleListByClientId({
             token: session.accessToken,
             clientId: session?.clientId,
@@ -655,6 +656,7 @@ export default function journeyReplayComp() {
     setPlayBtn(true);
     setStopBtn(true);
     setPauseBtn(true);
+    setStopDetailsOpen(true);
     try {
       setIsPlaying(false);
       if (session) {
@@ -1038,7 +1040,6 @@ export default function journeyReplayComp() {
         <div className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-5 px-4 text-start  bg-bgLight select_box_journey">
           <div
             className="xl:col-span-1 lg:col-span-2 md:col-span-2  col-span-12
-
           "
           >
             {/* <select
@@ -1083,28 +1084,45 @@ export default function journeyReplayComp() {
               name="VehicleReg"
               id="select_box_journey"
               displayEmpty
-              className={`h-8 text-black font-popins font-bold w-full outline-green p-1 ${
+              className={`h-8 text-black font-popins font-bold w-full outline-green  ${
                 getShowRadioButton
                   ? " text-black font-popins font-extrabold"
                   : " text-black font-popins  "
               }`}
-              style={{ color: getShowRadioButton ? "black" : "" }}
+              style={{
+                color: getShowRadioButton ? "black" : "",
+                paddingTop: getShowRadioButton ? "4%" : "2%",
+                paddingLeft: getShowRadioButton ? "6%" : "3%",
+                fontWeight: getShowRadioButton ? "bold" : "bold",
+              }}
             >
               <MenuItem value="" disabled selected hidden className="text-sm">
                 Select Vechile
               </MenuItem>
               {vehicleList?.data?.map((item: DeviceAttach) => (
                 <MenuItem
-                  className="hover:bg-green hover:text-white w-full text-start"
+                  // className=" w-full text-start font-semibold "
                   key={item.id}
                   value={item.vehicleReg}
+                  id="bg_hover_select_vehicle"
                 >
                   {item.vehicleReg}
                 </MenuItem>
               ))}
             </Select>
           </div>
-
+          {/* <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
+            <KeyboardDatePicker
+              format="MM/DD/yyyy"
+              value={Ignitionreport.fromDateTime}
+              onChange={(newDate: any) =>
+                handleDateChange("fromDateTime", newDate)
+              }
+              variant="inline"
+              maxDate={currenTDates}
+              autoOk
+            />
+          </MuiPickersUtilsProvider> */}
           <div className="xl:col-span-3 lg:col-span-4 md:col-span-6 col-span-12     pt-2">
             {getShowRadioButton ? (
               <div className="grid lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-12  -mt-5  grid-cols-12  xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2 flex justify-center ">
@@ -1121,6 +1139,7 @@ export default function journeyReplayComp() {
                       variant="inline"
                       maxDate={currenTDates}
                       autoOk
+                      inputProps={{ readOnly: true }}
                     />
                   </MuiPickersUtilsProvider>
                 </div>
@@ -1135,6 +1154,7 @@ export default function journeyReplayComp() {
                       }
                       variant="inline"
                       maxDate={currenTDates}
+                      inputProps={{ readOnly: true }}
                       // maxDate={currenTDates}
                       // shouldDisableDate={(date) => !isCurrentDate(date)}
                       autoOk
@@ -1152,7 +1172,7 @@ export default function journeyReplayComp() {
               </div>
             ) : (
               <div
-                className="grid xl:grid-cols-11 lg:grid-cols-12  md:grid-cols-12 grid-cols-12  "
+                className="grid xl:grid-cols-11 lg:grid-cols-12  md:grid-cols-12 grid-cols-12 -mt-2 "
                 // style={{ display: "flex", justifyContent: "start" }}
               >
                 <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2 col-span-3">
@@ -1380,11 +1400,20 @@ export default function journeyReplayComp() {
                                 expandIcon={<ExpandMoreIcon />}
                                 aria-controls="panel1a-content"
                                 id="panel1a-header"
+                                style={{
+                                  paddingLeft: getShowRadioButton ? "5%" : "5%",
+                                  paddingRight: getShowRadioButton
+                                    ? "5%"
+                                    : "5%",
+                                  borderBottom: "1px solid gray",
+                                  width: "100%",
+                                }}
                               >
                                 <Typography>
                                   <b>
-                                    {date} &nbsp;&nbsp; (x
-                                    {items.count}) &nbsp;&nbsp; {items.day}{" "}
+                                    {date} &nbsp;&nbsp; {items.day}
+                                    &nbsp;&nbsp; &nbsp;&nbsp; (x
+                                    {items.count}){" "}
                                   </b>
                                 </Typography>
                               </AccordionSummary>
@@ -1397,6 +1426,7 @@ export default function journeyReplayComp() {
                                       item.toDateTime
                                     )
                                   }
+                                  className="border-b"
                                 >
                                   <Typography>
                                     <div
@@ -1829,7 +1859,7 @@ export default function journeyReplayComp() {
               <div className="xl:col-span-2 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-5">
                 <div
                   className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg  rounded-md cursor-pointer"
-                  onClick={handleShowDetails}
+                  onClick={() => stopDetailsOpen && handleShowDetails()}
                 >
                   <div className="lg:col-span-11  md:col-span-10 sm:col-span-10 col-span-11">
                     <p className="text-white lg:px-3 ps-1 text-lg">
@@ -1887,7 +1917,7 @@ export default function journeyReplayComp() {
                           className="cursor-pointer"
                         >
                           <p className="text-black font-popins px-3 py-3 text-sm">
-                            {item?.address}
+                            {item?.address.substring(0, 50)}
                           </p>
 
                           <div className="grid grid-cols-12">
@@ -2139,6 +2169,7 @@ export default function journeyReplayComp() {
                         style={{
                           color: "#00B56C",
                           paddingBottom: "2%",
+                          cursor: isPlaying ? "pointer" : "not-allowed",
                         }}
                         max={polylinedata.length}
                         disabled={isPlaying ? false : true}
@@ -2176,28 +2207,38 @@ export default function journeyReplayComp() {
                           onChange={(e) =>
                             setSpeedFactor(Number(e.target.value))
                           }
+                          style={{
+                            color: getShowRadioButton ? "black" : "",
+                            paddingTop: getShowRadioButton ? "4%" : "2%",
+                            paddingLeft: getShowRadioButton ? "12%" : "3%",
+                            fontWeight: getShowRadioButton ? "bold" : "bold",
+                          }}
                         >
                           <MenuItem
-                            className="hover:bg-green hover:text-white text-sm"
+                            className="hover:bg-green hover:text-white text-sm w-full"
                             value={1}
+                            id="select_slider"
                           >
                             1x
                           </MenuItem>
                           <MenuItem
-                            className="hover:bg-green hover:text-white text-sm"
+                            className="hover:bg-green hover:text-white text-sm w-full"
                             value={2}
+                            id="select_slider"
                           >
                             2x
                           </MenuItem>
                           <MenuItem
-                            className="hover:bg-green hover:text-white text-sm"
+                            className=" text-md w-full "
                             value={4}
+                            id="select_slider"
                           >
                             4x{" "}
                           </MenuItem>
                           <MenuItem
-                            className="hover:bg-green hover:text-white text-sm"
+                            className="hover:bg-green hover:text-white text-sm w-full"
                             value={6}
+                            id="select_slider"
                           >
                             6x
                           </MenuItem>

@@ -1224,7 +1224,10 @@ export default function DriverProfile() {
       <TableContainer component={Paper}>
         <div className="table_driver_profile">
           <Table aria-label="custom pagination table">
-            <TableHead>
+            <TableHead
+              className="sticky top-0 bg-white z-10"
+              // style={{ zIndex: "1", backgroundColor: "white" }}
+            >
               <TableRow>
                 <TableCell
                   align="center"

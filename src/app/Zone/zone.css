@@ -27,7 +27,14 @@
   background: gray;
   border-radius: 7px;
 }
-
+#zone_hover {
+  font-weight: 600;
+}
+#zone_hover:hover {
+  background-color: #00b56c;
+  color: white;
+  font-weight: 600;
+}
 .MuiOutlinedInput-notchedOutline {
   /* border-width: 1px !important; */
   border-color: #d3d3d3 !important;

@@ -349,7 +349,7 @@ export default function DriverProfile() {
 
         <TableContainer component={Paper}>
           <Table aria-label="custom pagination table">
-            <TableHead>
+            <TableHead className="sticky top-0 bg-white z-10">
               <TableRow>
                 {/* <TableCell align="center" colSpan={2}>
                   <input

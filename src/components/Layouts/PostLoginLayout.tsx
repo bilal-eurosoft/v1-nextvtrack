@@ -106,6 +106,24 @@ export default function RootLayout({
   };
 
   const { data: session }: { data: Session & MySessionData } = useSession();
+  const [loginTime, setLoginTime] = useState(new Date());
+  const [elapsedTime, setElapsedTime] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentTime = new Date();
+      const timeDifference = currentTime.getTime() - loginTime.getTime();
+      setElapsedTime(timeDifference);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [loginTime]); // Run effect when loginTime changes
+  console.log("session", session);
+  const formatTime = (milliseconds: any) => {
+    const seconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes} min ${remainingSeconds} sec`;
+  };
 
   useEffect(() => {
     if (!session) {
@@ -551,7 +569,7 @@ export default function RootLayout({
               <div className="flex items-center flex-shrink-0 text-white">
                 <Image
                   src={logo}
-                  className="xl:h-12 lg:h-14 lg:w-52 w-20 h-6   lg:block md:block sm:block hidden  "
+                  className="xl:h-12 lg:h-14 lg:w-44 w-20 h-6   lg:block md:block sm:block hidden  "
                   alt=""
                 />
               </div>
@@ -844,13 +862,13 @@ export default function RootLayout({
                       <div className="grid grid-cols-12">
                         <div className="col-span-2">
                           <img
-                            className="mb-5 w-10 lg:h-8 h-10 rounded-full"
+                            className="mb-5 w-10 lg:h-10 h-10 rounded-full"
                             src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
                             alt="Rounded avatar"
                           />
                         </div>
-                        <div className="col-span-9  text-lg font-popins text-start text-black">
-                          <p className="text-2xl text-start">
+                        <div className="col-span-9 ms-2 text-lg font-popins text-start text-black">
+                          <p className="text-2xl text-center">
                             {session?.FullName}
                           </p>
                           {session?.Email}
@@ -863,6 +881,9 @@ export default function RootLayout({
                       >
                         {/* <p className=" mb-3 text-center">{session?.FullName}</p> */}
                         <hr className="text-green w-full"></hr>
+                        <p className="text-center pt-2 text-md font-popins font-bold ms-5">
+                          {/* login Time: {formatTime(elapsedTime)} */}
+                        </p>
                         <div className="flex justify-center">
                           <button
                             className="bg-green shadow-md  hover:shadow-gray transition duration-500 cursor px-5 py-2 rounded-lg text-white mt-5"

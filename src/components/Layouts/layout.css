@@ -11,7 +11,7 @@
   padding-left: 16px;
   padding-right: 16px;
   min-height: 56px;
-  background-color: #00b56c;
+  background-color: #00b56c !important;
   height: 2vh;
 }
 

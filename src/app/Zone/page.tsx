@@ -392,7 +392,7 @@ export default function Zone() {
       <form className=" lg:w-full w-screen bg-bgLight lg:-ms-0 -ms-1 zone_form">
         <div className="grid lg:grid-cols-2 md:grid-cols-2  gap-6 pt-5 px-5  ">
           <div className="lg:col-span-1">
-            <label className="text-md font-popins text-black font-medium">
+            <label className="text-md font-popins text-black font-semibold">
               Zone Name
             </label>
             {/* <select
@@ -435,18 +435,14 @@ export default function Zone() {
               {[...zoneList]
                 .sort((a, b) => a.zoneName.localeCompare(b.zoneName))
                 .map((item, index) => (
-                  <MenuItem
-                    key={index}
-                    value={item.zoneName}
-                    className="hover:bg-green hover:text-white"
-                  >
+                  <MenuItem key={index} value={item.zoneName} id="zone_hover">
                     {item.zoneName}
                   </MenuItem>
                 ))}
             </Select>
           </div>
           <div className="lg:col-span-1 md:col-span-1 col-span-1">
-            <label className="text-md font-popins text-black font-medium">
+            <label className="text-md font-popins text-black font-semibold">
               Zone Short Name
             </label>
             {/* <input
@@ -487,7 +483,7 @@ export default function Zone() {
                   <MenuItem
                     key={index}
                     value={item.zoneShortName}
-                    className="hover:bg-green hover:text-white"
+                    id="zone_hover"
                   >
                     {item.zoneShortName}
                   </MenuItem>
@@ -497,7 +493,7 @@ export default function Zone() {
         </div>
         <div className="grid lg:grid-cols-2 md:grid-cols-2 mb-3   gap-6 pt-5 px-5 bg-green-50 ">
           <div className="lg:col-span-1">
-            <label className="text-md font-popins text-black font-medium">
+            <label className="text-md font-popins text-black font-semibold">
               Geofence
             </label>
             {/* <select
@@ -541,37 +537,19 @@ export default function Zone() {
               displayEmpty
               className="h-8 text-sm text-gray  w-full  outline-green "
             >
-              <MenuItem
-                className="hover:bg-green hover:text-white text-sm"
-                value=""
-                disabled
-                selected
-                hidden
-              >
+              <MenuItem id="zone_hover" value="" disabled selected hidden>
                 Select Geofence Type
               </MenuItem>
-              <MenuItem
-                className="hover:bg-green hover:text-white text-sm"
-                value="On-Site"
-              >
+              <MenuItem id="zone_hover" value="On-Site">
                 On-Site
               </MenuItem>
-              <MenuItem
-                className="hover:bg-green hover:text-white text-sm"
-                value="Off-Site"
-              >
+              <MenuItem id="zone_hover" value="Off-Site">
                 Off-Site
               </MenuItem>
-              <MenuItem
-                className="hover:bg-green hover:text-white text-sm"
-                value="City-Area"
-              >
+              <MenuItem id="zone_hover" value="City-Area">
                 City-Area
               </MenuItem>
-              <MenuItem
-                value="Restricted-Area"
-                className="hover:bg-green hover:text-white text-sm"
-              >
+              <MenuItem value="Restricted-Area" id="zone_hover">
                 Restricted-Area
               </MenuItem>
             </Select>
@@ -581,13 +559,13 @@ export default function Zone() {
             id="zoneType"
             className="lg:col-span-1 md:col-span-1 col-span-1  text-black "
           >
-            <label className="text-md font-popins text-black font-medium">
+            <label className="text-md font-popins text-black font-semibold">
               Zone Type
             </label>
             <br></br>
             <span
               id="Circle"
-              className={`inline-flex items-center mt-2 border rounded-md border-grayLight px-2 h-8 text-md font-popins text-black font-medium cursor-pointer shadow-md hover:shadow-gray transition duration-500   ${
+              className={`inline-flex items-center mt-2 border rounded-md border-grayLight px-2 h-8 text-md font-popins text-black  cursor-pointer shadow-md hover:shadow-gray transition duration-500 font-semibold  ${
                 selectedZoneTypeCircle && "bg-green text-white "
               } transition duration-300`}
               onClick={() => handleClickZoneType("Circle")}
@@ -602,7 +580,7 @@ export default function Zone() {
 
             <span
               id="Polygon"
-              className={`inline-flex items-center mt-2 border rounded-md border-grayLight px-2 h-8 text-md font-popins text-black font-medium cursor-pointer shadow-md hover:shadow-gray transition duration-500  mx-5  ${
+              className={`inline-flex items-center mt-2 border rounded-md border-grayLight px-2 h-8 text-md font-popins text-black font-semibold cursor-pointer shadow-md hover:shadow-gray transition duration-500  mx-5  ${
                 selectedZoneTypPolyGone && "bg-green text-white"
               } transition duration-300`}
               onClick={() => handleClickZoneType("Polygon")}
@@ -715,7 +693,7 @@ export default function Zone() {
             className="flex lg:justify-end justify-start"
           >
             <Link href="/AddZone">
-              <div className="rounded-md  grid grid-cols-3 bg-green mb-5 mt-2 w-full  shadow-md   hover:shadow-gray transition duration-500 ">
+              <div className="rounded-md  grid grid-cols-3 bg-green mb-8 lg:-mt-2 md:-mt-1 mt-2 w-full  shadow-md   hover:shadow-gray transition duration-500 ">
                 <div className="col-span-1">
                   <svg
                     className="h-11 py-3 w-full text-white "
@@ -735,7 +713,7 @@ export default function Zone() {
                 </div>
                 <div className="col-span-2 pt-1">
                   <button
-                    className="text-white  font-popins font-bold -ms-2 h-10 bg-[#00B56C] px-2 text-md  "
+                    className="text-white  font-popins font-bold -ms-2 h-10 bg-[#00B56C] px-2 text-md   "
                     // onClick={handleClick}
                   >
                     Add Zone
@@ -792,22 +770,22 @@ export default function Zone() {
                 </TableCell>
                 <TableCell
                   align="left"
-                  className="border-r border-green text-white font-popins font-medium "
-                  style={{ fontSize: "20px" }}
+                  className="border-r border-green  font-popins font-medium "
+                  style={{ fontSize: "20px", color: "white" }}
                 >
                   Zone Sort Name
                 </TableCell>
                 <TableCell
                   align="left"
-                  className="border-r border-green text-white font-popins font-medium "
-                  style={{ fontSize: "20px" }}
+                  className="border-r border-green  font-popins font-medium "
+                  style={{ fontSize: "20px", color: "white" }}
                 >
                   Zone Type
                 </TableCell>
                 <TableCell
                   align="left"
-                  className="border-r border-green text-center text-white font-popins font-medium "
-                  style={{ fontSize: "20px" }}
+                  className="border-r border-green text-center font-popins font-medium "
+                  style={{ fontSize: "20px", color: "white" }}
                 >
                   Action
                 </TableCell>
