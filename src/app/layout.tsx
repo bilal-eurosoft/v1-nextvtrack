@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import Provider from "@/app/context/client-provider";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import React, { createContext, useState, useContext } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 

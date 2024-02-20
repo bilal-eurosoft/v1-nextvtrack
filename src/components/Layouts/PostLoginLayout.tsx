@@ -116,7 +116,7 @@ export default function RootLayout({
       setElapsedTime(timeDifference);
     }, 1000);
     return () => clearInterval(interval);
-  }, [loginTime]); // Run effect when loginTime changes
+  }, []); // Run effect when loginTime changes
   const formatTime = (milliseconds: any) => {
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
@@ -167,7 +167,7 @@ export default function RootLayout({
           <div className="basis-20 py-6 bg-[#29303b] h-screen lg:block md:hidden sm:hidden hidden sticky top-0">
             <Link href="/liveTracking">
               <Tooltip
-                className="bg-white text-[#00B56C] shadow-lg rounded"
+                className="bg-[#00B56C] text-white shadow-lg rounded"
                 placement="right"
                 content="Live Map"
               >
@@ -199,7 +199,7 @@ export default function RootLayout({
             </Link>
             <Link href="/journeyReplay">
               <Tooltip
-                className="bg-white  text-[#00B56C] shadow-lg rounded"
+                className="bg-[#00B56C] text-white shadow-lg rounded"
                 placement="right"
                 content="Journey Replay"
               >
@@ -230,7 +230,7 @@ export default function RootLayout({
             {session?.userRole === "Controller" ? null : (
               <Link href="/Zone">
                 <Tooltip
-                  className="bg-white text-[#00B56C] rounded shadow-lg"
+                  className="bg-[#00B56C] text-white rounded shadow-lg"
                   placement="right"
                   content="Zones"
                 >
@@ -329,7 +329,7 @@ export default function RootLayout({
                     {/* <Link href="/DriverProfile"> */}
                     {/* <Link href={pathname ? "/DriverProfile" : "/DriverAssign"}> */}
                     <Tooltip
-                      className="bg-white text-green shadow-lg rounded border-none"
+                      className="bg-[#00B56C] text-white shadow-lg rounded border-none"
                       placement="right"
                       content="Camera"
                     >
@@ -438,7 +438,7 @@ export default function RootLayout({
 
             <Link href="/Reports">
               <Tooltip
-                className="bg-white text-[#00B56C] shadow-lg rounded"
+                className="bg-[#00B56C] text-white shadow-lg rounded"
                 placement="right"
                 content="Reports"
               >
@@ -475,7 +475,7 @@ export default function RootLayout({
                     {/* <Link href="/DriverProfile"> */}
                     {/* <Link href={pathname ? "/DriverProfile" : "/DriverAssign"}> */}
                     <Tooltip
-                      className="bg-white text-green shadow-lg rounded border-none"
+                      className="bg-[#00B56C] text-white shadow-lg rounded border-none"
                       placement="right"
                       content="Driver"
                     >
@@ -881,7 +881,7 @@ export default function RootLayout({
                         {/* <p className=" mb-3 text-center">{session?.FullName}</p> */}
                         <hr className="text-green w-full"></hr>
                         <p className="text-center pt-2 text-md font-popins font-bold ms-5">
-                          {/* login Time: {formatTime(elapsedTime)} */}
+                          login Time: {formatTime(elapsedTime)}
                         </p>
                         <div className="flex justify-center">
                           <button

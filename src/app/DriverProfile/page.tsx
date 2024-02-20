@@ -158,10 +158,36 @@ export default function DriverProfile() {
       item.driverContact?.toLowerCase().includes(inputs.toLowerCase()) ||
       item.driverIdNo?.toLowerCase().includes(inputs.toLowerCase()) ||
       item.driverAddress1?.toLowerCase().includes(inputs.toLowerCase())
+
+      // item.isDeleted?.toLowerCase().includes(inputs.toLowerCase())
+
       // item.driverRFIDCardNumber.toLowerCase().includes(inputs.toLowerCase())
     ) {
       return item;
     }
+    if (
+      inputs.toLowerCase() == "u" ||
+      inputs.toLowerCase() == "un" ||
+      inputs.toLowerCase() == "una" ||
+      inputs.toLowerCase() == "unas" ||
+      inputs.toLowerCase() == "unass" ||
+      inputs.toLowerCase() == "unassi" ||
+      inputs.toLowerCase() == "unassig" ||
+      inputs.toLowerCase() == "unassign"
+    ) {
+      return item.isAvailable === true;
+    }
+    if (
+      inputs.toLowerCase() === "a" ||
+      inputs.toLowerCase() === "ac" ||
+      inputs.toLowerCase() === "act" ||
+      inputs.toLowerCase() === "acti" ||
+      inputs.toLowerCase() === "activ" ||
+      inputs.toLowerCase() === "active"
+    ) {
+      return !item.isDeleted;
+    }
+
     return false;
   });
   const startIndexs: any = currentPage * rowsPerPages;

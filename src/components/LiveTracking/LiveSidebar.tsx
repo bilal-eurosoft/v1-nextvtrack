@@ -82,7 +82,24 @@ const LiveSidebar = ({
       .filter((data) =>
         data.vehicleReg.toLowerCase().includes(searchData.search.toLowerCase())
       )
-      .sort((a, b) => a.vehicleReg.localeCompare(b.vehicleReg))
+      .sort((a: any, b: any) => {
+        const regA = parseInt(a.vehicleReg);
+        const regB = parseInt(b.vehicleReg);
+
+        // If both values are numeric, sort numerically
+        if (!isNaN(regA) && !isNaN(regB)) {
+          return regA - regB;
+        }
+
+        // If one or both values are non-numeric, sort alphabetically
+        if (isNaN(regA) || isNaN(regB)) {
+          // Convert to uppercase for case-insensitive sorting
+          const regAUpperCase = a.vehicleReg.toUpperCase();
+          const regBUpperCase = b.vehicleReg.toUpperCase();
+
+          return regAUpperCase.localeCompare(regBUpperCase);
+        }
+      })
       .map((item: any) => {
         const i = zoneLatlog.findIndex((zone: any) => {
           if (zone != undefined) {
@@ -210,7 +227,7 @@ const LiveSidebar = ({
         {filteredData?.map((item: VehicleData, index: any) => {
           return (
             <div
-              className="hover:bg-bgLight cursor-pointer pt-2"
+              className="hover:bg-[#e1f0e3] cursor-pointer pt-2 "
               onClick={() => handleClickVehicle(item)}
               key={index}
               style={{

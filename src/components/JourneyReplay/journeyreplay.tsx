@@ -4,6 +4,7 @@ import DateFnsMomemtUtils from "@date-io/moment";
 import { DatePicker } from "@material-ui/pickers";
 import BlinkingTime from "@/components/General/BlinkingTime";
 import axios from "axios";
+import PlaceIcon from "@mui/icons-material/Place";
 
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
@@ -70,6 +71,7 @@ import {
 
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
+import car_icon from "../../../public/Images/journey_car_icon.png";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -1406,7 +1408,7 @@ export default function journeyReplayComp() {
                       <div key={date}>
                         <ul>
                           <div>
-                            <Accordion className=" hover:bg-tripBg  cursor-pointer">
+                            <Accordion className="  cursor-pointer">
                               <AccordionSummary
                                 expandIcon={<ExpandMoreIcon />}
                                 aria-controls="panel1a-content"
@@ -1421,11 +1423,26 @@ export default function journeyReplayComp() {
                                 }}
                               >
                                 <Typography className="text-green">
-                                  <b>
+                                  {/* <b>
                                     {date} &nbsp;&nbsp; {items.day}
                                     &nbsp;&nbsp; &nbsp;&nbsp; (x
                                     {items.count}){" "}
-                                  </b>
+                                  </b> */}
+                                  <div className="grid grid-cols-12 space-x-2">
+                                    <div className="col-span-5">
+                                      <b> {date}</b>
+                                    </div>
+                                    <div className="col-span-5">
+                                      <b> {items.day}</b>
+                                    </div>
+                                    <div className="col-span-2">
+                                      <b>
+                                        {" "}
+                                        (x
+                                        {items.count})
+                                      </b>
+                                    </div>
+                                  </div>
                                 </Typography>
                               </AccordionSummary>
                               {items?.trips?.map((item: any, index: any) => (
@@ -1441,7 +1458,7 @@ export default function journeyReplayComp() {
                                 >
                                   <Typography>
                                     <div
-                                      className="py-5 hover:bg-tripBg  cursor-pointer"
+                                      className="py-5 hover:bg-[#e1f0e3]  cursor-pointer"
                                       onClick={() => handleGetItem(item, index)}
                                       style={{
                                         backgroundColor:
@@ -1450,27 +1467,24 @@ export default function journeyReplayComp() {
                                             : "",
                                       }}
                                     >
-                                      <div className="grid grid-cols-12 gap-10">
+                                      <div className="grid grid-cols-12 space-x-4 ">
                                         <div className="col-span-1">
                                           <svg
-                                            className="h-8 w-8 text-green"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            className="h-9 w-9 text-green "
                                             width="24"
                                             height="24"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth="2"
-                                            stroke="currentColor"
-                                            fill="none"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
+                                            style={{
+                                              filter:
+                                                "drop-shadow(1px 2px 2px #000000)",
+                                            }}
                                           >
-                                            {" "}
                                             <path
-                                              stroke="none"
-                                              d="M0 0h24v24H0z"
-                                            />{" "}
-                                            <circle cx="7" cy="17" r="2" />{" "}
-                                            <circle cx="17" cy="17" r="2" />{" "}
-                                            <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" />
+                                              fill="currentColor"
+                                              className="shadow-lg"
+                                              d="M3 6h13l3 4h2c1.11 0 2 .89 2 2v3h-2a3 3 0 0 1-3 3a3 3 0 0 1-3-3H9a3 3 0 0 1-3 3a3 3 0 0 1-3-3H1V8c0-1.11.89-2 2-2m-.5 1.5V10h8V7.5zm9.5 0V10h5.14l-1.89-2.5zm-6 6A1.5 1.5 0 0 0 4.5 15A1.5 1.5 0 0 0 6 16.5A1.5 1.5 0 0 0 7.5 15A1.5 1.5 0 0 0 6 13.5m12 0a1.5 1.5 0 0 0-1.5 1.5a1.5 1.5 0 0 0 1.5 1.5a1.5 1.5 0 0 0 1.5-1.5a1.5 1.5 0 0 0-1.5-1.5"
+                                            />
                                           </svg>
                                         </div>
                                         <div className="col-span-10 ">
@@ -1482,30 +1496,38 @@ export default function journeyReplayComp() {
                                           <p className=" text-green text-start font-popins font-semibold text-sm">
                                             {" "}
                                             Distance: {item.TotalDistance}
+                                            {item?.DriverName && (
+                                              <div>
+                                                <p>
+                                                  {" "}
+                                                  Driver: {item?.DriverName}
+                                                </p>
+                                              </div>
+                                            )}
                                           </p>
-                                          <p>{item.DriverName}</p>
                                         </div>
                                       </div>
 
                                       <div className="grid grid-cols-12 gap-10 mt-5">
                                         <div className="col-span-1">
                                           <svg
+                                            xmlns="http://www.w3.org/2000/svg"
                                             className="h-8 w-8 text-green"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
+                                            viewBox="0 0 512 512"
+                                            style={{
+                                              filter:
+                                                "drop-shadow(1px 2px 2px #000000)",
+                                            }}
                                           >
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth="2"
-                                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                            <circle
+                                              cx="256"
+                                              cy="192"
+                                              r="32"
+                                              // fill="currentColor"
                                             />
                                             <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth="2"
-                                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                              fill="currentColor"
+                                              d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
                                             />
                                           </svg>
                                           <div className=" border-l-2 h-10 border-green  mx-4 my-3"></div>
@@ -1532,22 +1554,23 @@ export default function journeyReplayComp() {
                                       <div className="grid grid-cols-12 gap-10">
                                         <div className="col-span-1">
                                           <svg
+                                            xmlns="http://www.w3.org/2000/svg"
                                             className="h-8 w-8 text-green"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
+                                            viewBox="0 0 512 512"
+                                            style={{
+                                              filter:
+                                                "drop-shadow(1px 2px 2px #000000)",
+                                            }}
                                           >
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth="2"
-                                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                            <circle
+                                              cx="256"
+                                              cy="192"
+                                              r="32"
+                                              // fill="currentColor"
                                             />
                                             <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth="2"
-                                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                              fill="currentColor"
+                                              d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
                                             />
                                           </svg>
                                         </div>
@@ -1594,16 +1617,16 @@ export default function journeyReplayComp() {
                       }
                     >
                       <div
-                        className="py-5 hover:bg-tripBg px-5 cursor-pointer border-b"
+                        className="py-5 hover:bg-[#e1f0e3] px-5 cursor-pointer border-b"
                         onClick={() => handleGetItem(item, index)}
                         style={{
                           backgroundColor:
                             activeTripColor.id === item.id ? "#e1f0e3" : "",
                         }}
                       >
-                        <div className="grid grid-cols-12 gap-10">
+                        <div className="grid grid-cols-12 space-x-3">
                           <div className="col-span-1">
-                            <svg
+                            {/* <svg
                               className="h-8 w-8 text-green"
                               width="24"
                               height="24"
@@ -1618,7 +1641,24 @@ export default function journeyReplayComp() {
                               <path stroke="none" d="M0 0h24v24H0z" />{" "}
                               <circle cx="7" cy="17" r="2" />{" "}
                               <circle cx="17" cy="17" r="2" />{" "}
-                              <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" />
+                              <path d="M5 17h-2 v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" />
+                            </svg> */}
+
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              className="h-10 w-10 text-green "
+                              width="24"
+                              height="24"
+                              style={{
+                                filter: "drop-shadow(1px 2px 2px #000000)",
+                              }}
+                            >
+                              <path
+                                fill="currentColor"
+                                className="shadow-lg"
+                                d="M3 6h13l3 4h2c1.11 0 2 .89 2 2v3h-2a3 3 0 0 1-3 3a3 3 0 0 1-3-3H9a3 3 0 0 1-3 3a3 3 0 0 1-3-3H1V8c0-1.11.89-2 2-2m-.5 1.5V10h8V7.5zm9.5 0V10h5.14l-1.89-2.5zm-6 6A1.5 1.5 0 0 0 4.5 15A1.5 1.5 0 0 0 6 16.5A1.5 1.5 0 0 0 7.5 15A1.5 1.5 0 0 0 6 13.5m12 0a1.5 1.5 0 0 0-1.5 1.5a1.5 1.5 0 0 0 1.5 1.5a1.5 1.5 0 0 0 1.5-1.5a1.5 1.5 0 0 0-1.5-1.5"
+                              />
                             </svg>
                           </div>
                           <div className="col-span-10 ">
@@ -1640,7 +1680,7 @@ export default function journeyReplayComp() {
 
                         <div className="grid grid-cols-12 gap-10 mt-5">
                           <div className="col-span-1">
-                            <svg
+                            {/* <svg
                               className="h-8 w-8 text-green"
                               fill="none"
                               viewBox="0 0 24 24"
@@ -1657,6 +1697,25 @@ export default function journeyReplayComp() {
                                 strokeLinejoin="round"
                                 strokeWidth="2"
                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg> */}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-8 w-8 text-green"
+                              viewBox="0 0 512 512"
+                              style={{
+                                filter: "drop-shadow(1px 2px 2px #000000)",
+                              }}
+                            >
+                              <circle
+                                cx="256"
+                                cy="192"
+                                r="32"
+                                // fill="currentColor"
+                              />
+                              <path
+                                fill="currentColor"
+                                d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
                               />
                             </svg>
                             <div className=" border-l-2 h-10 border-green  mx-4 my-3"></div>
@@ -1679,7 +1738,7 @@ export default function journeyReplayComp() {
 
                         <div className="grid grid-cols-12 gap-10">
                           <div className="col-span-1">
-                            <svg
+                            {/* <svg
                               className="h-8 w-8 text-green"
                               fill="none"
                               viewBox="0 0 24 24"
@@ -1696,6 +1755,25 @@ export default function journeyReplayComp() {
                                 strokeLinejoin="round"
                                 strokeWidth="2"
                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg> */}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-8 w-8 text-green"
+                              viewBox="0 0 512 512"
+                              style={{
+                                filter: "drop-shadow(1px 2px 2px #000000)",
+                              }}
+                            >
+                              <circle
+                                cx="256"
+                                cy="192"
+                                r="32"
+                                // fill="currentColor"
+                              />
+                              <path
+                                fill="currentColor"
+                                d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
                               />
                             </svg>
                           </div>
