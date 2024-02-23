@@ -157,7 +157,8 @@ export default function DriverProfile() {
       item.driverLastName?.toLowerCase().includes(inputs.toLowerCase()) ||
       item.driverContact?.toLowerCase().includes(inputs.toLowerCase()) ||
       item.driverIdNo?.toLowerCase().includes(inputs.toLowerCase()) ||
-      item.driverAddress1?.toLowerCase().includes(inputs.toLowerCase())
+      item.driverAddress1?.toLowerCase().includes(inputs.toLowerCase()) ||
+      item.driverRFIDCardNumber?.toLowerCase().includes(inputs.toLowerCase())
 
       // item.isDeleted?.toLowerCase().includes(inputs.toLowerCase())
 
@@ -188,6 +189,16 @@ export default function DriverProfile() {
       return !item.isDeleted;
     }
 
+    if (
+      inputs.toLowerCase() === "a" ||
+      inputs.toLowerCase() === "as" ||
+      inputs.toLowerCase() === "ass" ||
+      inputs.toLowerCase() === "assi" ||
+      inputs.toLowerCase() === "assign"
+    ) {
+      return item.isDeleted === false;
+    }
+
     return false;
   });
   const startIndexs: any = currentPage * rowsPerPages;
@@ -198,8 +209,6 @@ export default function DriverProfile() {
   //   currentPage * rowsPerPages + rowsPerPages
   // );
 
-  console.log("driver Data", DriverData);
-  console.log("rfid", inactiveRFIDs);
   const totalCount = DriverData.length / currentPage;
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -465,50 +474,88 @@ export default function DriverProfile() {
     };
 
     try {
-      if (session) {
-        const newformdata = {
-          ...payLoad,
-          clientId: session?.clientId,
-        };
+      // Show a custom confirmation toast with "OK" and "Cancel" buttons
 
-        const response = await toast.promise(
-          postDriverDataByClientId({
-            token: session?.accessToken,
-            newformdata: newformdata,
-          }),
-          {
-            loading: "Saving data...",
-            success: "User successfully InActive!",
-            error: "Error saving data. Please try again.",
-          },
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
-            },
-            success: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-            error: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-          }
-        );
-        vehicleListData();
-        RFid();
-      }
-    } catch (e) {}
-    // await vehicleListData();
-    // console.log("Updated Data from API:", updatedData);
+      const { id } = toast.custom((t) => (
+        <div className="bg-white p-2 rounded-md">
+          <p>Are you sure you want to InActive this Driver?</p>
+          <button
+            onClick={async () => {
+              // Check if the user is authenticated
+              if (session) {
+                const newformdata = {
+                  ...payLoad,
+                  clientId: session.clientId,
+                };
+
+                // Send a request to delete the zone
+                const response = await toast.promise(
+                  postDriverDataByClientId({
+                    token: session.accessToken,
+                    newformdata: newformdata,
+                  }),
+                  {
+                    loading: "Saving data...",
+                    success: "User successfully InActive!",
+                    error: "Error saving data. Please try again.",
+                  },
+                  {
+                    style: {
+                      border: "1px solid #00B56C",
+                      padding: "16px",
+                      color: "#1A202C",
+                    },
+                    success: {
+                      duration: 2000,
+                      iconTheme: {
+                        primary: "#00B56C",
+                        secondary: "#FFFAEE",
+                      },
+                    },
+                    error: {
+                      duration: 2000,
+                      iconTheme: {
+                        primary: "#00B56C",
+                        secondary: "#FFFAEE",
+                      },
+                    },
+                  }
+                );
+
+                // Refresh vehicle list and RFid data after deletion
+                vehicleListData();
+                RFid();
+              }
+            }}
+            className="text-green pr-5 font-popins font-bold"
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => {
+              // Dismiss the confirmation toast without deleting
+              toast.dismiss(id);
+
+              // Optionally, you can show a cancellation message
+              toast("Deletion canceled", {
+                duration: 3000,
+                position: "top-center",
+              });
+            }}
+            className="text-red font-popins font-bold"
+          >
+            No
+          </button>
+        </div>
+      ));
+    } catch (error) {
+      // Show an error toast
+      toast.error("Failed to delete zone", {
+        duration: 3000,
+        position: "top-center",
+      });
+      console.log(error);
+    }
   };
 
   const handleActive = async (data: any) => {
@@ -1505,6 +1552,8 @@ export default function DriverProfile() {
         onRowsPerPageChange={handleChangeRowsPerPage}
         className="bg-bgLight table_pagination"
       />
+
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }

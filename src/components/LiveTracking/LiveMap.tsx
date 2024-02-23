@@ -163,14 +163,14 @@ const DynamicCarMap = ({
               />
             </MapContainer>
           )}
-          <div className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">
+          <div className="grid grid-cols-1 absolute shadow-lg rounded-md lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">
             <div className="col-span-1" style={{ color: "green" }}>
               <input
                 type="checkbox"
                 onClick={() => {
                   setShowZones(!showZones);
                 }}
-                className="mx-2  mt-1"
+                className="mx-3  mt-1"
                 style={{ accentColor: "green" }}
               />
               <button className="text-labelColor font-popins text-sm font-bold">

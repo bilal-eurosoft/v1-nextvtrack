@@ -20,6 +20,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
+import TimeCounter from "@/app/context/timer";
 import { usePathname } from "next/navigation";
 
 import {
@@ -873,19 +874,21 @@ export default function RootLayout({
                           {session?.Email}
                         </div>
                       </div>
+                      <hr></hr>
+                      <div
+                        style={{ display: "flex", justifyContent: "center" }}
+                        className="py-2 font-popins font-semibold"
+                      >
+                        <TimeCounter />
+                      </div>
                       <Typography
                         variant="small"
                         color="gray"
                         className="font-normal "
                       >
-                        {/* <p className=" mb-3 text-center">{session?.FullName}</p> */}
-                        <hr className="text-green w-full"></hr>
-                        <p className="text-center pt-2 text-md font-popins font-bold ms-5">
-                          login Time: {formatTime(elapsedTime)}
-                        </p>
                         <div className="flex justify-center">
                           <button
-                            className="bg-green shadow-md  hover:shadow-gray transition duration-500 cursor px-5 py-2 rounded-lg text-white mt-5"
+                            className="bg-green shadow-md  hover:shadow-gray transition duration-500 cursor px-5 py-2 rounded-lg text-white "
                             onClick={() => {
                               signOut();
                             }}

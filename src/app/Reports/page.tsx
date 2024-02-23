@@ -8,9 +8,10 @@ import { DeviceAttach } from "@/types/vehiclelistreports";
 import { IgnitionReport } from "@/types/IgnitionReport";
 import React, { useEffect, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
-import Select from "@mui/material/Select";
+// import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import DateFnsMomemtUtils from "@date-io/moment";
+import Select from "react-select";
 import "./report.css";
 
 import {
@@ -103,7 +104,27 @@ export default function Reports() {
   const formattedDateTime = `${parsedDateTime
     .toISOString()
     .slice(0, 10)}TO${timeOnly}`;
+  const handleInputChangeSelect = (e: any) => {
+    console.log("ee", e);
+    const { value, label } = e;
+    if (!e) return;
+    setIgnitionreport((prevReport: any) => ({
+      ...prevReport,
+      VehicleReg: value,
+      // ["label"]: label,
+    }));
+  };
 
+  const handleInputChangeTrip = (e: any) => {
+    console.log("tt", e);
+    const { value, label } = e;
+    if (!e) return;
+    setIgnitionreport((prevReport: any) => ({
+      ...prevReport,
+      reportType: value,
+      // ["label"]: label,
+    }));
+  };
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
     setIgnitionreport((prevReport: any) => ({
@@ -311,6 +332,20 @@ export default function Reports() {
     }
   };
 
+  const optionsTrip = [
+    { value: "Trip", label: "Trip" },
+    { value: "DailyActivity", label: "Daily Activity" },
+    { value: "Ignition", label: "Ignition" },
+    { value: "Events", label: "Events" },
+    { value: "DetailReportByStreet", label: "Detail Report By Street" },
+    { value: "IdlingActivity", label: "Id ling Activity" },
+  ];
+  const options =
+    vehicleList?.data?.map((item: any) => ({
+      value: item.vehicleReg,
+      label: item.vehicleReg,
+    })) || [];
+
   return (
     <div>
       <form
@@ -333,6 +368,33 @@ export default function Reports() {
                 </div>
                 <div className="lg:col-span-8 col-span-12">
                   <Select
+                    value={Ignitionreport?.vehicleNo}
+                    onChange={handleInputChangeTrip}
+                    options={optionsTrip}
+                    placeholder="Pick Vehicle"
+                    isSearchable
+                    noOptionsMessage={() => "No options available"}
+                    className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        border: "none",
+                        boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                      }),
+                      option: (provided, state) => ({
+                        ...provided,
+                        backgroundColor: state.isFocused
+                          ? "#00B56C"
+                          : "transparent", // Change 'blue' to your desired hover color
+                        color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
+                        "&:hover": {
+                          backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
+                          color: "white", // Change 'white' to your desired text color
+                        },
+                      }),
+                    }}
+                  />
+                  {/* <Select
                     className="h-8 text-sm w-full text-gray  outline-green"
                     name="reportType"
                     value={Ignitionreport.reportType}
@@ -372,14 +434,42 @@ export default function Reports() {
                     <MenuItem id="report_select_hover" value="IdlingActivity">
                       Idling Activity
                     </MenuItem>
-                  </Select>
+                  </Select> */}
                 </div>
               </div>
             </div>
 
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4">
               <label className="text-labelColor">Vehicle: &nbsp;&nbsp;</label>
+
               <Select
+                value={Ignitionreport.vehicleNo}
+                onChange={handleInputChangeSelect}
+                options={options}
+                placeholder="Pick Vehicle"
+                isSearchable
+                noOptionsMessage={() => "No options available"}
+                className="   rounded-md  outline-green border border-grayLight  hover:border-green"
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    border: "none",
+                    boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                  }),
+                  option: (provided, state) => ({
+                    ...provided,
+                    backgroundColor: state.isFocused
+                      ? "#00B56C"
+                      : "transparent", // Change 'blue' to your desired hover color
+                    color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
+                    "&:hover": {
+                      backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
+                      color: "white", // Change 'white' to your desired text color
+                    },
+                  }),
+                }}
+              />
+              {/* <Select
                 className="h-8 lg:w-4/6 w-full text-labelColor outline-green px-1e"
                 name="VehicleReg"
                 value={Ignitionreport.vehicleNo}
@@ -401,7 +491,7 @@ export default function Reports() {
                     {item.vehicleNo} (Reg#{item.vehicleReg})
                   </MenuItem>
                 ))}
-              </Select>
+              </Select> */}
             </div>
           </div>
 
@@ -548,13 +638,6 @@ export default function Reports() {
                             : "opacity-50 cursor-not-allowed"
                         }`}
               type="submit"
-              // disabled={
-              //   !Ignitionreport.reportType ||
-              //   !Ignitionreport.VehicleReg ||
-              //   !Ignitionreport.period ||
-              //   !Ignitionreport.fromDateTime ||
-              //   !Ignitionreport.toDateTime
-              // }
             >
               Submit
             </button>

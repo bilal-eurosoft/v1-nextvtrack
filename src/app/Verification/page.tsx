@@ -1,37 +1,44 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { forgetEmailByClientId } from "@/utils/API_CALLS";
+import { useSearchParams } from "next/navigation";
+import { forgetPasswordClientId } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 import logo from "../../../public/Images/logo.png";
-import "./forget.css";
-export default function ForgetPassword() {
+
+import "./verification.css";
+export default function Verification() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const id: any = searchParams.get("q");
 
+  const decodedValue = decodeURIComponent(id);
   const [formData, setFormData] = useState({
-    email: "",
-    userName: "",
+    password: "",
+    link: id,
   });
 
+  // Use the decoded value in your component
+  console.log('Decoded value of "q":', decodedValue);
   const handleInputChange = (key: any, e: any) => {
     setFormData({ ...formData, [key]: e.target.value });
   };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
+    console.log("formData", formData);
     const newformdata = {
       ...formData,
       clientId: session?.clientId,
     };
 
     const response = await toast.promise(
-      forgetEmailByClientId({
+      forgetPasswordClientId({
         token: session?.accessToken,
         newformdata: newformdata,
       }),
@@ -62,47 +69,6 @@ export default function ForgetPassword() {
         },
       }
     );
-
-    // if (session) {
-    //   const newformdata: any = {
-    //     ...formData,
-    //     clientId: session?.clientId,
-    //   };
-
-    //   const response = await toast.promise(
-    //     forgetEmailByClientId({
-    //       token: session?.accessToken,
-    //       newformdata: newformdata,
-    //     }),
-
-    //     {
-    //       loading: "Saving data...",
-    //       success: "Data saved successfully!",
-    //       error: "Error saving data. Please try again.",
-    //     },
-    //     {
-    //       style: {
-    //         border: "1px solid #00B56C",
-    //         padding: "16px",
-    //         color: "#1A202C",
-    //       },
-    //       success: {
-    //         duration: 2000,
-    //         iconTheme: {
-    //           primary: "#00B56C",
-    //           secondary: "#FFFAEE",
-    //         },
-    //       },
-    //       error: {
-    //         duration: 2000,
-    //         iconTheme: {
-    //           primary: "#00B56C",
-    //           secondary: "#FFFAEE",
-    //         },
-    //       },
-    //     }
-    //   );
-    // }
   };
 
   return (
@@ -144,61 +110,46 @@ export default function ForgetPassword() {
               />
             </div>
             <p className="mt-5 text-start   font-popins text-2xl  leading-9 tracking-tight text-white px-5">
-              Forgot Your Password?
+              Enter New Password
             </p>
-
-            <p className="mt-3 text-start   font-popins text-1xl  leading-9 tracking-tight text-white px-5">
-              Not to worry, we got you! let's get you a new password
-            </p>
-
-            {/* <label className=" text-start lg:mx-0 mx-5 block text-sm font-seri leading-6 pt-2 text-gray">
-              Not to worry, we got you! let's get you a new password
-            </label> */}
-
             <form className="space-y-6 mx-6" onSubmit={handleSubmit}>
               <div className="lg:mx-0 mx-5">
                 <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
                   <div className="col-span-12 ">
                     <input
                       required
-                      placeholder="Please Input Your Name"
+                      placeholder="Please Enter Your New Password"
                       className="outline-none w-full text-black font-bold"
                       type="text"
-                      value={formData.userName}
-                      onChange={(e: any) => handleInputChange("userName", e)}
+                      value={formData.password}
+                      onChange={(e: any) => handleInputChange("password", e)}
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
+                {/* <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
                   <div className="col-span-12 ">
                     <input
                       required
-                      placeholder="Please Input Your Email Address"
+                      placeholder="Please Enter Your Confirm Password"
                       className="outline-none w-full text-black font-bold"
                       type="email"
                       value={formData.email}
-                      onChange={(e: any) => handleInputChange("email", e)}
+                      onChange={(e: any) => handleInputChange("password", e)}
                     />
                   </div>
-                </div>
+                </div> */}
               </div>
 
               <div className="lg:mx-0 px-20">
                 <button
                   type="submit"
-                  className="flex w-full mt-20 justify-center rounded-md bg-green px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-8"
+                  className="flex w-full mt-10 justify-center rounded-md bg-green px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-8"
                   // onClick={handleClick}
                 >
-                  Reset My Password
+                  Save
                 </button>
               </div>
-              <p
-                className="text-white text-sm lg:mx-0 mx-5 cursor-pointer hover:text-red pb-0"
-                onClick={() => router.push("/login")}
-              >
-                <b> Back To Sign In</b>
-              </p>
               <br></br>
             </form>
           </div>

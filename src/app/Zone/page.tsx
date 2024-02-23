@@ -30,7 +30,8 @@ import {
 import { zonelistType } from "@/types/zoneType";
 import "./zone.css";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+// import Select from "@mui/material/Select";
+import Select from "react-select";
 import HexagonIcon from "@mui/icons-material/Hexagon";
 
 const ITEM_HEIGHT = 48;
@@ -384,6 +385,43 @@ export default function Zone() {
     setcheckBox(!checkBox);
   };
 
+  const handleZoneName = (e: any) => {
+    const { value, label } = e;
+    console.log("value", value);
+    setSearchCriteria({
+      ...searchCriteria,
+      zoneName: e.value,
+      ["label"]: label,
+    });
+  };
+  const handleZoneSortName = (e: any) => {
+    const { value, label } = e;
+    console.log("value", value);
+    setSearchCriteria({
+      ...searchCriteria,
+      zoneShortName: e.value,
+      ["label"]: label,
+    });
+  };
+  const handleGeoFence = (e: any) => {};
+  const optionZoneName =
+    zoneList?.map((item: any) => ({
+      value: item.zoneName,
+      label: item.zoneName,
+    })) || [];
+  const optionZoneSortName =
+    zoneList?.map((item: any) => ({
+      value: item.zoneShortName,
+      label: item.zoneShortName,
+    })) || [];
+
+  const GeofenceOption = [
+    { value: "On-Site", label: "On-Site" },
+    { value: "Off-Site", label: "Off-Site" },
+    { value: "City-Area", label: "City-Area" },
+    { value: "Restricted-Area", label: "Restricted-Area" },
+  ];
+
   return (
     <div className=" bg-bgLight border-t border-bgLight " id="zone_main">
       <p className="bg-green px-4 py-1 text-black text-center text-2xl text-white font-bold zone_heading">
@@ -415,7 +453,7 @@ export default function Zone() {
           </option>
         ))}
     </select> */}
-            <Select
+            {/* <Select
               value={searchCriteria.zoneName}
               onChange={(e) =>
                 setSearchCriteria({
@@ -423,6 +461,7 @@ export default function Zone() {
                   zoneName: e.target.value,
                 })
               }
+              onChange={selectZoneName}
               MenuProps={MenuProps}
               name="VehicleReg"
               id="select_box_journey"
@@ -439,7 +478,31 @@ export default function Zone() {
                     {item.zoneName}
                   </MenuItem>
                 ))}
-            </Select>
+            </Select> */}
+            <Select
+              onChange={handleZoneName}
+              options={optionZoneName}
+              placeholder="Zone Name"
+              isSearchable
+              noOptionsMessage={() => "No options available"}
+              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  border: "none",
+                  boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  backgroundColor: state.isFocused ? "#00B56C" : "transparent", // Change 'blue' to your desired hover color
+                  color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
+                  "&:hover": {
+                    backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
+                    color: "white", // Change 'white' to your desired text color
+                  },
+                }),
+              }}
+            />
           </div>
           <div className="lg:col-span-1 md:col-span-1 col-span-1">
             <label className="text-md font-popins text-black font-semibold">
@@ -458,7 +521,7 @@ export default function Zone() {
         })
       }
     /> */}
-            <Select
+            {/* <Select
               value={searchCriteria.zoneShortName}
               onChange={(e) =>
                 setSearchCriteria({
@@ -488,7 +551,31 @@ export default function Zone() {
                     {item.zoneShortName}
                   </MenuItem>
                 ))}
-            </Select>
+            </Select> */}
+            <Select
+              onChange={handleZoneSortName}
+              options={optionZoneSortName}
+              placeholder="Zone Sort Name"
+              isSearchable
+              noOptionsMessage={() => "No options available"}
+              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  border: "none",
+                  boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  backgroundColor: state.isFocused ? "#00B56C" : "transparent", // Change 'blue' to your desired hover color
+                  color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
+                  "&:hover": {
+                    backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
+                    color: "white", // Change 'white' to your desired text color
+                  },
+                }),
+              }}
+            />
           </div>
         </div>
         <div className="grid lg:grid-cols-2 md:grid-cols-2 mb-3   gap-6 pt-5 px-5 bg-green-50 ">
@@ -523,7 +610,7 @@ export default function Zone() {
         Restricted-Area
       </option>
     </select> */}
-            <Select
+            {/* <Select
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
@@ -552,7 +639,31 @@ export default function Zone() {
               <MenuItem value="Restricted-Area" id="zone_hover">
                 Restricted-Area
               </MenuItem>
-            </Select>
+            </Select> */}
+            <Select
+              onChange={handleGeoFence}
+              options={GeofenceOption}
+              placeholder="GeoFence"
+              isSearchable
+              noOptionsMessage={() => "No options available"}
+              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  border: "none",
+                  boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  backgroundColor: state.isFocused ? "#00B56C" : "transparent", // Change 'blue' to your desired hover color
+                  color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
+                  "&:hover": {
+                    backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
+                    color: "white", // Change 'white' to your desired text color
+                  },
+                }),
+              }}
+            />
           </div>
 
           <div

@@ -79,7 +79,6 @@ export async function vehicleListByClientId({
   }
 }
 
-
 export async function getAllVehicleByUserId({
   token,
   userId,
@@ -110,12 +109,6 @@ export async function getAllVehicleByUserId({
     return [];
   }
 }
-
-
-
-
-
-
 
 export async function IgnitionReportByTrip({
   token,
@@ -350,6 +343,34 @@ export async function forgetEmailByClientId({
 }) {
   try {
     const response = await fetch(`${URL}/forgotpassword/forgotpassword`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(newformdata),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log("Error fetching data", error);
+    return [];
+  }
+}
+
+export async function forgetPasswordClientId({
+  token,
+  newformdata,
+}: {
+  token: any;
+  newformdata: any;
+}) {
+  try {
+    const response = await fetch(`${URL}/forgotpassword/Passwordreset`, {
       method: "POST",
       headers: {
         accept: "application/json, text/plain, */*",

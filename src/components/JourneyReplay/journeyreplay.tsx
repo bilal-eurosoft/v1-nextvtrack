@@ -70,9 +70,11 @@ import {
 } from "@material-ui/pickers";
 
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+// import Select from "@mui/material/Select";
 import car_icon from "../../../public/Images/journey_car_icon.png";
+import Select from "react-select";
 
+const { Option } = Select;
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -158,6 +160,7 @@ export default function journeyReplayComp() {
     toDateTime: new Date(),
     unit: session?.unit || "",
   });
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [carPosition, setCarPosition] = useState<LatLng | null>(null);
@@ -190,6 +193,7 @@ export default function journeyReplayComp() {
   const [pausebtn, setPauseBtn] = useState(false);
   const [stopDetailsOpen, setStopDetailsOpen] = useState(false);
   const [activeTripColor, setactiveTripColor] = useState<any>("");
+  const [loadingMap, setLaodingMap] = useState(false);
 
   const SetViewOnClick = ({ coords }: { coords: any }) => {
     if (isPaused) {
@@ -678,7 +682,7 @@ export default function journeyReplayComp() {
           fromDateTime: `${TripStart}`,
           toDateTime: `${TripEnd}`,
         };
-
+        setLaodingMap(false);
         const TravelHistoryresponseapi = await toast.promise(
           TravelHistoryByBucketV2({
             token: session.accessToken,
@@ -762,6 +766,7 @@ export default function journeyReplayComp() {
     } catch (error) {
       console.error(`Error calling API for:`, error);
     }
+    setLaodingMap(true);
   };
 
   useEffect(() => {
@@ -914,14 +919,31 @@ export default function journeyReplayComp() {
   //   const value = "yesterday";
   //   setSelectedOption(newValue);
   // };
+  const handleInputChangeSelect = (e: any) => {
+    if (!e) return;
+    const { value, label } = e;
+    setIgnitionreport((prevReport: any) => ({
+      ...prevReport,
+      ["VehicleReg"]: value,
+      ["label"]: label,
+    }));
+  };
 
   const handleInputChange: any = (e: any) => {
     setClearMapData(false);
+    // if (e.target == undefined) {
+    //   const { name, value } = e;
+    //   setIgnitionreport((prevReport: any) => ({
+    //     ...prevReport,
+    //     ["VehicleReg"]: value,
+    //   }));
+    // } else {
     const { name, value } = e.target;
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
       [name]: value,
     }));
+
     if (value == "week") {
       setWeekData(true);
     }
@@ -938,12 +960,11 @@ export default function journeyReplayComp() {
     }
 
     if (name === "period" && value === "custom") {
-      // setweekDataGrouped("week");
       setIsCustomPeriod(true);
     } else if (name === "period" && value != "custom") {
-      // setweekDataGrouped("week");
       setIsCustomPeriod(false);
     }
+    // }
   };
 
   const [lat, setlat] = useState<any>("");
@@ -1019,7 +1040,18 @@ export default function journeyReplayComp() {
       groupedData[item.TripStartDateLabel].count += 1;
     }
   });
+  const options =
+    vehicleList?.data?.map((item: any) => ({
+      value: item.vehicleReg,
+      label: item.vehicleReg,
+    })) || [];
 
+  const SpeedOption = [
+    { value: "1", label: "x1" },
+    { value: "2", label: "x2" },
+    { value: "4", label: "x4" },
+    { value: "6", label: "x6" },
+  ];
   return (
     <>
       <div className="main_journey">
@@ -1054,7 +1086,34 @@ export default function journeyReplayComp() {
           <div
             className="xl:col-span-1 lg:col-span-2 md:col-span-2  col-span-12
           "
+            style={{ gridColumnEnd: "span 1.5" }}
           >
+            <Select
+              // value={Ignitionreport}
+              onChange={handleInputChangeSelect}
+              options={options}
+              placeholder="Pick Vehicle"
+              isSearchable
+              noOptionsMessage={() => "No options available"}
+              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  border: "none",
+                  boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  backgroundColor: state.isFocused ? "#00B56C" : "transparent", // Change 'blue' to your desired hover color
+                  color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
+                  "&:hover": {
+                    backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
+                    color: "white", // Change 'white' to your desired text color
+                  },
+                }),
+              }}
+            />
+
             {/* <select
               id="select_box"
               className="   h-8 text-gray  w-full  outline-green border border-grayLight px-1 hover:border-green"
@@ -1089,7 +1148,7 @@ export default function journeyReplayComp() {
               })}
             /> */}
             {/* <FormControl sx={{ m: 1, minWidth: 120 }}> */}
-            <Select
+            {/* <Select
               value={Ignitionreport.VehicleReg}
               onChange={handleInputChange}
               MenuProps={MenuProps}
@@ -1110,7 +1169,7 @@ export default function journeyReplayComp() {
               }}
             >
               <MenuItem value="" disabled selected hidden className="text-sm">
-                Select Vechile
+                Select Vehicle
               </MenuItem>
               {vehicleList?.data?.map((item: DeviceAttach) => (
                 <MenuItem
@@ -1122,7 +1181,31 @@ export default function journeyReplayComp() {
                   {item.vehicleReg}
                 </MenuItem>
               ))}
-            </Select>
+            </Select> */}
+
+            {/* <Select
+              value={Ignitionreport.VehicleReg}
+              onChange={handleInputChange}
+              MenuProps={MenuProps}
+              disabled={loading}
+              options={options}
+              isClearable
+              isSearchable  
+              name="VehicleReg"
+              id="select_box_journey"
+              displayEmpty
+              className={`h-8 text-black font-popins font-bold w-full outline-green  ${
+                getShowRadioButton
+                  ? " text-black font-popins font-extrabold"
+                  : " text-black font-popins  "
+              }`}
+              style={{
+                color: getShowRadioButton ? "black" : "",
+                paddingTop: getShowRadioButton ? "4%" : "2%",
+                paddingLeft: getShowRadioButton ? "6%" : "3%",
+                fontWeight: getShowRadioButton ? "bold" : "bold",
+              }}
+            > */}
           </div>
           {/* <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
             <KeyboardDatePicker
@@ -1356,21 +1439,33 @@ export default function journeyReplayComp() {
             {TravelHistoryresponse.filter((item: any) => {
               return (
                 item.vehicleEvents.filter(
-                  (items: any) => items.Event == "HarshAcceleration"
+                  (items: any) => items.Event === "HarshAcceleration"
                 ).length > 0
               );
             }).length > 0 && (
               <div className="grid grid-cols-12">
                 <div className="col-span-2">
                   <Image
-                    src={harshAcceleration}
+                    src={HarshAccelerationIcon}
                     alt="harshIcon "
                     className="h-6 "
                   />
                 </div>
-                <div className="col-span-10 text-sm">Harsh Acceleration</div>
+                <div className="col-span-10 text-sm">
+                  Harsh Acc.. (x
+                  {TravelHistoryresponse.reduce((count, item) => {
+                    return (
+                      count +
+                      item.vehicleEvents.filter(
+                        (items: any) => items.Event === "HarshAcceleration"
+                      ).length
+                    );
+                  }, 0)}
+                  )
+                </div>
               </div>
             )}
+
             {TravelHistoryresponse.filter((item: any) => {
               return (
                 item.vehicleEvents.filter(
@@ -1381,13 +1476,24 @@ export default function journeyReplayComp() {
               <div className="grid grid-cols-12">
                 <div className="col-span-2">
                   <Image
-                    src={HarshAccelerationIcon}
-                    alt="harshIcon "
-                    className="h-6 mt-1"
+                    src={harshAcceleration}
+                    alt="harshIcon"
+                    className="h-6 mt-"
                   />
                 </div>
                 <div className="col-span-10 text-sm">
-                  <p className="mt-2">Harsh Break</p>
+                  <p className="mt-2">
+                    Harsh Break (x
+                    {TravelHistoryresponse.reduce((count, item) => {
+                      return (
+                        count +
+                        item.vehicleEvents.filter(
+                          (items: any) => items.Event === "HarshBreak"
+                        ).length
+                      );
+                    }, 0)}
+                    )
+                  </p>
                 </div>
               </div>
             )}
@@ -1408,7 +1514,7 @@ export default function journeyReplayComp() {
                       <div key={date}>
                         <ul>
                           <div>
-                            <Accordion className="  cursor-pointer">
+                            <Accordion className="cursor-pointer">
                               <AccordionSummary
                                 expandIcon={<ExpandMoreIcon />}
                                 aria-controls="panel1a-content"
@@ -1420,30 +1526,26 @@ export default function journeyReplayComp() {
                                     : "5%",
                                   borderBottom: "1px solid gray",
                                   width: "100%",
+                                  paddingTop: "2%",
+                                  paddingBottom: "2%",
                                 }}
                               >
-                                <Typography className="text-green">
-                                  {/* <b>
+                                {/* <b>
                                     {date} &nbsp;&nbsp; {items.day}
                                     &nbsp;&nbsp; &nbsp;&nbsp; (x
                                     {items.count}){" "}
                                   </b> */}
-                                  <div className="grid grid-cols-12 space-x-2">
-                                    <div className="col-span-5">
-                                      <b> {date}</b>
-                                    </div>
-                                    <div className="col-span-5">
-                                      <b> {items.day}</b>
-                                    </div>
-                                    <div className="col-span-2">
-                                      <b>
-                                        {" "}
-                                        (x
-                                        {items.count})
-                                      </b>
-                                    </div>
+                                <div className="grid grid-cols-12 space-x-3 justify-center text-green font-semibold">
+                                  <div className="col-span-4 w-full text-start">
+                                    <p>{date}</p>
                                   </div>
-                                </Typography>
+                                  <div className="col-span-5 w-full text-center">
+                                    <p>{items.day}</p>
+                                  </div>
+                                  <div className="col-span-2 w-full text-center">
+                                    <p>x{items.count}</p>
+                                  </div>
+                                </div>
                               </AccordionSummary>
                               {items?.trips?.map((item: any, index: any) => (
                                 <AccordionDetails
@@ -1454,36 +1556,40 @@ export default function journeyReplayComp() {
                                       item.toDateTime
                                     )
                                   }
-                                  className="border-b"
+                                  className="border-b hover:bg-[#e1f0e3]"
+                                  style={{
+                                    backgroundColor:
+                                      activeTripColor.id === item.id
+                                        ? "#e1f0e3"
+                                        : "",
+                                  }}
                                 >
                                   <Typography>
                                     <div
-                                      className="py-5 hover:bg-[#e1f0e3]  cursor-pointer"
+                                      className="py-5   cursor-pointer"
                                       onClick={() => handleGetItem(item, index)}
-                                      style={{
-                                        backgroundColor:
-                                          activeTripColor.id === item.id
-                                            ? "#e1f0e3"
-                                            : "",
-                                      }}
                                     >
                                       <div className="grid grid-cols-12 space-x-4 ">
                                         <div className="col-span-1">
                                           <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24"
-                                            className="h-9 w-9 text-green "
+                                            className="h-10 w-10 text-green "
                                             width="24"
                                             height="24"
                                             style={{
                                               filter:
                                                 "drop-shadow(1px 2px 2px #000000)",
                                             }}
+                                            viewBox="0 0 512 512"
                                           >
+                                            <rect
+                                              width="512"
+                                              height="512"
+                                              fill="none"
+                                            />
                                             <path
                                               fill="currentColor"
-                                              className="shadow-lg"
-                                              d="M3 6h13l3 4h2c1.11 0 2 .89 2 2v3h-2a3 3 0 0 1-3 3a3 3 0 0 1-3-3H9a3 3 0 0 1-3 3a3 3 0 0 1-3-3H1V8c0-1.11.89-2 2-2m-.5 1.5V10h8V7.5zm9.5 0V10h5.14l-1.89-2.5zm-6 6A1.5 1.5 0 0 0 4.5 15A1.5 1.5 0 0 0 6 16.5A1.5 1.5 0 0 0 7.5 15A1.5 1.5 0 0 0 6 13.5m12 0a1.5 1.5 0 0 0-1.5 1.5a1.5 1.5 0 0 0 1.5 1.5a1.5 1.5 0 0 0 1.5-1.5a1.5 1.5 0 0 0-1.5-1.5"
+                                              d="M488 224c-3-5-32.61-17.79-32.61-17.79c5.15-2.66 8.67-3.21 8.67-14.21c0-12-.06-16-8.06-16h-27.14c-.11-.24-.23-.49-.34-.74c-17.52-38.26-19.87-47.93-46-60.95C347.47 96.88 281.76 96 256 96s-91.47.88-126.49 18.31c-26.16 13-25.51 19.69-46 60.95c0 .11-.21.4-.4.74H55.94c-7.94 0-8 4-8 16c0 11 3.52 11.55 8.67 14.21C56.61 206.21 28 220 24 224s-8 32-8 80s4 96 4 96h11.94c0 14 2.06 16 8.06 16h80c6 0 8-2 8-16h256c0 14 2 16 8 16h82c4 0 6-3 6-16h12s4-49 4-96s-5-75-8-80m-362.74 44.94A516.94 516.94 0 0 1 70.42 272c-20.42 0-21.12 1.31-22.56-11.44a72.16 72.16 0 0 1 .51-17.51L49 240h3c12 0 23.27.51 44.55 6.78a98 98 0 0 1 30.09 15.06C131 265 132 268 132 268Zm247.16 72L368 352H144s.39-.61-5-11.18c-4-7.82 1-12.82 8.91-15.66C163.23 319.64 208 304 256 304s93.66 13.48 108.5 21.16C370 328 376.83 330 372.42 341Zm-257-136.53a96.23 96.23 0 0 1-9.7.07c2.61-4.64 4.06-9.81 6.61-15.21c8-17 17.15-36.24 33.44-44.35c23.54-11.72 72.33-17 110.23-17s86.69 5.24 110.23 17c16.29 8.11 25.4 27.36 33.44 44.35c2.57 5.45 4 10.66 6.68 15.33c-2 .11-4.3 0-9.79-.19Zm347.72 56.11C461 273 463 272 441.58 272a516.94 516.94 0 0 1-54.84-3.06c-2.85-.51-3.66-5.32-1.38-7.1a93.84 93.84 0 0 1 30.09-15.06c21.28-6.27 33.26-7.11 45.09-6.69a3.22 3.22 0 0 1 3.09 3a70.18 70.18 0 0 1-.49 17.47Z"
                                             />
                                           </svg>
                                         </div>
@@ -1498,9 +1604,24 @@ export default function journeyReplayComp() {
                                             Distance: {item.TotalDistance}
                                             {item?.DriverName && (
                                               <div>
-                                                <p>
-                                                  {" "}
-                                                  Driver: {item?.DriverName}
+                                                <p style={{ display: "flex" }}>
+                                                  <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="20"
+                                                    height="20"
+                                                    style={{
+                                                      filter:
+                                                        "drop-shadow(1px 2px 2px #000000)",
+                                                      marginRight: "0.5%",
+                                                    }}
+                                                    viewBox="0 0 24 24"
+                                                  >
+                                                    <path
+                                                      fill="currentColor"
+                                                      d="M12 12q-1.65 0-2.825-1.175T8 8q0-1.65 1.175-2.825T12 4q1.65 0 2.825 1.175T16 8q0 1.65-1.175 2.825T12 12m-8 8v-2.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13q1.65 0 3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2V20z"
+                                                    />
+                                                  </svg>
+                                                  {item?.DriverName}
                                                 </p>
                                               </div>
                                             )}
@@ -1646,18 +1767,18 @@ export default function journeyReplayComp() {
 
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
                               className="h-10 w-10 text-green "
                               width="24"
                               height="24"
                               style={{
                                 filter: "drop-shadow(1px 2px 2px #000000)",
                               }}
+                              viewBox="0 0 512 512"
                             >
+                              <rect width="512" height="512" fill="none" />
                               <path
                                 fill="currentColor"
-                                className="shadow-lg"
-                                d="M3 6h13l3 4h2c1.11 0 2 .89 2 2v3h-2a3 3 0 0 1-3 3a3 3 0 0 1-3-3H9a3 3 0 0 1-3 3a3 3 0 0 1-3-3H1V8c0-1.11.89-2 2-2m-.5 1.5V10h8V7.5zm9.5 0V10h5.14l-1.89-2.5zm-6 6A1.5 1.5 0 0 0 4.5 15A1.5 1.5 0 0 0 6 16.5A1.5 1.5 0 0 0 7.5 15A1.5 1.5 0 0 0 6 13.5m12 0a1.5 1.5 0 0 0-1.5 1.5a1.5 1.5 0 0 0 1.5 1.5a1.5 1.5 0 0 0 1.5-1.5a1.5 1.5 0 0 0-1.5-1.5"
+                                d="M488 224c-3-5-32.61-17.79-32.61-17.79c5.15-2.66 8.67-3.21 8.67-14.21c0-12-.06-16-8.06-16h-27.14c-.11-.24-.23-.49-.34-.74c-17.52-38.26-19.87-47.93-46-60.95C347.47 96.88 281.76 96 256 96s-91.47.88-126.49 18.31c-26.16 13-25.51 19.69-46 60.95c0 .11-.21.4-.4.74H55.94c-7.94 0-8 4-8 16c0 11 3.52 11.55 8.67 14.21C56.61 206.21 28 220 24 224s-8 32-8 80s4 96 4 96h11.94c0 14 2.06 16 8.06 16h80c6 0 8-2 8-16h256c0 14 2 16 8 16h82c4 0 6-3 6-16h12s4-49 4-96s-5-75-8-80m-362.74 44.94A516.94 516.94 0 0 1 70.42 272c-20.42 0-21.12 1.31-22.56-11.44a72.16 72.16 0 0 1 .51-17.51L49 240h3c12 0 23.27.51 44.55 6.78a98 98 0 0 1 30.09 15.06C131 265 132 268 132 268Zm247.16 72L368 352H144s.39-.61-5-11.18c-4-7.82 1-12.82 8.91-15.66C163.23 319.64 208 304 256 304s93.66 13.48 108.5 21.16C370 328 376.83 330 372.42 341Zm-257-136.53a96.23 96.23 0 0 1-9.7.07c2.61-4.64 4.06-9.81 6.61-15.21c8-17 17.15-36.24 33.44-44.35c23.54-11.72 72.33-17 110.23-17s86.69 5.24 110.23 17c16.29 8.11 25.4 27.36 33.44 44.35c2.57 5.45 4 10.66 6.68 15.33c-2 .11-4.3 0-9.79-.19Zm347.72 56.11C461 273 463 272 441.58 272a516.94 516.94 0 0 1-54.84-3.06c-2.85-.51-3.66-5.32-1.38-7.1a93.84 93.84 0 0 1 30.09-15.06c21.28-6.27 33.26-7.11 45.09-6.69a3.22 3.22 0 0 1 3.09 3a70.18 70.18 0 0 1-.49 17.47Z"
                               />
                             </svg>
                           </div>
@@ -1671,7 +1792,26 @@ export default function journeyReplayComp() {
                               Distance: {item.TotalDistance}
                               {item?.DriverName && (
                                 <div>
-                                  <p> Driver: {item?.DriverName}</p>
+                                  <p style={{ display: "flex" }}>
+                                    {" "}
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="20"
+                                      height="20"
+                                      style={{
+                                        filter:
+                                          "drop-shadow(1px 2px 2px #000000)",
+                                        marginRight: "0.5%",
+                                      }}
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        fill="currentColor"
+                                        d="M12 12q-1.65 0-2.825-1.175T8 8q0-1.65 1.175-2.825T12 4q1.65 0 2.825 1.175T16 8q0 1.65-1.175 2.825T12 12m-8 8v-2.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13q1.65 0 3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2V20z"
+                                      />
+                                    </svg>
+                                    {item?.DriverName}
+                                  </p>
                                 </div>
                               )}
                             </p>
@@ -1815,10 +1955,14 @@ export default function journeyReplayComp() {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
                   />
 
-                  <Polyline
-                    pathOptions={{ color: "red", weight: 12 }}
-                    positions={polylinedata}
-                  />
+                  {loadingMap ? (
+                    <Polyline
+                      pathOptions={{ color: "red", weight: 12 }}
+                      positions={polylinedata}
+                    />
+                  ) : (
+                    ""
+                  )}
                   {isPlaying ? (
                     <SetViewOnClick coords={mapcenter} />
                   ) : (
@@ -1844,12 +1988,14 @@ export default function journeyReplayComp() {
                       );
                     })}
 
-                  {carPosition && (
-                    <Marker
-                      position={carPosition}
-                      icon={createMarkerIcon(getCurrentAngle())}
-                    ></Marker>
-                  )}
+                  {loadingMap
+                    ? carPosition && (
+                        <Marker
+                          position={carPosition}
+                          icon={createMarkerIcon(getCurrentAngle())}
+                        ></Marker>
+                      )
+                    : ""}
 
                   {lat && lng && (
                     <Marker
@@ -1866,39 +2012,47 @@ export default function journeyReplayComp() {
                   )}
                   {TravelHistoryresponse.length > 0 && (
                     <div>
-                      <Marker
-                        position={[
-                          TravelHistoryresponse[0].lat,
-                          TravelHistoryresponse[0].lng,
-                        ]}
-                        icon={
-                          new L.Icon({
-                            iconUrl:
-                              "https://img.icons8.com/fluent/48/000000/marker-a.png",
-                            iconAnchor: [22, 47],
-                            popupAnchor: [1, -34],
-                          })
-                        }
-                      ></Marker>
+                      {loadingMap ? (
+                        <Marker
+                          position={[
+                            TravelHistoryresponse[0].lat,
+                            TravelHistoryresponse[0].lng,
+                          ]}
+                          icon={
+                            new L.Icon({
+                              iconUrl:
+                                "https://img.icons8.com/fluent/48/000000/marker-a.png",
+                              iconAnchor: [22, 47],
+                              popupAnchor: [1, -34],
+                            })
+                          }
+                        ></Marker>
+                      ) : (
+                        ""
+                      )}
 
-                      <Marker
-                        position={[
-                          TravelHistoryresponse[
-                            TravelHistoryresponse.length - 1
-                          ].lat,
-                          TravelHistoryresponse[
-                            TravelHistoryresponse.length - 1
-                          ].lng,
-                        ]}
-                        icon={
-                          new L.Icon({
-                            iconUrl:
-                              "https://img.icons8.com/fluent/48/000000/marker-b.png",
-                            iconAnchor: [22, 47],
-                            popupAnchor: [1, -34],
-                          })
-                        }
-                      ></Marker>
+                      {loadingMap ? (
+                        <Marker
+                          position={[
+                            TravelHistoryresponse[
+                              TravelHistoryresponse.length - 1
+                            ].lat,
+                            TravelHistoryresponse[
+                              TravelHistoryresponse.length - 1
+                            ].lng,
+                          ]}
+                          icon={
+                            new L.Icon({
+                              iconUrl:
+                                "https://img.icons8.com/fluent/48/000000/marker-b.png",
+                              iconAnchor: [22, 47],
+                              popupAnchor: [1, -34],
+                            })
+                          }
+                        ></Marker>
+                      ) : (
+                        ""
+                      )}
                     </div>
                   )}
 
@@ -1906,7 +2060,7 @@ export default function journeyReplayComp() {
                     if (item.vehicleEvents.length > 0) {
                       return item.vehicleEvents.map((items) => {
                         if (items.Event === "HarshBreak") {
-                          return (
+                          return loadingMap ? (
                             <Marker
                               position={[item.lat, item.lng]}
                               icon={
@@ -1918,10 +2072,12 @@ export default function journeyReplayComp() {
                                 })
                               }
                             ></Marker>
+                          ) : (
+                            ""
                           );
                         }
                         if (items.Event === "HarshAcceleration") {
-                          return (
+                          return loadingMap ? (
                             <Marker
                               position={[item.lat, item.lng]}
                               icon={
@@ -1933,6 +2089,8 @@ export default function journeyReplayComp() {
                                 })
                               }
                             ></Marker>
+                          ) : (
+                            ""
                           );
                         }
                       });
@@ -1950,7 +2108,7 @@ export default function journeyReplayComp() {
                 >
                   <div className="lg:col-span-11  md:col-span-10 sm:col-span-10 col-span-11">
                     <p className="text-white lg:px-3 ps-1 text-lg">
-                      Stop Details ({stops.length})
+                      Stop Details ({loadingMap ? stops.length : ""})
                     </p>
                   </div>
                   <div className="col-span-1 mt-1 lg:-ms-3 md:-ms-2 -ms-3">
@@ -1998,7 +2156,7 @@ export default function journeyReplayComp() {
                 {getShowdetails ? (
                   <div className="bg-white h-60 overflow-y-scroll">
                     {stops?.map((item: any) => {
-                      return (
+                      return loadingMap ? (
                         <div
                           onClick={() => handleClickStopCar(item)}
                           className="cursor-pointer"
@@ -2016,6 +2174,8 @@ export default function journeyReplayComp() {
                           <br></br>
                           <hr className="text-gray"></hr>
                         </div>
+                      ) : (
+                        ""
                       );
                     })}
                     {/* {stops.map((item: any) => (
@@ -2040,26 +2200,21 @@ export default function journeyReplayComp() {
               ></div>
 
               <div className="xl:col-span-1 lg:col-span-3  md:col-span-3 sm-col-span-3 col-span-4 text-end  ">
-                <div
-                  className="grid xl:grid-cols-12 lg:grid-cols-12  md:grid-cols-12   sm:grid-cols-12 grid-cols-12 bg-bgLight  py-3 shadow-lg rounded-md"
-                  onClick={handleZoneClick}
-                >
+                <div className="grid xl:grid-cols-12 lg:grid-cols-12  md:grid-cols-12   sm:grid-cols-12 grid-cols-12 bg-bgLight  py-2 shadow-lg rounded-md">
                   <div className="xl:col-span-1"></div>
                   <div className="xl:col-span-2 lg:col-span-2 md:col-span-1 sm:col-span-1  col-span-1 text-center ">
                     <input
                       type="checkbox"
                       onChange={handleChangeChecked}
+                      onClick={handleZoneClick}
                       checked={getCheckedInput}
                       style={{ accentColor: "green" }}
                     />
                   </div>
                   <div className="xl:col-span-8 lg:col-span-7 md:col-span-9 sm:col-span-9 col-span-9  ">
-                    <button
-                      className="text-sm font-popins font-bold"
-                      onClick={handleChangeChecked}
-                    >
+                    <button className="text-sm font-popins font-bold">
                       {/* <h1 className="xl:-ms-32 lg:-ms-24  sm:-ms-32 -ms-24 font-popins font-semibold"> */}{" "}
-                      Show zones
+                      Show Zones
                       {/* </h1> */}
                     </button>
                   </div>
@@ -2152,14 +2307,14 @@ export default function journeyReplayComp() {
               className="absolute xl:left-56 lg:left-10 xl:right-20 lg:right-10 xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8  bottom-2  left-1 right-3"
             >
               <div className="grid xl:grid-cols-7 lg:grid-cols-12 md:grid-12 grid-cols-12 lg:gap-5 gap-2 ">
-                <div className="xl:col-span-1 lg:col-span-4 md:col-span-4 col-span-4  ">
-                  <div className="bg-bgPlatBtn rounded-md">
+                <div className="xl:col-span-1 mt-5  lg:col-span-4 md:col-span-4 col-span-4  ">
+                  {/* <div className="bg-bgPlatBtn rounded-md">
                     <div className="lg:text-xl text-white font-medium text-center  py-2 text-md mx-1">
                       <BlinkingTime timezone={session?.timezone} />
                     </div>
 
                     <div className=" border-t border-white my-1 lg:w-32 mx-2"></div>
-                    <div className="mt-3 pb-3 ms-1">
+                    <div className="  ms-1 pb-3">
                       <Tooltip content="Pause" className="bg-black">
                         <button
                           onClick={() => pausebtn && pauseTick()}
@@ -2238,10 +2393,10 @@ export default function journeyReplayComp() {
                         </button>
                       </Tooltip>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="xl:col-span-4 lg:col-span-8 col-span-8   ">
-                  <div className="grid lg:grid-cols-12 grid-cols-12 gap-1 lg:py-5 py-2 mt-8 pt-4 lg:pt-8 rounded-md  mx-2 px-5 bg-white">
+                  <div className="grid lg:grid-cols-12 grid-cols-12 gap-1 lg:py-5 py-2 mt-8 pt-4 lg:pt-4 rounded-md  mx-2 px-5 bg-white">
                     <div
                       className="lg:col-span-10 col-span-10"
                       // style={{ height: "4vh" }}
@@ -2271,7 +2426,113 @@ export default function journeyReplayComp() {
                         // value={progressVal || cursor}
                         // className="replay-slider-inner"
                       />
-
+                      <div style={{ display: "flex", justifyContent: "end" }}>
+                        <div className="grid grid-cols-12 ">
+                          <div className="col-span-4">
+                            <Tooltip content="Pause" className="bg-black">
+                              <button
+                                onClick={() => pausebtn && pauseTick()}
+                                className={`${
+                                  pausebtn
+                                    ? "cursor-pointer"
+                                    : "cursor-not-allowed"
+                                }`}
+                              >
+                                <svg
+                                  className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6  mx-1 "
+                                  // style={{
+                                  //   color: stopVehicle === true ? "gray" : "white",
+                                  // }}
+                                  style={{
+                                    color: isPauseColor ? "green" : "black",
+                                  }}
+                                  fill={isPauseColor ? "none" : "none"}
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth="2"
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  {" "}
+                                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                                  <line x1="4" y1="4" x2="4" y2="20" />{" "}
+                                  <line x1="20" y1="4" x2="20" y2="20" />{" "}
+                                  <rect
+                                    x="9"
+                                    y="6"
+                                    width="6"
+                                    height="12"
+                                    rx="2"
+                                  />
+                                </svg>
+                              </button>
+                            </Tooltip>
+                            <Tooltip content="Play" className="bg-black">
+                              <button
+                                onClick={() => playbtn && tick()}
+                                className={`${
+                                  playbtn
+                                    ? "cursor-pointer"
+                                    : "cursor-not-allowed"
+                                }`}
+                              >
+                                <svg
+                                  className="h-5 w-5  lg:mx-2  md:mx-3 sm:mx-3 mx-1"
+                                  viewBox="0 0 24 24"
+                                  style={{
+                                    color: isPlaying ? "green" : "black",
+                                  }}
+                                  fill={isPlaying ? "green" : "black"}
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  {" "}
+                                  <polygon points="5 3 19 12 5 21 5 3" />
+                                </svg>
+                              </button>
+                            </Tooltip>
+                            <Tooltip content="Stop" className="bg-black">
+                              <button
+                                onClick={() => stopbtn && stopTick()}
+                                className={`${
+                                  stopbtn
+                                    ? "cursor-pointer"
+                                    : "cursor-not-allowed"
+                                }`}
+                              >
+                                <svg
+                                  className="h-4 w-4 lg:mx-2 md:mx-3 sm:mx-3 mx-1"
+                                  width="24"
+                                  style={{
+                                    color: stopVehicle ? "green" : "black",
+                                  }}
+                                  fill={stopVehicle ? "green" : "black    "}
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth="2"
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  {" "}
+                                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                                  <rect
+                                    x="4"
+                                    y="4"
+                                    width="16"
+                                    height="16"
+                                    rx="2"
+                                  />
+                                </svg>
+                              </button>
+                            </Tooltip>
+                          </div>
+                        </div>
+                      </div>
                       <div className="grid grid-cols-12 ">
                         <div className="col-span-11">
                           <p className="text-sm color-labelColor">
@@ -2286,50 +2547,81 @@ export default function journeyReplayComp() {
                         </div>
                       </div>
                     </div>
-                    <div className="lg:col-span-1 col-span-1 ">
+                    <div className="lg:col-span-2 col-span-1 ">
                       {isPlaying && (
+                        // <Select
+                        //   className="text-black  outline-green border h-8 w-16 border-grayLight px-1"
+                        //   value={speedFactor}
+                        //   onChange={(e) => setSpeedFactor(Number(e.value))}
+                        //   style={{
+                        //     color: getShowRadioButton ? "black" : "",
+                        //     paddingTop: getShowRadioButton ? "4%" : "2%",
+                        //     paddingLeft: getShowRadioButton ? "12%" : "3%",
+                        //     fontWeight: getShowRadioButton ? "bold" : "bold",
+                        //   }}
+                        // >
+                        //   <MenuItem
+                        //     className="hover:bg-green hover:text-white text-sm w-full"
+                        //     value={1}
+                        //     id="select_slider"
+                        //   >
+                        //     1x
+                        //   </MenuItem>
+                        //   <MenuItem
+                        //     className="hover:bg-green hover:text-white text-sm w-full"
+                        //     value={2}
+                        //     id="select_slider"
+                        //   >
+                        //     2x
+                        //   </MenuItem>
+                        //   <MenuItem
+                        //     className=" text-md w-full "
+                        //     value={4}
+                        //     id="select_slider"
+                        //   >
+                        //     4x{" "}
+                        //   </MenuItem>
+                        //   <MenuItem
+                        //     className="hover:bg-green hover:text-white text-sm w-full"
+                        //     value={6}
+                        //     id="select_slider"
+                        //   >
+                        //     6x
+                        //   </MenuItem>
+                        // </Select>
                         <Select
-                          className="text-black  outline-green border h-8 w-16 border-grayLight px-1"
-                          value={speedFactor}
-                          onChange={(e) =>
-                            setSpeedFactor(Number(e.target.value))
-                          }
-                          style={{
-                            color: getShowRadioButton ? "black" : "",
-                            paddingTop: getShowRadioButton ? "4%" : "2%",
-                            paddingLeft: getShowRadioButton ? "12%" : "3%",
-                            fontWeight: getShowRadioButton ? "bold" : "bold",
+                          onChange={(e: any) => setSpeedFactor(Number(e.value))}
+                          options={SpeedOption}
+                          placeholder="Speed"
+                          isSearchable
+                          noOptionsMessage={() => "No options available"}
+                          className="rounded-md h-10 -mt-3 w-full outline-green border border-grayLight hover:border-green"
+                          styles={{
+                            control: (provided, state) => ({
+                              ...provided,
+                              border: "none",
+                              boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                            }),
+                            menu: (provided, state) => ({
+                              ...provided,
+                              zIndex: 9999, // Ensure the menu appears above other elements
+                              position: "absolute",
+                              top: "auto",
+                              bottom: "100%", // Position the menu above the select input
+                            }),
+                            option: (provided, state) => ({
+                              ...provided,
+                              backgroundColor: state.isFocused
+                                ? "#00B56C"
+                                : "transparent",
+                              color: state.isFocused ? "white" : "black",
+                              "&:hover": {
+                                backgroundColor: "#00B56C",
+                                color: "white",
+                              },
+                            }),
                           }}
-                        >
-                          <MenuItem
-                            className="hover:bg-green hover:text-white text-sm w-full"
-                            value={1}
-                            id="select_slider"
-                          >
-                            1x
-                          </MenuItem>
-                          <MenuItem
-                            className="hover:bg-green hover:text-white text-sm w-full"
-                            value={2}
-                            id="select_slider"
-                          >
-                            2x
-                          </MenuItem>
-                          <MenuItem
-                            className=" text-md w-full "
-                            value={4}
-                            id="select_slider"
-                          >
-                            4x{" "}
-                          </MenuItem>
-                          <MenuItem
-                            className="hover:bg-green hover:text-white text-sm w-full"
-                            value={6}
-                            id="select_slider"
-                          >
-                            6x
-                          </MenuItem>
-                        </Select>
+                        />
                       )}
                     </div>
                   </div>

@@ -225,46 +225,73 @@ export default function DriverProfile() {
     };
 
     try {
-      if (session) {
-        const newformdata = {
-          ...payLoad,
-          clientId: session?.clientId,
-        };
+      const { id } = toast.custom((t) => (
+        <div className="bg-white p-2 rounded-md">
+          <p>Are you sure you want to Active this ?</p>
+          <button
+            onClick={async () => {
+              // Check if the user is authenticated
+              if (session) {
+                const newformdata = {
+                  ...payLoad,
+                  clientId: session?.clientId,
+                };
+                const response = await toast.promise(
+                  postDriverDataByClientId({
+                    token: session?.accessToken,
+                    newformdata: newformdata,
+                  }),
+                  {
+                    loading: "Saving data...",
+                    success: "User successfully Active!",
+                    error: "Error saving data. Please try again.",
+                  },
+                  {
+                    style: {
+                      border: "1px solid #00B56C",
+                      padding: "16px",
+                      color: "#1A202C",
+                    },
+                    success: {
+                      duration: 2000,
+                      iconTheme: {
+                        primary: "#00B56C",
+                        secondary: "#FFFAEE",
+                      },
+                    },
+                    error: {
+                      duration: 2000,
+                      iconTheme: {
+                        primary: "#00B56C",
+                        secondary: "#FFFAEE",
+                      },
+                    },
+                  }
+                );
+                vehicleListData();
+              }
+            }}
+            className="text-green pr-5 font-popins font-bold"
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => {
+              // Dismiss the confirmation toast without deleting
+              toast.dismiss(id);
 
-        const response = await toast.promise(
-          postDriverDataByClientId({
-            token: session?.accessToken,
-            newformdata: newformdata,
-          }),
-          {
-            loading: "Saving data...",
-            success: "User successfully Active!",
-            error: "Error saving data. Please try again.",
-          },
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
-            },
-            success: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-            error: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-          }
-        );
-        vehicleListData();
-      }
+              // Optionally, you can show a cancellation message
+              toast("Deletion canceled", {
+                duration: 3000,
+                position: "top-center",
+              });
+            }}
+            className="text-red font-popins font-bold"
+          >
+            No
+          </button>
+        </div>
+      ));
     } catch (e) {}
     // await vehicleListData();
     // console.log("Updated Data from API:", updatedData);
@@ -593,6 +620,7 @@ export default function DriverProfile() {
         onRowsPerPageChange={handleChangeRowsPerPage}
         className="bg-bgLight"
       />
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }

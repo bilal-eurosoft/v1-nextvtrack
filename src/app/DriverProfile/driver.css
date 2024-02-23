@@ -4,6 +4,15 @@
 #table_head {
   font-size: 18px;
 }
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: rgb(255, 255, 255);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #29303b;
+  border-radius: 7px;
+}
 .MuiOutlinedInput-notchedOutline {
   /* border-width: 1px !important; */
   border-color: #d3d3d3 !important;
@@ -113,10 +122,7 @@
     font-size: 16px;
   }
 }
-::-webkit-scrollbar-thumb {
-  background: #29303b;
-  border-radius: 7px;
-}
+
 @media (max-width: 1200px) and (min-width: 810px) {
   .popup_style {
     width: 65%;

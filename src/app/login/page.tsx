@@ -7,6 +7,8 @@ import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
+import { setLoginTime } from "../../utils/time";
+
 import "./login.css";
 
 import { ToastContainer, toast } from "react-toastify";
@@ -27,6 +29,26 @@ export default function LoginPage() {
     setFormData({ ...formData, [e.target.name]: value });
   };
 
+  // const handleClick = async () => {
+  //   setLoading(true);
+  //   const { userName, password } = formData;
+  //   const data = await signIn("credentials", {
+  //     userName,
+  //     password,
+  //     redirect: false,
+  //   });
+
+  //   if (data?.status === 200) {
+  //     router.push("/liveTracking");
+  //   }
+  //   if (data?.status === 401) {
+  //     toast.error("Invalid Credential", {
+  //       position: "top-center",
+  //     });
+  //   }
+  //   setLoading(false);
+  // };
+
   const handleClick = async () => {
     setLoading(true);
     const { userName, password } = formData;
@@ -35,17 +57,13 @@ export default function LoginPage() {
       password,
       redirect: false,
     });
-
     if (data?.status === 200) {
+      setLoginTime();
       router.push("/liveTracking");
-    }
-    if (data?.status === 401) {
-      toast.error("Invalid Credential", {
-        position: "top-center",
-      });
     }
     setLoading(false);
   };
+
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
