@@ -670,7 +670,7 @@ export default function DriverProfile() {
                       align="center"
                       colSpan={2}
                       onClick={() => handleDeasign(row.id)}
-                      className="text-green"
+                      className="text-green font-bold"
                     >
                       Deasign
                       {/* {row.DriverDetails.driverAddress2} */}

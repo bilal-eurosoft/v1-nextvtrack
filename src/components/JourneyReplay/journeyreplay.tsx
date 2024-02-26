@@ -194,7 +194,11 @@ export default function journeyReplayComp() {
   const [stopDetailsOpen, setStopDetailsOpen] = useState(false);
   const [activeTripColor, setactiveTripColor] = useState<any>("");
   const [loadingMap, setLaodingMap] = useState(false);
+  const [expanded, setExpanded] = useState(null);
 
+  const handleChange = (panel: any) => (event: any, isExpanded: any) => {
+    setExpanded(isExpanded ? panel : null);
+  };
   const SetViewOnClick = ({ coords }: { coords: any }) => {
     if (isPaused) {
       setMapcenterToFly(null);
@@ -480,13 +484,28 @@ export default function journeyReplayComp() {
     .toISOString()
     .slice(0, 10)}TO${timeOnly}`;
   const handleSubmit = async (e: React.FormEvent) => {
-    setLoading(true);
-
     e.preventDefault();
-
+    setIsDynamicTime("");
+    setstops([]);
+    setIsPaused(false);
+    setPlayBtn(false);
+    setStopBtn(false);
+    setPauseBtn(false);
+    setLaodingMap(false);
+    setIsPlaying(false);
+    setCarPosition(null);
+    setactiveTripColor("");
+    setTravelHistoryresponse([]);
+    setClearMapData(false);
+    setProgressWidth(0);
+    if (polylinedata.length > 0) {
+      setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
+    }
+    setCurrentPositionIndex(0);
+    setLoading(true);
     setClearMapData(true);
     if (session) {
-      const { VehicleReg, period } = Ignitionreport;
+      const { VehicleReg, period } = await Ignitionreport;
       if (period == "week") {
         setWeekData(true);
       }
@@ -547,7 +566,6 @@ export default function journeyReplayComp() {
           const response = await toast.promise(
             TripsByBucketAndVehicle({
               token: session.accessToken,
-
               payload: newdata,
             }),
 
@@ -655,6 +673,17 @@ export default function journeyReplayComp() {
     setTravelHistoryresponse([]);
     setIsPlaying(false);
     setClearMapData(false);
+    setIsDynamicTime("");
+    setstops([]);
+    setPlayBtn(false);
+    setStopBtn(false);
+    setPauseBtn(false);
+    setactiveTripColor("");
+    setProgressWidth(0);
+    if (polylinedata.length > 0) {
+      setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
+    }
+    setCurrentPositionIndex(0);
   };
   const handleClick = () => {
     setShowRadioButton(!getShowRadioButton);
@@ -686,7 +715,6 @@ export default function journeyReplayComp() {
         const TravelHistoryresponseapi = await toast.promise(
           TravelHistoryByBucketV2({
             token: session.accessToken,
-
             payload: newresponsedata,
           }),
           {
@@ -1047,10 +1075,10 @@ export default function journeyReplayComp() {
     })) || [];
 
   const SpeedOption = [
-    { value: "1", label: "x1" },
-    { value: "2", label: "x2" },
-    { value: "4", label: "x4" },
-    { value: "6", label: "x6" },
+    { value: "1", label: "1X" },
+    { value: "2", label: "2X" },
+    { value: "4", label: "4X" },
+    { value: "6", label: "6X" },
   ];
   return (
     <>
@@ -1514,7 +1542,11 @@ export default function journeyReplayComp() {
                       <div key={date}>
                         <ul>
                           <div>
-                            <Accordion className="cursor-pointer">
+                            <Accordion
+                              className="cursor-pointer"
+                              expanded={expanded === `panel${index}`}
+                              onChange={handleChange(`panel${index}`)}
+                            >
                               <AccordionSummary
                                 expandIcon={<ExpandMoreIcon />}
                                 aria-controls="panel1a-content"
@@ -2066,7 +2098,7 @@ export default function journeyReplayComp() {
                               icon={
                                 new L.Icon({
                                   iconUrl:
-                                    "https://img.icons8.com/nolan/64/speed-up.png",
+                                    "https://img.icons8.com/color/48/000000/brake-discs.png",
                                   iconSize: [40, 40],
                                   iconAnchor: [16, 37],
                                 })
@@ -2083,7 +2115,7 @@ export default function journeyReplayComp() {
                               icon={
                                 new L.Icon({
                                   iconUrl:
-                                    "https://img.icons8.com/color/48/000000/brake-discs.png",
+                                    " https://img.icons8.com/nolan/64/speed-up.png",
                                   iconSize: [30, 30],
                                   iconAnchor: [16, 37],
                                 })
@@ -2410,7 +2442,6 @@ export default function journeyReplayComp() {
                         color="secondary"
                         style={{
                           color: "#00B56C",
-                          paddingBottom: "2%",
                           cursor: isPlaying ? "pointer" : "not-allowed",
                         }}
                         max={polylinedata.length}
@@ -2426,9 +2457,15 @@ export default function journeyReplayComp() {
                         // value={progressVal || cursor}
                         // className="replay-slider-inner"
                       />
-                      <div style={{ display: "flex", justifyContent: "end" }}>
+                      <div
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
                         <div className="grid grid-cols-12 ">
-                          <div className="col-span-4">
+                          <div className="col-span-5 ">
+                            {isDynamicTime.TripStartTimeLabel}
+                          </div>
+                          {/* <div className="col-span-3"></div> */}
+                          <div className="col-span-6">
                             <Tooltip content="Pause" className="bg-black">
                               <button
                                 onClick={() => pausebtn && pauseTick()}
@@ -2495,7 +2532,7 @@ export default function journeyReplayComp() {
                                 </svg>
                               </button>
                             </Tooltip>
-                            <Tooltip content="Stop" className="bg-black">
+                            <Tooltip content="Stop" Stop Details="bg-black">
                               <button
                                 onClick={() => stopbtn && stopTick()}
                                 className={`${
@@ -2531,9 +2568,12 @@ export default function journeyReplayComp() {
                               </button>
                             </Tooltip>
                           </div>
+                          <div className="col-span-1">
+                            {isDynamicTime.TripEndTimeLabel}
+                          </div>
                         </div>
                       </div>
-                      <div className="grid grid-cols-12 ">
+                      {/* <div className="grid grid-cols-12 ">
                         <div className="col-span-11">
                           <p className="text-sm color-labelColor">
                             {" "}
@@ -2545,9 +2585,9 @@ export default function journeyReplayComp() {
                             {isDynamicTime.TripEndTimeLabel}
                           </p>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
-                    <div className="lg:col-span-2 col-span-1 ">
+                    <div className="lg:col-span-2 col-span-1 mt-2">
                       {isPlaying && (
                         // <Select
                         //   className="text-black  outline-green border h-8 w-16 border-grayLight px-1"

@@ -242,7 +242,7 @@ export default function AddZoneComp() {
         if (response.id !== null) {
           // Delay the redirection by 4 seconds
           setTimeout(() => {
-            router.push("http://localhost:3010/Zone");
+            router.push("/Zone");
           }, 2000);
         }
       }

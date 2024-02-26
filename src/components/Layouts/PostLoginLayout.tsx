@@ -21,7 +21,8 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import TimeCounter from "@/app/context/timer";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { getZoneListByClientId } from "@/utils/API_CALLS";
 
 import {
   Popover,
@@ -32,6 +33,7 @@ import {
 } from "@material-tailwind/react";
 import "./layout.css";
 import BlinkingTime from "../General/BlinkingTime";
+import { stringify } from "querystring";
 // const inter = Inter({ subsets: ["latin"] });
 // Example import statement
 const drawerWidth = 58;
@@ -89,6 +91,11 @@ export default function RootLayout({
   const router = useRouter();
   const [openPopover, setOpenPopover] = useState(false);
   const [selectedColor, setSelectedColor] = useState(null);
+  const [zoneList, setZoneList] = useState([]);
+  const [filterId, setFilterId] = useState("");
+  const searchParams = useSearchParams();
+  const pathName = searchParams.get("id");
+
   /*   const obj = [
     { herf: " /liveTracking", label: "Live-Tracing" },
     { herf: "/journeyReplay", label: "journer-Replay" },
@@ -118,6 +125,29 @@ export default function RootLayout({
     }, 1000);
     return () => clearInterval(interval);
   }, []); // Run effect when loginTime changes
+
+  useEffect(() => {
+    const fetchZoneList = async () => {
+      if (session) {
+        try {
+          const allzoneList = await getZoneListByClientId({
+            token: session.accessToken,
+            clientId: session.clientId,
+          });
+          setZoneList(allzoneList);
+        } catch (error) {
+          console.log("Error fetching zone list:", error);
+        }
+      }
+    };
+
+    fetchZoneList();
+  }, [session]);
+
+  // const allzoneList = zoneList?.map((item) => {
+  //   return item?.id;
+  // });
+  // console.log("zoneId", allzoneList);
   const formatTime = (milliseconds: any) => {
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
@@ -146,7 +176,24 @@ export default function RootLayout({
   };
 
   const pathname = usePathname();
+  useEffect(() => {
+    const filterZoneIds = async () => {
+      if (zoneList) {
+        try {
+          const filteredIds = zoneList?.find(
+            (item: any) => item?.id == pathName
+          );
 
+          setFilterId(filteredIds?.id);
+          // Use filteredIds as needed
+        } catch (error) {
+          console.log("Error filtering zone ids:", error);
+        }
+      }
+    };
+
+    filterZoneIds();
+  }, [zoneList]);
   return (
     // <div className={inter.className}>
     <div>
@@ -247,15 +294,21 @@ export default function RootLayout({
                     strokeLinejoin="round"
                     style={{
                       color:
-                        pathname == "/Zone" || pathname == "/AddZone"
+                        pathname == "/Zone" ||
+                        pathname == "/AddZone" ||
+                        `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
                           ? "green"
                           : "white",
                       backgroundColor:
-                        pathname == "/Zone" || pathname == "/AddZone"
+                        pathname == "/Zone" ||
+                        pathname == "/AddZone" ||
+                        `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
                           ? "white"
                           : "",
                       border:
-                        pathname == "/Zone" || pathname == "/AddZone"
+                        pathname == "/Zone" ||
+                        pathname == "/AddZone" ||
+                        `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
                           ? "none"
                           : "",
                     }}
@@ -494,18 +547,21 @@ export default function RootLayout({
                           style={{
                             color:
                               pathname == "/DriverAssign" ||
-                              pathname == "/DriverProfile"
+                              pathname == "/DriverProfile" ||
+                              pathname == "/ActiveDriver"
                                 ? "green"
                                 : "white",
                             backgroundColor:
                               pathname == "/DriverAssign" ||
-                              pathname == "/DriverProfile"
+                              pathname == "/DriverProfile" ||
+                              pathname == "/ActiveDriver"
                                 ? "white"
                                 : "",
 
                             border:
                               pathname == "/DriverAssign" ||
-                              pathname == "/DriverProfile"
+                              pathname == "/DriverProfile" ||
+                              pathname == "/ActiveDriver"
                                 ? "none"
                                 : "",
                           }}

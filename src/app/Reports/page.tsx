@@ -440,35 +440,84 @@ export default function Reports() {
             </div>
 
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4">
-              <label className="text-labelColor">Vehicle: &nbsp;&nbsp;</label>
+              <div className="grid grid-cols-12">
+                <div className="lg:col-span-2 col-span-12">
+                  <label className="text-labelColor">
+                    Vehicle: &nbsp;&nbsp;
+                  </label>
+                </div>
+                <div className="lg:col-span-8 col-span-12">
+                  <Select
+                    value={Ignitionreport.vehicleNo}
+                    onChange={handleInputChangeSelect}
+                    options={options}
+                    placeholder="Pick Vehicle"
+                    isSearchable
+                    noOptionsMessage={() => "No options available"}
+                    className="   rounded-md w-full outline-green border border-grayLight  hover:border-green"
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        border: "none",
+                        boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                      }),
+                      option: (provided, state) => ({
+                        ...provided,
+                        backgroundColor: state.isFocused
+                          ? "#00B56C"
+                          : "transparent", // Change 'blue' to your desired hover color
+                        color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
+                        "&:hover": {
+                          backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
+                          color: "white", // Change 'white' to your desired text color
+                        },
+                      }),
+                    }}
+                  />
+                  {/* <Select
+                    className="h-8 text-sm w-full text-gray  outline-green"
+                    name="reportType"
+                    value={Ignitionreport.reportType}
+                    onChange={handleInputChange}
+                    displayEmpty
+                    MenuProps={MenuProps}
+                    renderValue={(value: any) => (
+                      <span
+                        style={{
+                          color: value === 0 ? "black" : "normal",
+                          fontSize: value === 0 ? "15px" : "normal",
+                          paddingLeft: isCustomPeriod ? "10px" : "5px",
+                        }}
+                      >
+                        {value === 0 ? "Select Report Type" : value}
+                      </span>
+                    )}
+                  >
+                    <MenuItem id="report_select_hover" value="Trip">
+                      Trip
+                    </MenuItem>
+                    <MenuItem id="report_select_hover" value="DailyActivity">
+                      Daily Activity
+                    </MenuItem>
+                    <MenuItem id="report_select_hover" value="Ignition">
+                      Ignition
+                    </MenuItem>
+                    <MenuItem id="report_select_hover" value="Events">
+                      Events
+                    </MenuItem>
+                    <MenuItem
+                      id="report_select_hover"
+                      value="DetailReportByStreet"
+                    >
+                      Detail Report By Street
+                    </MenuItem>
+                    <MenuItem id="report_select_hover" value="IdlingActivity">
+                      Idling Activity
+                    </MenuItem>
+                  </Select> */}
+                </div>
+              </div>
 
-              <Select
-                value={Ignitionreport.vehicleNo}
-                onChange={handleInputChangeSelect}
-                options={options}
-                placeholder="Pick Vehicle"
-                isSearchable
-                noOptionsMessage={() => "No options available"}
-                className="   rounded-md  outline-green border border-grayLight  hover:border-green"
-                styles={{
-                  control: (provided, state) => ({
-                    ...provided,
-                    border: "none",
-                    boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
-                  }),
-                  option: (provided, state) => ({
-                    ...provided,
-                    backgroundColor: state.isFocused
-                      ? "#00B56C"
-                      : "transparent", // Change 'blue' to your desired hover color
-                    color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
-                    "&:hover": {
-                      backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
-                      color: "white", // Change 'white' to your desired text color
-                    },
-                  }),
-                }}
-              />
               {/* <Select
                 className="h-8 lg:w-4/6 w-full text-labelColor outline-green px-1e"
                 name="VehicleReg"
@@ -568,6 +617,7 @@ export default function Reports() {
                       onChange={(e) =>
                         handleCustomDateChange("fromDateTime", e)
                       }
+                      placeholder="Start Date"
                       variant="inline"
                       maxDate={currenTDates}
                       className="xl:w-80  lg:w-80 w-auto"
@@ -599,6 +649,7 @@ export default function Reports() {
                     onChange={(newDate: any) =>
                       handleCustomDateChange("toDateTime", newDate)
                     }
+                    placeholder="End Date"
                     variant="inline"
                     maxDate={currenTDates}
                     className="xl:w-80  lg:w-80 w-auto"
