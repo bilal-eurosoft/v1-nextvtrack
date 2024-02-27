@@ -261,7 +261,7 @@ export default function Zone() {
   async function deleteSelectedZones(zoneId: any) {
     try {
       // Show a custom confirmation toast with "OK" and "Cancel" buttons
-      const { id } = toast.custom((t) => (
+      const { id } = await toast.custom((t) => (
         <div className="bg-white p-2 rounded-md">
           <p>Are you sure you want to delete this zone?</p>
           <button
@@ -285,6 +285,7 @@ export default function Zone() {
           >
             OK
           </button>
+
           <button
             onClick={() => {
               // Dismiss the confirmation toast without deleting
@@ -311,7 +312,7 @@ export default function Zone() {
       console.log(error);
     }
   }
-  // allZone();
+  allZone();
 
   // async function deleteSelectedZones(zoneId: any) {
   // try {

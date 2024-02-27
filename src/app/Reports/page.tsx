@@ -371,7 +371,7 @@ export default function Reports() {
                     value={Ignitionreport?.vehicleNo}
                     onChange={handleInputChangeTrip}
                     options={optionsTrip}
-                    placeholder="Pick Vehicle"
+                    placeholder="Select Report Type"
                     isSearchable
                     noOptionsMessage={() => "No options available"}
                     className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
@@ -451,7 +451,7 @@ export default function Reports() {
                     value={Ignitionreport.vehicleNo}
                     onChange={handleInputChangeSelect}
                     options={options}
-                    placeholder="Pick Vehicle"
+                    placeholder="Select Vehicle"
                     isSearchable
                     noOptionsMessage={() => "No options available"}
                     className="   rounded-md w-full outline-green border border-grayLight  hover:border-green"

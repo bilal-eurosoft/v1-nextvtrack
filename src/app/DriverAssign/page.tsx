@@ -9,7 +9,7 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Button from "@mui/material/Button";
-import { toast } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
@@ -29,6 +29,7 @@ import { vehicleListByClientId } from "@/utils/API_CALLS";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import "./assign.css";
+import { el } from "date-fns/locale";
 interface Column {
   id: "name" | "code" | "population" | "size" | "density";
   label: string;
@@ -181,30 +182,32 @@ export default function DriverProfile() {
   const [getAllAsignData, setgetAllAsignData] = useState<any>([]);
   const [selectedDriver, setSelectedDriver] = useState<any>({});
   const [selectVehicleNum, setSelectVehicleNum] = useState<any>({});
-  useEffect(() => {
-    const vehicleName = async () => {
-      try {
-        // setLaoding(true);
-        if (session) {
-          const response = await GetDriverDataByClientId({
-            token: session?.accessToken,
-            clientId: session?.clientId,
-          });
-          setDriverList(
-            response.filter(
-              (item: any) =>
-                item.isAvailable == true && item.isDeleted === false
-            )
-          );
-        }
-        // setLaoding(false);
-      } catch (error) {
-        console.error("Error fetching zone data:", error);
+
+  const vehicleName = async () => {
+    console.log("selected", selectedDriver);
+    try {
+      // setLaoding(true);
+      if (session) {
+        const response = await GetDriverDataByClientId({
+          token: session?.accessToken,
+          clientId: session?.clientId,
+        });
+        setDriverList(
+          response.filter(
+            (item: any) => item.isAvailable == true && item.isDeleted === false
+          )
+        );
       }
-    };
+      // setLaoding(false);
+    } catch (error) {
+      console.error("Error fetching zone data:", error);
+    }
+  };
+
+  useEffect(() => {
     vehicleName();
   }, [session]);
-
+  console.log("getallAssign", getAllAsignData);
   const AllAsignData = async () => {
     try {
       // setLaoding(true);
@@ -258,12 +261,11 @@ export default function DriverProfile() {
   // }, [session]);
   useEffect(() => {
     vehicleNum();
-  });
+  }, [session]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
-    const payload: any = {
+    let payload: any = {
       DriverDetails: {
         id: selectedDriver._id,
         driverfirstName: selectedDriver.driverfirstName,
@@ -287,58 +289,72 @@ export default function DriverProfile() {
       // dateDeassign: null,
     };
 
-    try {
-      if (session) {
-        const newformdata: any = {
-          ...payload,
-          clientId: session?.clientId,
-        };
-        const response = await toast.promise(
-          postDriverDataAssignByClientId({
-            token: session?.accessToken,
-            newformdata: newformdata,
-          }),
-          {
-            loading: "Saving data...",
-            success: "Data saved successfully!",
-            error: "Error saving data. Please try again.",
-          },
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
+    if (
+      !payload.vehicleDetails.vehicleNo ||
+      !payload.DriverDetails.driverfirstName ||
+      !payload.DriverDetails.driverLastName
+    ) {
+      toast.error("Please Fill the field");
+    } else {
+      try {
+        if (session) {
+          const newformdata: any = {
+            ...payload,
+            clientId: session?.clientId,
+          };
+
+          const response = await toast.promise(
+            postDriverDataAssignByClientId({
+              token: session?.accessToken,
+              newformdata: newformdata,
+            }),
+            {
+              loading: "Saving data...",
+              success: "Data saved successfully!",
+              error: "Error saving data. Please try again.",
             },
-            success: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
+            {
+              style: {
+                border: "1px solid #00B56C",
+                padding: "16px",
+                color: "#1A202C",
               },
-            },
-            error: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
+              success: {
+                duration: 2000,
+                iconTheme: {
+                  primary: "#00B56C",
+                  secondary: "#FFFAEE",
+                },
               },
-            },
-          }
-        );
-        // vehicleListData();
-        AllAsignData();
+              error: {
+                duration: 2000,
+                iconTheme: {
+                  primary: "#00B56C",
+                  secondary: "#FFFAEE",
+                },
+              },
+            }
+          );
+          // vehicleListData();
+          AllAsignData();
+          setSelectedDriver("");
+        }
+      } catch (error) {
+        console.error("Error fetching zone data:", error);
       }
-    } catch (error) {
-      console.error("Error fetching zone data:", error);
+      vehicleName();
+      vehicleNum();
+      vehicleNum();
+      setSelectedDriver("");
+      setOpen(false);
     }
-    vehicleNum();
+    setSelectVehicleNum({});
   };
 
   const handleDeasign = async (item: any) => {
     const selectedDriverObject: any = await getAllAsignData?.data?.find(
       (driver: any) => driver._id === item
     );
-    console.log("item", selectedDriverObject.id);
     const payload: any = {
       DriverDetails: {
         driverfirstName: selectedDriverObject?.DriverDetails?.driverfirstName,
@@ -367,45 +383,107 @@ export default function DriverProfile() {
     };
     try {
       if (session) {
-        const newformdata: any = {
-          ...payload,
-          clientId: session?.clientId,
-        };
-        console.log("deAssign", newformdata);
-        const response = await toast.promise(
-          postDriverDeDataAssignByClientId({
-            token: session?.accessToken,
-            newformdata: newformdata,
-          }),
-          {
-            loading: "Saving data...",
-            success: "Data saved successfully!",
-            error: "Error saving data. Please try again.",
-          },
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
-            },
-            success: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-            error: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-          }
-        );
-        // vehicleListData();
-        AllAsignData();
+        const { id } = toast.custom((t) => (
+          <div className="bg-white p-2 rounded-md">
+            <p>Are you sure you want to Deasign This Driver ?</p>
+            <button
+              onClick={async () => {
+                // Check if the user is authenticated
+                if (session) {
+                  const newformdata: any = {
+                    ...payload,
+                    clientId: session?.clientId,
+                  };
+                  const response = await toast.promise(
+                    postDriverDeDataAssignByClientId({
+                      token: session?.accessToken,
+                      newformdata: newformdata,
+                    }),
+                    {
+                      loading: "Saving data...",
+                      success: "User successfully Active!",
+                      error: "Error saving data. Please try again.",
+                    },
+                    {
+                      style: {
+                        border: "1px solid #00B56C",
+                        padding: "16px",
+                        color: "#1A202C",
+                      },
+                      success: {
+                        duration: 2000,
+                        iconTheme: {
+                          primary: "#00B56C",
+                          secondary: "#FFFAEE",
+                        },
+                      },
+                      error: {
+                        duration: 2000,
+                        iconTheme: {
+                          primary: "#00B56C",
+                          secondary: "#FFFAEE",
+                        },
+                      },
+                    }
+                  );
+                  AllAsignData();
+                }
+              }}
+              className="text-green pr-5 font-popins font-bold"
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => {
+                // Dismiss the confirmation toast without deleting
+                toast.dismiss(id);
+
+                // Optionally, you can show a cancellation message
+                toast("Deletion canceled", {
+                  duration: 3000,
+                  position: "top-center",
+                });
+              }}
+              className="text-red font-popins font-bold"
+            >
+              No
+            </button>
+          </div>
+        ));
+
+        // console.log("deAssign", newformdata);
+        // const response = await toast.promise(
+        //   postDriverDeDataAssignByClientId({
+        //     token: session?.accessToken,
+        //     newformdata: newformdata,
+        //   }),
+        //   {
+        //     loading: "Saving data...",
+        //     success: "Data saved successfully!",
+        //     error: "Error saving data. Please try again.",
+        //   },
+        //   {
+        //     style: {
+        //       border: "1px solid #00B56C",
+        //       padding: "16px",
+        //       color: "#1A202C",
+        //     },
+        //     success: {
+        //       duration: 2000,
+        //       iconTheme: {
+        //         primary: "#00B56C",
+        //         secondary: "#FFFAEE",
+        //       },
+        //     },
+        //     error: {
+        //       duration: 2000,
+        //       iconTheme: {
+        //         primary: "#00B56C",
+        //         secondary: "#FFFAEE",
+        //       },
+        //     },
+        //   }
+        // );
       }
     } catch (error) {
       console.error("Error fetching zone data:", error);
@@ -481,7 +559,7 @@ export default function DriverProfile() {
                   <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 m-6 mt-8 gap-5">
                     <div className="lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-12  ">
                       <label className="text-gray-700 ">
-                        <i className="text-black font-popins font-medium mt-5">
+                        <i className=" font-popins font-extrabold mt-5 text-red">
                           *
                         </i>{" "}
                         Drives:
@@ -515,7 +593,7 @@ export default function DriverProfile() {
                     <div className="lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-12 lg:mt-0 md:mt-0 sm:mt-0  mt-4 ">
                       <label>
                         {" "}
-                        <i className="text-black font-popins font-medium  mt-5">
+                        <i className="text-red font-popins font-extrabold  mt-5">
                           *
                         </i>{" "}
                         Vehicles:
@@ -692,6 +770,7 @@ export default function DriverProfile() {
           className="bg-bgLight table_pagination"
         />
       </Paper>
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }

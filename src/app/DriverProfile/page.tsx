@@ -60,6 +60,7 @@ export default function DriverProfile() {
   const [inactiveRFIDs, setInactiveRFIDs] = useState<any>([]);
   const handleClose = () => {
     setOpen(false);
+    setSelectedRFID("");
     setShowCardNumber(false);
     setFormData({
       id: "",
@@ -97,9 +98,26 @@ export default function DriverProfile() {
 
   const handleEdit = (id: any) => {
     setShowCardNumber(true);
-    setOpenEdit(true);
-    const filterData: any = DriverData.find((item: any) => item.id == id);
+    if (id.isAvailable == true) {
+      setOpenEdit(true);
+    } else {
+      toast.error("Please Driver Deasign");
+    }
+
+    // DriverData.map((item) => {
+    //   if (item.isAvailable === false) {
+    //     alert("test");
+    //   } else {
+    //     setOpenEdit(true);
+    //   }
+    // });
+    // if (editdataFilter.isAvailable == false) {
+    //   alert("please Deasign Driver");
+    // } else {
+    // }
+    const filterData: any = DriverData.find((item: any) => item.id == id?.id);
     setSelectedData(filterData);
+    vehicleListData();
   };
 
   const [singleFormData, setSingleFormData] = useState<any>({
@@ -321,12 +339,12 @@ export default function DriverProfile() {
             },
           }
         );
-        vehicleListData();
-        RFid();
       }
     } catch (error) {
       console.error("Error fetching zone data:", error);
     }
+    vehicleListData();
+    RFid();
     setOpenEdit(false);
   };
 
@@ -458,103 +476,107 @@ export default function DriverProfile() {
     setInputs("");
   };
   const handleDelete = async (data: any) => {
-    const payLoad: any = {
-      id: data.id,
-      driverNo: data.driverNo,
-      driverfirstName: data.driverfirstName,
-      driverMiddleName: data.driverMiddleName,
-      driverLastName: data.driverLastName,
-      driverContact: data.driverContact,
-      driverIdNo: data.driverIdNo,
-      driverAddress1: data.driverAddress1,
-      driverAddress2: data.driverAddress2,
-      driverRFIDCardNumber: data.driverRFIDCardNumber,
-      isAvailable: false,
-      isDeleted: true,
-    };
+    if (data.isAvailable == true) {
+      const payLoad: any = {
+        id: data.id,
+        driverNo: data.driverNo,
+        driverfirstName: data.driverfirstName,
+        driverMiddleName: data.driverMiddleName,
+        driverLastName: data.driverLastName,
+        driverContact: data.driverContact,
+        driverIdNo: data.driverIdNo,
+        driverAddress1: data.driverAddress1,
+        driverAddress2: data.driverAddress2,
+        driverRFIDCardNumber: data.driverRFIDCardNumber,
+        isAvailable: false,
+        isDeleted: true,
+      };
 
-    try {
-      // Show a custom confirmation toast with "OK" and "Cancel" buttons
+      try {
+        // Show a custom confirmation toast with "OK" and "Cancel" buttons
 
-      const { id } = toast.custom((t) => (
-        <div className="bg-white p-2 rounded-md">
-          <p>Are you sure you want to InActive this Driver?</p>
-          <button
-            onClick={async () => {
-              // Check if the user is authenticated
-              if (session) {
-                const newformdata = {
-                  ...payLoad,
-                  clientId: session.clientId,
-                };
+        const { id } = toast.custom((t) => (
+          <div className="bg-white p-2 rounded-md">
+            <p>Are you sure you want to InActive this Driver?</p>
+            <button
+              onClick={async () => {
+                // Check if the user is authenticated
+                if (session) {
+                  const newformdata = {
+                    ...payLoad,
+                    clientId: session.clientId,
+                  };
 
-                // Send a request to delete the zone
-                const response = await toast.promise(
-                  postDriverDataByClientId({
-                    token: session.accessToken,
-                    newformdata: newformdata,
-                  }),
-                  {
-                    loading: "Saving data...",
-                    success: "User successfully InActive!",
-                    error: "Error saving data. Please try again.",
-                  },
-                  {
-                    style: {
-                      border: "1px solid #00B56C",
-                      padding: "16px",
-                      color: "#1A202C",
+                  // Send a request to delete the zone
+                  const response = await toast.promise(
+                    postDriverDataByClientId({
+                      token: session.accessToken,
+                      newformdata: newformdata,
+                    }),
+                    {
+                      loading: "Saving data...",
+                      success: "User successfully InActive!",
+                      error: "Error saving data. Please try again.",
                     },
-                    success: {
-                      duration: 2000,
-                      iconTheme: {
-                        primary: "#00B56C",
-                        secondary: "#FFFAEE",
+                    {
+                      style: {
+                        border: "1px solid #00B56C",
+                        padding: "16px",
+                        color: "#1A202C",
                       },
-                    },
-                    error: {
-                      duration: 2000,
-                      iconTheme: {
-                        primary: "#00B56C",
-                        secondary: "#FFFAEE",
+                      success: {
+                        duration: 2000,
+                        iconTheme: {
+                          primary: "#00B56C",
+                          secondary: "#FFFAEE",
+                        },
                       },
-                    },
-                  }
-                );
+                      error: {
+                        duration: 2000,
+                        iconTheme: {
+                          primary: "#00B56C",
+                          secondary: "#FFFAEE",
+                        },
+                      },
+                    }
+                  );
 
-                // Refresh vehicle list and RFid data after deletion
-                vehicleListData();
-                RFid();
-              }
-            }}
-            className="text-green pr-5 font-popins font-bold"
-          >
-            Yes
-          </button>
-          <button
-            onClick={() => {
-              // Dismiss the confirmation toast without deleting
-              toast.dismiss(id);
+                  // Refresh vehicle list and RFid data after deletion
+                  vehicleListData();
+                  RFid();
+                }
+              }}
+              className="text-green pr-5 font-popins font-bold"
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => {
+                // Dismiss the confirmation toast without deleting
+                toast.dismiss(id);
 
-              // Optionally, you can show a cancellation message
-              toast("Deletion canceled", {
-                duration: 3000,
-                position: "top-center",
-              });
-            }}
-            className="text-red font-popins font-bold"
-          >
-            No
-          </button>
-        </div>
-      ));
-    } catch (error) {
-      // Show an error toast
-      toast.error("Failed to delete zone", {
-        duration: 3000,
-        position: "top-center",
-      });
-      console.log(error);
+                // Optionally, you can show a cancellation message
+                toast("Deletion canceled", {
+                  duration: 3000,
+                  position: "top-center",
+                });
+              }}
+              className="text-red font-popins font-bold"
+            >
+              No
+            </button>
+          </div>
+        ));
+      } catch (error) {
+        // Show an error toast
+        toast.error("Failed to delete zone", {
+          duration: 3000,
+          position: "top-center",
+        });
+        console.log(error);
+      }
+    } else {
+      toast.error("Please Driver Deasign");
     }
   };
 
@@ -811,7 +833,7 @@ export default function DriverProfile() {
                   </div>
                   <div className="lg:col-span-3 md:col-span-3 col-span-6 mx-2">
                     <label className="text-sm text-black font-popins font-medium">
-                      ID Number
+                      Driver ID
                     </label>
                     <input
                       type="text"
@@ -825,7 +847,7 @@ export default function DriverProfile() {
                 <div className="grid grid-cols-12 m-2  ">
                   <div className="lg:col-span-6 md:col-span-6 col-span-6   mx-2">
                     <label className="text-sm text-black font-popins font-medium">
-                      Address 1
+                      Address
                     </label>
                     <br></br>
                     <textarea
@@ -884,7 +906,7 @@ export default function DriverProfile() {
                               <MenuItem
                                 key={item?.RFIDCardNo}
                                 value={item?._id}
-                                className="hover:bg-green hover:text-white"
+                                className="bg_hover_rfid"
                               >
                                 {item?.RFIDCardNo}
                               </MenuItem>
@@ -1054,7 +1076,7 @@ export default function DriverProfile() {
                   </div>
                   <div className="lg:col-span-3 md:col-span-3 col-span-6 mx-2 ">
                     <label className="text-sm text-black font-popins font-medium">
-                      ID Number
+                      Driver ID
                     </label>
                     <input
                       type="text"
@@ -1348,7 +1370,7 @@ export default function DriverProfile() {
                   className="font-popins  font-bold text-black"
                   colSpan={2}
                 >
-                  Driver Contact N.O
+                  Driver Number
                 </TableCell>
                 <TableCell
                   align="center"
@@ -1494,7 +1516,7 @@ export default function DriverProfile() {
                     >
                       <button
                         className="text-white bg-green p-1 rounded-md shadow-md hover:shadow-gray transition duration-500 "
-                        onClick={() => handleEdit(row.id)}
+                        onClick={() => handleEdit(row)}
                       >
                         <BorderColorIcon className="" />
                       </button>

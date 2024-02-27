@@ -8,7 +8,10 @@
   width: 10px;
   background-color: rgb(255, 255, 255);
 }
-
+.bg_hover_rfid:hover {
+  background-color: #00b56c;
+  color: white;
+}
 ::-webkit-scrollbar-thumb {
   background: #29303b;
   border-radius: 7px;
