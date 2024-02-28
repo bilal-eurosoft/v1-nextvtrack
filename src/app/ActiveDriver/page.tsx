@@ -313,7 +313,7 @@ export default function DriverProfile() {
               className="bg-red px-4 py-1  text-white rounded-md font-popins font-bold"
               onClick={() => router.push("DriverProfile")}
             >
-              Cancel
+              Cancels
             </button>
           </div>
 
