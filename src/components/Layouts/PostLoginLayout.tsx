@@ -935,7 +935,7 @@ export default function RootLayout({
                         style={{ display: "flex", justifyContent: "center" }}
                         className="py-2 font-popins font-semibold"
                       >
-                        <TimeCounter />
+                        {/* <TimeCounter /> */}
                       </div>
                       <Typography
                         variant="small"

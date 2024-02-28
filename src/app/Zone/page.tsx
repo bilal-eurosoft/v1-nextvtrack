@@ -189,7 +189,23 @@ export default function Zone() {
       });
     }
   };
+  let optionZoneName: any =
+    zoneList?.map((item: any) => ({
+      value: item.zoneName,
+      label: item.zoneName,
+    })) || [];
+  const optionZoneSortName =
+    zoneList?.map((item: any) => ({
+      value: item.zoneShortName,
+      label: item.zoneShortName,
+    })) || [];
 
+  let GeofenceOption = [
+    { value: "On-Site", label: "On-Site" },
+    { value: "Off-Site", label: "Off-Site" },
+    { value: "City-Area", label: "City-Area" },
+    { value: "Restricted-Area", label: "Restricted-Area" },
+  ];
   const handleClear = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setSearchCriteria({
@@ -198,6 +214,7 @@ export default function Zone() {
       GeoFenceType: "",
       zoneType: "",
     });
+
     setFilteredDataIsNotAvaialable(true);
     setselectedZoneTypeCircle(false);
     setselectedZoneTypePolyGone(false);
@@ -405,23 +422,6 @@ export default function Zone() {
     });
   };
   const handleGeoFence = (e: any) => {};
-  const optionZoneName =
-    zoneList?.map((item: any) => ({
-      value: item.zoneName,
-      label: item.zoneName,
-    })) || [];
-  const optionZoneSortName =
-    zoneList?.map((item: any) => ({
-      value: item.zoneShortName,
-      label: item.zoneShortName,
-    })) || [];
-
-  const GeofenceOption = [
-    { value: "On-Site", label: "On-Site" },
-    { value: "Off-Site", label: "Off-Site" },
-    { value: "City-Area", label: "City-Area" },
-    { value: "Restricted-Area", label: "Restricted-Area" },
-  ];
 
   return (
     <div className=" bg-bgLight border-t border-bgLight " id="zone_main">
@@ -481,12 +481,17 @@ export default function Zone() {
                 ))}
             </Select> */}
             <Select
+              // value={searchCriteria.zoneName}
               onChange={handleZoneName}
               options={optionZoneName}
-              placeholder="Zone Name"
+              placeholder={
+                optionZoneName.label === null || optionZoneName.label === null
+                  ? "Zone Name"
+                  : optionZoneName.value
+              }
               isSearchable
               noOptionsMessage={() => "No options available"}
-              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              className="rounded-md w-full  outline-green border border-grayLight  hover:border-green"
               styles={{
                 control: (provided, state) => ({
                   ...provided,
@@ -685,7 +690,7 @@ export default function Zone() {
             >
               <RadioButtonUncheckedIcon
                 className="mr-2"
-                style={{ color: "black !important" }}
+                // style={{ color: "black !important" }}
               />{" "}
               Circle
             </span>
