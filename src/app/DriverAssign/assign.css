@@ -97,6 +97,10 @@
     width: 65%;
   }
 }
+.assign_driver_hover:hover {
+  background-color: #00b56c !important;
+  color: white;
+}
 
 @media (max-width: 800px) and (min-width: 510px) {
   .popup_style {

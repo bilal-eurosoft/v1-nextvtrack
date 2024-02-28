@@ -95,9 +95,15 @@ export default function DriverProfile() {
     driverRFIDCardNumber: "",
     isAvailabl: "",
   });
-
+  console.log("session", session);
   const handleEdit = (id: any) => {
-    setShowCardNumber(true);
+    if (!id.driverRFIDCardNumber) {
+      setShowCardNumber(false);
+    } else {
+      setShowCardNumber(true);
+    }
+
+    console.log("ids", id);
     if (id.isAvailable == true) {
       setOpenEdit(true);
     } else {
@@ -250,7 +256,7 @@ export default function DriverProfile() {
   const id: any = selectedData?._id;
 
   const handleDriverEditedSubmit = async (e: React.FormEvent, value: any) => {
-    console.log("value", value);
+    console.log("value", value, "=====");
     e.preventDefault();
     const payLoad: any = {
       id: selectedData.id,
@@ -262,90 +268,98 @@ export default function DriverProfile() {
       driverIdNo: selectedData.driverIdNo,
       driverAddress1: selectedData.driverAddress1,
       driverAddress2: selectedData.driverAddress2,
-      driverRFIDCardNumber: selectedData.driverRFIDCardNumber,
-      isAvailabl: selectedData.isAvailable,
+      // driverRFIDCardNumber: showCardNumber
+      //   ? selectedData.driverRFIDCardNumber
+      //   : "",
+      isAvailable: selectedData.isAvailable,
     };
+    if (showCardNumber && !selectedData.driverRFIDCardNumber) {
+      toast.error("please Enter RFID Card Number");
+    } else {
+      try {
+        if (session) {
+          const newformdata = {
+            ...payLoad,
+            clientId: session?.clientId,
+          };
+          console.log("value", value, "=====2");
 
-    try {
-      if (session) {
-        const newformdata = {
-          ...payLoad,
-          clientId: session?.clientId,
-        };
+          const response = await toast.promise(
+            postDriverDataByClientId({
+              token: session?.accessToken,
+              newformdata: newformdata,
+            }),
+            {
+              loading: "Saving data...",
+              success: "Data saved successfully!",
+              error: "Error saving data. Please try again.",
+            },
+            {
+              style: {
+                border: "1px solid #00B56C",
+                padding: "16px",
+                color: "#1A202C",
+              },
+              success: {
+                duration: 2000,
+                iconTheme: {
+                  primary: "#00B56C",
+                  secondary: "#FFFAEE",
+                },
+              },
+              error: {
+                duration: 2000,
+                iconTheme: {
+                  primary: "#00B56C",
+                  secondary: "#FFFAEE",
+                },
+              },
+            }
+          );
+          console.log("value", selectedData, "=====3");
 
-        const response = await toast.promise(
-          postDriverDataByClientId({
-            token: session?.accessToken,
-            newformdata: newformdata,
-          }),
-          {
-            loading: "Saving data...",
-            success: "Data saved successfully!",
-            error: "Error saving data. Please try again.",
-          },
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
+          const response2 = await toast.promise(
+            AssignRfidtodriver(session?.accessToken, {
+              DriverId: selectedData.id,
+              RFIDid: getRfid?.find((i: any) => {
+                return i.RFIDCardNo === selectedData.driverRFIDCardNumber;
+              })._id,
+            }),
+            {
+              loading: "Saving data...",
+              success: "Data saved successfully!",
+              error: "Error saving data. Please try again.",
             },
-            success: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
+            {
+              style: {
+                border: "1px solid #00B56C",
+                padding: "16px",
+                color: "#1A202C",
               },
-            },
-            error: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
+              success: {
+                duration: 2000,
+                iconTheme: {
+                  primary: "#00B56C",
+                  secondary: "#FFFAEE",
+                },
               },
-            },
-          }
-        );
-        const response2 = await toast.promise(
-          AssignRfidtodriver(session?.accessToken, {
-            DriverId: selectedData.id,
-            RFIDid: getRfid?.find((i: any) => {
-              return i.RFIDCardNo === selectedData.driverRFIDCardNumber;
-            })._id,
-          }),
-          {
-            loading: "Saving data...",
-            success: "Data saved successfully!",
-            error: "Error saving data. Please try again.",
-          },
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
-            },
-            success: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
+              error: {
+                duration: 2000,
+                iconTheme: {
+                  primary: "#00B56C",
+                  secondary: "#FFFAEE",
+                },
               },
-            },
-            error: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-          }
-        );
+            }
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching zone data:", error);
       }
-    } catch (error) {
-      console.error("Error fetching zone data:", error);
+      vehicleListData();
+      RFid();
+      setOpenEdit(false);
     }
-    vehicleListData();
-    RFid();
-    setOpenEdit(false);
   };
 
   const handleDriverSubmit = async (e: any) => {
@@ -451,11 +465,7 @@ export default function DriverProfile() {
           token: session?.accessToken,
           ClientId: session?.clientId,
         });
-        setRfid(
-          response.data.filter((item: any) => {
-            return item.DriverId == "";
-          }) || []
-        );
+        setRfid(response.data || []);
       }
     } catch (error) {
       console.error("Error fetching zone data:", error);
@@ -554,7 +564,6 @@ export default function DriverProfile() {
               onClick={() => {
                 // Dismiss the confirmation toast without deleting
                 toast.dismiss(id);
-
                 // Optionally, you can show a cancellation message
                 toast("Deletion canceled", {
                   duration: 3000,
@@ -902,15 +911,18 @@ export default function DriverProfile() {
                             <MenuItem value="" selected hidden disabled>
                               Select RFID
                             </MenuItem>
-                            {getRfid.map((item: any) => (
-                              <MenuItem
-                                key={item?.RFIDCardNo}
-                                value={item?._id}
-                                className="bg_hover_rfid"
-                              >
-                                {item?.RFIDCardNo}
-                              </MenuItem>
-                            ))}
+                            {getRfid.map(
+                              (item: any) =>
+                                item.DriverId == "" && (
+                                  <MenuItem
+                                    key={item?.RFIDCardNo}
+                                    value={item?._id}
+                                    className="bg_hover_rfid"
+                                  >
+                                    {item?.RFIDCardNo}
+                                  </MenuItem>
+                                )
+                            )}
                           </Select>
                           {/* <button onClick={handleInactiveClick}>
                               Active
@@ -1244,15 +1256,18 @@ export default function DriverProfile() {
                                 >
                                   {singleFormData.driverRFIDCardNumber}
                                 </option>
-                                {getRfid.map((item: any) => (
-                                  <option
-                                    className="hover:bg-green hover:text-white"
-                                    key={item?.RFIDCardNo}
-                                    value={item?.RFIDCardNo}
-                                  >
-                                    {item?.RFIDCardNo}
-                                  </option>
-                                ))}
+                                {getRfid.map(
+                                  (item: any) =>
+                                    item.DriverId == "" && (
+                                      <option
+                                        className="hover:bg-green hover:text-white"
+                                        key={item?.RFIDCardNo}
+                                        value={item?.RFIDCardNo}
+                                      >
+                                        {item?.RFIDCardNo}
+                                      </option>
+                                    )
+                                )}
                               </select>
                             </div>
                           ) : (

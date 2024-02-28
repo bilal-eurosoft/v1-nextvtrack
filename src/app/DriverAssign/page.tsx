@@ -578,7 +578,8 @@ export default function DriverProfile() {
                           DriverList.map((item: any, i: any) => {
                             return (
                               <MenuItem
-                                className="hover:bg-green hover:text-white"
+                                className="assign_driver_hover"
+                                // className="hover:bg-green hover:text-white"
                                 key={item._id}
                                 value={item._id}
                               >
@@ -610,7 +611,8 @@ export default function DriverProfile() {
                             vehicleNums?.map((item: any) => {
                               return (
                                 <MenuItem
-                                  className="hover:bg-green hover:text-white"
+                                  className=" "
+                                  // className="hover:bg-green hover:text-white"
                                   key={item._id}
                                   value={item._id}
                                 >

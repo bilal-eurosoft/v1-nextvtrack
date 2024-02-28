@@ -100,7 +100,7 @@ export default function Zone() {
 
   useEffect(() => {
     allZone();
-  }, []);
+  }, [session]);
 
   // }, []);
 
@@ -303,6 +303,7 @@ export default function Zone() {
           </button>
         </div>
       ));
+      allZone();
     } catch (error) {
       // Show an error toast
       toast.error("Failed to delete zone", {
@@ -312,7 +313,6 @@ export default function Zone() {
       console.log(error);
     }
   }
-  allZone();
 
   // async function deleteSelectedZones(zoneId: any) {
   // try {
@@ -495,8 +495,8 @@ export default function Zone() {
                 }),
                 option: (provided, state) => ({
                   ...provided,
-                  backgroundColor: state.isFocused ? "#00B56C" : "transparent", // Change 'blue' to your desired hover color
-                  color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
+                  backgroundColor: state.isFocused ? "white" : "transparent", // Change 'blue' to your desired hover color
+                  color: state.isFocused ? "black" : "black", // Change 'white' to your desired text color
                   "&:hover": {
                     backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
                     color: "white", // Change 'white' to your desired text color
@@ -568,8 +568,8 @@ export default function Zone() {
                 }),
                 option: (provided, state) => ({
                   ...provided,
-                  backgroundColor: state.isFocused ? "#00B56C" : "transparent", // Change 'blue' to your desired hover color
-                  color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
+                  backgroundColor: state.isFocused ? "white" : "transparent", // Change 'blue' to your desired hover color
+                  color: state.isFocused ? "black" : "black", // Change 'white' to your desired text color
                   "&:hover": {
                     backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
                     color: "white", // Change 'white' to your desired text color
@@ -656,8 +656,8 @@ export default function Zone() {
                 }),
                 option: (provided, state) => ({
                   ...provided,
-                  backgroundColor: state.isFocused ? "#00B56C" : "transparent", // Change 'blue' to your desired hover color
-                  color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
+                  backgroundColor: state.isFocused ? "white" : "transparent", // Change 'blue' to your desired hover color
+                  color: state.isFocused ? "black" : "black", // Change 'white' to your desired text color
                   "&:hover": {
                     backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
                     color: "white", // Change 'white' to your desired text color
@@ -704,7 +704,7 @@ export default function Zone() {
         </div>
 
         <div className="grid lg:grid-cols-2 md:grid-cols-2  sm:grid-cols-2 grid-cols-2 px-5 lg:mt-0 mt-5">
-          <div className="lg:col-span-1 md:col-span-1 sm:col-span-1   col-span-2">
+          <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2">
             <div className="grid xl:grid-cols-7 lg:grid-cols-4  md:grid-cols-3 grid-cols-2">
               <div className="grid  rounded-md lg:grid-cols-3 md:grid-cols-4 grid-cols-5 bg-green shadow-md  hover:shadow-gray transition duration-500 cursor-pointer">
                 <div className="lg:col-span-1 md:col-span-1 sm:col-span-2  col-span-2">

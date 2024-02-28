@@ -220,7 +220,7 @@ export default function DriverProfile() {
       driverAddress1: data.driverAddress1,
       driverAddress2: data.driverAddress2,
       driverRFIDCardNumber: data.driverRFIDCardNumber,
-      isAvailable: data.isAvailable,
+      isAvailable: true,
       isDeleted: false,
     };
 
