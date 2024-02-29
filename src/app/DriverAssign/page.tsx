@@ -30,6 +30,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import "./assign.css";
 import { el } from "date-fns/locale";
+import { InputLabel } from "@mui/material";
 interface Column {
   id: "name" | "code" | "population" | "size" | "density";
   label: string;
@@ -571,15 +572,17 @@ export default function DriverProfile() {
                         className="h-8 w-full  border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-outoutline-none color-gray"
                         displayEmpty
                       >
-                        <MenuItem value="" disabled>
+                        {/* <MenuItem value="" disabled selected>
                           Drives
-                        </MenuItem>
+                        </MenuItem> */}
+                        <InputLabel disabled hidden className="text-gray">
+                          Select Driver{" "}
+                        </InputLabel>
                         {DriverList &&
                           DriverList.map((item: any, i: any) => {
                             return (
                               <MenuItem
                                 className="assign_driver_hover"
-                                // className="hover:bg-green hover:text-white"
                                 key={item._id}
                                 value={item._id}
                               >
@@ -604,14 +607,14 @@ export default function DriverProfile() {
                           displayEmpty
                           className="h-8  border w-full border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out"
                         >
-                          <MenuItem value="" disabled selected hidden>
-                            Vehicles
-                          </MenuItem>
+                          <InputLabel disabled hidden className="text-gray">
+                            Select Vehicle{" "}
+                          </InputLabel>
                           {vehicleNums &&
                             vehicleNums?.map((item: any) => {
                               return (
                                 <MenuItem
-                                  className=" "
+                                  className="assign_driver_hover"
                                   // className="hover:bg-green hover:text-white"
                                   key={item._id}
                                   value={item._id}

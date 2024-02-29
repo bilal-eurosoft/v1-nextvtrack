@@ -899,7 +899,10 @@ export default function RootLayout({
                         alt="Rounded avatar"
                       />
                     </PopoverHandler>
-                    <PopoverContent {...triggers} className="z-50  w-auto">
+                    <PopoverContent
+                      {...triggers}
+                      className="z-50  lg:w-auto md:w-auto w-full"
+                    >
                       {/* <div className="mb-2 flex items-center gap-3 px-20">
                         <Typography
                           as="a"
@@ -915,7 +918,7 @@ export default function RootLayout({
                           />
                         </Typography>
                       </div> */}
-                      <div className="grid grid-cols-12">
+                      <div className="grid grid-cols-12 w-full">
                         <div className="col-span-2">
                           <img
                             className="mb-5 w-10 lg:h-10 h-10 rounded-full"
@@ -924,7 +927,7 @@ export default function RootLayout({
                           />
                         </div>
                         <div className="col-span-9 ms-2 text-lg font-popins text-start text-black">
-                          <p className="text-2xl text-center">
+                          <p className="text-2xl text-start">
                             {session?.FullName}
                           </p>
                           {session?.Email}
