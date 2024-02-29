@@ -8,6 +8,10 @@
   /* border-width: 1px !important; */
   border: #00b56c !important;
 }
+.hover_add_zone:hover {
+  background-color: #00b56c;
+  color: white;
+}
 
 .Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: #00b56c !important;

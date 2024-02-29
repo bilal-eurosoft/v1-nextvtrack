@@ -687,7 +687,7 @@ export default function DriverProfile() {
                     id="table_head"
                     className="font-popins  font-bold text-black"
                   >
-                    Driver Contact.NO
+                    Driver Number
                   </TableCell>
                   <TableCell
                     align="center"

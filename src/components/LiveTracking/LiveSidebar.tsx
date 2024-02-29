@@ -307,9 +307,13 @@ const LiveSidebar = ({
                 <h1 className="font-popins text-start"> {item.timestamp}</h1>
                 {/* <p className="text-labelColor">{item.zone}</p> */}
                 {/* <p> */}
-                {item.DriverName && (
-                  <p>Driver Name: {item.DriverName.replace("undefine", "")}</p>
-                )}
+                {item.DriverName &&
+                  (item?.vehicleStatus === "Moving" ||
+                    item?.vehicleStatus === "Pause") && (
+                    <p>
+                      Driver Name: {item.DriverName.replace("undefine", "")}
+                    </p>
+                  )}
                 {/* {item.DriverName.replace("undefine", "")} */}
                 {/* </p> */}
                 <span className="text-labelColor">
