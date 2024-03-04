@@ -227,7 +227,7 @@ const LiveSidebar = ({
         {filteredData?.map((item: VehicleData, index: any) => {
           return (
             <div
-              className="hover:bg-[#e1f0e3] cursor-pointer pt-2 "
+              className="hover:bg-[#e1f0e3] cursor-pointer pt-2"
               onClick={() => handleClickVehicle(item)}
               key={index}
               style={{

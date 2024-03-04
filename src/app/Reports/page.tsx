@@ -106,22 +106,22 @@ export default function Reports() {
     .slice(0, 10)}TO${timeOnly}`;
   const handleInputChangeSelect = (e: any) => {
     console.log("ee", e);
-    const { value, label } = e;
+    // const { value, label } = e;
     if (!e) return;
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
-      VehicleReg: value,
+      VehicleReg: e?.value,
       // ["label"]: label,
     }));
   };
 
   const handleInputChangeTrip = (e: any) => {
     console.log("tt", e);
-    const { value, label } = e;
+    // const { value, label } = e;
     if (!e) return;
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
-      reportType: value,
+      reportType: e?.value,
       // ["label"]: label,
     }));
   };
@@ -361,7 +361,7 @@ export default function Reports() {
           <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-2 mt-5 mb-8  grid-cols-2 pt-5 px-10 gap-2 flex justify-center ">
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 ">
               <div className="grid grid-cols-12">
-                <div className="lg:col-span-3 col-span-12">
+                <div className="lg:col-span-3 col-span-12 mt-2">
                   <label className="text-labelColor">
                     Report Type: &nbsp;&nbsp;
                   </label>
@@ -373,6 +373,7 @@ export default function Reports() {
                     options={optionsTrip}
                     placeholder="Select Report Type"
                     isSearchable
+                    isClearable
                     noOptionsMessage={() => "No options available"}
                     className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
                     styles={{
@@ -441,7 +442,7 @@ export default function Reports() {
 
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4">
               <div className="grid grid-cols-12">
-                <div className="lg:col-span-2 col-span-12">
+                <div className="lg:col-span-2 col-span-12 mt-2">
                   <label className="text-labelColor">
                     Vehicle: &nbsp;&nbsp;
                   </label>
@@ -452,6 +453,7 @@ export default function Reports() {
                     onChange={handleInputChangeSelect}
                     options={options}
                     placeholder="Select Vehicle"
+                    isClearable
                     isSearchable
                     noOptionsMessage={() => "No options available"}
                     className="   rounded-md w-full outline-green border border-grayLight  hover:border-green"

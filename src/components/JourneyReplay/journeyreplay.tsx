@@ -1121,6 +1121,7 @@ export default function journeyReplayComp() {
               onChange={handleInputChangeSelect}
               options={options}
               placeholder="Pick Vehicle"
+              isClearable
               isSearchable
               noOptionsMessage={() => "No options available"}
               className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"

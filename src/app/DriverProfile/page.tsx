@@ -48,7 +48,7 @@ export default function DriverProfile() {
   const router = useRouter();
   const [showCardNumber, setShowCardNumber] = useState(false);
   const [page, setPage] = React.useState(0);
-  const [rowsPerPages, setRowsPerPages] = React.useState(11);
+  const [rowsPerPages, setRowsPerPages] = React.useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [data, setData] = useState([]);
   const [open, setOpen] = React.useState(false);
@@ -125,7 +125,6 @@ export default function DriverProfile() {
     setSelectedData(filterData);
     vehicleListData();
   };
-
   const [singleFormData, setSingleFormData] = useState<any>({
     id: "",
     clientId: "",
@@ -1447,7 +1446,7 @@ export default function DriverProfile() {
                       colSpan={2}
                       className="table_text"
                     >
-                      {index + 1}
+                      {currentPage * rowsPerPages + index + 1}
                     </TableCell>
                     <TableCell
                       align="center"
@@ -1580,10 +1579,10 @@ export default function DriverProfile() {
         </div>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[5, 10, 20]}
+        rowsPerPageOptions={[5, 10, 20]} // Add 11 to the rowsPerPageOptions array
         component="div"
         count={DriverData.length}
-        rowsPerPage={rowsPerPages}
+        rowsPerPage={rowsPerPages} // Set rows per page to 11
         page={currentPage}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}

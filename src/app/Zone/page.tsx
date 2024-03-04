@@ -116,16 +116,19 @@ export default function Zone() {
       const filteredZone = zoneList.filter((zone) => {
         return (
           (zoneName === "" ||
-            zone.zoneName.toLowerCase().includes(zoneName.toLowerCase())) &&
-          (zoneShortName === "" ||
-            (zone.zoneShortName &&
-              zone.zoneShortName
+            (typeof zone.zoneName === "string" &&
+              zone.zoneName
                 .toLowerCase()
-                .includes(zoneShortName.toLowerCase()))) &&
+                .includes(zoneName.value.toLowerCase()))) &&
+          (zoneShortName === "" ||
+            (zone?.zoneShortName &&
+              zone?.zoneShortName
+                ?.toLowerCase()
+                .includes(zoneShortName.value?.toLowerCase()))) &&
           (GeoFenceType === "" ||
             (zone.GeoFenceType !== undefined &&
               zone.GeoFenceType.toLowerCase() ===
-                GeoFenceType.toLowerCase())) &&
+                GeoFenceType.value.toLowerCase())) &&
           (zoneType === "" ||
             (zone.zoneType !== undefined &&
               zone.zoneType.toLowerCase() === zoneType.toLowerCase()))
@@ -214,7 +217,7 @@ export default function Zone() {
       GeoFenceType: "",
       zoneType: "",
     });
-
+    console.log("optionZoneName", optionZoneName);
     setFilteredDataIsNotAvaialable(true);
     setselectedZoneTypeCircle(false);
     setselectedZoneTypePolyGone(false);
@@ -404,25 +407,30 @@ export default function Zone() {
   };
 
   const handleZoneName = (e: any) => {
-    const { value, label } = e;
-    console.log("value", value);
+    // const { value, label } = e;
+    // console.log("value", value);
     setSearchCriteria({
       ...searchCriteria,
-      zoneName: e.value,
-      ["label"]: label,
+      zoneName: e,
+      // ["label"]: label,
     });
   };
   const handleZoneSortName = (e: any) => {
-    const { value, label } = e;
-    console.log("value", value);
+    // const { value, label } = e;
+    // console.log("value", value);
     setSearchCriteria({
       ...searchCriteria,
-      zoneShortName: e.value,
-      ["label"]: label,
+      zoneShortName: e,
+      // ["label"]: label,
     });
   };
-  const handleGeoFence = (e: any) => {};
-
+  const handleGeoFence = (e: any) => {
+    setSearchCriteria({
+      ...searchCriteria,
+      GeoFenceType: e,
+      // ["label"]: label,
+    });
+  };
   return (
     <div className=" bg-bgLight border-t border-bgLight " id="zone_main">
       <p className="bg-green px-4 py-1 text-black text-center text-2xl text-white font-bold zone_heading">
@@ -481,17 +489,14 @@ export default function Zone() {
                 ))}
             </Select> */}
             <Select
-              // value={searchCriteria.zoneName}
+              value={searchCriteria.zoneName}
               onChange={handleZoneName}
               options={optionZoneName}
-              placeholder={
-                optionZoneName.label === null || optionZoneName.label === null
-                  ? "Zone Name"
-                  : optionZoneName.value
-              }
+              placeholder="Zone Name"
+              isClearable
               isSearchable
               noOptionsMessage={() => "No options available"}
-              className="rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
               styles={{
                 control: (provided, state) => ({
                   ...provided,
@@ -560,8 +565,10 @@ export default function Zone() {
             </Select> */}
             <Select
               onChange={handleZoneSortName}
+              value={searchCriteria.zoneShortName}
               options={optionZoneSortName}
               placeholder="Zone Sort Name"
+              isClearable
               isSearchable
               noOptionsMessage={() => "No options available"}
               className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
@@ -647,9 +654,11 @@ export default function Zone() {
               </MenuItem>
             </Select> */}
             <Select
+              value={searchCriteria.GeoFenceType}
               onChange={handleGeoFence}
               options={GeofenceOption}
               placeholder="GeoFence"
+              isClearable
               isSearchable
               noOptionsMessage={() => "No options available"}
               className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
@@ -708,7 +717,7 @@ export default function Zone() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 md:grid-cols-2  sm:grid-cols-2 grid-cols-2 px-5 lg:mt-0 mt-5">
+        <div className="grid lg:grid-cols-2 md:grid-cols-2  sm:grid-cols-2 grid-cols-2 px-5 lg:mt-0 mt-5 ">
           <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2">
             <div className="grid xl:grid-cols-7 lg:grid-cols-4  md:grid-cols-3 grid-cols-2">
               <div className="grid  rounded-md lg:grid-cols-3 md:grid-cols-4 grid-cols-5 bg-green shadow-md  hover:shadow-gray transition duration-500 cursor-pointer">
@@ -771,6 +780,7 @@ export default function Zone() {
                     Clear
                   </button>
                 </div>
+                <br></br>
               </div>
 
               {/* <div className="grid rounded-md lg:grid-cols-2 lg:grid-cols-4 grid-cols-5 bg-zonebtnColor shadow-md ms-3 hover:shadow-gray transition duration-500 cursor-pointer">

@@ -652,7 +652,7 @@ export default function DriverProfile() {
                     id="table_head"
                     className="font-popins  font-bold text-black"
                   >
-                    Driver Number
+                    S.No
                   </TableCell>
                   <TableCell
                     align="center"
@@ -690,7 +690,7 @@ export default function DriverProfile() {
                     Driver Number
                   </TableCell>
                   <TableCell
-                    align="center"
+                    align="start"
                     colSpan={2}
                     id="table_head"
                     className="font-popins  font-bold text-black"
@@ -701,7 +701,7 @@ export default function DriverProfile() {
                   Driver Address 1
                 </TableCell> */}
                   <TableCell
-                    align="center"
+                    align="start"
                     colSpan={2}
                     id="table_head"
                     className="font-popins  font-bold text-black"
@@ -709,7 +709,7 @@ export default function DriverProfile() {
                     Driver Address
                   </TableCell>
                   <TableCell
-                    align="center"
+                    align="start"
                     colSpan={2}
                     id="table_head"
                     className="font-popins  font-bold text-black"
@@ -719,8 +719,11 @@ export default function DriverProfile() {
                 </TableRow>
               </TableHead>
               <TableBody className="bg-bgLight cursor-pointer  ">
-                {getAllAsignData?.data?.map((row: any) => (
+                {getAllAsignData?.data?.map((row: any, index: any) => (
                   <TableRow className="hover:bg-bgHoverTabel w-full">
+                    <TableCell align="center" colSpan={2}>
+                      {page * rowsPerPage + index + 1}
+                    </TableCell>
                     <TableCell align="center" colSpan={2}>
                       {row?.DriverDetails?.driverNo}
                     </TableCell>
@@ -737,9 +740,9 @@ export default function DriverProfile() {
                     </TableCell>
                     <TableCell align="center" colSpan={2}>
                       {row?.DriverDetails?.driverIdNo}
-                    </TableCell>
-                    <TableCell>{row?.DriverDetails?.driverIdNo}</TableCell>
-                    <TableCell align="center">
+                      {/* </TableCell> */}
+                      {/* <TableCell>{row?.DriverDetails?.driverIdNo}</TableCell> */}
+                      {/* <TableCell align="center"> */}
                       {row?.DriverDetails?.driverContact}
                     </TableCell>
                     <TableCell align="center" colSpan={2}>
@@ -750,7 +753,7 @@ export default function DriverProfile() {
                     </TableCell>
 
                     <TableCell
-                      align="center"
+                      align="start"
                       colSpan={2}
                       onClick={() => handleDeasign(row.id)}
                       className=" font-bold"
