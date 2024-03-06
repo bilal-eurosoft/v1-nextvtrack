@@ -95,7 +95,6 @@ export default function DriverProfile() {
     driverRFIDCardNumber: "",
     isAvailabl: "",
   });
-  console.log("session", session);
   const handleEdit = (id: any) => {
     if (!id.driverRFIDCardNumber) {
       setShowCardNumber(false);
@@ -1257,11 +1256,11 @@ export default function DriverProfile() {
                                 </option>
                                 {getRfid.map(
                                   (item: any) =>
-                                    item.DriverId == "" && (
+                                    item.DriverId === "" && (
                                       <option
-                                        className="hover:bg-green hover:text-white"
                                         key={item?.RFIDCardNo}
                                         value={item?.RFIDCardNo}
+                                        className={"bg-green text-white"}
                                       >
                                         {item?.RFIDCardNo}
                                       </option>
@@ -1334,7 +1333,7 @@ export default function DriverProfile() {
         <div className="table_driver_profile">
           <Table aria-label="custom pagination table">
             <TableHead
-              className="sticky top-0 bg-white z-10"
+              className="sticky top-0 bg-white"
               // style={{ zIndex: "1", backgroundColor: "white" }}
             >
               <TableRow>

@@ -644,7 +644,7 @@ export default function DriverProfile() {
         <TableContainer>
           <div className="table_driver_profile">
             <Table stickyHeader aria-label="sticky table">
-              <TableHead className="sticky top-0 bg-white z-10">
+              <TableHead className="sticky top-0 bg-white ">
                 <TableRow>
                   <TableCell
                     align="center"
@@ -690,7 +690,7 @@ export default function DriverProfile() {
                     Driver Number
                   </TableCell>
                   <TableCell
-                    align="start"
+                    align="center"
                     colSpan={2}
                     id="table_head"
                     className="font-popins  font-bold text-black"
@@ -701,7 +701,7 @@ export default function DriverProfile() {
                   Driver Address 1
                 </TableCell> */}
                   <TableCell
-                    align="start"
+                    align="center"
                     colSpan={2}
                     id="table_head"
                     className="font-popins  font-bold text-black"
@@ -709,7 +709,7 @@ export default function DriverProfile() {
                     Driver Address
                   </TableCell>
                   <TableCell
-                    align="start"
+                    align="center"
                     colSpan={2}
                     id="table_head"
                     className="font-popins  font-bold text-black"
@@ -753,7 +753,7 @@ export default function DriverProfile() {
                     </TableCell>
 
                     <TableCell
-                      align="start"
+                      align="center"
                       colSpan={2}
                       onClick={() => handleDeasign(row.id)}
                       className=" font-bold"

@@ -21,6 +21,7 @@ import moment from "moment";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import Image from "next/image";
+import { Popup } from "react-leaflet";
 import harshIcon from "../../../public/Images/HarshBreak.png";
 import HarshAccelerationIcon from "../../../public/Images/HarshAccelerationIcon.png";
 import markerA from "../../../public/Images/marker-a.png";
@@ -705,6 +706,12 @@ export default function journeyReplayComp() {
     setStopDetailsOpen(true);
     try {
       setIsPlaying(false);
+      setTravelHistoryresponse([]);
+      setProgressWidth(0);
+      // if (polylinedata.length > 0) {
+      //   setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
+      // }
+      setCurrentPositionIndex(0);
       if (session) {
         let newresponsedata = {
           ...Ignitionreport,
@@ -1431,7 +1438,7 @@ export default function journeyReplayComp() {
             )}
           </div>
 
-          <div className=" xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold flex justify-center items-center">
+          <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold flex justify-center items-center">
             {clearMapData ? (
               <button
                 onClick={handleClickClear}
@@ -1569,13 +1576,13 @@ export default function journeyReplayComp() {
                                     {items.count}){" "}
                                   </b> */}
                                 <div className="grid grid-cols-12 space-x-3 justify-center text-green font-semibold">
-                                  <div className="col-span-4 w-full text-start">
+                                  <div className="col-span-5 w-full text-start">
                                     <p>{date}</p>
                                   </div>
-                                  <div className="col-span-5 w-full text-center">
+                                  <div className="col-span-5 w-full text-start">
                                     <p>{items.day}</p>
                                   </div>
-                                  <div className="col-span-2 w-full text-center">
+                                  <div className="col-span-1 w-full text-center">
                                     <p>x{items.count}</p>
                                   </div>
                                 </div>
@@ -1975,7 +1982,7 @@ export default function journeyReplayComp() {
             className="xl:col-span-4 lg:col-span-3 md:col-span-7 sm:col-span-12 col-span-4 journey_map"
             style={{ position: "relative" }}
           >
-            <div>
+            <div onClick={() => setMapcenterToFly(null)}>
               {mapcenter !== null && (
                 <MapContainer
                   id="map"
@@ -2012,12 +2019,20 @@ export default function journeyReplayComp() {
                               Number(singleRecord.centerPoints.split(",")[1]),
                             ]}
                             radius={Number(singleRecord.latlngCordinates)}
-                          />
+                          >
+                            <Popup>{singleRecord.zoneName}</Popup>
+                          </Circle>
                         </>
                       ) : (
+                        // <Polygon
+                        //   positions={JSON.parse(singleRecord.latlngCordinates)}
+                        // />
                         <Polygon
+                          key={singleRecord.zoneName}
                           positions={JSON.parse(singleRecord.latlngCordinates)}
-                        />
+                        >
+                          <Popup>{singleRecord.zoneName}</Popup>
+                        </Polygon>
                       );
                     })}
 

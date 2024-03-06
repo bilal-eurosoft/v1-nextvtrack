@@ -14,5 +14,4 @@ export type DeviceAttach = {
   vehicleskipstep: number;
   __v: number;
   _id: string;
-  data: any;
 };

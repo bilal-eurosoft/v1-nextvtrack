@@ -245,7 +245,7 @@ export default function RootLayout({
                 </svg>
               </Tooltip>
             </Link>
-            <Link href="/journeyReplay">
+            <Link href="/journeyReplay" style={{ zIndex: "999" }}>
               <Tooltip
                 className="bg-[#00B56C] text-white shadow-lg rounded"
                 placement="right"
@@ -283,7 +283,7 @@ export default function RootLayout({
                   content="Zones"
                 >
                   <svg
-                    className="w-20 h-14 py-3  border-y-2   text-[white]  text-white-10  dark:text-white"
+                    className="w-20 h-14 py-3  border-y-2  text-[white]  text-white-10  dark:text-white"
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"
@@ -616,7 +616,7 @@ export default function RootLayout({
           </div>
 
           <hr></hr>
-          <div className="basis-1/1 w-screen  ">
+          <div className="basis-1/1 w-screen">
             <nav
               className="flex items-center justify-between  lg:mt-0 md:mt-14 sm:mt-14   flex-wrap bg-green px-5 py-2 sticky top-0 z-10 w-full"
               // style={{ height: "7vh" }}

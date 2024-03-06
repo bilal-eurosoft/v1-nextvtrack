@@ -1,7 +1,7 @@
 import { IgnitionReport, replayreport } from "@/types/IgnitionReport";
 import { zonelistType } from "@/types/zoneType";
 
-var URL = "https://backend.vtracksolutions.com";
+var URL = "http://172.16.10.46:80";
 // "https://backend.vtracksolutions.com";
 
 //""http://172.16.11.210:3001; //"http://172.16.11.210:3001";
