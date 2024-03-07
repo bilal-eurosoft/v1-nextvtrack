@@ -14,7 +14,7 @@ export default function ForgetPassword() {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    email: "",
+    email: ""
     // userName: "",
   });
 
@@ -27,39 +27,39 @@ export default function ForgetPassword() {
 
     const newformdata = {
       ...formData,
-      clientId: session?.clientId,
+      clientId: session?.clientId
     };
 
     const response = await toast.promise(
       forgetEmailByClientId({
         token: session?.accessToken,
-        newformdata: newformdata,
+        newformdata: newformdata
       }),
       {
         loading: "Saving data...",
         success: "Data saved successfully!",
-        error: "Error saving data. Please try again.",
+        error: "Error saving data. Please try again."
       },
       {
         style: {
           border: "1px solid #00B56C",
           padding: "16px",
-          color: "#1A202C",
+          color: "#1A202C"
         },
         success: {
           duration: 2000,
           iconTheme: {
             primary: "#00B56C",
-            secondary: "#FFFAEE",
-          },
+            secondary: "#FFFAEE"
+          }
         },
         error: {
           duration: 2000,
           iconTheme: {
             primary: "#00B56C",
-            secondary: "#FFFAEE",
-          },
-        },
+            secondary: "#FFFAEE"
+          }
+        }
       }
     );
 
@@ -195,7 +195,7 @@ export default function ForgetPassword() {
               </div>
               <p
                 className="text-white text-sm lg:mx-0 mx-5 cursor-pointer hover:text-red pb-0"
-                onClick={() => router.push("/login")}
+                onClick={() => router.push("/signin")}
               >
                 <b> Back To Sign In</b>
               </p>

@@ -1,16 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import logo from "../../../public/Images/logo.png";
 import loadings from "../../../public/Images/loadinglogo.png";
-
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import { setLoginTime } from "../../utils/time";
-
+import { GetUsersByClientId, GetLicenseById } from "@/utils/API_CALLS";
 import "./login.css";
-
+import { useSession } from "next-auth/react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -18,12 +18,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const clientIdparams = searchParams.get("clientId");
+  const pageparams = searchParams.get("page");
 
   const [formData, setFormData] = useState({
     userName: "",
-    password: "",
+    password: ""
   });
-
+  const { data: session } = useSession();
   const handleInputChange = (e: any) => {
     const value = e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
@@ -35,7 +38,7 @@ export default function LoginPage() {
     const data = await signIn("credentials", {
       userName,
       password,
-      redirect: false,
+      redirect: false
     });
 
     if (data?.status === 200) {
@@ -43,7 +46,7 @@ export default function LoginPage() {
     }
     if (data?.status === 401) {
       toast.error("Invalid Credential", {
-        position: "top-center",
+        position: "top-center"
       });
     }
     setLoading(false);
@@ -63,6 +66,48 @@ export default function LoginPage() {
   //   }
   //   setLoading(false);
   // };
+  const fetchData = async () => {
+    if (
+      clientIdparams !== undefined &&
+      clientIdparams !== null &&
+      pageparams !== undefined &&
+      pageparams !== null
+    ) {
+      try {
+        const users = await GetUsersByClientId({
+          // token: session.accessToken,
+          clientId: clientIdparams
+        });
+
+        const licenseInfo = await GetLicenseById({
+          // token: session.accessToken,
+          id: clientIdparams
+        });
+
+        const user = users[0];
+        const data = await signIn("credentials", {
+          userName: licenseInfo[0].accountCode + "@" + user.userName,
+          password: user.password,
+          redirect: false
+        });
+        if (data?.status === 200) {
+          router.push("/liveTracking");
+          localStorage.setItem("IsRedirect", "1");
+          localStorage.setItem("page", pageparams);
+        }
+        if (data?.status === 401) {
+          toast.error("Invalid Credential", {
+            position: "top-center"
+          });
+        }
+      } catch (error) {
+        // Handle errors
+        console.error("Error fetching data:", error);
+      }
+    }
+  };
+
+  fetchData();
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -79,7 +124,7 @@ export default function LoginPage() {
         position: "relative",
         backgroundImage: "url(Images/bgLogo.png)",
         backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
+        backgroundSize: "cover"
         // filter: "blur(4px)",
         // zIndex: "-1 !important",
       }}
@@ -92,7 +137,7 @@ export default function LoginPage() {
               display: "flex",
               height: "100vh",
               justifyContent: "center",
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <Image

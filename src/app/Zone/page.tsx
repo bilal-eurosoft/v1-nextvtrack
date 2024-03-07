@@ -720,7 +720,7 @@ export default function Zone() {
         <div className="grid lg:grid-cols-2 md:grid-cols-2  sm:grid-cols-2 grid-cols-2 px-5 lg:mt-0 mt-5 ">
           <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2">
             <div className="grid xl:grid-cols-7 lg:grid-cols-4  md:grid-cols-3 grid-cols-2">
-              <div className="grid  rounded-md lg:grid-cols-3 md:grid-cols-4 grid-cols-5 bg-green shadow-md  hover:shadow-gray transition duration-500 cursor-pointer">
+              <div className="grid  rounded-md lg:grid-cols-3 md:grid-cols-4 grid-cols-5 bg-green shadow-md    hover:shadow-gray transition duration-500 cursor-pointer">
                 <div className="lg:col-span-1 md:col-span-1 sm:col-span-2  col-span-2">
                   <svg
                     className="h-11 py-3 w-full text-white"
@@ -1003,18 +1003,33 @@ export default function Zone() {
                 </>
               ) : filteredDataIsNotAvaialable === false ? (
                 <>
-                  <p className="flex items-center justify-center mt-52">
-                    No data found
-                  </p>
+                  <h2
+                    style={{
+                      height: "45vh",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      textAlign: "center",
+                      position: "absolute",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                    }}
+                    className="font-popins text-3xl"
+                  >
+                    No Data Found
+                  </h2>
                 </>
               ) : (
                 <>
-                  {displayedData.map((item: any, index) => (
-                    <TableRow
-                      key={index}
-                      className="cursor-pointer hover:bg-[#e2f6f0]"
-                    >
-                      {/* <TableCell
+                  {displayedData.length > 0 ? (
+                    <>
+                      {" "}
+                      {displayedData.map((item: any, index) => (
+                        <TableRow
+                          key={index}
+                          className="cursor-pointer hover:bg-[#e2f6f0]"
+                        >
+                          {/* <TableCell
                   align="left"
                   className="w-4 h-4 border-r border-green"
                 >
@@ -1031,55 +1046,73 @@ export default function Zone() {
                     onChange={() => handleCheckboxChange(item)}
                   />
                 </TableCell> */}
-                      <TableCell
-                        align="left"
-                        className="border-r border-green  font-popins text-black font-normal"
-                        style={{ fontSize: "16px" }}
-                      >
-                        {item.zoneName}
-                      </TableCell>
-                      <TableCell
-                        align="left"
-                        className="border-r border-green  font-popins text-black font-normal"
-                        style={{ fontSize: "16px" }}
-                      >
-                        {item.zoneShortName}
-                      </TableCell>
-                      <TableCell
-                        align="left"
-                        className="border-r border-green  font-popins text-black font-normal"
-                        style={{ fontSize: "16px" }}
-                      >
-                        {item.zoneType}
-                      </TableCell>
-                      <TableCell
-                        align="center" // Set align to center
-                        className="border-r border-green font-popins text-black font-normal"
-                      >
-                        <Link href={`/EditZone?id=${item.id}`}>
-                          <BorderColorIcon
-                            style={{ marginTop: "-2%" }}
-                            className="text-white bg-green  p-1 h-7 w-8  rounded-md shadow-md hover:shadow-gray transition duration-500 "
-                          />
-                        </Link>
-                        <button
-                          // style={{ marginLeft: "73%" }}
-                          className="icon_delete_edit"
-                          onClick={() => deleteSelectedZones(item.id)}
-                        >
-                          <DeleteIcon
-                            className="text-white bg-red p-1 h-7 w-8 rounded-md shadow-md hover:shadow-gray transition duration-500 "
-                            style={{ marginTop: "-18%", marginLeft: "20%" }}
-                          />
-                        </button>
+                          <TableCell
+                            align="left"
+                            className="border-r border-green  font-popins text-black font-normal"
+                            style={{ fontSize: "16px" }}
+                          >
+                            {item.zoneName}
+                          </TableCell>
+                          <TableCell
+                            align="left"
+                            className="border-r border-green  font-popins text-black font-normal"
+                            style={{ fontSize: "16px" }}
+                          >
+                            {item.zoneShortName}
+                          </TableCell>
+                          <TableCell
+                            align="left"
+                            className="border-r border-green  font-popins text-black font-normal"
+                            style={{ fontSize: "16px" }}
+                          >
+                            {item.zoneType}
+                          </TableCell>
+                          <TableCell
+                            align="center" // Set align to center
+                            className="border-r border-green font-popins text-black font-normal"
+                          >
+                            <Link href={`/EditZone?id=${item.id}`}>
+                              <BorderColorIcon
+                                style={{ marginTop: "-2%" }}
+                                className="text-white bg-green  p-1 h-7 w-8  rounded-md shadow-md hover:shadow-gray transition duration-500 "
+                              />
+                            </Link>
+                            <button
+                              // style={{ marginLeft: "73%" }}
+                              className="icon_delete_edit"
+                              onClick={() => deleteSelectedZones(item.id)}
+                            >
+                              <DeleteIcon
+                                className="text-white bg-red p-1 h-7 w-8 rounded-md shadow-md hover:shadow-gray transition duration-500 "
+                                style={{ marginTop: "-18%", marginLeft: "20%" }}
+                              />
+                            </button>
 
-                        {/* <BorderColorIcon
+                            {/* <BorderColorIcon
                     onClick={deleteSelectedZones}
                 
                   /> */}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </>
+                  ) : (
+                    <h2
+                      style={{
+                        height: "40vh",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        textAlign: "center",
+                        position: "absolute",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                      }}
+                      className="font-popins text-3xl"
+                    >
+                      No Data Found
+                    </h2>
+                  )}
                 </>
               )}
             </TableBody>

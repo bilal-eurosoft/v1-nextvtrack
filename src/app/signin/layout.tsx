@@ -5,11 +5,11 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "VTrack Sign In",
-  description: "Clients can use this page to sign in to the portal",
+  description: "Clients can use this page to sign in to the portal"
 };
 
 export default function RootLayout({
-  children,
+  children
 }: {
   children: React.ReactNode;
 }) {
