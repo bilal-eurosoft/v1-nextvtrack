@@ -18,7 +18,11 @@
 #nav_height {
   height: 7vh;
 }
-
+/* @media (max-width: 1028px) and (min-height: 600px) {
+  #nav_height {
+    height: 12vh;
+  }
+} */
 @media (max-width: 600px) {
   #nav_height {
     height: auto;

@@ -65,3 +65,19 @@
   padding-top: 2%;
   padding-bottom: 2%;
 }
+
+.height_report_form {
+  height: 7vh;
+}
+.height_table {
+  /* style={{
+    maxWidth: "100%",
+    overflowX: "auto",
+    height: "75vh",
+    marginTop: "-0.5%",
+  }} */
+  width: 100%;
+  overflow-y: auto;
+  height: 80vh;
+  margin-top: -0.5%;
+}

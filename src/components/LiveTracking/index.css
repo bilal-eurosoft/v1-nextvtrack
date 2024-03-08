@@ -57,6 +57,15 @@ input[type="checkbox"]:hover {
 .main_sider_bar {
   height: 93vh;
 }
+/* @media (min-width: 1024px) and (min-height: 600px) {
+  .search_live_tracking {
+    height: 8vh;
+  }
+
+  .vehicle_summary {
+    height: 8vh;
+  }
+} */
 
 @media (max-width: 1000px) and (min-width: 750px) {
   .main_sider_bar {

@@ -42,7 +42,7 @@ export default function LoginPage() {
       router.push("/liveTracking");
     }
     if (data?.status === 401) {
-      toast.error("Invalid Credential", {
+      toast.error("Invalid User Or Password", {
         position: "top-center",
       });
     }

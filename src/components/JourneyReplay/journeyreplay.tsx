@@ -1131,20 +1131,28 @@ export default function journeyReplayComp() {
               isClearable
               isSearchable
               noOptionsMessage={() => "No options available"}
-              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              className="   rounded-md w-full  outline-green border border-grayLight  "
               styles={{
                 control: (provided, state) => ({
                   ...provided,
                   border: "none",
-                  boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                  boxShadow: state.isFocused ? null : null,
                 }),
                 option: (provided, state) => ({
                   ...provided,
-                  backgroundColor: state.isFocused ? "#00B56C" : "transparent", // Change 'blue' to your desired hover color
-                  color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
+                  backgroundColor: state.isSelected
+                    ? "#00B56C"
+                    : state.isFocused
+                    ? "#00B56C"
+                    : "transparent",
+                  color: state.isSelected
+                    ? "white"
+                    : state.isFocused
+                    ? "white"
+                    : "black",
                   "&:hover": {
-                    backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
-                    color: "white", // Change 'white' to your desired text color
+                    backgroundColor: "#00B56C",
+                    color: "white",
                   },
                 }),
               }}
@@ -1437,7 +1445,6 @@ export default function journeyReplayComp() {
               // </div>
             )}
           </div>
-
           <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold flex justify-center items-center">
             {clearMapData ? (
               <button
@@ -2648,15 +2655,15 @@ export default function journeyReplayComp() {
                         <Select
                           onChange={(e: any) => setSpeedFactor(Number(e.value))}
                           options={SpeedOption}
-                          placeholder="Speed"
+                          placeholder="1x"
                           isSearchable
                           noOptionsMessage={() => "No options available"}
-                          className="rounded-md h-10 -mt-3 w-full outline-green border border-grayLight hover:border-green"
+                          className="rounded-md h-10 -mt-3 w-full outline-green border border-grayLight"
                           styles={{
                             control: (provided, state) => ({
                               ...provided,
                               border: "none",
-                              boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                              boxShadow: state.isFocused ? null : null,
                             }),
                             menu: (provided, state) => ({
                               ...provided,
@@ -2665,17 +2672,36 @@ export default function journeyReplayComp() {
                               top: "auto",
                               bottom: "100%", // Position the menu above the select input
                             }),
+
                             option: (provided, state) => ({
                               ...provided,
-                              backgroundColor: state.isFocused
+                              backgroundColor: state.isSelected
                                 ? "#00B56C"
+                                : state.isFocused
+                                ? "white"
                                 : "transparent",
-                              color: state.isFocused ? "white" : "black",
+                              color: state.isSelected
+                                ? "white"
+                                : state.isFocused
+                                ? "black"
+                                : "black",
                               "&:hover": {
                                 backgroundColor: "#00B56C",
                                 color: "white",
                               },
                             }),
+
+                            // option: (provided, state) => ({
+                            //   ...provided,
+                            //   backgroundColor: state.isFocused
+                            //     ? "#00B56C"
+                            //     : "transparent",
+                            //   color: state.isFocused ? "white" : "black",
+                            //   "&:hover": {
+                            //     backgroundColor: "#00B56C",
+                            //     color: "white",
+                            //   },
+                            // }),
                           }}
                         />
                       )}

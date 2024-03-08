@@ -40,6 +40,7 @@ export default function Reports() {
   const { data: session } = useSession();
   const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
   const [isCustomPeriod, setIsCustomPeriod] = useState(false);
+  const [showWeekDays, setShowWeekDays] = useState(true);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [startdate, setstartdate] = useState(new Date());
   const [enddate, setenddate] = useState(new Date());
@@ -200,7 +201,8 @@ export default function Reports() {
     }));
 
     if (name === "period" && value === "custom") {
-      setIsCustomPeriod(true);
+      setIsCustomPeriod(!isCustomPeriod);
+      setShowWeekDays(false);
     } else if (name === "period" && value != "custom") {
       setIsCustomPeriod(false);
     }
@@ -811,23 +813,31 @@ export default function Reports() {
     return { duration, distance };
   }
 
+  const hanldeCloseDateTap = () => {
+    setIsCustomPeriod(!isCustomPeriod);
+    setShowWeekDays(true);
+  };
+
+  const hanldeCustomClick = () => {
+    setIsCustomPeriod(!isCustomPeriod);
+    setShowWeekDays(false);
+  };
+
   return (
     <div>
+      <p className="bg-green px-4 py-1 border-t-2  text-center text-2xl text-white font-bold zone_heading">
+        Reports Filter
+      </p>
       <form
-        className="container mx-auto  lg:max-w-screen-lg bg-bgLight shadow-lg"
+        className="  bg-bgLight   height_report_form"
         onSubmit={handleSubmit}
       >
-        <div className="bg-green-50 mt-20">
-          <div className="grid grid-cols-1">
-            <p className="bg-green text-center font-popins font-bold text-xl px-4 py-3 rounded-md text-white">
-              Reports Filter{" "}
-            </p>
-          </div>
-          <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-2 mt-5 mb-8  grid-cols-2 pt-5 px-10 gap-2 flex justify-center ">
-            <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 ">
+        <div className="bg-green-50 mt-5">
+          <div className="grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-2 mt-5 mb-1 grid-cols-2  px-10 gap-2 ">
+            <div className="lg:col-span-3 md:col-span-1 sm:col-span-1 col-span-2 ">
               <div className="grid grid-cols-12">
-                <div className="col-span-3">
-                  <label className="text-labelColor">
+                <div className="col-span-3 mt-2">
+                  <label className="text-labelColor ">
                     Report Type: &nbsp;&nbsp;
                   </label>
                 </div>
@@ -889,29 +899,35 @@ export default function Reports() {
                     </MenuItem>
                   </Select> */}
                   <Select
-                    value={Ignitionreport?.vehicleNo}
+                    // value={Ignitionreport?.vehicleNo}
                     onChange={handleInputChangeTrip}
                     options={optionsTrip}
                     placeholder="Select Report Type"
                     isSearchable
                     isClearable
                     noOptionsMessage={() => "No options available"}
-                    className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+                    className="   rounded-md w-full  outline-green border border-grayLight"
                     styles={{
                       control: (provided, state) => ({
                         ...provided,
                         border: "none",
-                        boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                        boxShadow: state.isFocused ? null : null,
                       }),
                       option: (provided, state) => ({
                         ...provided,
-                        backgroundColor: state.isFocused
+                        backgroundColor: state.isSelected
                           ? "#00B56C"
-                          : "transparent", // Change 'blue' to your desired hover color
-                        color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
+                          : state.isFocused
+                          ? "#00B56C"
+                          : "transparent",
+                        color: state.isSelected
+                          ? "white"
+                          : state.isFocused
+                          ? "white"
+                          : "black",
                         "&:hover": {
-                          backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
-                          color: "white", // Change 'white' to your desired text color
+                          backgroundColor: "#00B56C",
+                          color: "white",
                         },
                       }),
                     }}
@@ -919,10 +935,13 @@ export default function Reports() {
                 </div>
               </div>
             </div>
-
-            <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4">
-              <label className="text-labelColor">
-                Vehicle: &nbsp;&nbsp;
+            <div className="lg:col-span-3 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4">
+              <div className="grid grid-cols-12">
+                <div className="col-span-2 mt-2">
+                  <label className="text-labelColor">
+                    Vehicle: &nbsp;&nbsp;{" "}
+                  </label>
+                </div>
                 {/* <Select
                   className="h-8 lg:w-4/6 w-full text-labelColor outline-green px-1e"
                   name="VehicleReg"
@@ -948,40 +967,255 @@ export default function Reports() {
                     </MenuItem>
                   ))}
                 </Select> */}
-                <Select
-                  value={Ignitionreport.vehicleNo}
-                  onChange={handleInputChangeSelect}
-                  options={options}
-                  placeholder="Select Vehicle"
-                  isClearable
-                  isSearchable
-                  noOptionsMessage={() => "No options available"}
-                  className="   rounded-md w-full outline-green border border-grayLight  hover:border-green"
-                  styles={{
-                    control: (provided, state) => ({
-                      ...provided,
-                      border: "none",
-                      boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
-                    }),
-                    option: (provided, state) => ({
-                      ...provided,
-                      backgroundColor: state.isFocused
-                        ? "#00B56C"
-                        : "transparent", // Change 'blue' to your desired hover color
-                      color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
-                      "&:hover": {
-                        backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
-                        color: "white", // Change 'white' to your desired text color
-                      },
-                    }),
-                  }}
-                />
-              </label>
+                <div className="col-span-8">
+                  <Select
+                    value={Ignitionreport.vehicleNo}
+                    onChange={handleInputChangeSelect}
+                    options={options}
+                    placeholder="Select Vehicle"
+                    isClearable
+                    isSearchable
+                    noOptionsMessage={() => "No options available"}
+                    className="   rounded-md w-full outline-green border border-grayLight  hover:border-green"
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        border: "none",
+                        boxShadow: state.isFocused ? null : null,
+                      }),
+                      option: (provided, state) => ({
+                        ...provided,
+                        backgroundColor: state.isSelected
+                          ? "#00B56C"
+                          : state.isFocused
+                          ? "#00B56C"
+                          : "transparent",
+                        color: state.isSelected
+                          ? "white"
+                          : state.isFocused
+                          ? "white"
+                          : "black",
+                        "&:hover": {
+                          backgroundColor: "#00B56C",
+                          color: "white",
+                        },
+                      }),
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            {showWeekDays && (
+              <>
+                <div
+                  className="lg:col-span-1 md:col-span-2 sm:col-span-2 mt-2"
+                  style={{ display: "flex", justifyContent: "center" }}
+                >
+                  <label>
+                    <input
+                      type="radio"
+                      className="w-5 h-4 form-radio  "
+                      style={{ accentColor: "green" }}
+                      name="period"
+                      value="today"
+                      checked={Ignitionreport.period === "today"}
+                      onChange={handleInputChange}
+                    />
+                    &nbsp;&nbsp;Today
+                  </label>
+                </div>
+                <div
+                  className="lg:col-span-1 md:col-span-2 sm:col-span-2 mt-2"
+                  style={{ display: "flex", justifyContent: "center" }}
+                >
+                  <label>
+                    <input
+                      type="radio"
+                      className="w-5 h-4 "
+                      name="period"
+                      value="yesterday"
+                      style={{ accentColor: "green" }}
+                      checked={Ignitionreport.period === "yesterday"}
+                      onChange={handleInputChange}
+                    />
+                    &nbsp;&nbsp;Yesterday
+                  </label>
+                </div>
+                <div
+                  className="lg:col-span-1 md:col-span-2 mt-2"
+                  style={{ display: "flex", justifyContent: "center" }}
+                >
+                  <label>
+                    <input
+                      type="radio"
+                      className="w-5 h-4"
+                      name="period"
+                      value="week"
+                      style={{ accentColor: "green" }}
+                      checked={Ignitionreport.period === "week"}
+                      onChange={handleInputChange}
+                    />
+                    &nbsp;&nbsp;Week
+                  </label>
+                </div>
+                <div
+                  className="lg:col-span-1 md:col-span-2 mt-2"
+                  style={{ display: "flex", justifyContent: "center" }}
+                >
+                  <label>
+                    <input
+                      type="radio"
+                      className="w-5 h-4"
+                      name="period"
+                      value="custom"
+                      style={{ accentColor: "green" }}
+                      checked={Ignitionreport.period === "custom"}
+                      onChange={handleInputChange}
+                      onClick={hanldeCustomClick}
+                    />
+                    &nbsp;&nbsp;Custom
+                  </label>
+                </div>{" "}
+              </>
+            )}
+            {isCustomPeriod && (
+              <>
+                <div className="lg:col-span-2 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4 ">
+                  <label className="text-labelColor">
+                    From Date: &nbsp;&nbsp;&nbsp;
+                    <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
+                      <KeyboardDatePicker
+                        format="MM/DD/yyyy"
+                        value={Ignitionreport.fromDateTime}
+                        onChange={(e) =>
+                          handleCustomDateChange("fromDateTime", e)
+                        }
+                        variant="inline"
+                        maxDate={currenTDates}
+                        autoOk
+                        inputProps={{ readOnly: true }}
+                        placeholder="Start Date"
+                        // className="xl:w-80  lg:w-80 w-auto"
+                      />
+                    </MuiPickersUtilsProvider>
+                    {/* <input
+                    type="date"
+                    className="ms-1 h-8 lg:w-4/6 w-full  text-labelColor  outline-green border border-grayLight px-1"
+                    name="fromDateTime"
+                    placeholder="Select Date"
+                    autoComplete="off"
+                    // onChange={handleStartdateChange}
+                    defaultValue={currentDate}
+                    onChange={(e) =>
+                      handleCustomDateChange("fromDateTime", e.target.value)
+                    }
+                  /> */}
+                  </label>
+                </div>
+                <div className="lg:col-span-2 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0  w-full ">
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "end",
+                      paddingLeft: "-15%",
+                    }}
+                  >
+                    <button
+                      className="text-green -mt-5 -mb-5 text-2xl font-bold"
+                      onClick={hanldeCloseDateTap}
+                    >
+                      x
+                    </button>
+                  </div>
+                  <label className="text-labelColor "></label>
+                  To Date: &nbsp;&nbsp;&nbsp;
+                  <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
+                    <KeyboardDatePicker
+                      format="MM/DD/yyyy"
+                      value={Ignitionreport.toDateTime}
+                      onChange={(newDate: any) =>
+                        handleCustomDateChange("toDateTime", newDate)
+                      }
+                      variant="inline"
+                      maxDate={currenTDates}
+                      autoOk
+                      inputProps={{ readOnly: true }}
+                      placeholder="End Date"
+                      // className="xl:w-80  lg:w-80 w-auto"
+                      // style={{ width: "70%" }}
+                    />
+                  </MuiPickersUtilsProvider>
+                  {/* <input
+                  type="date"
+                  className="h-8 lg:w-4/6 w-full  text-labelColor  outline-green border border-grayLight px-1"
+                  name="toDateTime"
+                  onChange={(e) =>
+                    handleCustomDateChange("toDateTime", e.target.value)
+                  }
+                /> */}
+                </div>
+              </>
+            )}
+            <div className="lg:col-span-1">
+              <button
+                className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
+                        ${
+                          (Ignitionreport.reportType &&
+                            Ignitionreport.VehicleReg &&
+                            Ignitionreport.period === "today") ||
+                          (Ignitionreport.reportType &&
+                            Ignitionreport.VehicleReg &&
+                            Ignitionreport.period === "yesterday") ||
+                          (Ignitionreport.reportType &&
+                            Ignitionreport.VehicleReg &&
+                            Ignitionreport.period === "week") ||
+                          (Ignitionreport.reportType &&
+                            Ignitionreport.VehicleReg &&
+                            Ignitionreport.period === "custom")
+                            ? ""
+                            : "opacity-50 cursor-not-allowed"
+                        }`}
+                type="submit"
+                onClick={handleSubmit}
+                // disabled={
+                //   !Ignitionreport.reportType ||
+                //   !Ignitionreport.VehicleReg ||
+                //   !Ignitionreport.period ||
+                //   !Ignitionreport.fromDateTime ||
+                //   !Ignitionreport.toDateTime
+                // }
+              >
+                Submit
+              </button>{" "}
+            </div>
+            <div className="lg:col-span-1 -ms-5">
+              <button
+                className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
+              ${
+                (Ignitionreport.reportType &&
+                  Ignitionreport.VehicleReg &&
+                  Ignitionreport.period === "today") ||
+                (Ignitionreport.reportType &&
+                  Ignitionreport.VehicleReg &&
+                  Ignitionreport.period === "yesterday") ||
+                (Ignitionreport.reportType &&
+                  Ignitionreport.VehicleReg &&
+                  Ignitionreport.period === "week") ||
+                (Ignitionreport.reportType &&
+                  Ignitionreport.VehicleReg &&
+                  Ignitionreport.period === "custom")
+                  ? ""
+                  : "opacity-50 cursor-not-allowed"
+              }`}
+                onClick={handleExportPdf}
+              >
+                Export Pdf
+              </button>
             </div>
           </div>
 
-          <div className=" grid lg:grid-cols-8  mb-5 md:grid-cols-6 sm:grid-cols-5 gap-5 lg:text-center lg:mx-52 md:mx-24 sm:mx-10  flex justify-center">
-            <div className="lg:col-span-2 md:col-span-2 sm:col-span-2">
+          <div className=" grid lg:grid-cols-8  mb-5 md:grid-cols-6 sm:grid-cols-5 gap-5 lg:text-center lg:mx-52 md:mx-24 sm:mx-10   justify-center">
+            {/* <div className="lg:col-span-2 md:col-span-2 sm:col-span-2">
               <label>
                 <input
                   type="radio"
@@ -1038,10 +1272,10 @@ export default function Reports() {
                 />
                 &nbsp;&nbsp;Custom
               </label>
-            </div>
+            </div> */}
           </div>
 
-          {isCustomPeriod && (
+          {/* {isCustomPeriod && (
             <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-2 mt-5 mb-8  grid-cols-2 pt-5 px-10 gap-2 flex justify-center ">
               <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4 ">
                 <label className="text-labelColor">
@@ -1058,18 +1292,6 @@ export default function Reports() {
                       className="xl:w-80  lg:w-80 w-auto"
                     />
                   </MuiPickersUtilsProvider>
-                  {/* <input
-                    type="date"
-                    className="ms-1 h-8 lg:w-4/6 w-full  text-labelColor  outline-green border border-grayLight px-1"
-                    name="fromDateTime"
-                    placeholder="Select Date"
-                    autoComplete="off"
-                    // onChange={handleStartdateChange}
-                    defaultValue={currentDate}
-                    onChange={(e) =>
-                      handleCustomDateChange("fromDateTime", e.target.value)
-                    }
-                  /> */}
                 </label>
               </div>
               <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4 w-full ">
@@ -1088,171 +1310,160 @@ export default function Reports() {
                     // style={{ width: "70%" }}
                   />
                 </MuiPickersUtilsProvider>
-                {/* <input
-                  type="date"
-                  className="h-8 lg:w-4/6 w-full  text-labelColor  outline-green border border-grayLight px-1"
-                  name="toDateTime"
-                  onChange={(e) =>
-                    handleCustomDateChange("toDateTime", e.target.value)
-                  }
-                /> */}
               </div>
             </div>
-          )}
-          <div className="text-white h-20 flex justify-center items-center">
-            <button
-              className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500
-                        ${
-                          (Ignitionreport.reportType &&
-                            Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "today") ||
-                          (Ignitionreport.reportType &&
-                            Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "yesterday") ||
-                          (Ignitionreport.reportType &&
-                            Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "week") ||
-                          (Ignitionreport.reportType &&
-                            Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "custom")
-                            ? ""
-                            : "opacity-50 cursor-not-allowed"
-                        }`}
-              type="submit"
-              onClick={handleSubmit}
-              // disabled={
-              //   !Ignitionreport.reportType ||
-              //   !Ignitionreport.VehicleReg ||
-              //   !Ignitionreport.period ||
-              //   !Ignitionreport.fromDateTime ||
-              //   !Ignitionreport.toDateTime
-              // }
-            >
-              Submit
-            </button>{" "}
-            <button
-              className="bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray test-white"
-              onClick={handleExportPdf}
-            >
-              Export Pdf
-            </button>
-          </div>
+          )} */}
+          {/* <div className="text-white h-20 flex justify-center items-center">
+              <button
+                className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500
+                          ${
+                            (Ignitionreport.reportType &&
+                              Ignitionreport.VehicleReg &&
+                              Ignitionreport.period === "today") ||
+                            (Ignitionreport.reportType &&
+                              Ignitionreport.VehicleReg &&
+                              Ignitionreport.period === "yesterday") ||
+                            (Ignitionreport.reportType &&
+                              Ignitionreport.VehicleReg &&
+                              Ignitionreport.period === "week") ||
+                            (Ignitionreport.reportType &&
+                              Ignitionreport.VehicleReg &&
+                              Ignitionreport.period === "custom")
+                              ? ""
+                              : "opacity-50 cursor-not-allowed"
+                          }`}
+                type="submit"
+                onClick={handleSubmit}
+                // disabled={
+                //   !Ignitionreport.reportType ||
+                //   !Ignitionreport.VehicleReg ||
+                //   !Ignitionreport.period ||
+                //   !Ignitionreport.fromDateTime ||
+                //   !Ignitionreport.toDateTime
+                // }
+              >
+                Submit
+              </button>{" "}
+              <button
+                className="bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray test-white"
+                onClick={handleExportPdf}
+              >
+                Export Pdf
+              </button>
+            </div> */}
         </div>
       </form>
 
       {/* Render your table below the form */}
 
       {trisdata && trisdata.length > 0 && (
-        <div
-          className="mt-8 mx-auto"
-          style={{
-            width: "111rem",
-            maxHeight: "500px",
-            overflowY: "auto",
-            borderRadius: "2px",
-          }}
-        >
-          <table className="w-full border-collapse border border-gray-300">
-            <thead
-              style={{ position: "sticky", top: -1, zIndex: 2 }}
-              className="bg-green "
-            >
-              <tr>
-                {customHeaderTitles.map((header, index) => (
-                  <th key={index} className="border border-gray-300 px-4 py-2">
-                    <span style={{ color: "white" }}>{header}</span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {trisdata.map((trip, tripIndex) => (
-                <tr key={tripIndex}>
-                  {/* Render data cells dynamically based on the headers */}
-                  {columnHeaders.map((header, headerIndex) => {
-                    const dataKey = header.replace(
-                      /\s+/g,
-                      ""
-                    ) as keyof TripsByBucket;
-                    return (
-                      <td
-                        key={headerIndex}
-                        className="border border-gray-300 px-4 py-2"
-                      >
-                        {header === "TripStart" ||
-                        header === "TripEnd" ||
-                        header === "date" ||
-                        header === "BeginingDateTime" ||
-                        header === "EndingDateTime" ? (
-                          <>
-                            {moment(trip[dataKey]).format("MMM D, YYYY")}{" "}
-                            {trip[dataKey] &&
-                              trip[dataKey]
-                                .toString()
-                                .split("T")[1]
-                                ?.trim()
-                                ?.slice(0, -1)
-                                .trim()
-                                .split(".")[0]}
-                          </>
-                        ) : header === "TripDuration" ? (
-                          `${trip.TripDurationHr} hrs ${trip.TripDurationMins} mins`
-                        ) : header === "DriverName" && !trip[dataKey] ? (
-                          "Driver Not Assigned"
-                        ) : (
-                          trip[dataKey]?.toString() ?? ""
-                        )}
-                        {header === "Address" && trip.OsmElement
-                          ? `${trip.OsmElement.display_name.split(",")[0]} ${
-                              trip.OsmElement.display_name.split(",")[1]
-                            } ${trip.OsmElement.display_name.split(",")[2]}`
-                          : ""}
-                        {}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-
-              <tr
-                style={{ position: "sticky", bottom: 0, zIndex: 2 }}
+        <div className="mt-8 mx-auto height_table">
+          <div style={{ width: "100%", borderRadius: "2px" }}>
+            <table className="w-full border-collapse border border-gray-300">
+              <thead
+                style={{ position: "sticky", top: -1 }}
                 className="bg-green"
               >
-                {calculateTotalDurationAndDistance(trisdata) &&
-                  calculateTotalDurationAndDistance(trisdata).duration !==
-                    "NaN hrs NaN mins" && (
-                    <td colSpan={3}>
-                      <span style={{ color: "white" }}>Total:</span>
-                    </td>
-                  )}
-                {calculateTotalDurationAndDistance(trisdata) &&
-                  calculateTotalDurationAndDistance(trisdata).duration !==
-                    "NaN hrs NaN mins" && (
-                    <td
-                      colSpan={1}
+                <tr>
+                  {customHeaderTitles.map((header, index) => (
+                    <th
+                      key={index}
                       className="border border-gray-300 px-4 py-2"
                     >
-                      <span style={{ color: "white" }}>
-                        {calculateTotalDurationAndDistance(trisdata).duration}
-                      </span>
-                    </td>
-                  )}
-                <td
-                  colSpan={columnHeaders.length}
-                  className="border border-gray-300 px-4 py-2"
+                      <span style={{ color: "white" }}>{header}</span>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {trisdata.map((trip, tripIndex) => (
+                  <tr key={tripIndex}>
+                    {/* Render data cells dynamically based on the headers */}
+                    {columnHeaders.map((header, headerIndex) => {
+                      const dataKey = header.replace(
+                        /\s+/g,
+                        ""
+                      ) as keyof TripsByBucket;
+                      return (
+                        <td
+                          key={headerIndex}
+                          className="border border-gray-300 px-4 py-2"
+                        >
+                          {header === "TripStart" ||
+                          header === "TripEnd" ||
+                          header === "date" ||
+                          header === "BeginingDateTime" ||
+                          header === "EndingDateTime" ? (
+                            <>
+                              {moment(trip[dataKey]).format("MMM D, YYYY")}{" "}
+                              {trip[dataKey] &&
+                                trip[dataKey]
+                                  .toString()
+                                  .split("T")[1]
+                                  ?.trim()
+                                  ?.slice(0, -1)
+                                  .trim()
+                                  .split(".")[0]}
+                            </>
+                          ) : header === "TripDuration" ? (
+                            `${trip.TripDurationHr} hrs ${trip.TripDurationMins} mins`
+                          ) : header === "DriverName" && !trip[dataKey] ? (
+                            "Driver Not Assigned"
+                          ) : (
+                            trip[dataKey]?.toString() ?? ""
+                          )}
+                          {header === "Address" && trip.OsmElement
+                            ? `${trip.OsmElement.display_name.split(",")[0]} ${
+                                trip.OsmElement.display_name.split(",")[1]
+                              } ${trip.OsmElement.display_name.split(",")[2]}`
+                            : ""}
+                          {}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+
+                <tr
+                  style={{ position: "sticky", bottom: 0, zIndex: 2 }}
+                  className="bg-green"
                 >
                   {calculateTotalDurationAndDistance(trisdata) &&
                     calculateTotalDurationAndDistance(trisdata).duration !==
                       "NaN hrs NaN mins" && (
-                      <span style={{ color: "white" }}>
-                        {calculateTotalDurationAndDistance(trisdata).distance}{" "}
-                        miles
-                      </span>
+                      <td colSpan={3}>
+                        <span style={{ color: "white" }}>Total:</span>
+                      </td>
                     )}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  {calculateTotalDurationAndDistance(trisdata) &&
+                    calculateTotalDurationAndDistance(trisdata).duration !==
+                      "NaN hrs NaN mins" && (
+                      <td
+                        colSpan={1}
+                        className="border border-gray-300 px-4 py-2"
+                      >
+                        <span style={{ color: "white" }}>
+                          {calculateTotalDurationAndDistance(trisdata).duration}
+                        </span>
+                      </td>
+                    )}
+                  <td
+                    colSpan={columnHeaders.length}
+                    className="border border-gray-300 px-4 py-2"
+                  >
+                    {calculateTotalDurationAndDistance(trisdata) &&
+                      calculateTotalDurationAndDistance(trisdata).duration !==
+                        "NaN hrs NaN mins" && (
+                        <span style={{ color: "white" }}>
+                          {calculateTotalDurationAndDistance(trisdata).distance}{" "}
+                          miles
+                        </span>
+                      )}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
