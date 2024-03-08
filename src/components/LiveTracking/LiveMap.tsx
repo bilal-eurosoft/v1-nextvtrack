@@ -75,6 +75,7 @@ const DynamicCarMap = ({
     })();
   }, []);
 
+
   useEffect(() => {
     const regex = /lat:([^,]+),lng:([^}]+)/;
     if (clientMapSettings) {
@@ -95,6 +96,7 @@ const DynamicCarMap = ({
     // setSelectedVehicle(null);
   };
 
+
   return (
     <>
       <div className="xl:col-span-4 lg:col-span-3  md:col-span-3  sm:col-span-5 col-span-4 ">
@@ -114,6 +116,8 @@ const DynamicCarMap = ({
               {showZones &&
                 zoneList.map((singleRecord: any) => {
                   const radius = Number(singleRecord.latlngCordinates);
+                  const isRestrictedArea = singleRecord.GeoFenceType === "Restricted-Area" // && session?.clickToCall === true;
+                  const isCityArea = singleRecord.GeoFenceType === "City-Area" // && session?.clickToCall === true;
 
                   return singleRecord.zoneType === "Circle" &&
                     !isNaN(radius) ? (
@@ -124,27 +128,20 @@ const DynamicCarMap = ({
                         Number(singleRecord.centerPoints.split(",")[1]),
                       ]}
                       radius={radius}
+                      color={isCityArea ? "green" : isRestrictedArea ? "#b30000" : "blue"}
                     >
-                      {/*  <Marker
-                        position={[
-                          Number(singleRecord.centerPoints.split(",")[0]),
-                          Number(singleRecord.centerPoints.split(",")[1]),
-                        ]}
-                      >
-                        <Popup>{singleRecord.zoneName}</Popup>
-                      </Marker> */}
                       <Popup>{singleRecord.zoneName}</Popup>
                     </Circle>
                   ) : (
                     <Polygon
                       key={singleRecord.zoneName}
                       positions={JSON.parse(singleRecord.latlngCordinates)}
+                      color={isCityArea ? "green" : isRestrictedArea ? "red" : "blue"}
                     >
                       <Popup>{singleRecord.zoneName}</Popup>
                     </Polygon>
                   );
                 })}
-
               <button
                 className="bg-[#00B56C] text-white"
                 onClick={() => {
@@ -163,7 +160,7 @@ const DynamicCarMap = ({
               />
             </MapContainer>
           )}
-          <div className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">
+          {/* <div className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">
             <div className="col-span-1" style={{ color: "green" }}>
               <input
                 type="checkbox"
@@ -177,7 +174,74 @@ const DynamicCarMap = ({
                 Show Zones
               </button>
             </div>
+          </div> */}
+          <div className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2" style={{ borderRadius: '10px', borderColor: 'green', borderWidth: '3px', borderStyle: 'solid' }}>
+            <div className="col-span-1" style={{ color: "green" }}>
+              <input
+                type="checkbox"
+                onClick={() => {
+                  setShowZones(!showZones);
+                }}
+                className="mx-2 mt-1"
+                style={{ accentColor: "green" }}
+              />
+              <button className="text-labelColor font-popins text-sm font-bold">
+                Show Zones
+              </button>
+            </div>
+
+            {/* Three rows with colored dots and text meaning */}
+            {showZones && (
+              <>
+                <div className="flex items-center mt-2 ml-2">
+                  <div className="lg:col-span-1">
+                    <svg
+                      className={`h-6 w-3 text-blue mr-2`}
+                      viewBox="0 0 24 24"
+                      fill="blue"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                    </svg>
+                  </div>
+                  <span className="text-sm text-labelColor">On/Off-site</span>
+                </div>
+                <div className="flex items-center mt-2 ml-2">
+                  <div className="lg:col-span-1">
+                    <svg
+                      className={`h-6 w-3 text-red mr-2`}
+                      viewBox="0 0 24 24"
+                      fill="red"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                    </svg>
+                  </div>
+                  <span className="text-sm text-labelColor">Restricted</span>
+                </div>
+                <div className="flex items-center mt-2 ml-2">
+                  <div className="lg:col-span-1">
+                    <svg
+                      className={`h-6 w-3 text-green mr-2`}
+                      viewBox="0 0 24 24"
+                      fill="green"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                    </svg>
+                  </div>
+                  <span className="text-sm text-labelColor">City Area</span>
+                </div>
+              </>
+            )}
           </div>
+
         </div>
       </div>
     </>

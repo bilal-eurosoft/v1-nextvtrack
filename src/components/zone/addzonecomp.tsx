@@ -79,8 +79,11 @@ export default function AddZoneComp() {
           });
 
           if (clientSettingData) {
-            const centervalue = await clientSettingData?.[0].PropertyValue;
+            //   const centervalue = await clientSettingData?.[0].PropertyValue;
+            const mapObject = clientSettingData.find((obj: { PropertDesc: string; }) => obj.PropertDesc === "Map");
 
+            // Get the PropertyValue from the found object
+            const centervalue = mapObject ? mapObject.PropertyValue : null;
             if (centervalue) {
               const match = centervalue.match(/\{lat:([^,]+),lng:([^}]+)\}/);
               if (match) {
@@ -98,7 +101,7 @@ export default function AddZoneComp() {
       })();
     }
   }, []);
-
+  console.log("fvfdvdfvbfdvfdvdf", mapcenter)
   const clientZoomSettings = clientsetting?.filter(
     (el) => el?.PropertDesc === "Zoom"
   )[0]?.PropertyValue;
@@ -184,6 +187,10 @@ export default function AddZoneComp() {
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setForm({ ...Form, [name]: value });
+    if (value === "Restricted-Area") {
+      setForm({ ...Form, GeoFenceType: value });
+    }
+
   };
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -330,23 +337,44 @@ export default function AddZoneComp() {
             <label className="text-black text-md w-full font-popins font-medium">
               <span className="text-red">*</span> Geofence:{" "}
             </label>
-            <Select
-              onChange={handleChange}
-              value={Form?.GeoFenceType}
-              className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
-              placeholder="geofence"
-              // required
-              name="GeoFenceType"
-              displayEmpty
-            >
-              <MenuItem value="" selected disabled hidden>
-                Select Geofence Type
-              </MenuItem>
-              <MenuItem value="On-Site">On-Site</MenuItem>
-              <MenuItem value="Off-Site">Off-Site</MenuItem>
-              <MenuItem value="City-Area">City-Area</MenuItem>
-              <MenuItem value="Restricted-Area">Restricted-Area</MenuItem>
-            </Select>
+            {session?.clickToCall === true ? (
+              <Select
+                onChange={handleChange}
+                value={Form?.GeoFenceType}
+                className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
+                placeholder="geofence"
+                // required
+                name="GeoFenceType"
+                displayEmpty
+              >
+                <MenuItem value="" selected disabled hidden>
+                  Select Geofence Type
+                </MenuItem>
+                <MenuItem value="On-Site">On-Site</MenuItem>
+                <MenuItem value="Off-Site">Off-Site</MenuItem>
+                <MenuItem value="City-Area">City-Area</MenuItem>
+                <MenuItem value="Restricted-Area">Restricted-Area</MenuItem>
+
+              </Select>)
+              :
+              (<Select
+                onChange={handleChange}
+                value={Form?.GeoFenceType}
+                className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
+                placeholder="geofence"
+                // required
+                name="GeoFenceType"
+                displayEmpty
+              >
+                <MenuItem value="" selected disabled hidden>
+                  Select Geofence Type
+                </MenuItem>
+                <MenuItem value="On-Site">On-Site</MenuItem>
+                <MenuItem value="Off-Site">Off-Site</MenuItem>
+
+
+              </Select>)
+            }
             <br></br>
             <br></br>
             <label className="text-black text-md w-full font-popins font-medium">
@@ -483,9 +511,9 @@ export default function AddZoneComp() {
                       ) : null}
 
                       {shapeType === "Circle" &&
-                      !isNaN(mapcenter[0]) &&
-                      !isNaN(mapcenter[1]) &&
-                      !isNaN(Number(circleDataById?.radius)) ? (
+                        !isNaN(mapcenter[0]) &&
+                        !isNaN(mapcenter[1]) &&
+                        !isNaN(Number(circleDataById?.radius)) ? (
                         <Circle
                           radius={Number(circleDataById?.radius)}
                           center={mapcenter}
@@ -515,9 +543,9 @@ export default function AddZoneComp() {
                       ) : null}
 
                       {shapeType === "Circle" &&
-                      !isNaN(mapcenter[0]) &&
-                      !isNaN(mapcenter[1]) &&
-                      !isNaN(Number(circleDataById?.radius)) ? (
+                        !isNaN(mapcenter[0]) &&
+                        !isNaN(mapcenter[1]) &&
+                        !isNaN(Number(circleDataById?.radius)) ? (
                         <Circle
                           radius={Number(circleDataById?.radius)}
                           center={mapcenter}

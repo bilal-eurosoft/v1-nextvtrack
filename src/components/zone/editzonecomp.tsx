@@ -543,22 +543,57 @@ export default function EditZoneComp() {
                           }}
                         />
                         {shapeType === "Polygon" &&
-                        polygondataById.length > 0 ? (
-                          <Polygon
-                            positions={polygondataById}
-                            color="#97009c"
-                          />
+                          polygondataById.length > 0 ? (
+
+                          <>
+                            {zoneDataById?.GeoFenceType === "Restricted-Area" && (
+                              <Polygon
+                                positions={polygondataById}
+                                color="red"
+                              />
+                            )}
+                            {zoneDataById?.GeoFenceType !== "Restricted-Area" && (
+                              <Polygon
+                                positions={polygondataById}
+                                color="#97009c"
+                              />
+                            )}
+                            {zoneDataById?.GeoFenceType === "City-Area" && (
+                              <Polygon
+                                positions={polygondataById}
+                                color="green"
+                              />
+                            )}
+                          </>
                         ) : null}
 
                         {shapeType === "Circle" &&
-                        !isNaN(mapcenter[0]) &&
-                        !isNaN(mapcenter[1]) &&
-                        !isNaN(Number(circleDataById?.radius)) ? (
-                          <Circle
-                            radius={Number(circleDataById?.radius)}
-                            center={mapcenter}
-                            color="#97009c"
-                          />
+                          !isNaN(mapcenter[0]) &&
+                          !isNaN(mapcenter[1]) &&
+                          !isNaN(Number(circleDataById?.radius)) ? (
+                          <>
+                            {zoneDataById?.GeoFenceType === "Restricted-Area" && (
+                              <Circle
+                                radius={Number(circleDataById?.radius)}
+                                center={mapcenter}
+                                color="red"
+                              />
+                            )}
+                            {zoneDataById?.GeoFenceType !== "Restricted-Area" && (
+                              <Circle
+                                radius={Number(circleDataById?.radius)}
+                                center={mapcenter}
+                                color="#97009c"
+                              />
+                            )}
+                            {zoneDataById?.GeoFenceType === "City-Area" && (
+                              <Circle
+                                radius={Number(circleDataById?.radius)}
+                                center={mapcenter}
+                                color="green"
+                              />
+                            )}
+                          </>
                         ) : null}
                       </FeatureGroup>
                     )}
@@ -578,7 +613,7 @@ export default function EditZoneComp() {
                           }}
                         />
                         {shapeType === "Polygon" &&
-                        polygondataById.length > 0 ? (
+                          polygondataById.length > 0 ? (
                           <Polygon
                             positions={polygondataById}
                             color="#97009c"
@@ -586,9 +621,9 @@ export default function EditZoneComp() {
                         ) : null}
 
                         {shapeType === "Circle" &&
-                        !isNaN(mapcenter[0]) &&
-                        !isNaN(mapcenter[1]) &&
-                        !isNaN(Number(circleDataById?.radius)) ? (
+                          !isNaN(mapcenter[0]) &&
+                          !isNaN(mapcenter[1]) &&
+                          !isNaN(Number(circleDataById?.radius)) ? (
                           <Circle
                             radius={Number(circleDataById?.radius)}
                             center={mapcenter}
