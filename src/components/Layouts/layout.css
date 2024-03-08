@@ -24,3 +24,7 @@
     height: auto;
   }
 }
+
+.sidebar-hide{
+  display: none;
+}

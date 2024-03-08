@@ -15,7 +15,7 @@ const LiveSidebar = ({
   setIsActiveColor,
   setshowAllVehicles,
   setunselectVehicles,
-  unselectVehicles,
+  unselectVehicles
 }: {
   carData: VehicleData[];
   countPause: Number;
@@ -30,7 +30,7 @@ const LiveSidebar = ({
 }) => {
   const { data: session } = useSession();
   const [searchData, setSearchData] = useState({
-    search: "",
+    search: ""
   });
   const [filteredData, setFilteredData] = useState<any>([]);
   const [zoneList, setZoneList] = useState<zonelistType[]>([]);
@@ -44,7 +44,7 @@ const LiveSidebar = ({
       if (session) {
         const allzoneList = await getZoneListByClientId({
           token: session?.accessToken,
-          clientId: session?.clientId,
+          clientId: session?.clientId
         });
         setZoneList(allzoneList);
       }
@@ -130,7 +130,7 @@ const LiveSidebar = ({
 
   return (
     <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-4  col-span-4 main_sider_bar">
-      <div className="grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3 search_live_tracking">
+      <div className="grid grid-cols-12 bg-white py-3  md:mb-4 lg:gap-0 gap-3 search_live_tracking">
         <div className="lg:col-span-7 w-full  md:col-span-5 sm:col-span-5 col-span-6 sticky top-0">
           <div className="grid grid-cols-12">
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1">
@@ -168,7 +168,7 @@ const LiveSidebar = ({
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-2 text-center border-y-2  border-green bg-zoneTabelBg py-4 text-white vehicle_summary">
+      <div className="grid grid-cols-2    md:pb-8 text-center border-y-2  border-green bg-zoneTabelBg py-4 text-white vehicle_summary">
         <div className="lg:col-span-1 w-full">
           <p className="text-md mt-1 text-black font-popins font-semibold">
             Vehicle Summary:
@@ -231,7 +231,7 @@ const LiveSidebar = ({
               onClick={() => handleClickVehicle(item)}
               key={index}
               style={{
-                backgroundColor: activeColor == item.vehicleId ? "#e1f0e3" : "",
+                backgroundColor: activeColor == item.vehicleId ? "#e1f0e3" : ""
               }}
             >
               <div
@@ -270,7 +270,7 @@ const LiveSidebar = ({
                   style={{
                     display: "flex",
                     justifyContent: "start",
-                    marginLeft: "-5%",
+                    marginLeft: "-5%"
                   }}
                 >
                   <button
@@ -298,7 +298,7 @@ const LiveSidebar = ({
                       {session?.timezone !== undefined ? (
                         <ActiveStatus
                           currentTime={new Date().toLocaleString("en-US", {
-                            timeZone: session.timezone,
+                            timeZone: session.timezone
                           })}
                           targetTime={item.timestamp}
                           reg={item.vehicleReg}

@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import { getZoneListByClientId } from "@/utils/API_CALLS";
 import { Marker, Popup } from "react-leaflet";
 import L, { LatLng } from "leaflet";
+import { useSearchParams } from "next/navigation";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((module) => module.MapContainer),
@@ -38,7 +39,7 @@ const DynamicCarMap = ({
   setSelectedVehicle,
   showAllVehicles,
   setunselectVehicles,
-  unselectVehicles,
+  unselectVehicles
 }: {
   carData: VehicleData[];
   clientSettings: ClientSettings[];
@@ -52,6 +53,9 @@ const DynamicCarMap = ({
   const clientMapSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Map"
   )[0]?.PropertyValue;
+  const searchParams = useSearchParams();
+
+  const fullparams = searchParams.get("screen");
 
   const clientZoomSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Zoom"
@@ -68,7 +72,7 @@ const DynamicCarMap = ({
       if (session) {
         const allzoneList = await getZoneListByClientId({
           token: session?.accessToken,
-          clientId: session?.clientId,
+          clientId: session?.clientId
         });
         setZoneList(allzoneList);
       }
@@ -121,7 +125,7 @@ const DynamicCarMap = ({
                       key={singleRecord.zoneName}
                       center={[
                         Number(singleRecord.centerPoints.split(",")[0]),
-                        Number(singleRecord.centerPoints.split(",")[1]),
+                        Number(singleRecord.centerPoints.split(",")[1])
                       ]}
                       radius={radius}
                     >
@@ -173,9 +177,11 @@ const DynamicCarMap = ({
                 className="mx-3  mt-1"
                 style={{ accentColor: "green" }}
               />
-              <button className="text-labelColor font-popins text-sm font-bold">
-                Show Zones
-              </button>
+              {fullparams != "full" ? (
+                <button className="text-labelColor font-popins text-sm font-bold">
+                  Show Zones
+                </button>
+              ) : null}
             </div>
           </div>
         </div>
