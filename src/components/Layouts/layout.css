@@ -16,15 +16,20 @@
 }
 
 #nav_height {
-  height: 7vh;
+  height: 7vh !important;
+}
+@media only screen and (min-width: 1024px) and (max-height: 700px) {
+  #nav_height {
+    height: 12vh !important;
+  }
 }
 
 @media (max-width: 600px) {
   #nav_height {
-    height: auto;
+    height: auto !important;
   }
 }
 
-.sidebar-hide{
+.sidebar-hide {
   display: none;
 }

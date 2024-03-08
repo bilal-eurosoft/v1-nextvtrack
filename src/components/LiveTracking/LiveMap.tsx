@@ -39,7 +39,7 @@ const DynamicCarMap = ({
   setSelectedVehicle,
   showAllVehicles,
   setunselectVehicles,
-  unselectVehicles
+  unselectVehicles,
 }: {
   carData: VehicleData[];
   clientSettings: ClientSettings[];
@@ -72,7 +72,7 @@ const DynamicCarMap = ({
       if (session) {
         const allzoneList = await getZoneListByClientId({
           token: session?.accessToken,
-          clientId: session?.clientId
+          clientId: session?.clientId,
         });
         setZoneList(allzoneList);
       }
@@ -106,6 +106,7 @@ const DynamicCarMap = ({
           {mapCoordinates !== null && zoom !== null && (
             <MapContainer
               id="maps"
+              style={{ height: fullparams == "full" ? "100vh" : "" }}
               center={mapCoordinates}
               className=" z-0"
               zoom={zoom}
@@ -125,7 +126,7 @@ const DynamicCarMap = ({
                       key={singleRecord.zoneName}
                       center={[
                         Number(singleRecord.centerPoints.split(",")[0]),
-                        Number(singleRecord.centerPoints.split(",")[1])
+                        Number(singleRecord.centerPoints.split(",")[1]),
                       ]}
                       radius={radius}
                     >
@@ -167,23 +168,24 @@ const DynamicCarMap = ({
               />
             </MapContainer>
           )}
-          <div className="grid grid-cols-1 absolute shadow-lg rounded-md lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">
-            <div className="col-span-1" style={{ color: "green" }}>
-              <input
-                type="checkbox"
-                onClick={() => {
-                  setShowZones(!showZones);
-                }}
-                className="mx-3  mt-1"
-                style={{ accentColor: "green" }}
-              />
-              {fullparams != "full" ? (
+          {fullparams != "full" ? (
+            <div className="grid grid-cols-1 absolute shadow-lg rounded-md lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">
+              <div className="col-span-1" style={{ color: "green" }}>
+                <input
+                  type="checkbox"
+                  onClick={() => {
+                    setShowZones(!showZones);
+                  }}
+                  className="mx-3  mt-1"
+                  style={{ accentColor: "green" }}
+                />
+
                 <button className="text-labelColor font-popins text-sm font-bold">
                   Show Zones
                 </button>
-              ) : null}
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       </div>
     </>
