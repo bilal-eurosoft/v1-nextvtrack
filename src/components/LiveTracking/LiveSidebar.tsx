@@ -229,7 +229,7 @@ const LiveSidebar = ({
       <div
         className="overflow-y-scroll bg-zoneTabelBg"
         id="scroll_side_bar"
-        style={{ height: fullparams == "full" ? "83vh" : "" }}
+        style={{ height: fullparams == "full" ? "81vh" : "" }}
       >
         {filteredData?.map((item: VehicleData, index: any) => {
           return (

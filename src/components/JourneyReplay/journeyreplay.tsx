@@ -1450,6 +1450,7 @@ export default function journeyReplayComp() {
               <button
                 onClick={handleSubmit}
                 className={`bg-green py-2 px-8  rounded-md shadow-md  hover:shadow-gray transition duration-500 c`}
+                disabled
               >
                 Search
               </button>
