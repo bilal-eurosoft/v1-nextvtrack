@@ -279,6 +279,7 @@ const LiveSidebar = ({
                     justifyContent: "start",
                     marginLeft: "-5%",
                   }}
+                  id="btn_left_margin"
                 >
                   <button
                     className={`${
@@ -296,7 +297,7 @@ const LiveSidebar = ({
                     {item?.vehicleStatus ? item?.vehicleStatus : "Parked"}
                   </button>
                 </div>
-                <div className="lg:col-span-3 col-span-1">
+                <div className="lg:col-span-3 col-span-1 " id="mph_left">
                   <div className="grid grid-cols-4">
                     <div className="lg:col-span-3 col-span-2 font-bold">
                       {item.gps.speedWithUnitDesc}
