@@ -719,7 +719,7 @@ export default function Zone() {
 
         <div className="grid lg:grid-cols-2 md:grid-cols-2  sm:grid-cols-2 grid-cols-2 px-5 lg:mt-0 mt-5 ">
           <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2">
-            <div className="grid xl:grid-cols-7 lg:grid-cols-4  md:grid-cols-3 grid-cols-2">
+            <div className="grid xl:grid-cols-7 -mt-2 lg:grid-cols-4  md:grid-cols-3 grid-cols-2">
               <div className="grid  rounded-md lg:grid-cols-3 md:grid-cols-4 grid-cols-5 bg-green shadow-md    hover:shadow-gray transition duration-500 cursor-pointer">
                 <div className="lg:col-span-1 md:col-span-1 sm:col-span-2  col-span-2">
                   <svg

@@ -29,7 +29,7 @@ import {
   PopoverHandler,
   PopoverContent,
   Typography,
-  Tooltip
+  Tooltip,
 } from "@material-tailwind/react";
 import "./layout.css";
 import BlinkingTime from "../General/BlinkingTime";
@@ -39,39 +39,39 @@ import { stringify } from "querystring";
 const drawerWidth = 58;
 
 const Main = styled("main", {
-  shouldForwardProp: (prop) => prop !== "open"
+  shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen
+    duration: theme.transitions.duration.leavingScreen,
   }),
   marginLeft: `-${drawerWidth}px`,
   ...(open && {
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen
+      duration: theme.transitions.duration.enteringScreen,
     }),
-    marginLeft: 0
-  })
+    marginLeft: 0,
+  }),
 }));
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open"
+  shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen
+    duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: `${drawerWidth}px`,
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen
-    })
-  })
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
 }));
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -80,11 +80,11 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
-  justifyContent: "flex-end"
+  justifyContent: "flex-end",
 }));
 
 export default function RootLayout({
-  children
+  children,
 }: {
   children: React.ReactNode;
 }) {
@@ -107,7 +107,7 @@ export default function RootLayout({
   };
 
   const triggers = {
-    onClick: handleOpenPopUp
+    onClick: handleOpenPopUp,
   };
   type MySessionData = {
     // Define the properties you expect in your session object
@@ -132,7 +132,7 @@ export default function RootLayout({
         try {
           const allzoneList = await getZoneListByClientId({
             token: session.accessToken,
-            clientId: session.clientId
+            clientId: session.clientId,
           });
           setZoneList(allzoneList);
         } catch (error) {
@@ -227,7 +227,7 @@ export default function RootLayout({
                   style={{
                     color: pathname == "/liveTracking" ? "green" : "white",
                     backgroundColor: pathname == "/liveTracking" ? "white" : "",
-                    border: pathname == "/liveTracking" ? "none" : ""
+                    border: pathname == "/liveTracking" ? "none" : "",
                   }}
                 >
                   <path
@@ -252,7 +252,7 @@ export default function RootLayout({
                 content="Journey Replay"
               >
                 <svg
-                  className={`w-20 h-14 py-3  -my-1      text-white-10  dark:text-white ${
+                  className={`w-20 h-14 py-3  -my-1   text-white-10  dark:text-white ${
                     session?.userRole === "Controller"
                       ? "border-b-2 border-white"
                       : ""
@@ -265,7 +265,8 @@ export default function RootLayout({
                   strokeLinejoin="round"
                   style={{
                     color: pathname == "/journeyReplay" ? "green" : "white",
-                    backgroundColor: pathname == "/journeyReplay" ? "white" : ""
+                    backgroundColor:
+                      pathname == "/journeyReplay" ? "white" : "",
                   }}
                 >
                   {" "}
@@ -309,7 +310,7 @@ export default function RootLayout({
                         pathname == "/AddZone" ||
                         `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
                           ? "none"
-                          : ""
+                          : "",
                     }}
                   >
                     {" "}
@@ -410,7 +411,7 @@ export default function RootLayout({
                             border:
                               pathname == "/DualCam" || pathname == "/DualCam"
                                 ? "none"
-                                : ""
+                                : "",
                           }}
                         >
                           {" "}
@@ -433,7 +434,8 @@ export default function RootLayout({
                         href="/DualCam"
                         style={{
                           color: pathname == "/DualCam" ? "black" : "white",
-                          backgroundColor: pathname == "/DualCam" ? "white" : ""
+                          backgroundColor:
+                            pathname == "/DualCam" ? "white" : "",
                         }}
                       >
                         Get Image And Video
@@ -510,7 +512,7 @@ export default function RootLayout({
                   style={{
                     color: pathname == "/Reports" ? "green" : "white",
                     backgroundColor: pathname == "/Reports" ? "white" : "",
-                    border: pathname == "/Reports" ? "none" : ""
+                    border: pathname == "/Reports" ? "none" : "",
                   }}
                 >
                   <path d="M9 7V2.13a2.98 2.98 0 0 0-1.293.749L4.879 5.707A2.98 2.98 0 0 0 4.13 7H9Z" />
@@ -561,7 +563,7 @@ export default function RootLayout({
                               pathname == "/DriverProfile" ||
                               pathname == "/ActiveDriver"
                                 ? "none"
-                                : ""
+                                : "",
                           }}
                         >
                           {" "}
@@ -583,7 +585,7 @@ export default function RootLayout({
                           color:
                             pathname == "/DriverProfile" ? "black" : "white",
                           backgroundColor:
-                            pathname == "/DriverProfile" ? "white" : ""
+                            pathname == "/DriverProfile" ? "white" : "",
                         }}
                       >
                         Driver Profile
@@ -598,7 +600,7 @@ export default function RootLayout({
                           color:
                             pathname == "/DriverAssign" ? "black" : "white",
                           backgroundColor:
-                            pathname == "/DriverAssign" ? "white" : ""
+                            pathname == "/DriverAssign" ? "white" : "",
                         }}
                       >
                         Assign Driver
@@ -647,8 +649,8 @@ export default function RootLayout({
                       flexShrink: 0,
                       "& .MuiDrawer-paper": {
                         width: drawerWidth,
-                        boxSizing: "border-box"
-                      }
+                        boxSizing: "border-box",
+                      },
                     }}
                     anchor="left"
                     open={open}
@@ -746,7 +748,7 @@ export default function RootLayout({
                         </Tooltip>
                       </Link>
 
-                      <Popover placement="right-start">
+                      {/* <Popover placement="right-start">
                         <Tooltip
                           className="bg-white text-green shadow-lg rounded border-none"
                           placement="right"
@@ -789,8 +791,102 @@ export default function RootLayout({
                           </span>
                           <br></br>
                         </PopoverContent>
-                      </Popover>
+                      </Popover> */}
+                      {(session?.userRole == "SuperAdmin" ||
+                        session?.userRole == "Admin") && (
+                        <div>
+                          {session?.cameraProfile && (
+                            <Popover placement="right-start">
+                              {/* <Link href="/DriverProfile"> */}
+                              {/* <Link href={pathname ? "/DriverProfile" : "/DriverAssign"}> */}
+                              <Tooltip
+                                className="bg-[#00B56C] text-white shadow-lg rounded border-none"
+                                placement="right"
+                                content="Camera"
+                              >
+                                <PopoverHandler>
+                                  <svg
+                                    className="w-20 h-12 py-2  text-white-10  dark:text-white cursor-pointer"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth="2"
+                                    stroke="currentColor"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    style={{
+                                      color:
+                                        pathname == "/DualCam" ||
+                                        pathname == "/DualCam"
+                                          ? "green"
+                                          : "white",
+                                      backgroundColor:
+                                        pathname == "/DualCam" ||
+                                        pathname == "/DualCam"
+                                          ? "white"
+                                          : "",
 
+                                      border:
+                                        pathname == "/DualCam" ||
+                                        pathname == "/DualCam"
+                                          ? "none"
+                                          : "",
+                                    }}
+                                  >
+                                    {" "}
+                                    <path
+                                      stroke="none"
+                                      d="M0 0h24v24H0z"
+                                    />{" "}
+                                    <circle cx="6" cy="6" r="2" />{" "}
+                                    <circle cx="18" cy="18" r="2" />{" "}
+                                    <path d="M11 6h5a2 2 0 0 1 2 2v8" />{" "}
+                                    <polyline points="14 9 11 6 14 3" />{" "}
+                                    <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />{" "}
+                                    <polyline points="10 15 13 18 10 21" />
+                                  </svg>
+                                </PopoverHandler>
+                              </Tooltip>
+                              <PopoverContent className="border-none cursor-pointer bg-green">
+                                {/* <Link className="w-full text-white" href="/DriverProfile">
+                  Driver Profile
+                </Link> */}
+                                <Link
+                                  className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
+                                  href="/DualCam"
+                                  style={{
+                                    color:
+                                      pathname == "/DualCam"
+                                        ? "black"
+                                        : "white",
+                                    backgroundColor:
+                                      pathname == "/DualCam" ? "white" : "",
+                                  }}
+                                >
+                                  Get Image And Video
+                                </Link>
+                                <br></br>
+                                <br></br>
+
+                                <Link
+                                  className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
+                                  href="/DualCam"
+                                  // style={{
+                                  //   color: pathname == "/DualCam" ? "black" : "white",
+                                  //   backgroundColor: pathname == "/DualCam" ? "white" : "",
+                                  // }}
+                                >
+                                  View Image And Video
+                                </Link>
+                                <br></br>
+                              </PopoverContent>
+
+                              {/* </Link> */}
+                            </Popover>
+                          )}
+                        </div>
+                      )}
                       <Link href="/Reports">
                         <Tooltip
                           className="bg-white text-[#00B56C] shadow-lg rounded"
@@ -813,7 +909,7 @@ export default function RootLayout({
                           </svg>
                         </Tooltip>
                       </Link>
-                      <Popover placement="right-start">
+                      {/* <Popover placement="right-start">
                         <Tooltip
                           className="bg-white text-green shadow-lg rounded border-none"
                           placement="right"
@@ -844,7 +940,7 @@ export default function RootLayout({
                             className=" w-full text-white"
                             onClick={() => router.push("/DriverProfile")}
                           >
-                            Driver Profile
+                            Driver Profilesss
                           </span>
                           <br></br>
                           <br></br>
@@ -856,7 +952,110 @@ export default function RootLayout({
                           </span>
                           <br></br>
                         </PopoverContent>
-                      </Popover>
+                      </Popover> */}
+                      {(session?.userRole == "SuperAdmin" ||
+                        session?.userRole == "Admin") && (
+                        <div>
+                          {session?.driverProfile && (
+                            <Popover placement="right-start">
+                              {/* <Link href="/DriverProfile"> */}
+                              {/* <Link href={pathname ? "/DriverProfile" : "/DriverAssign"}> */}
+                              <Tooltip
+                                className="bg-[#00B56C] text-white shadow-lg rounded border-none"
+                                placement="right"
+                                content="Driver"
+                              >
+                                <PopoverHandler>
+                                  <svg
+                                    className="w-20 h-14 py-3 border-b-2 text-[white] text-white-10  dark:text-white"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth="2"
+                                    stroke="currentColor"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    style={{
+                                      color:
+                                        pathname == "/DriverAssign" ||
+                                        pathname == "/DriverProfile" ||
+                                        pathname == "/ActiveDriver"
+                                          ? "green"
+                                          : "white",
+                                      backgroundColor:
+                                        pathname == "/DriverAssign" ||
+                                        pathname == "/DriverProfile" ||
+                                        pathname == "/ActiveDriver"
+                                          ? "white"
+                                          : "",
+
+                                      border:
+                                        pathname == "/DriverAssign" ||
+                                        pathname == "/DriverProfile" ||
+                                        pathname == "/ActiveDriver"
+                                          ? "none"
+                                          : "",
+                                    }}
+                                  >
+                                    {" "}
+                                    <path
+                                      stroke="none"
+                                      d="M0 0h24v24H0z"
+                                    />{" "}
+                                    <circle cx="7" cy="17" r="2" />{" "}
+                                    <circle cx="17" cy="17" r="2" />{" "}
+                                    <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" />
+                                  </svg>
+                                </PopoverHandler>
+                              </Tooltip>
+                              <PopoverContent className="border-none cursor-pointer bg-green">
+                                {/* <Link className="w-full text-white" href="/DriverProfile">
+                  Driver Profile
+                </Link> */}
+                                <Link
+                                  className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
+                                  href="/DriverProfile"
+                                  style={{
+                                    color:
+                                      pathname == "/DriverProfile"
+                                        ? "black"
+                                        : "white",
+                                    backgroundColor:
+                                      pathname == "/DriverProfile"
+                                        ? "white"
+                                        : "",
+                                  }}
+                                >
+                                  Driver Profile
+                                </Link>
+                                <br></br>
+                                <br></br>
+
+                                <Link
+                                  className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
+                                  href="/DriverAssign"
+                                  style={{
+                                    color:
+                                      pathname == "/DriverAssign"
+                                        ? "black"
+                                        : "white",
+                                    backgroundColor:
+                                      pathname == "/DriverAssign"
+                                        ? "white"
+                                        : "",
+                                  }}
+                                >
+                                  Assign Driver
+                                </Link>
+                                <br></br>
+                              </PopoverContent>
+
+                              {/* </Link> */}
+                            </Popover>
+                          )}
+                        </div>
+                      )}
                     </List>
                     <Divider />
                   </Drawer>
@@ -868,7 +1067,7 @@ export default function RootLayout({
                 style={{
                   display: "flex",
                   justifyContent: "end",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 <div className="lg:col-span-2  col-span-4  lg:mt-1 md:mt-3  sm:mt-3 mt-5 ">

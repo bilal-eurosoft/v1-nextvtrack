@@ -196,6 +196,7 @@ export default function journeyReplayComp() {
   const [activeTripColor, setactiveTripColor] = useState<any>("");
   const [loadingMap, setLaodingMap] = useState(false);
   const [expanded, setExpanded] = useState(null);
+  const [searchJourney, setsearchJourney] = useState(true);
 
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
     setExpanded(isExpanded ? panel : null);
@@ -499,6 +500,9 @@ export default function journeyReplayComp() {
     setTravelHistoryresponse([]);
     setClearMapData(false);
     setProgressWidth(0);
+    if (!Ignitionreport.period || !Ignitionreport.VehicleReg) {
+      toast.error("Select Vehicle And Days ");
+    }
     if (polylinedata.length > 0) {
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
     }
@@ -955,6 +959,7 @@ export default function journeyReplayComp() {
   //   setSelectedOption(newValue);
   // };
   const handleInputChangeSelect = (e: any) => {
+    setsearchJourney(false);
     if (!e) return;
     const { value, label } = e;
     setIgnitionreport((prevReport: any) => ({
@@ -1445,18 +1450,50 @@ export default function journeyReplayComp() {
               // </div>
             )}
           </div>
-          <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold flex justify-center items-center">
+          <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold flex justify-center items-center mt-2">
             {clearMapData ? (
               <button
                 onClick={handleClickClear}
-                className={`bg-green py-2 px-8  rounded-md shadow-md  hover:shadow-gray transition duration-500 c`}
+                // className={`bg-green py-2 px-8  rounded-md shadow-md  hover:shadow-gray transition duration-500 c`}
+                className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
+                ${
+                  (Ignitionreport.VehicleReg &&
+                    Ignitionreport.period === "today") ||
+                  (Ignitionreport.VehicleReg &&
+                    Ignitionreport.period === "yesterday") ||
+                  (Ignitionreport.VehicleReg &&
+                    Ignitionreport.period === "week") ||
+                  (Ignitionreport.VehicleReg &&
+                    Ignitionreport.period === "custom")
+                    ? ""
+                    : "opacity-50 cursor-not-allowed"
+                }`}
               >
                 Search
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
-                className={`bg-green py-2 px-8  rounded-md shadow-md  hover:shadow-gray transition duration-500 c`}
+                // className={`bg-green py-2 px-8  rounded-md shadow-md  ${
+                //   searchJourney
+                //     ? "cursor-not-allowed" ||
+                //       "hover:shadow-gray transition duration-500 "
+                //     : ""
+                // }`}
+                // disabled={searchJourney}
+                className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
+                        ${
+                          (Ignitionreport.VehicleReg &&
+                            Ignitionreport.period === "today") ||
+                          (Ignitionreport.VehicleReg &&
+                            Ignitionreport.period === "yesterday") ||
+                          (Ignitionreport.VehicleReg &&
+                            Ignitionreport.period === "week") ||
+                          (Ignitionreport.VehicleReg &&
+                            Ignitionreport.period === "custom")
+                            ? ""
+                            : "opacity-50 cursor-not-allowed"
+                        }`}
               >
                 Search
               </button>
