@@ -9,6 +9,7 @@ import { Toaster, toast } from "react-hot-toast";
 // import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import DateFnsMomemtUtils from "@date-io/moment";
+import TablePagination from "@mui/material/TablePagination";
 import Select from "react-select";
 import "./report.css";
 
@@ -46,6 +47,8 @@ export default function Reports() {
   const [enddate, setenddate] = useState(new Date());
   // suraksha code
   const [trisdata, setTrisdata] = useState<TripsByBucket[]>([]);
+  const [rowsPerPages, setRowsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(0);
   const [columnHeaders, setColumnHeaders] = useState<
     (
       | "duration"
@@ -140,6 +143,20 @@ export default function Reports() {
       | "Type"
     )[]
   >([]);
+  const firstIndex = currentPage * rowsPerPages;
+  const lastIndex = Math.min(firstIndex + rowsPerPages, trisdata.length); // Ensure lastIndex does not exceed trisdata.length
+
+  // Slice the data array to get the data for the current page
+  const filterData = trisdata.slice(firstIndex, lastIndex);
+  const handleChangeRowsPerPage = (e: any) => {
+    setCurrentPage(0);
+    setRowsPerPage(parseInt(e.target.value, 10));
+  };
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  console.log("fileter", filterData);
   const [Ignitionreport, setIgnitionreport] = useState<IgnitionReport>({
     TimeZone: session?.timezone || "",
     VehicleReg: "",
@@ -1376,9 +1393,8 @@ export default function Reports() {
                 </tr>
               </thead>
               <tbody>
-                {trisdata.map((trip, tripIndex) => (
+                {filterData?.map((trip, tripIndex) => (
                   <tr key={tripIndex}>
-                    {/* Render data cells dynamically based on the headers */}
                     {columnHeaders.map((header, headerIndex) => {
                       const dataKey = header.replace(
                         /\s+/g,
@@ -1464,6 +1480,16 @@ export default function Reports() {
               </tbody>
             </table>
           </div>
+          <TablePagination
+            rowsPerPageOptions={[5, 12, 20]} // Add 11 to the rowsPerPageOptions array
+            component="div"
+            count={trisdata.length}
+            rowsPerPage={rowsPerPages}
+            page={currentPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            className="bg-bgLight table_pagination"
+          />
         </div>
       )}
 
