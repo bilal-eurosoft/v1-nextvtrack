@@ -57,16 +57,39 @@ input[type="checkbox"]:hover {
 .main_sider_bar {
   height: 93vh;
 }
-/* @media (min-width: 1024px) and (min-height: 600px) {
+@media only screen and (max-width: 1440px) and (max-height: 900px) {
+  .main_sider_bar {
+    height: 77vh;
+    width: 80%;
+  }
+  #scroll_side_bar {
+    height: 68vh;
+  }
   .search_live_tracking {
-    height: 8vh;
+    height: 10vh;
   }
 
   .vehicle_summary {
-    height: 8vh;
+    height: 6vh;
   }
-} */
-
+  #maps {
+    height: 88vh;
+    margin-left: -13%;
+  }
+  .vehicle_search_left {
+    width: 80%;
+  }
+  .show_vehicle_left {
+    margin-left: -17%;
+    width: 10rem;
+  }
+  #btn_left_margin {
+    margin-left: -25% !important;
+  }
+  #mph_left {
+    margin-left: -10%;
+  }
+}
 @media (max-width: 1000px) and (min-width: 750px) {
   .main_sider_bar {
     height: 87.5vh;

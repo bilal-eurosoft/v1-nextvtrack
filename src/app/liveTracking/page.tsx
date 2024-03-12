@@ -10,7 +10,7 @@ import {
   getClientSettingByClinetIdAndToken,
   getVehicleDataByClientId,
   getZoneListByClientId,
-  getAllVehicleByUserId,
+  getAllVehicleByUserId
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { socket } from "@/utils/socket";
@@ -49,11 +49,14 @@ const LiveMap = dynamic(() => import("@/components/LiveTracking/LiveMap"), {
   //     </div>
   //   </div>
   // ),
-  ssr: false,
+  ssr: false
 });
 
 const LiveTracking = () => {
-  const { data: session } = useSession();
+  let { data: session } = useSession();
+  if (!session) {
+    session = JSON.parse(localStorage.getItem("user"));
+  }
   const carData = useRef<VehicleData[]>([]);
   const [clientSettings, setClientSettings] = useState<ClientSettings[]>([]);
   const [zoneList, setZoneList] = useState<zonelistType[]>([]);
@@ -96,7 +99,7 @@ const LiveTracking = () => {
       if (session && session.userRole === "Controller") {
         const data = await getAllVehicleByUserId({
           token: session.accessToken,
-          userId: session.userId,
+          userId: session.userId
         });
         console.log("data", data.data);
         setuserVehicle(data.data);
@@ -140,7 +143,7 @@ const LiveTracking = () => {
 
         const clientSettingData = await getClientSettingByClinetIdAndToken({
           token: session?.accessToken,
-          clientId: session?.clientId,
+          clientId: session?.clientId
         });
         if (clientSettingData) {
           setClientSettings(clientSettingData);
@@ -178,7 +181,7 @@ const LiveTracking = () => {
     isFirstTimeFetchedFromGraphQL,
     session?.clientId,
     lastDataReceivedTimestamp,
-    fetchTimeoutGraphQL,
+    fetchTimeoutGraphQL
   ]);
 
   // This useEffect is responsible for getting the data from socket and updating it into the state.

@@ -10,10 +10,13 @@ import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import { setLoginTime } from "../../utils/time";
 import { GetUsersByClientId, GetLicenseById } from "@/utils/API_CALLS";
 import "./login.css";
+import https from "https";
 import { useSession } from "next-auth/react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
+import { ToastContainer, toast } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 export default function LoginPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +24,9 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const clientIdparams = searchParams.get("clientId");
   const pageparams = searchParams.get("page");
+  const agent = new https.Agent({
+    rejectUnauthorized: false,
+  });
 
   const [formData, setFormData] = useState({
     userName: "",
@@ -88,21 +94,30 @@ export default function LoginPage() {
           id: clientIdparams,
         });
 
-        const user = users[0];
-        const data = await signIn("credentials", {
-          userName: licenseInfo[0].accountCode + "@" + user.userName,
-          password: user.password,
-          redirect: false,
-        });
-        if (data?.status === 200) {
-          router.push("/liveTracking");
-          localStorage.setItem("IsRedirect", "1");
-          localStorage.setItem("page", pageparams);
-        }
-        if (data?.status === 401) {
-          toast.error("Invalid Credential", {
-            position: "top-center",
-          });
+        let config = {
+          method: "post",
+          maxBodyLength: Infinity,
+          url: "https://backend.vtracksolutions.com/Portallogin",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          httpsAgent: agent,
+          data: {
+            userName: licenseInfo[0].accountCode + "@" + users[0].userName,
+            password: users[0].password,
+          },
+        };
+
+        const response = await axios.request(config);
+
+        if (response?.data?.accessToken) {
+          // localStorage.setItem(
+          //   "user_id",
+          //   JSON.stringify(response?.data?.Email)
+          // );
+
+          localStorage.setItem("user", JSON.stringify(response?.data));
+          router.push("/liveTracking?screen=full");
         }
       } catch (error) {
         // Handle errors

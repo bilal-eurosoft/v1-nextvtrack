@@ -21,7 +21,7 @@ export default function Verification() {
   // console.log(base64decode(id))
   // const decodedValue = decodeURIComponent(id);
   // console.log(decodedValue);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     password: "",
     link: base64decode(id),
   });
@@ -39,45 +39,60 @@ export default function Verification() {
       ...formData,
       clientId: session?.clientId,
     };
-    if (inputConfirmPassword == formData.password) {
-      const response = await toast.promise(
-        forgetPasswordClientId({
-          token: session?.accessToken,
-          newformdata: newformdata,
-        }),
-        {
-          loading: "Saving data...",
-          success: "Data saved successfully!",
-          error: "Error saving data. Please try again.",
-        },
-        {
-          style: {
-            border: "1px solid #00B56C",
-            padding: "16px",
-            color: "#1A202C",
-          },
-          success: {
-            duration: 2000,
-            iconTheme: {
-              primary: "#00B56C",
-              secondary: "#FFFAEE",
-            },
-          },
-          error: {
-            duration: 2000,
-            iconTheme: {
-              primary: "#00B56C",
-              secondary: "#FFFAEE",
-            },
-          },
-        }
+    if (formData.password.length < 6 || inputConfirmPassword.length < 6) {
+      toast.error("Password Max Lenght Is 6 Character");
+    } else if (
+      !/[!@#$%^&*(),.?":{}|<>]/.test(formData.password || inputConfirmPassword)
+    ) {
+      toast.error(
+        "Please include at least one special character in the password",
+        { position: "top-center" }
       );
-
-      toast.success("Password Successfully Updated");
     } else {
-      toast.error("please Enter Same Passord", {
-        position: "top-center",
-      });
+      if (inputConfirmPassword == formData.password) {
+        const response = await toast.promise(
+          forgetPasswordClientId({
+            token: session?.accessToken,
+            newformdata: newformdata,
+          }),
+          {
+            loading: "Saving data...",
+            success: "Data saved successfully!",
+            error: "Error saving data. Please try again.",
+          },
+          {
+            style: {
+              border: "1px solid #00B56C",
+              padding: "16px",
+              color: "#1A202C",
+            },
+            success: {
+              duration: 2000,
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            },
+            error: {
+              duration: 2000,
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            },
+          }
+        );
+
+        toast.success("Password Successfully Updated");
+        setFormData({
+          password: "",
+        });
+        setinputConfirmPassword("");
+      } else {
+        toast.error("please Enter Same Passord", {
+          position: "top-center",
+        });
+      }
     }
   };
 

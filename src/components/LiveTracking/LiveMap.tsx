@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import { getZoneListByClientId } from "@/utils/API_CALLS";
 import { Marker, Popup } from "react-leaflet";
 import L, { LatLng } from "leaflet";
+import { useSearchParams } from "next/navigation";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((module) => module.MapContainer),
@@ -52,6 +53,9 @@ const DynamicCarMap = ({
   const clientMapSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Map"
   )[0]?.PropertyValue;
+  const searchParams = useSearchParams();
+
+  const fullparams = searchParams.get("screen");
 
   const clientZoomSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Zoom"
@@ -102,6 +106,7 @@ const DynamicCarMap = ({
           {mapCoordinates !== null && zoom !== null && (
             <MapContainer
               id="maps"
+              style={{ height: fullparams == "full" ? "100vh" : "" }}
               center={mapCoordinates}
               className=" z-0"
               zoom={zoom}
@@ -163,21 +168,24 @@ const DynamicCarMap = ({
               />
             </MapContainer>
           )}
-          <div className="grid grid-cols-1 absolute shadow-lg rounded-md lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">
-            <div className="col-span-1" style={{ color: "green" }}>
-              <input
-                type="checkbox"
-                onClick={() => {
-                  setShowZones(!showZones);
-                }}
-                className="mx-3  mt-1"
-                style={{ accentColor: "green" }}
-              />
-              <button className="text-labelColor font-popins text-sm font-bold">
-                Show Zones
-              </button>
+          {fullparams != "full" ? (
+            <div className="grid grid-cols-1 absolute shadow-lg rounded-md lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">
+              <div className="col-span-1" style={{ color: "green" }}>
+                <input
+                  type="checkbox"
+                  onClick={() => {
+                    setShowZones(!showZones);
+                  }}
+                  className="mx-3  mt-1"
+                  style={{ accentColor: "green" }}
+                />
+
+                <button className="text-labelColor font-popins text-sm font-bold">
+                  Show Zones
+                </button>
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       </div>
     </>
