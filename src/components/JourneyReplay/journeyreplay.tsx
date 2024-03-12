@@ -33,7 +33,7 @@ import Speedometer, {
   Needle,
   Progress,
   Marks,
-  Indicator,
+  Indicator
 } from "react-speedometer";
 import {
   TravelHistoryByBucketV2,
@@ -42,7 +42,7 @@ import {
   getClientSettingByClinetIdAndToken,
   getCurrentAddress,
   getZoneListByClientId,
-  vehicleListByClientId,
+  vehicleListByClientId
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { DeviceAttach } from "@/types/vehiclelistreports";
@@ -57,7 +57,7 @@ import { useMap } from "react-leaflet";
 import {
   Tripaddressresponse,
   calculateZoomCenter,
-  createMarkerIcon,
+  createMarkerIcon
 } from "@/utils/JourneyReplayFunctions";
 import { StopAddressData } from "@/types/StopDetails";
 import Box from "@mui/material/Box";
@@ -67,7 +67,7 @@ import { Tooltip, Button } from "@material-tailwind/react";
 import DateFnsUtils from "@date-io/date-fns";
 import {
   MuiPickersUtilsProvider,
-  KeyboardDatePicker,
+  KeyboardDatePicker
 } from "@material-ui/pickers";
 
 import MenuItem from "@mui/material/MenuItem";
@@ -82,9 +82,9 @@ const MenuProps = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 50,
-    },
-  },
+      width: 50
+    }
+  }
 };
 
 import "./index.css";
@@ -125,12 +125,12 @@ import Slider from "@mui/material/Slider";
 const useStyles = makeStyles((theme) => ({
   select: {
     "&:before": {
-      borderColor: "green", // Change this to the desired border color
+      borderColor: "green" // Change this to the desired border color
     },
     "&:after": {
-      borderColor: "green", // Change this to the desired border color
-    },
-  },
+      borderColor: "green" // Change this to the desired border color
+    }
+  }
 }));
 export default function journeyReplayComp() {
   const { data: session } = useSession();
@@ -159,7 +159,7 @@ export default function journeyReplayComp() {
     fromDateTime: new Date(),
     period: "",
     toDateTime: new Date(),
-    unit: session?.unit || "",
+    unit: session?.unit || ""
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -372,7 +372,7 @@ export default function journeyReplayComp() {
     isPaused,
     TravelHistoryresponse,
     speedFactor,
-    stopVehicle,
+    stopVehicle
   ]);
   useEffect(() => {
     if (polylinedata.length > 0) {
@@ -388,7 +388,7 @@ export default function journeyReplayComp() {
           if (session) {
             const Data = await vehicleListByClientId({
               token: session.accessToken,
-              clientId: session?.clientId,
+              clientId: session?.clientId
             });
             setVehicleList(Data);
           }
@@ -396,7 +396,7 @@ export default function journeyReplayComp() {
           if (session) {
             const data = await getAllVehicleByUserId({
               token: session.accessToken,
-              userId: session.userId,
+              userId: session.userId
             });
             setVehicleList(data);
           }
@@ -410,7 +410,7 @@ export default function journeyReplayComp() {
       if (session) {
         const allzoneList = await getZoneListByClientId({
           token: session?.accessToken,
-          clientId: session?.clientId,
+          clientId: session?.clientId
         });
         setZoneList(allzoneList);
       }
@@ -420,11 +420,16 @@ export default function journeyReplayComp() {
       if (session) {
         const clientSettingData = await getClientSettingByClinetIdAndToken({
           token: session?.accessToken,
-          clientId: session?.clientId,
+          clientId: session?.clientId
         });
 
         if (clientSettingData) {
-          const centervalue = await clientSettingData?.[0].PropertyValue;
+          const mapObject = clientSettingData.find(
+            (obj: { PropertDesc: string }) => obj.PropertDesc === "Map"
+          );
+
+          // Get the PropertyValue from the found object
+          const centervalue = mapObject ? mapObject.PropertyValue : null;
 
           if (centervalue) {
             const match = centervalue.match(/\{lat:([^,]+),lng:([^}]+)\}/);
@@ -438,12 +443,16 @@ export default function journeyReplayComp() {
             }
           }
           setClientsetting(clientSettingData);
-          const clientZoomSettings = clientsetting?.filter(
-            (el) => el?.PropertDesc === "Zoom"
-          )[0]?.PropertyValue;
-          const zoomLevel = clientZoomSettings
-            ? parseInt(clientZoomSettings)
-            : 13;
+          const zoomObject = clientSettingData.find(
+            (obj: { PropertDesc: string }) => obj.PropertDesc === "Zoom"
+          );
+
+          // Get the PropertyValue from the found object
+          const zoomvalue = zoomObject ? mapObject.PropertyValue : null;
+          /*    const clientZoomSettings = clientsetting?.filter(
+               (el) => el?.PropertDesc === "Zoom"
+             )[0]?.PropertyValue;*/
+          const zoomLevel = zoomvalue ? parseInt(zoomvalue) : 13;
           setzoom(zoomLevel);
         }
       }
@@ -459,7 +468,7 @@ export default function journeyReplayComp() {
   }, [clientsetting]);
 
   let currentTime = new Date().toLocaleString("en-US", {
-    timeZone: session?.timezone,
+    timeZone: session?.timezone
   });
 
   let timeOnly = currentTime.split(",")[1].trim();
@@ -515,7 +524,7 @@ export default function journeyReplayComp() {
       }
       if (VehicleReg && period) {
         let newdata = {
-          ...Ignitionreport,
+          ...Ignitionreport
         };
         const timestart: string = "00:00:00";
         const timeend: string = "23:59:59";
@@ -537,7 +546,7 @@ export default function journeyReplayComp() {
             }T${timestart}Z`,
             toDateTime: `${
               weekData ? formattedToDateTime : Ignitionreport.toDateTime
-            }T${timeend}Z`,
+            }T${timeend}Z`
           };
         } else {
           newdata = {
@@ -547,7 +556,7 @@ export default function journeyReplayComp() {
             }T${timestart}Z`,
             toDateTime: `${
               weekData ? formattedToDateTime : currentDate
-            }T${timeend}Z`,
+            }T${timeend}Z`
           };
         }
         setIgnitionreport(newdata);
@@ -567,34 +576,34 @@ export default function journeyReplayComp() {
           const response = await toast.promise(
             TripsByBucketAndVehicle({
               token: session.accessToken,
-              payload: newdata,
+              payload: newdata
             }),
 
             {
               loading: "Loading...",
               success: "",
-              error: "",
+              error: ""
             },
             {
               style: {
                 border: "1px solid #00B56C",
                 padding: "16px",
-                color: "#1A202C",
+                color: "#1A202C"
               },
               success: {
                 duration: 10,
                 iconTheme: {
                   primary: "#00B56C",
-                  secondary: "#FFFAEE",
-                },
+                  secondary: "#FFFAEE"
+                }
               },
               error: {
                 duration: 10,
                 iconTheme: {
                   primary: "#00B56C",
-                  secondary: "#FFFAEE",
-                },
-              },
+                  secondary: "#FFFAEE"
+                }
+              }
             }
           );
           if (
@@ -618,25 +627,25 @@ export default function journeyReplayComp() {
               style: {
                 border: "1px solid #00B56C",
                 padding: "16px",
-                color: "#1A202C",
+                color: "#1A202C"
               },
               duration: 4000,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
+                secondary: "#FFFAEE"
+              }
             });
           } else {
             toast.error(`${response.message}`, {
               style: {
                 border: "1px solid red",
                 padding: "16px",
-                color: "red",
+                color: "red"
               },
               iconTheme: {
                 primary: "red",
-                secondary: "white",
-              },
+                secondary: "white"
+              }
             });
           }
         } catch (error) {
@@ -716,39 +725,39 @@ export default function journeyReplayComp() {
         let newresponsedata = {
           ...Ignitionreport,
           fromDateTime: `${TripStart}`,
-          toDateTime: `${TripEnd}`,
+          toDateTime: `${TripEnd}`
         };
         setLaodingMap(false);
         const TravelHistoryresponseapi = await toast.promise(
           TravelHistoryByBucketV2({
             token: session.accessToken,
-            payload: newresponsedata,
+            payload: newresponsedata
           }),
           {
             loading: "Loading...",
             success: "",
-            error: "",
+            error: ""
           },
           {
             style: {
               border: "1px solid #00B56C",
               padding: "16px",
-              color: "#1A202C",
+              color: "#1A202C"
             },
             success: {
               duration: 10,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
+                secondary: "#FFFAEE"
+              }
             },
             error: {
               duration: 10,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
+                secondary: "#FFFAEE"
+              }
+            }
           }
         );
         // if (session?.unit == "Mile") {
@@ -809,7 +818,7 @@ export default function journeyReplayComp() {
       setPolylinedata(
         TravelHistoryresponse.map((item: TravelHistoryData) => [
           item.lat,
-          item.lng,
+          item.lng
         ])
       );
 
@@ -842,7 +851,7 @@ export default function journeyReplayComp() {
             const Data = await getCurrentAddress({
               token: session.accessToken,
               lat: lat,
-              lon: lng,
+              lon: lng
             });
 
             stopDetailsArray.push(Data);
@@ -875,7 +884,7 @@ export default function journeyReplayComp() {
       const item = TravelHistoryresponse[currentPositionIndex];
       return {
         speed: item.speed,
-        distanceCovered: item.distanceCovered,
+        distanceCovered: item.distanceCovered
       };
     }
     return null;
@@ -920,7 +929,7 @@ export default function journeyReplayComp() {
     setCurrentDateDefaul(true);
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
-      [fieldName]: newDate?.toISOString(),
+      [fieldName]: newDate?.toISOString()
     }));
   };
 
@@ -960,7 +969,7 @@ export default function journeyReplayComp() {
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
       ["VehicleReg"]: value,
-      ["label"]: label,
+      ["label"]: label
     }));
   };
 
@@ -976,7 +985,7 @@ export default function journeyReplayComp() {
     const { name, value } = e.target;
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
-      [name]: value,
+      [name]: value
     }));
 
     if (value == "week") {
@@ -1053,7 +1062,7 @@ export default function journeyReplayComp() {
       "Wednesday",
       "Thursday",
       "Friday",
-      "Saturday",
+      "Saturday"
     ];
     return days[date.getDay()];
   }
@@ -1067,7 +1076,7 @@ export default function journeyReplayComp() {
       groupedData[item.TripStartDateLabel] = {
         trips: [item],
         count: 1,
-        day: dayName,
+        day: dayName
       };
     } else {
       // If the date group already exists, push the trip and increment the count
@@ -1078,14 +1087,14 @@ export default function journeyReplayComp() {
   const options =
     vehicleList?.data?.map((item: any) => ({
       value: item.vehicleReg,
-      label: item.vehicleReg,
+      label: item.vehicleReg
     })) || [];
 
   const SpeedOption = [
     { value: "1", label: "1X" },
     { value: "2", label: "2X" },
     { value: "4", label: "4X" },
-    { value: "6", label: "6X" },
+    { value: "6", label: "6X" }
   ];
   return (
     <>
@@ -1136,7 +1145,7 @@ export default function journeyReplayComp() {
                 control: (provided, state) => ({
                   ...provided,
                   border: "none",
-                  boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                  boxShadow: state.isFocused ? null : null // Add any box-shadow you want here
                 }),
                 option: (provided, state) => ({
                   ...provided,
@@ -1144,9 +1153,9 @@ export default function journeyReplayComp() {
                   color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
                   "&:hover": {
                     backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
-                    color: "white", // Change 'white' to your desired text color
-                  },
-                }),
+                    color: "white" // Change 'white' to your desired text color
+                  }
+                })
               }}
             />
 
@@ -1192,11 +1201,10 @@ export default function journeyReplayComp() {
               name="VehicleReg"
               id="select_box_journey"
               displayEmpty
-              className={`h-8 text-black font-popins font-bold w-full outline-green  ${
-                getShowRadioButton
-                  ? " text-black font-popins font-extrabold"
-                  : " text-black font-popins  "
-              }`}
+              className={`h-8 text-black font-popins font-bold w-full outline-green  ${getShowRadioButton
+                ? " text-black font-popins font-extrabold"
+                : " text-black font-popins  "
+                }`}
               style={{
                 color: getShowRadioButton ? "black" : "",
                 paddingTop: getShowRadioButton ? "4%" : "2%",
@@ -1568,7 +1576,7 @@ export default function journeyReplayComp() {
                                   borderBottom: "1px solid gray",
                                   width: "100%",
                                   paddingTop: "2%",
-                                  paddingBottom: "2%",
+                                  paddingBottom: "2%"
                                 }}
                               >
                                 {/* <b>
@@ -1602,7 +1610,7 @@ export default function journeyReplayComp() {
                                     backgroundColor:
                                       activeTripColor.id === item.id
                                         ? "#e1f0e3"
-                                        : "",
+                                        : ""
                                   }}
                                 >
                                   <Typography>
@@ -1619,7 +1627,7 @@ export default function journeyReplayComp() {
                                             height="24"
                                             style={{
                                               filter:
-                                                "drop-shadow(1px 2px 2px #000000)",
+                                                "drop-shadow(1px 2px 2px #000000)"
                                             }}
                                             viewBox="0 0 512 512"
                                           >
@@ -1653,7 +1661,7 @@ export default function journeyReplayComp() {
                                                     style={{
                                                       filter:
                                                         "drop-shadow(1px 2px 2px #000000)",
-                                                      marginRight: "0.5%",
+                                                      marginRight: "0.5%"
                                                     }}
                                                     viewBox="0 0 24 24"
                                                   >
@@ -1678,7 +1686,7 @@ export default function journeyReplayComp() {
                                             viewBox="0 0 512 512"
                                             style={{
                                               filter:
-                                                "drop-shadow(1px 2px 2px #000000)",
+                                                "drop-shadow(1px 2px 2px #000000)"
                                             }}
                                           >
                                             <circle
@@ -1721,7 +1729,7 @@ export default function journeyReplayComp() {
                                             viewBox="0 0 512 512"
                                             style={{
                                               filter:
-                                                "drop-shadow(1px 2px 2px #000000)",
+                                                "drop-shadow(1px 2px 2px #000000)"
                                             }}
                                           >
                                             <circle
@@ -1761,6 +1769,95 @@ export default function journeyReplayComp() {
                                         </div>
                                       </div>
                                     </div>
+
+                                    <div className="grid grid-cols-12 gap-10 mt-5">
+                                      <div className="col-span-1">
+                                        <svg
+                                          className="h-8 w-8 text-green"
+                                          fill="none"
+                                          viewBox="0 0 24 24"
+                                          stroke="currentColor"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                          />
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                          />
+                                        </svg>
+                                        <div className=" border-l-2 h-10 border-green  mx-4 my-3"></div>
+                                      </div>
+                                      <div className="col-span-8 ">
+                                        <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
+                                          <p className="text-green ">
+                                            {" "}
+                                            Location Start:
+                                          </p>{" "}
+                                          <p className="text-black text-sm font-popins">
+                                            {item.StartingPoint}
+                                          </p>
+                                        </p>
+                                        <p className=" text-black text-start font-semibold text-sm font-popins">
+                                          {" "}
+                                          Trip Start: {
+                                            item.TripStartDateLabel
+                                          }{" "}
+                                          &nbsp;
+                                          {item.TripStartTimeLabel}
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-12 gap-10">
+                                      <div className="col-span-1">
+                                        <svg
+                                          className="h-8 w-8 text-green"
+                                          fill="none"
+                                          viewBox="0 0 24 24"
+                                          stroke="currentColor"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                          />
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <div className="col-span-8 ">
+                                        <div className="text-start font-bold text-md text-labelColor">
+                                          <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
+                                            <span className="text-green">
+                                              {" "}
+                                              Location End:
+                                            </span>{" "}
+                                            <br></br>
+                                            <p className="text-black text-sm font-popins">
+                                              {" "}
+                                              {item.EndingPoint}
+                                            </p>
+                                          </p>
+                                        </div>
+                                        <p className=" text-black text-start font-semibold text-sm">
+                                          {" "}
+                                          Trip End:{item.TripEndDateLabel}{" "}
+                                          &nbsp;
+                                          {item.TripEndTimeLabel}
+                                        </p>
+                                      </div>
+                                    </div>
                                   </Typography>
                                 </AccordionDetails>
                               ))}
@@ -1779,16 +1876,26 @@ export default function journeyReplayComp() {
                       }
                     >
                       <div
-                        className="py-5 hover:bg-[#e1f0e3] px-5 cursor-pointer border-b"
+                        className="py-5 hover:bg-tripBg px-5 cursor-pointer border-b"
                         onClick={() => handleGetItem(item, index)}
                         style={{
                           backgroundColor:
-                            activeTripColor.id === item.id ? "#e1f0e3" : "",
+                            activeTripColor.id === item.id
+                              ? "rgba(0, 0, 0, 0.08)"
+                              : ""
                         }}
                       >
-                        <div className="grid grid-cols-12 space-x-3">
-                          <div className="col-span-1">
-                            {/* <svg
+                        <div
+                          className="py-5 hover:bg-[#e1f0e3] px-5 cursor-pointer border-b"
+                          onClick={() => handleGetItem(item, index)}
+                          style={{
+                            backgroundColor:
+                              activeTripColor.id === item.id ? "#e1f0e3" : ""
+                          }}
+                        >
+                          <div className="grid grid-cols-12 space-x-3">
+                            <div className="col-span-1">
+                              {/* <svg
                               className="h-8 w-8 text-green"
                               width="24"
                               height="24"
@@ -1806,62 +1913,62 @@ export default function journeyReplayComp() {
                               <path d="M5 17h-2 v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" />
                             </svg> */}
 
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-10 w-10 text-green "
-                              width="24"
-                              height="24"
-                              style={{
-                                filter: "drop-shadow(1px 2px 2px #000000)",
-                              }}
-                              viewBox="0 0 512 512"
-                            >
-                              <rect width="512" height="512" fill="none" />
-                              <path
-                                fill="currentColor"
-                                d="M488 224c-3-5-32.61-17.79-32.61-17.79c5.15-2.66 8.67-3.21 8.67-14.21c0-12-.06-16-8.06-16h-27.14c-.11-.24-.23-.49-.34-.74c-17.52-38.26-19.87-47.93-46-60.95C347.47 96.88 281.76 96 256 96s-91.47.88-126.49 18.31c-26.16 13-25.51 19.69-46 60.95c0 .11-.21.4-.4.74H55.94c-7.94 0-8 4-8 16c0 11 3.52 11.55 8.67 14.21C56.61 206.21 28 220 24 224s-8 32-8 80s4 96 4 96h11.94c0 14 2.06 16 8.06 16h80c6 0 8-2 8-16h256c0 14 2 16 8 16h82c4 0 6-3 6-16h12s4-49 4-96s-5-75-8-80m-362.74 44.94A516.94 516.94 0 0 1 70.42 272c-20.42 0-21.12 1.31-22.56-11.44a72.16 72.16 0 0 1 .51-17.51L49 240h3c12 0 23.27.51 44.55 6.78a98 98 0 0 1 30.09 15.06C131 265 132 268 132 268Zm247.16 72L368 352H144s.39-.61-5-11.18c-4-7.82 1-12.82 8.91-15.66C163.23 319.64 208 304 256 304s93.66 13.48 108.5 21.16C370 328 376.83 330 372.42 341Zm-257-136.53a96.23 96.23 0 0 1-9.7.07c2.61-4.64 4.06-9.81 6.61-15.21c8-17 17.15-36.24 33.44-44.35c23.54-11.72 72.33-17 110.23-17s86.69 5.24 110.23 17c16.29 8.11 25.4 27.36 33.44 44.35c2.57 5.45 4 10.66 6.68 15.33c-2 .11-4.3 0-9.79-.19Zm347.72 56.11C461 273 463 272 441.58 272a516.94 516.94 0 0 1-54.84-3.06c-2.85-.51-3.66-5.32-1.38-7.1a93.84 93.84 0 0 1 30.09-15.06c21.28-6.27 33.26-7.11 45.09-6.69a3.22 3.22 0 0 1 3.09 3a70.18 70.18 0 0 1-.49 17.47Z"
-                              />
-                            </svg>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-10 w-10 text-green "
+                                width="24"
+                                height="24"
+                                style={{
+                                  filter: "drop-shadow(1px 2px 2px #000000)"
+                                }}
+                                viewBox="0 0 512 512"
+                              >
+                                <rect width="512" height="512" fill="none" />
+                                <path
+                                  fill="currentColor"
+                                  d="M488 224c-3-5-32.61-17.79-32.61-17.79c5.15-2.66 8.67-3.21 8.67-14.21c0-12-.06-16-8.06-16h-27.14c-.11-.24-.23-.49-.34-.74c-17.52-38.26-19.87-47.93-46-60.95C347.47 96.88 281.76 96 256 96s-91.47.88-126.49 18.31c-26.16 13-25.51 19.69-46 60.95c0 .11-.21.4-.4.74H55.94c-7.94 0-8 4-8 16c0 11 3.52 11.55 8.67 14.21C56.61 206.21 28 220 24 224s-8 32-8 80s4 96 4 96h11.94c0 14 2.06 16 8.06 16h80c6 0 8-2 8-16h256c0 14 2 16 8 16h82c4 0 6-3 6-16h12s4-49 4-96s-5-75-8-80m-362.74 44.94A516.94 516.94 0 0 1 70.42 272c-20.42 0-21.12 1.31-22.56-11.44a72.16 72.16 0 0 1 .51-17.51L49 240h3c12 0 23.27.51 44.55 6.78a98 98 0 0 1 30.09 15.06C131 265 132 268 132 268Zm247.16 72L368 352H144s.39-.61-5-11.18c-4-7.82 1-12.82 8.91-15.66C163.23 319.64 208 304 256 304s93.66 13.48 108.5 21.16C370 328 376.83 330 372.42 341Zm-257-136.53a96.23 96.23 0 0 1-9.7.07c2.61-4.64 4.06-9.81 6.61-15.21c8-17 17.15-36.24 33.44-44.35c23.54-11.72 72.33-17 110.23-17s86.69 5.24 110.23 17c16.29 8.11 25.4 27.36 33.44 44.35c2.57 5.45 4 10.66 6.68 15.33c-2 .11-4.3 0-9.79-.19Zm347.72 56.11C461 273 463 272 441.58 272a516.94 516.94 0 0 1-54.84-3.06c-2.85-.51-3.66-5.32-1.38-7.1a93.84 93.84 0 0 1 30.09-15.06c21.28-6.27 33.26-7.11 45.09-6.69a3.22 3.22 0 0 1 3.09 3a70.18 70.18 0 0 1-.49 17.47Z"
+                                />
+                              </svg>
+                            </div>
+                            <div className="col-span-10 ">
+                              <p className="text-start text-md   text-black font-popins font-semibold">
+                                Duration: {item.TripDurationHr} Hour(s){" "}
+                                {item.TripDurationMins} Minute(s)
+                              </p>
+                              <p className=" text-green text-start font-popins font-semibold text-sm">
+                                {" "}
+                                Distance: {item.TotalDistance}
+                                {item?.DriverName && (
+                                  <div>
+                                    <p style={{ display: "flex" }}>
+                                      {" "}
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        style={{
+                                          filter:
+                                            "drop-shadow(1px 2px 2px #000000)",
+                                          marginRight: "0.5%"
+                                        }}
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          fill="currentColor"
+                                          d="M12 12q-1.65 0-2.825-1.175T8 8q0-1.65 1.175-2.825T12 4q1.65 0 2.825 1.175T16 8q0 1.65-1.175 2.825T12 12m-8 8v-2.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13q1.65 0 3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2V20z"
+                                        />
+                                      </svg>
+                                      {item?.DriverName}
+                                    </p>
+                                  </div>
+                                )}
+                              </p>
+                            </div>
                           </div>
-                          <div className="col-span-10 ">
-                            <p className="text-start text-md   text-black font-popins font-semibold">
-                              Duration: {item.TripDurationHr} Hour(s){" "}
-                              {item.TripDurationMins} Minute(s)
-                            </p>
-                            <p className=" text-green text-start font-popins font-semibold text-sm">
-                              {" "}
-                              Distance: {item.TotalDistance}
-                              {item?.DriverName && (
-                                <div>
-                                  <p style={{ display: "flex" }}>
-                                    {" "}
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      width="20"
-                                      height="20"
-                                      style={{
-                                        filter:
-                                          "drop-shadow(1px 2px 2px #000000)",
-                                        marginRight: "0.5%",
-                                      }}
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path
-                                        fill="currentColor"
-                                        d="M12 12q-1.65 0-2.825-1.175T8 8q0-1.65 1.175-2.825T12 4q1.65 0 2.825 1.175T16 8q0 1.65-1.175 2.825T12 12m-8 8v-2.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13q1.65 0 3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2V20z"
-                                      />
-                                    </svg>
-                                    {item?.DriverName}
-                                  </p>
-                                </div>
-                              )}
-                            </p>
-                          </div>
-                        </div>
 
-                        <div className="grid grid-cols-12 gap-10 mt-5">
-                          <div className="col-span-1">
-                            {/* <svg
+                          <div className="grid grid-cols-12 gap-10 mt-5">
+                            <div className="col-span-1">
+                              {/* <svg
                               className="h-8 w-8 text-green"
                               fill="none"
                               viewBox="0 0 24 24"
@@ -1880,46 +1987,108 @@ export default function journeyReplayComp() {
                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                               />
                             </svg> */}
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-8 w-8 text-green"
+                                viewBox="0 0 512 512"
+                                style={{
+                                  filter: "drop-shadow(1px 2px 2px #000000)"
+                                }}
+                              >
+                                <circle
+                                  cx="256"
+                                  cy="192"
+                                  r="32"
+                                  // fill="currentColor"
+                                />
+                                <path
+                                  fill="currentColor"
+                                  d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
+                                />
+                              </svg>
+                              <div className=" border-l-2 h-10 border-green  mx-4 my-3"></div>
+                            </div>
+                            <div className="col-span-8 ">
+                              <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
+                                <p className="text-green "> Location Start:</p>{" "}
+                                {/* <br></br>{" "} */}
+                                <p className="text-black text-sm font-popins">
+                                  {item.StartingPoint}
+                                </p>
+                              </p>
+                              <p className=" text-black font-popins text-start font-semibold text-sm lg:mr-0 md:mr-10">
+                                {" "}
+                                Trip Start: {item.TripStartDateLabel} &nbsp;
+                                {item.TripStartTimeLabel}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-12 gap-10">
+                            <div className="col-span-1">
+                              {/* <svg
                               className="h-8 w-8 text-green"
-                              viewBox="0 0 512 512"
-                              style={{
-                                filter: "drop-shadow(1px 2px 2px #000000)",
-                              }}
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
                             >
-                              <circle
-                                cx="256"
-                                cy="192"
-                                r="32"
-                                // fill="currentColor"
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
                               />
                               <path
-                                fill="currentColor"
-                                d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                               />
-                            </svg>
-                            <div className=" border-l-2 h-10 border-green  mx-4 my-3"></div>
-                          </div>
-                          <div className="col-span-8 ">
-                            <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
-                              <p className="text-green "> Location Start:</p>{" "}
-                              {/* <br></br>{" "} */}
-                              <p className="text-black text-sm font-popins">
-                                {item.StartingPoint}
+                            </svg> */}
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-8 w-8 text-green"
+                                viewBox="0 0 512 512"
+                                style={{
+                                  filter: "drop-shadow(1px 2px 2px #000000)"
+                                }}
+                              >
+                                <circle
+                                  cx="256"
+                                  cy="192"
+                                  r="32"
+                                  // fill="currentColor"
+                                />
+                                <path
+                                  fill="currentColor"
+                                  d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
+                                />
+                              </svg>
+                            </div>
+                            <div className="col-span-8 ">
+                              <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
+                                <span className="text-green">
+                                  {" "}
+                                  Location End:
+                                </span>{" "}
+                                <br></br>
+                                <p className="text-black text-sm font-popins">
+                                  {" "}
+                                  {item.EndingPoint}
+                                </p>
                               </p>
-                            </p>
-                            <p className=" text-black font-popins text-start font-semibold text-sm lg:mr-0 md:mr-10">
-                              {" "}
-                              Trip Start: {item.TripStartDateLabel} &nbsp;
-                              {item.TripStartTimeLabel}
-                            </p>
+                              <p className=" text-black  lg:mr-0 md:mr-10 text-start font-bold text-sm">
+                                {" "}
+                                Trip End:{item.TripEndDateLabel} &nbsp;
+                                {item.TripEndTimeLabel}
+                              </p>
+                            </div>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-12 gap-10">
                           <div className="col-span-1">
-                            {/* <svg
+                            <svg
                               className="h-8 w-8 text-green"
                               fill="none"
                               viewBox="0 0 24 24"
@@ -1936,25 +2105,6 @@ export default function journeyReplayComp() {
                                 strokeLinejoin="round"
                                 strokeWidth="2"
                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                            </svg> */}
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-8 w-8 text-green"
-                              viewBox="0 0 512 512"
-                              style={{
-                                filter: "drop-shadow(1px 2px 2px #000000)",
-                              }}
-                            >
-                              <circle
-                                cx="256"
-                                cy="192"
-                                r="32"
-                                // fill="currentColor"
-                              />
-                              <path
-                                fill="currentColor"
-                                d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
                               />
                             </svg>
                           </div>
@@ -2017,7 +2167,7 @@ export default function journeyReplayComp() {
                           <Circle
                             center={[
                               Number(singleRecord.centerPoints.split(",")[0]),
-                              Number(singleRecord.centerPoints.split(",")[1]),
+                              Number(singleRecord.centerPoints.split(",")[1])
                             ]}
                             radius={Number(singleRecord.latlngCordinates)}
                           >
@@ -2054,7 +2204,7 @@ export default function journeyReplayComp() {
                           iconUrl:
                             "https://img.icons8.com/fluency/48/000000/stop-sign.png",
                           iconAnchor: [22, 47],
-                          popupAnchor: [1, -34],
+                          popupAnchor: [1, -34]
                         })
                       }
                     ></Marker>
@@ -2065,14 +2215,14 @@ export default function journeyReplayComp() {
                         <Marker
                           position={[
                             TravelHistoryresponse[0].lat,
-                            TravelHistoryresponse[0].lng,
+                            TravelHistoryresponse[0].lng
                           ]}
                           icon={
                             new L.Icon({
                               iconUrl:
                                 "https://img.icons8.com/fluent/48/000000/marker-a.png",
                               iconAnchor: [22, 47],
-                              popupAnchor: [1, -34],
+                              popupAnchor: [1, -34]
                             })
                           }
                         ></Marker>
@@ -2088,14 +2238,14 @@ export default function journeyReplayComp() {
                             ].lat,
                             TravelHistoryresponse[
                               TravelHistoryresponse.length - 1
-                            ].lng,
+                            ].lng
                           ]}
                           icon={
                             new L.Icon({
                               iconUrl:
                                 "https://img.icons8.com/fluent/48/000000/marker-b.png",
                               iconAnchor: [22, 47],
-                              popupAnchor: [1, -34],
+                              popupAnchor: [1, -34]
                             })
                           }
                         ></Marker>
@@ -2117,7 +2267,7 @@ export default function journeyReplayComp() {
                                   iconUrl:
                                     "https://img.icons8.com/color/48/000000/brake-discs.png",
                                   iconSize: [40, 40],
-                                  iconAnchor: [16, 37],
+                                  iconAnchor: [16, 37]
                                 })
                               }
                             ></Marker>
@@ -2134,7 +2284,7 @@ export default function journeyReplayComp() {
                                   iconUrl:
                                     " https://img.icons8.com/nolan/64/speed-up.png",
                                   iconSize: [30, 30],
-                                  iconAnchor: [16, 37],
+                                  iconAnchor: [16, 37]
                                 })
                               }
                             ></Marker>
@@ -2367,9 +2517,8 @@ export default function journeyReplayComp() {
                       <Tooltip content="Pause" className="bg-black">
                         <button
                           onClick={() => pausebtn && pauseTick()}
-                          className={`${
-                            pausebtn ? "cursor-pointer" : "cursor-not-allowed"
-                          }`}
+                          className={`${pausebtn ? "cursor-pointer" : "cursor-not-allowed"
+                            }`}
                         >
                           <svg
                             className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6  mx-1 "
@@ -2397,9 +2546,8 @@ export default function journeyReplayComp() {
                       <Tooltip content="Play" className="bg-black">
                         <button
                           onClick={() => playbtn && tick()}
-                          className={`${
-                            playbtn ? "cursor-pointer" : "cursor-not-allowed"
-                          }`}
+                          className={`${playbtn ? "cursor-pointer" : "cursor-not-allowed"
+                            }`}
                         >
                           <svg
                             className="h-5 w-5  lg:mx-2  md:mx-3 sm:mx-3 mx-1"
@@ -2419,9 +2567,8 @@ export default function journeyReplayComp() {
                       <Tooltip content="Stop" className="bg-black">
                         <button
                           onClick={() => stopbtn && stopTick()}
-                          className={`${
-                            stopbtn ? "cursor-pointer" : "cursor-not-allowed"
-                          }`}
+                          className={`${stopbtn ? "cursor-pointer" : "cursor-not-allowed"
+                            }`}
                         >
                           <svg
                             className="h-4 w-4 lg:mx-2 md:mx-3 sm:mx-3 mx-1"
@@ -2459,7 +2606,7 @@ export default function journeyReplayComp() {
                         color="secondary"
                         style={{
                           color: "#00B56C",
-                          cursor: isPlaying ? "pointer" : "not-allowed",
+                          cursor: isPlaying ? "pointer" : "not-allowed"
                         }}
                         max={polylinedata.length}
                         disabled={isPlaying ? false : true}
@@ -2498,7 +2645,7 @@ export default function journeyReplayComp() {
                                   //   color: stopVehicle === true ? "gray" : "white",
                                   // }}
                                   style={{
-                                    color: isPauseColor ? "green" : "black",
+                                    color: isPauseColor ? "green" : "black"
                                   }}
                                   fill={isPauseColor ? "none" : "none"}
                                   width="24"
@@ -2536,7 +2683,7 @@ export default function journeyReplayComp() {
                                   className="h-5 w-5  lg:mx-2  md:mx-3 sm:mx-3 mx-1"
                                   viewBox="0 0 24 24"
                                   style={{
-                                    color: isPlaying ? "green" : "black",
+                                    color: isPlaying ? "green" : "black"
                                   }}
                                   fill={isPlaying ? "green" : "black"}
                                   stroke="currentColor"
@@ -2562,7 +2709,7 @@ export default function journeyReplayComp() {
                                   className="h-4 w-4 lg:mx-2 md:mx-3 sm:mx-3 mx-1"
                                   width="24"
                                   style={{
-                                    color: stopVehicle ? "green" : "black",
+                                    color: stopVehicle ? "green" : "black"
                                   }}
                                   fill={stopVehicle ? "green" : "black    "}
                                   height="24"
@@ -2657,14 +2804,14 @@ export default function journeyReplayComp() {
                             control: (provided, state) => ({
                               ...provided,
                               border: "none",
-                              boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                              boxShadow: state.isFocused ? null : null // Add any box-shadow you want here
                             }),
                             menu: (provided, state) => ({
                               ...provided,
                               zIndex: 9999, // Ensure the menu appears above other elements
                               position: "absolute",
                               top: "auto",
-                              bottom: "100%", // Position the menu above the select input
+                              bottom: "100%" // Position the menu above the select input
                             }),
                             option: (provided, state) => ({
                               ...provided,
@@ -2674,9 +2821,9 @@ export default function journeyReplayComp() {
                               color: state.isFocused ? "white" : "black",
                               "&:hover": {
                                 backgroundColor: "#00B56C",
-                                color: "white",
-                              },
-                            }),
+                                color: "white"
+                              }
+                            })
                           }}
                         />
                       )}

@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { ClientSettings } from "@/types/clientSettings";
 import {
   getClientSettingByClinetIdAndToken,
-  postZoneDataByClientId,
+  postZoneDataByClientId
 } from "@/utils/API_CALLS";
 import L, { LatLngTuple } from "leaflet";
 import { Toaster, toast } from "react-hot-toast";
@@ -53,7 +53,7 @@ export default function AddZoneComp() {
   >([]);
   const [circleData, setCircleData] = useState({
     latlng: "",
-    radius: "",
+    radius: ""
   });
 
   const [clientsetting, setClientsetting] = useState<ClientSettings[] | null>(
@@ -66,7 +66,7 @@ export default function AddZoneComp() {
     zoneName: "",
     zoneShortName: "",
     zoneType: "",
-    latlngCordinates: "",
+    latlngCordinates: ""
   });
 
   const router = useRouter();
@@ -77,12 +77,17 @@ export default function AddZoneComp() {
         if (session) {
           const clientSettingData = await getClientSettingByClinetIdAndToken({
             token: session?.accessToken,
-            clientId: session?.clientId,
+            clientId: session?.clientId
           });
 
           if (clientSettingData) {
-            const centervalue = await clientSettingData?.[0].PropertyValue;
+            //   const centervalue = await clientSettingData?.[0].PropertyValue;
+            const mapObject = clientSettingData.find(
+              (obj: { PropertDesc: string }) => obj.PropertDesc === "Map"
+            );
 
+            // Get the PropertyValue from the found object
+            const centervalue = mapObject ? mapObject.PropertyValue : null;
             if (centervalue) {
               const match = centervalue.match(/\{lat:([^,]+),lng:([^}]+)\}/);
               if (match) {
@@ -100,7 +105,7 @@ export default function AddZoneComp() {
       })();
     }
   }, []);
-
+  console.log("fvfdvdfvbfdvfdvdf", mapcenter);
   const clientZoomSettings = clientsetting?.filter(
     (el) => el?.PropertDesc === "Zoom"
   )[0]?.PropertyValue;
@@ -114,24 +119,24 @@ export default function AddZoneComp() {
           latlngCordinates: JSON.stringify(
             polygondata.map(({ latitude, longitude }) => ({
               lat: latitude,
-              lng: longitude,
+              lng: longitude
             }))
           ),
           centerPoints: "",
-          zoneType: "Polygon",
+          zoneType: "Polygon"
         });
       } else if (circleData.radius) {
         setForm({
           ...Form,
           latlngCordinates: circleData.radius.toString(),
           centerPoints: circleData.latlng,
-          zoneType: "Circle",
+          zoneType: "Circle"
         });
       } else {
         setForm((prevForm) => ({
           ...prevForm,
           latlngCordinates: "",
-          centerPoints: "",
+          centerPoints: ""
         }));
       }
     }
@@ -140,14 +145,14 @@ export default function AddZoneComp() {
   const handlePolygonSave = (coordinates: [number, number][]) => {
     const zoneCoords = coordinates.slice(0, -1).map(([lat, lng]) => ({
       latitude: lat,
-      longitude: lng,
+      longitude: lng
     }));
 
     if (drawShape == true) {
       const formattedCoordinate: [number, number][] = zoneCoords.map(
         (coord: { latitude: number; longitude: number }) => [
           coord.latitude,
-          coord.longitude,
+          coord.longitude
         ]
       );
 
@@ -172,7 +177,7 @@ export default function AddZoneComp() {
       const updateCircleData = (newLatlng: string, newRadius: string): void => {
         setCircleData({
           latlng: newLatlng,
-          radius: newRadius,
+          radius: newRadius
         });
       };
       updateCircleData(circlePoint, radius);
@@ -186,6 +191,9 @@ export default function AddZoneComp() {
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setForm({ ...Form, [name]: value });
+    if (value === "Restricted-Area") {
+      setForm({ ...Form, GeoFenceType: value });
+    }
   };
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -203,39 +211,39 @@ export default function AddZoneComp() {
       if (session) {
         const newformdata = {
           ...Form,
-          clientId: session?.clientId,
+          clientId: session?.clientId
         };
 
         const response = await toast.promise(
           postZoneDataByClientId({
             token: session?.accessToken,
-            newformdata: newformdata,
+            newformdata: newformdata
           }),
           {
             loading: "Saving data...",
             success: "Data saved successfully!",
-            error: "Error saving data. Please try again.",
+            error: "Error saving data. Please try again."
           },
           {
             style: {
               border: "1px solid #00B56C",
               padding: "16px",
-              color: "#1A202C",
+              color: "#1A202C"
             },
             success: {
               duration: 2000,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
+                secondary: "#FFFAEE"
+              }
             },
             error: {
               duration: 2000,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
+                secondary: "#FFFAEE"
+              }
+            }
           }
         );
 
@@ -281,7 +289,7 @@ export default function AddZoneComp() {
         ).map((latLng: L.LatLng) => [latLng.lat, latLng.lng]);
         const zoneCoords = coordinates.map(([lat, lng]) => ({
           latitude: lat,
-          longitude: lng,
+          longitude: lng
         }));
         setPolygondata(zoneCoords);
       } else if (layer instanceof L.Circle) {
@@ -332,31 +340,41 @@ export default function AddZoneComp() {
             <label className="text-black text-md w-full font-popins font-medium">
               <span className="text-red">*</span> Geofence:{" "}
             </label>
-            <Select
-              onChange={handleChange}
-              value={Form?.GeoFenceType}
-              className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
-              placeholder="geofence"
-              // required
-              name="GeoFenceType"
-              displayEmpty
-            >
-              <MenuItem value="" selected disabled hidden>
-                Select Geofence Type
-              </MenuItem>
-              <MenuItem className="hover_add_zone" value="On-Site">
-                On-Site
-              </MenuItem>
-              <MenuItem className="hover_add_zone" value="Off-Site">
-                Off-Site
-              </MenuItem>
-              <MenuItem className="hover_add_zone" value="City-Area">
-                City-Area
-              </MenuItem>
-              <MenuItem className="hover_add_zone" value="Restricted-Area">
-                Restricted-Area
-              </MenuItem>
-            </Select>
+            {session?.clickToCall === true ? (
+              <Select
+                onChange={handleChange}
+                value={Form?.GeoFenceType}
+                className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
+                placeholder="geofence"
+                // required
+                name="GeoFenceType"
+                displayEmpty
+              >
+                <MenuItem value="" selected disabled hidden>
+                  Select Geofence Type
+                </MenuItem>
+                <MenuItem value="On-Site">On-Site</MenuItem>
+                <MenuItem value="Off-Site">Off-Site</MenuItem>
+                <MenuItem value="City-Area">City-Area</MenuItem>
+                <MenuItem value="Restricted-Area">Restricted-Area</MenuItem>
+              </Select>
+            ) : (
+              <Select
+                onChange={handleChange}
+                value={Form?.GeoFenceType}
+                className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
+                placeholder="geofence"
+                // required
+                name="GeoFenceType"
+                displayEmpty
+              >
+                <MenuItem value="" selected disabled hidden>
+                  Select Geofence Type
+                </MenuItem>
+                <MenuItem value="On-Site">On-Site</MenuItem>
+                <MenuItem value="Off-Site">Off-Site</MenuItem>
+              </Select>
+            )}
             <br></br>
             <br></br>
             <label className="text-black text-md w-full font-popins font-medium">
@@ -543,7 +561,7 @@ export default function AddZoneComp() {
                           circle: drawShape,
                           marker: false,
                           circlemarker: false,
-                          rectangle: false,
+                          rectangle: false
                         }}
                       />
                       {shapeType === "Polygon" && polygondataById.length > 0 ? (
@@ -575,7 +593,7 @@ export default function AddZoneComp() {
                           circle: true,
                           marker: false,
                           circlemarker: false,
-                          rectangle: false,
+                          rectangle: false
                         }}
                       />
                       {shapeType === "Polygon" && polygondataById.length > 0 ? (

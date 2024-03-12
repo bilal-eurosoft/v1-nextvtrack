@@ -19,5 +19,6 @@ declare module 'next-auth' {
     exp: number
     jti: string
     userRole: string
+    clickToCall: Boolean
   }
 }
