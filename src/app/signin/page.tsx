@@ -48,6 +48,10 @@ export default function LoginPage() {
       toast.error("Invalid User Or Password", {
         position: "top-center",
       });
+    } else {
+      toast.error("License  is Expire", {
+        position: "top-center",
+      });
     }
     setLoading(false);
   };

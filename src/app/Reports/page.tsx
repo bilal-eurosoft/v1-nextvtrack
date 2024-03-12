@@ -47,7 +47,7 @@ export default function Reports() {
   const [enddate, setenddate] = useState(new Date());
   // suraksha code
   const [trisdata, setTrisdata] = useState<TripsByBucket[]>([]);
-  const [rowsPerPages, setRowsPerPage] = useState(10);
+  const [rowsPerPages, setRowsPerPage] = useState(18);
   const [currentPage, setCurrentPage] = useState(0);
   const [columnHeaders, setColumnHeaders] = useState<
     (
@@ -156,7 +156,7 @@ export default function Reports() {
     setCurrentPage(newPage);
   };
 
-  console.log("fileter", filterData);
+  // console.log("fileter", filterData);
   const [Ignitionreport, setIgnitionreport] = useState<IgnitionReport>({
     TimeZone: session?.timezone || "",
     VehicleReg: "",
@@ -359,7 +359,7 @@ export default function Reports() {
             );
             // suraksha code
             if (response.success === true) {
-              console.log("Trips Data isssssssss:", response);
+              // console.log("Trips Data isssssssss:", response);
               //  setIsFormSubmitted(true);
               setTrisdata(response.data.tableData);
 
@@ -451,7 +451,7 @@ export default function Reports() {
                 | "Type"
               )[] = [];
               if (Ignitionreport.reportType.toString() === "Trip") {
-                console.log("trips data ", response.data);
+                // console.log("trips data ", response.data);
 
                 if (response.data.clientModelProfile) {
                   newColumnHeaders = [
@@ -490,7 +490,7 @@ export default function Reports() {
 
                 setcustomHeaderTitles(custom1HeaderTitles);
               } else if (Ignitionreport.reportType.toString() === "Ignition") {
-                console.log("ignition", response.data.tableData);
+                // console.log("ignition", response.data.tableData);
                 newColumnHeaders = ["0", "1", "2", "3", "4", "5"];
                 custom1HeaderTitles = [
                   "event",
@@ -502,7 +502,7 @@ export default function Reports() {
                 ];
                 setcustomHeaderTitles(custom1HeaderTitles);
               } else if (Ignitionreport.reportType.toString() === "Events") {
-                console.log("event", response.data.tableData);
+                // console.log("event", response.data.tableData);
                 const filteredData = response.data.tableData.filter(
                   (eventitem: { event: string }) =>
                     eventitem.event !== "ignitionOn" &&
@@ -514,7 +514,7 @@ export default function Reports() {
               } else if (
                 Ignitionreport.reportType.toString() === "IdlingActivity"
               ) {
-                console.log("idling---------", response.data.tableData);
+                // console.log("idling---------", response.data.tableData);
 
                 // Constructing new column headers based on the data format
                 newColumnHeaders = ["0", "1", "2"];
@@ -523,7 +523,6 @@ export default function Reports() {
               } else if (
                 Ignitionreport.reportType.toString() === "DetailReportByStreet"
               ) {
-                console.log("streets", response.data);
                 newColumnHeaders = ["0", "1", "2", "3", "4", "5", "6", "7"];
                 custom1HeaderTitles = [
                   "BeginingDateTime",
@@ -584,7 +583,6 @@ export default function Reports() {
     }
   };
   const handleInputChangeSelect = (e: any) => {
-    console.log("ee", e);
     // const { value, label } = e;
     if (!e) return;
     setIgnitionreport((prevReport: any) => ({
@@ -1374,114 +1372,126 @@ export default function Reports() {
       {/* Render your table below the form */}
 
       {trisdata && trisdata.length > 0 && (
-        <div className="mt-8 mx-auto height_table">
-          <div style={{ width: "100%", borderRadius: "2px" }}>
-            <table className="w-full border-collapse border border-gray-300">
-              <thead
-                style={{ position: "sticky", top: -1 }}
-                className="bg-green"
-              >
-                <tr>
-                  {customHeaderTitles.map((header, index) => (
-                    <th
-                      key={index}
-                      className="border border-gray-300 px-4 py-2"
-                    >
-                      <span style={{ color: "white" }}>{header}</span>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filterData?.map((trip, tripIndex) => (
-                  <tr key={tripIndex}>
-                    {columnHeaders.map((header, headerIndex) => {
-                      const dataKey = header.replace(
-                        /\s+/g,
-                        ""
-                      ) as keyof TripsByBucket;
-                      return (
-                        <td
-                          key={headerIndex}
-                          className="border border-gray-300 px-4 py-2"
-                        >
-                          {header === "TripStart" ||
-                          header === "TripEnd" ||
-                          header === "date" ||
-                          header === "BeginingDateTime" ||
-                          header === "EndingDateTime" ? (
-                            <>
-                              {moment(trip[dataKey]).format("MMM D, YYYY")}{" "}
-                              {trip[dataKey] &&
-                                trip[dataKey]
-                                  .toString()
-                                  .split("T")[1]
-                                  ?.trim()
-                                  ?.slice(0, -1)
-                                  .trim()
-                                  .split(".")[0]}
-                            </>
-                          ) : header === "TripDuration" ? (
-                            `${trip.TripDurationHr} hrs ${trip.TripDurationMins} mins`
-                          ) : header === "DriverName" && !trip[dataKey] ? (
-                            "Driver Not Assigned"
-                          ) : (
-                            trip[dataKey]?.toString() ?? ""
-                          )}
-                          {header === "Address" && trip.OsmElement
-                            ? `${trip.OsmElement.display_name.split(",")[0]} ${
-                                trip.OsmElement.display_name.split(",")[1]
-                              } ${trip.OsmElement.display_name.split(",")[2]}`
-                            : ""}
-                          {}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-
-                <tr
-                  style={{ position: "sticky", bottom: 0, zIndex: 2 }}
+        <div>
+          <div className="mt-8 mx-auto height_table">
+            <div style={{ width: "100%", borderRadius: "2px" }}>
+              <table className="w-full border-collapse border border-gray-300">
+                <thead
+                  style={{ position: "sticky", top: -1 }}
                   className="bg-green"
                 >
-                  {calculateTotalDurationAndDistance(trisdata) &&
-                    calculateTotalDurationAndDistance(trisdata).duration !==
-                      "NaN hrs NaN mins" && (
-                      <td colSpan={3}>
-                        <span style={{ color: "white" }}>Total:</span>
-                      </td>
-                    )}
-                  {calculateTotalDurationAndDistance(trisdata) &&
-                    calculateTotalDurationAndDistance(trisdata).duration !==
-                      "NaN hrs NaN mins" && (
-                      <td
-                        colSpan={1}
+                  <tr>
+                    {customHeaderTitles.map((header, index) => (
+                      <th
+                        key={index}
                         className="border border-gray-300 px-4 py-2"
                       >
-                        <span style={{ color: "white" }}>
-                          {calculateTotalDurationAndDistance(trisdata).duration}
-                        </span>
-                      </td>
-                    )}
-                  <td
-                    colSpan={columnHeaders.length}
-                    className="border border-gray-300 px-4 py-2"
+                        <p className="text-white text-start font-popins font-medium">
+                          {header}
+                        </p>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filterData?.map((trip, tripIndex) => (
+                    <tr key={tripIndex}>
+                      {columnHeaders.map((header, headerIndex) => {
+                        const dataKey = header.replace(
+                          /\s+/g,
+                          ""
+                        ) as keyof TripsByBucket;
+                        return (
+                          <td
+                            key={headerIndex}
+                            className="border border-gray-300 px-4 py-2"
+                          >
+                            {header === "TripStart" ||
+                            header === "TripEnd" ||
+                            header === "date" ||
+                            header === "BeginingDateTime" ||
+                            header === "EndingDateTime" ? (
+                              <>
+                                {moment(trip[dataKey]).format("MMM D, YYYY")}{" "}
+                                {trip[dataKey] &&
+                                  trip[dataKey]
+                                    .toString()
+                                    .split("T")[1]
+                                    ?.trim()
+                                    ?.slice(0, -1)
+                                    .trim()
+                                    .split(".")[0]}
+                              </>
+                            ) : header === "TripDuration" ? (
+                              `${trip.TripDurationHr} hrs ${trip.TripDurationMins} mins`
+                            ) : header === "DriverName" && !trip[dataKey] ? (
+                              "Driver Not Assigned"
+                            ) : (
+                              trip[dataKey]?.toString() ?? ""
+                            )}
+                            {header === "Address" && trip.OsmElement
+                              ? `${
+                                  trip.OsmElement.display_name.split(",")[0]
+                                } ${
+                                  trip.OsmElement.display_name.split(",")[1]
+                                } ${trip.OsmElement.display_name.split(",")[2]}`
+                              : ""}
+                            {}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+
+                  <tr
+                    style={{ position: "sticky", bottom: 0, zIndex: 2 }}
+                    className="bg-green"
                   >
                     {calculateTotalDurationAndDistance(trisdata) &&
                       calculateTotalDurationAndDistance(trisdata).duration !==
                         "NaN hrs NaN mins" && (
-                        <span style={{ color: "white" }}>
-                          {calculateTotalDurationAndDistance(trisdata).distance}{" "}
-                          miles
-                        </span>
+                        <td colSpan={3}>
+                          <span style={{ color: "white" }}>&nbsp; Total:</span>
+                        </td>
                       )}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    {calculateTotalDurationAndDistance(trisdata) &&
+                      calculateTotalDurationAndDistance(trisdata).duration !==
+                        "NaN hrs NaN mins" && (
+                        <td
+                          colSpan={1}
+                          className="border border-gray-300 px-4 py-2"
+                        >
+                          <span style={{ color: "white" }}>
+                            {
+                              calculateTotalDurationAndDistance(trisdata)
+                                .duration
+                            }
+                          </span>
+                        </td>
+                      )}
+                    <td
+                      colSpan={columnHeaders.length}
+                      className="border border-gray-300 px-4 py-2"
+                    >
+                      {calculateTotalDurationAndDistance(trisdata) &&
+                        calculateTotalDurationAndDistance(trisdata).duration !==
+                          "NaN hrs NaN mins" && (
+                          <span style={{ color: "white" }}>
+                            {
+                              calculateTotalDurationAndDistance(trisdata)
+                                .distance
+                            }{" "}
+                            miles
+                          </span>
+                        )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
           <TablePagination
-            rowsPerPageOptions={[5, 12, 20]} // Add 11 to the rowsPerPageOptions array
+            rowsPerPageOptions={[5, 10, 18, 25]} // Add 11 to the rowsPerPageOptions array
             component="div"
             count={trisdata.length}
             rowsPerPage={rowsPerPages}
@@ -1489,6 +1499,7 @@ export default function Reports() {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             className="bg-bgLight table_pagination"
+            style={{ height: "5vh" }}
           />
         </div>
       )}

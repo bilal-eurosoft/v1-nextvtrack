@@ -102,7 +102,7 @@ export default function DriverProfile() {
       setShowCardNumber(true);
     }
 
-    console.log("ids", id);
+    // console.log("ids", id);
     if (id.isAvailable == true) {
       setOpenEdit(true);
     } else {
@@ -254,7 +254,7 @@ export default function DriverProfile() {
   const id: any = selectedData?._id;
 
   const handleDriverEditedSubmit = async (e: React.FormEvent, value: any) => {
-    console.log("value", value, "=====");
+    // console.log("value", value, "=====");
     e.preventDefault();
     const payLoad: any = {
       id: selectedData.id,
@@ -280,7 +280,7 @@ export default function DriverProfile() {
             ...payLoad,
             clientId: session?.clientId,
           };
-          console.log("value", value, "=====2");
+          // console.log("value", value, "=====2");
 
           const response = await toast.promise(
             postDriverDataByClientId({
@@ -314,7 +314,7 @@ export default function DriverProfile() {
               },
             }
           );
-          console.log("value", selectedData, "=====3");
+          // console.log("value", selectedData, "=====3");
 
           const response2 = await toast.promise(
             AssignRfidtodriver(session?.accessToken, {
@@ -469,7 +469,7 @@ export default function DriverProfile() {
       console.error("Error fetching zone data:", error);
     }
   };
-  console.log("rfids", getRfid);
+  // console.log("rfids", getRfid);
 
   useEffect(() => {
     vehicleListData();
@@ -661,7 +661,7 @@ export default function DriverProfile() {
     });
   };
 
-  console.log("drivers", DriverData);
+  // console.log("drivers", DriverData);
   const test = 20;
   return (
     <div className="main_driver">

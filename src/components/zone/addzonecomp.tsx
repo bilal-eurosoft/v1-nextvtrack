@@ -17,7 +17,8 @@ import { Circle } from "react-leaflet/Circle";
 import { LayerGroup } from "leaflet";
 import { MenuItem, Select } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
-
+import "leaflet/dist/leaflet.css";
+import "leaflet-draw/dist/leaflet.draw.css";
 import "./editZone.css";
 const MapContainer = dynamic(
   () => import("react-leaflet").then((module) => module.MapContainer),

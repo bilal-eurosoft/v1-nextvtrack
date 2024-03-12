@@ -6,8 +6,10 @@ import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { forgetPasswordClientId } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
-import { toast } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
+
 import logo from "../../../public/Images/logo.png";
+import { base64encode, base64decode } from "nodejs-base64";
 
 import "./verification.css";
 export default function Verification() {
@@ -16,59 +18,67 @@ export default function Verification() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id: any = searchParams.get("q");
-
-  const decodedValue = decodeURIComponent(id);
+  // console.log(base64decode(id))
+  // const decodedValue = decodeURIComponent(id);
+  // console.log(decodedValue);
   const [formData, setFormData] = useState({
     password: "",
-    link: id,
+    link: base64decode(id),
   });
 
+  const [inputConfirmPassword, setinputConfirmPassword] = useState("");
+
   // Use the decoded value in your component
-  console.log('Decoded value of "q":', decodedValue);
+  // console.log('Decoded value of "q":', decodedValue);
   const handleInputChange = (key: any, e: any) => {
     setFormData({ ...formData, [key]: e.target.value });
   };
-
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    console.log("formData", formData);
     const newformdata = {
       ...formData,
       clientId: session?.clientId,
     };
+    if (inputConfirmPassword == formData.password) {
+      const response = await toast.promise(
+        forgetPasswordClientId({
+          token: session?.accessToken,
+          newformdata: newformdata,
+        }),
+        {
+          loading: "Saving data...",
+          success: "Data saved successfully!",
+          error: "Error saving data. Please try again.",
+        },
+        {
+          style: {
+            border: "1px solid #00B56C",
+            padding: "16px",
+            color: "#1A202C",
+          },
+          success: {
+            duration: 2000,
+            iconTheme: {
+              primary: "#00B56C",
+              secondary: "#FFFAEE",
+            },
+          },
+          error: {
+            duration: 2000,
+            iconTheme: {
+              primary: "#00B56C",
+              secondary: "#FFFAEE",
+            },
+          },
+        }
+      );
 
-    const response = await toast.promise(
-      forgetPasswordClientId({
-        token: session?.accessToken,
-        newformdata: newformdata,
-      }),
-      {
-        loading: "Saving data...",
-        success: "Data saved successfully!",
-        error: "Error saving data. Please try again.",
-      },
-      {
-        style: {
-          border: "1px solid #00B56C",
-          padding: "16px",
-          color: "#1A202C",
-        },
-        success: {
-          duration: 2000,
-          iconTheme: {
-            primary: "#00B56C",
-            secondary: "#FFFAEE",
-          },
-        },
-        error: {
-          duration: 2000,
-          iconTheme: {
-            primary: "#00B56C",
-            secondary: "#FFFAEE",
-          },
-        },
-      }
-    );
+      toast.success("Password Successfully Updated");
+    } else {
+      toast.error("please Enter Same Passord", {
+        position: "top-center",
+      });
+    }
   };
 
   return (
@@ -76,6 +86,8 @@ export default function Verification() {
       className="w-100 h-screen bg-no-repeat bg-cover bg-center"
       style={{ backgroundImage: "url(Images/bgLogo.png)" }}
     >
+      {/* <ToastContainer /> */}
+
       {loading ? (
         <div role="status">
           <svg
@@ -140,6 +152,35 @@ export default function Verification() {
                   </div>
                 </div> */}
               </div>
+              <div className="lg:mx-0 mx-5">
+                <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
+                  <div className="col-span-12 ">
+                    <input
+                      required
+                      placeholder="Please Enter Confirm Password"
+                      className="outline-none w-full text-black font-bold"
+                      type="text"
+                      value={inputConfirmPassword}
+                      onChange={(e: any) =>
+                        setinputConfirmPassword(e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+
+                {/* <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
+                  <div className="col-span-12 ">
+                    <input
+                      required
+                      placeholder="Please Enter Your Confirm Password"
+                      className="outline-none w-full text-black font-bold"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e: any) => handleInputChange("password", e)}
+                    />
+                  </div>
+                </div> */}
+              </div>
 
               <div className="lg:mx-0 px-20">
                 <button
@@ -155,6 +196,7 @@ export default function Verification() {
           </div>
         </div>
       )}
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }

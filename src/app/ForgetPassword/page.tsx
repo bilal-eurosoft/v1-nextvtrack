@@ -14,8 +14,8 @@ export default function ForgetPassword() {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    email: ""
-    // userName: "",
+    email: "",
+    userName: "",
   });
 
   const handleInputChange = (key: any, e: any) => {
@@ -27,39 +27,39 @@ export default function ForgetPassword() {
 
     const newformdata = {
       ...formData,
-      clientId: session?.clientId
+      clientId: session?.clientId,
     };
 
     const response = await toast.promise(
       forgetEmailByClientId({
         token: session?.accessToken,
-        newformdata: newformdata
+        newformdata: newformdata,
       }),
       {
         loading: "Saving data...",
         success: "Data saved successfully!",
-        error: "Error saving data. Please try again."
+        error: "Error saving data. Please try again.",
       },
       {
         style: {
           border: "1px solid #00B56C",
           padding: "16px",
-          color: "#1A202C"
+          color: "#1A202C",
         },
         success: {
           duration: 2000,
           iconTheme: {
             primary: "#00B56C",
-            secondary: "#FFFAEE"
-          }
+            secondary: "#FFFAEE",
+          },
         },
         error: {
           duration: 2000,
           iconTheme: {
             primary: "#00B56C",
-            secondary: "#FFFAEE"
-          }
-        }
+            secondary: "#FFFAEE",
+          },
+        },
       }
     );
 
@@ -159,14 +159,14 @@ export default function ForgetPassword() {
               <div className="lg:mx-0 mx-5">
                 <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
                   <div className="col-span-12 ">
-                    {/* <input
+                    <input
                       required
                       placeholder="Please Input Your Name"
                       className="outline-none w-full text-black font-bold"
                       type="text"
                       value={formData.userName}
                       onChange={(e: any) => handleInputChange("userName", e)}
-                    /> */}
+                    />
                   </div>
                 </div>
 

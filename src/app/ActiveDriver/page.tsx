@@ -81,7 +81,7 @@ export default function DriverProfile() {
   const handleChangeDriver = (key: any, e: any) => {
     setFormDate({ ...formData, [key]: e.target.value });
   };
-  console.log("data", DriverData);
+  // console.log("data", DriverData);
   const handleDriverSubmit = async (e: any) => {
     e.preventDefault();
 

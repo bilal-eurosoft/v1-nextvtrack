@@ -1,7 +1,10 @@
 import { IgnitionReport, replayreport } from "@/types/IgnitionReport";
 import { zonelistType } from "@/types/zoneType";
 
-var URL = "http://172.16.10.46";
+var URL = "https://backend.vtracksolutions.com";
+// surakhSha api
+// "http0";
+
 // 'http://172.16.10.46:80'
 
 //""http://172.16.11.210:3001; //"http://172.16.11.210:3001";
