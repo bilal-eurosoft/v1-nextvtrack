@@ -849,14 +849,14 @@ export default function Reports() {
       >
         <div className="bg-green-50 mt-5">
           <div className="grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-2 mt-5 mb-1 grid-cols-2  px-10 gap-2 ">
-            <div className="lg:col-span-3 md:col-span-1 sm:col-span-1 col-span-2 ">
+            <div className="xl:col-span-3 lg:col-span-5 md:col-span-1 sm:col-span-1 col-span-2 ">
               <div className="grid grid-cols-12">
-                <div className="col-span-3 mt-2">
+                <div className="xl:col-span-3 lg:col-span-4 sm:col-span-10 col-span-12 mt-2">
                   <label className="text-labelColor ">
                     Report Type: &nbsp;&nbsp;
                   </label>
                 </div>
-                <div className="col-span-8">
+                <div className="lg:col-span-8 md:col-span-8 col-span-12">
                   {/* <Select
                     className="h-8 text-sm w-full text-gray  outline-green"
                     name="reportType"
@@ -950,9 +950,9 @@ export default function Reports() {
                 </div>
               </div>
             </div>
-            <div className="lg:col-span-3 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4">
+            <div className="xl:col-span-3 lg:col-span-6 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4">
               <div className="grid grid-cols-12">
-                <div className="col-span-2 mt-2">
+                <div className="lg:col-span-2 col-span-12 mt-2">
                   <label className="text-labelColor">
                     Vehicle: &nbsp;&nbsp;{" "}
                   </label>
@@ -982,7 +982,7 @@ export default function Reports() {
                     </MenuItem>
                   ))}
                 </Select> */}
-                <div className="col-span-8">
+                <div className="lg:col-span-8 col-span-12">
                   <Select
                     value={Ignitionreport.vehicleNo}
                     onChange={handleInputChangeSelect}
@@ -1023,7 +1023,7 @@ export default function Reports() {
             {showWeekDays && (
               <>
                 <div
-                  className="lg:col-span-1 md:col-span-2 sm:col-span-2 mt-2"
+                  className="xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2 mt-2"
                   style={{ display: "flex", justifyContent: "center" }}
                 >
                   <label>
@@ -1040,7 +1040,7 @@ export default function Reports() {
                   </label>
                 </div>
                 <div
-                  className="lg:col-span-1 md:col-span-2 sm:col-span-2 mt-2"
+                  className="xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2 mt-2"
                   style={{ display: "flex", justifyContent: "center" }}
                 >
                   <label>
@@ -1057,7 +1057,7 @@ export default function Reports() {
                   </label>
                 </div>
                 <div
-                  className="lg:col-span-1 md:col-span-2 mt-2"
+                  className="xl:col-span-1 lg:col-span-2 md:col-span-1 mt-2"
                   style={{ display: "flex", justifyContent: "center" }}
                 >
                   <label>
@@ -1074,7 +1074,7 @@ export default function Reports() {
                   </label>
                 </div>
                 <div
-                  className="lg:col-span-1 md:col-span-2 mt-2"
+                  className="xl:col-span-1 lg:col-span-2 md:col-span-1 mt-2"
                   style={{ display: "flex", justifyContent: "center" }}
                 >
                   <label>
@@ -1095,7 +1095,7 @@ export default function Reports() {
             )}
             {isCustomPeriod && (
               <>
-                <div className="lg:col-span-2 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4 ">
+                <div className="xl:col-span-2 lg:col-span-3 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4 ">
                   <label className="text-labelColor">
                     From Date: &nbsp;&nbsp;&nbsp;
                     <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
@@ -1127,7 +1127,7 @@ export default function Reports() {
                   /> */}
                   </label>
                 </div>
-                <div className="lg:col-span-2 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0  w-full ">
+                <div className="xl:col-span-2 lg:col-span-3  md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0  w-full ">
                   <div
                     style={{
                       display: "flex",
@@ -1171,7 +1171,7 @@ export default function Reports() {
                 </div>
               </>
             )}
-            <div className="lg:col-span-1">
+            <div className="xl:col-span-1 lg:col-span-2">
               <button
                 className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
                         ${
@@ -1203,7 +1203,7 @@ export default function Reports() {
                 Submit
               </button>{" "}
             </div>
-            <div className="lg:col-span-1 -ms-5">
+            <div className="xl:col-span-1 lg:col-span-2 -ms-5">
               <button
                 className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
               ${

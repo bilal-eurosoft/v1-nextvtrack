@@ -15,13 +15,15 @@ import "./verification.css";
 export default function Verification() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setshowConfirmPassword] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const id: any = searchParams.get("q");
   // console.log(base64decode(id))
   // const decodedValue = decodeURIComponent(id);
   // console.log(decodedValue);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     password: "",
     link: base64decode(id),
   });
@@ -39,48 +41,68 @@ export default function Verification() {
       ...formData,
       clientId: session?.clientId,
     };
-    if (inputConfirmPassword == formData.password) {
-      const response = await toast.promise(
-        forgetPasswordClientId({
-          token: session?.accessToken,
-          newformdata: newformdata,
-        }),
-        {
-          loading: "Saving data...",
-          success: "Data saved successfully!",
-          error: "Error saving data. Please try again.",
-        },
-        {
-          style: {
-            border: "1px solid #00B56C",
-            padding: "16px",
-            color: "#1A202C",
-          },
-          success: {
-            duration: 2000,
-            iconTheme: {
-              primary: "#00B56C",
-              secondary: "#FFFAEE",
-            },
-          },
-          error: {
-            duration: 2000,
-            iconTheme: {
-              primary: "#00B56C",
-              secondary: "#FFFAEE",
-            },
-          },
-        }
+    if (formData.password.length < 6 || inputConfirmPassword.length < 6) {
+      toast.error("Password Max Lenght Is 6 Character");
+    } else if (
+      !/[!@#$%^&*(),.?":{}|<>]/.test(formData.password || inputConfirmPassword)
+    ) {
+      toast.error(
+        "Please include at least one special character in the password",
+        { position: "top-center" }
       );
-
-      toast.success("Password Successfully Updated");
     } else {
-      toast.error("please Enter Same Passord", {
-        position: "top-center",
-      });
+      if (inputConfirmPassword == formData.password) {
+        const response = await toast.promise(
+          forgetPasswordClientId({
+            token: session?.accessToken,
+            newformdata: newformdata,
+          }),
+          {
+            loading: "Saving data...",
+            success: "Data saved successfully!",
+            error: "Error saving data. Please try again.",
+          },
+          {
+            style: {
+              border: "1px solid #00B56C",
+              padding: "16px",
+              color: "#1A202C",
+            },
+            success: {
+              duration: 2000,
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            },
+            error: {
+              duration: 2000,
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            },
+          }
+        );
+
+        toast.success("Password Successfully Updated");
+        setFormData({
+          password: "",
+        });
+        setinputConfirmPassword("");
+      } else {
+        toast.error("please Enter Same Passord", {
+          position: "top-center",
+        });
+      }
     }
   };
-
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+  const handleShowPasswordConfirm = () => {
+    setshowConfirmPassword(!showConfirmPassword);
+  };
   return (
     <div
       className="w-100 h-screen bg-no-repeat bg-cover bg-center"
@@ -127,15 +149,58 @@ export default function Verification() {
             <form className="space-y-6 mx-6" onSubmit={handleSubmit}>
               <div className="lg:mx-0 mx-5">
                 <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
-                  <div className="col-span-12 ">
+                  {/* <div className="col-span-12 ">
                     <input
                       required
                       placeholder="Please Enter Your New Password"
                       className="outline-none w-full text-black font-bold"
-                      type="text"
+                      type={showPassword ? "text" : "password"}
                       value={formData.password}
                       onChange={(e: any) => handleInputChange("password", e)}
                     />
+                  </div> */}
+                  <div className="col-span-11 ">
+                    <input
+                      required
+                      placeholder="Please Enter Your New Password"
+                      className="outline-none w-full text-black font-bold"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e: any) => handleInputChange("password", e)}
+                    />
+                  </div>
+                  <div className="col-span-1 cursor-pointer">
+                    {showPassword ? (
+                      <svg
+                        className="h-4 lg:w-16 w-10 text-gray mt-1"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        onClick={handleShowPassword}
+                      >
+                        {" "}
+                        <circle cx="12" cy="12" r="10" />{" "}
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="h-4 lg:w-16 w-10 text-gray mt-1"
+                        onClick={handleShowPassword}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                        />
+                      </svg>
+                    )}
                   </div>
                 </div>
 
@@ -154,17 +219,62 @@ export default function Verification() {
               </div>
               <div className="lg:mx-0 mx-5">
                 <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
-                  <div className="col-span-12 ">
+                  {/* <div className="col-span-12 ">
                     <input
                       required
                       placeholder="Please Enter Confirm Password"
                       className="outline-none w-full text-black font-bold"
-                      type="text"
+                      type={showPassword ? "text" : "password"}
                       value={inputConfirmPassword}
                       onChange={(e: any) =>
                         setinputConfirmPassword(e.target.value)
                       }
                     />
+                  </div> */}
+                  <div className="col-span-11 ">
+                    <input
+                      required
+                      placeholder="Please Enter Confirm Password"
+                      className="outline-none w-full text-black font-bold"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={inputConfirmPassword}
+                      onChange={(e: any) =>
+                        setinputConfirmPassword(e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="col-span-1 cursor-pointer">
+                    {showConfirmPassword ? (
+                      <svg
+                        className="h-4 lg:w-16 w-10 text-gray mt-1"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        onClick={handleShowPasswordConfirm}
+                      >
+                        {" "}
+                        <circle cx="12" cy="12" r="10" />{" "}
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="h-4 lg:w-16 w-10 text-gray mt-1"
+                        onClick={handleShowPasswordConfirm}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                        />
+                      </svg>
+                    )}
                   </div>
                 </div>
 

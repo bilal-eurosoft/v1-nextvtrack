@@ -75,7 +75,7 @@ import MenuItem from "@mui/material/MenuItem";
 import car_icon from "../../../public/Images/journey_car_icon.png";
 import Select from "react-select";
 
-const { Option } = Select;
+// const { Option } = Select;
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -196,7 +196,6 @@ export default function journeyReplayComp() {
   const [activeTripColor, setactiveTripColor] = useState<any>("");
   const [loadingMap, setLaodingMap] = useState(false);
   const [expanded, setExpanded] = useState(null);
-  const [searchJourney, setsearchJourney] = useState(true);
 
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
     setExpanded(isExpanded ? panel : null);
@@ -500,9 +499,6 @@ export default function journeyReplayComp() {
     setTravelHistoryresponse([]);
     setClearMapData(false);
     setProgressWidth(0);
-    if (!Ignitionreport.period || !Ignitionreport.VehicleReg) {
-      toast.error("Select Vehicle And Days ");
-    }
     if (polylinedata.length > 0) {
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
     }
@@ -959,7 +955,6 @@ export default function journeyReplayComp() {
   //   setSelectedOption(newValue);
   // };
   const handleInputChangeSelect = (e: any) => {
-    setsearchJourney(false);
     if (!e) return;
     const { value, label } = e;
     setIgnitionreport((prevReport: any) => ({
@@ -1136,7 +1131,7 @@ export default function journeyReplayComp() {
               isClearable
               isSearchable
               noOptionsMessage={() => "No options available"}
-              className="   rounded-md w-full  outline-green border border-grayLight  "
+              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
               styles={{
                 control: (provided, state) => ({
                   ...provided,
@@ -1145,16 +1140,8 @@ export default function journeyReplayComp() {
                 }),
                 option: (provided, state) => ({
                   ...provided,
-                  backgroundColor: state.isSelected
-                    ? "#00B56C"
-                    : state.isFocused
-                    ? "#00B56C"
-                    : "transparent",
-                  color: state.isSelected
-                    ? "white"
-                    : state.isFocused
-                    ? "white"
-                    : "black",
+                  backgroundColor: state.isFocused ? "#00B56C" : "transparent", // Change 'blue' to your desired hover color
+                  color: state.isFocused ? "white" : "black", // Change 'white' to your desired text color
                   "&:hover": {
                     backgroundColor: "#00B56C",
                     color: "white"
@@ -1450,50 +1437,19 @@ export default function journeyReplayComp() {
               // </div>
             )}
           </div>
-          <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold flex justify-center items-center mt-2">
+
+          <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold flex justify-center items-center">
             {clearMapData ? (
               <button
                 onClick={handleClickClear}
-                // className={`bg-green py-2 px-8  rounded-md shadow-md  hover:shadow-gray transition duration-500 c`}
-                className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
-                ${
-                  (Ignitionreport.VehicleReg &&
-                    Ignitionreport.period === "today") ||
-                  (Ignitionreport.VehicleReg &&
-                    Ignitionreport.period === "yesterday") ||
-                  (Ignitionreport.VehicleReg &&
-                    Ignitionreport.period === "week") ||
-                  (Ignitionreport.VehicleReg &&
-                    Ignitionreport.period === "custom")
-                    ? ""
-                    : "opacity-50 cursor-not-allowed"
-                }`}
+                className={`bg-green py-2 px-8  rounded-md shadow-md  hover:shadow-gray transition duration-500 c`}
               >
                 Search
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
-                // className={`bg-green py-2 px-8  rounded-md shadow-md  ${
-                //   searchJourney
-                //     ? "cursor-not-allowed" ||
-                //       "hover:shadow-gray transition duration-500 "
-                //     : ""
-                // }`}
-                // disabled={searchJourney}
-                className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
-                        ${
-                          (Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "today") ||
-                          (Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "yesterday") ||
-                          (Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "week") ||
-                          (Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "custom")
-                            ? ""
-                            : "opacity-50 cursor-not-allowed"
-                        }`}
+                className={`bg-green py-2 px-8  rounded-md shadow-md  hover:shadow-gray transition duration-500 c`}
               >
                 Search
               </button>
@@ -2692,10 +2648,10 @@ export default function journeyReplayComp() {
                         <Select
                           onChange={(e: any) => setSpeedFactor(Number(e.value))}
                           options={SpeedOption}
-                          placeholder="1x"
+                          placeholder="Speed"
                           isSearchable
                           noOptionsMessage={() => "No options available"}
-                          className="rounded-md h-10 -mt-3 w-full outline-green border border-grayLight"
+                          className="rounded-md h-10 -mt-3 w-full outline-green border border-grayLight hover:border-green"
                           styles={{
                             control: (provided, state) => ({
                               ...provided,
@@ -2709,19 +2665,12 @@ export default function journeyReplayComp() {
                               top: "auto",
                               bottom: "100%" // Position the menu above the select input
                             }),
-
                             option: (provided, state) => ({
                               ...provided,
-                              backgroundColor: state.isSelected
+                              backgroundColor: state.isFocused
                                 ? "#00B56C"
-                                : state.isFocused
-                                ? "white"
                                 : "transparent",
-                              color: state.isSelected
-                                ? "white"
-                                : state.isFocused
-                                ? "black"
-                                : "black",
+                              color: state.isFocused ? "white" : "black",
                               "&:hover": {
                                 backgroundColor: "#00B56C",
                                 color: "white"
