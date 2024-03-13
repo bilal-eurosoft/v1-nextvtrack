@@ -2011,6 +2011,11 @@ export default function journeyReplayComp() {
 
                   {showZones &&
                     zoneList.map(function (singleRecord) {
+                      const isRestrictedArea =
+                        singleRecord.GeoFenceType === "Restricted-Area"; // && session?.clickToCall === true;
+                      const isCityArea =
+                        singleRecord.GeoFenceType === "City-Area"; // && session?.clickToCall === true;
+
                       return singleRecord.zoneType == "Circle" ? (
                         <>
                           <Circle
@@ -2019,6 +2024,13 @@ export default function journeyReplayComp() {
                               Number(singleRecord.centerPoints.split(",")[1])
                             ]}
                             radius={Number(singleRecord.latlngCordinates)}
+                            color={
+                              isCityArea
+                                ? "green"
+                                : isRestrictedArea
+                                ? "#b30000"
+                                : "blue"
+                            }
                           >
                             <Popup>{singleRecord.zoneName}</Popup>
                           </Circle>
@@ -2030,6 +2042,13 @@ export default function journeyReplayComp() {
                         <Polygon
                           key={singleRecord.zoneName}
                           positions={JSON.parse(singleRecord.latlngCordinates)}
+                          color={
+                            isCityArea
+                              ? "green"
+                              : isRestrictedArea
+                              ? "red"
+                              : "blue"
+                          }
                         >
                           <Popup>{singleRecord.zoneName}</Popup>
                         </Polygon>
@@ -2247,32 +2266,98 @@ export default function journeyReplayComp() {
               col-span-1 "
               ></div>
 
-              <div className="xl:col-span-1 lg:col-span-3  md:col-span-3 sm-col-span-3 col-span-4 text-end  ">
-                <div className="grid xl:grid-cols-12 lg:grid-cols-12  md:grid-cols-12   sm:grid-cols-12 grid-cols-12 bg-bgLight  py-2 shadow-lg rounded-md">
-                  <div className="xl:col-span-1"></div>
-                  <div className="xl:col-span-2 lg:col-span-2 md:col-span-1 sm:col-span-1  col-span-1 text-center ">
-                    <input
-                      type="checkbox"
-                      onChange={handleChangeChecked}
-                      onClick={handleZoneClick}
-                      checked={getCheckedInput}
-                      style={{ accentColor: "green" }}
-                    />
-                  </div>
-                  <div className="xl:col-span-8 lg:col-span-7 md:col-span-9 sm:col-span-9 col-span-9  ">
-                    <button className="text-sm font-popins font-bold">
-                      {/* <h1 className="xl:-ms-32 lg:-ms-24  sm:-ms-32 -ms-24 font-popins font-semibold"> */}{" "}
-                      Show Zones
-                      {/* </h1> */}
-                    </button>
-                  </div>
+              <div className="grid grid-cols-1 absolute shadow-lg rounded-md lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">
+                <div className="col-span-1" style={{ color: "green" }}>
+                  <input
+                    type="checkbox"
+                    onClick={() => {
+                      setShowZones(!showZones);
+                    }}
+                    className="mx-2  mt-1"
+                    style={{ accentColor: "green" }}
+                  />
+                  <button className="text-labelColor font-popins text-sm font-bold">
+                    Show Zones
+                  </button>
                 </div>
-                {/* <div
-                  className="grid grid-cols-11 mt-3"
-                  style={{ justifyContent: "center", display: "flex" }}
-                >
-                  <div className="col-span-9 bg-bgPlatBtn w-20 h-10 rounded-tr-full rounded-tl-full"></div>
-                </div> */}
+              </div>
+              <div
+                className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2"
+                style={{
+                  borderRadius: "10px",
+                  borderColor: "green",
+                  borderWidth: "3px",
+                  borderStyle: "solid"
+                }}
+              >
+                <div className="col-span-1" style={{ color: "green" }}>
+                  <input
+                    type="checkbox"
+                    onClick={() => {
+                      setShowZones(!showZones);
+                    }}
+                    className="mx-2 mt-1"
+                    style={{ accentColor: "green" }}
+                  />
+                  <button className="text-labelColor font-popins text-sm font-bold">
+                    Show Zones
+                  </button>
+                </div>
+
+                {/* Three rows with colored dots and text meaning */}
+                {showZones && (
+                  <>
+                    <div className="flex items-center mt-2 ml-2">
+                      <div className="lg:col-span-1">
+                        <svg
+                          className={`h-6 w-3 text-blue mr-2`}
+                          viewBox="0 0 24 24"
+                          fill="blue"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinejoin="round"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                        </svg>
+                      </div>
+                      <span className="text-sm text-labelColor">
+                        On/Off-site
+                      </span>
+                    </div>
+                    <div className="flex items-center mt-2 ml-2">
+                      <div className="lg:col-span-1">
+                        <svg
+                          className={`h-6 w-3 text-red mr-2`}
+                          viewBox="0 0 24 24"
+                          fill="red"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinejoin="round"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                        </svg>
+                      </div>
+                      <span className="text-sm text-labelColor">
+                        Restricted
+                      </span>
+                    </div>
+                    <div className="flex items-center mt-2 ml-2">
+                      <div className="lg:col-span-1">
+                        <svg
+                          className={`h-6 w-3 text-green mr-2`}
+                          viewBox="0 0 24 24"
+                          fill="green"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinejoin="round"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                        </svg>
+                      </div>
+                      <span className="text-sm text-labelColor">City Area</span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
             <div
