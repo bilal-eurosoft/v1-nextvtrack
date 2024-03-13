@@ -24,7 +24,7 @@ export default function LoginPage() {
 
   const [formData, setFormData] = useState({
     userName: "",
-    password: "",
+    password: ""
   });
   const { data: session } = useSession();
   const handleInputChange = (e: any) => {
@@ -38,7 +38,7 @@ export default function LoginPage() {
     const data = await signIn("credentials", {
       userName,
       password,
-      redirect: false,
+      redirect: false
     });
 
     if (data?.status === 200) {
@@ -46,11 +46,11 @@ export default function LoginPage() {
     }
     if (data?.status === 401) {
       toast.error("Invalid User Or Password", {
-        position: "top-center",
+        position: "top-center"
       });
     } else {
       toast.error("License  is Expire", {
-        position: "top-center",
+        position: "top-center"
       });
     }
     setLoading(false);
@@ -80,19 +80,19 @@ export default function LoginPage() {
       try {
         const users = await GetUsersByClientId({
           // token: session.accessToken,
-          clientId: clientIdparams,
+          clientId: clientIdparams
         });
 
         const licenseInfo = await GetLicenseById({
           // token: session.accessToken,
-          id: clientIdparams,
+          id: clientIdparams
         });
 
         const user = users[0];
         const data = await signIn("credentials", {
-          userName: licenseInfo[0].accountCode + "@" + user.userName,
+          userName: licenseInfo[0]?.accountCode + "@" + user.userName,
           password: user.password,
-          redirect: false,
+          redirect: false
         });
         if (data?.status === 200) {
           router.push("/liveTracking");
@@ -101,7 +101,7 @@ export default function LoginPage() {
         }
         if (data?.status === 401) {
           toast.error("Invalid Credential", {
-            position: "top-center",
+            position: "top-center"
           });
         }
       } catch (error) {
@@ -128,7 +128,7 @@ export default function LoginPage() {
         position: "relative",
         backgroundImage: "url(Images/bgLogo.png)",
         backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
+        backgroundSize: "cover"
         // filter: "blur(4px)",
         // zIndex: "-1 !important",
       }}
@@ -141,7 +141,7 @@ export default function LoginPage() {
               display: "flex",
               height: "100vh",
               justifyContent: "center",
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <Image
