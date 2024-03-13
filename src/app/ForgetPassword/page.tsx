@@ -5,7 +5,8 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { forgetEmailByClientId } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
-import { toast } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
+
 import logo from "../../../public/Images/logo.png";
 import "./forget.css";
 export default function ForgetPassword() {
@@ -62,7 +63,13 @@ export default function ForgetPassword() {
         },
       }
     );
-
+    toast.success("Send Verifaction Your Email", {
+      position: "top-center",
+    });
+    setFormData({
+      userName: "",
+      email: "",
+    });
     // if (session) {
     //   const newformdata: any = {
     //     ...formData,
@@ -204,6 +211,7 @@ export default function ForgetPassword() {
           </div>
         </div>
       )}
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }

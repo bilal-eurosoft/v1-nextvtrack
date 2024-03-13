@@ -246,7 +246,7 @@ export default function LoginPage() {
                 </div>
               </div>
               <div className="lg:mx-0 mx-5">
-                <div className="grid lg:grid-cols-12 grid-cols-12   rounded-md  py-1.5 text-labelColor shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-green  px-3 bg-white">
+                <div className="grid lg:grid-cols-12 grid-cols-12  rounded-md  py-1.5 text-labelColor shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-green  px-3 bg-white">
                   <div className="col-span-11 ">
                     <input
                       id="password"
