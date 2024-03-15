@@ -1,7 +1,7 @@
-import { IgnitionReport, replayreport } from "@/types/IgnitionReport";
+import { IgnitionReport, replayreport, commandrequest } from "@/types/IgnitionReport";
 import { zonelistType } from "@/types/zoneType";
 
-var URL = "https://backend.vtracksolutions.com"; //""http://172.16.11.210:3001; //"http://172.16.11.210:3001";
+var URL ="http://localhost:3001"// "https://backend.vtracksolutions.com"; //""http://172.16.11.210:3001; //"http://172.16.11.210:3001";
 // https://backend.vtracksolutions.com
 export async function getVehicleDataByClientId(clientId: string) {
   try {
@@ -50,6 +50,37 @@ export async function getClientSettingByClinetIdAndToken({
     return [];
   }
 }
+
+
+export async function portalGprsCommand({
+  token,
+  payload,
+}: {
+  token: string;
+  payload: commandrequest;
+}) {
+  try {
+    const response = await fetch(`${URL}/portal/GprsCommand`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log("Error fetching data");
+    return [];
+  }
+}
+
+
 
 export async function vehicleListByClientId({
   token,

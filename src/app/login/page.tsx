@@ -34,16 +34,17 @@ export default function LoginPage() {
       userName,
       password,
       redirect: false,
-    });
-
-    if (data?.status === 200) {
+    });   
+console.log(data)
+    if (data?.error) {
+      if (data.error) {
+        toast.error(data.error, {
+          position: "top-center",
+        });
+      }       
+    } else {      
       router.push("/liveTracking");
-    }
-    if (data?.status === 401) {
-      toast.error("Invalid Credential", {
-        position: "top-center",
-      });
-    }
+    } 
     setLoading(false);
   };
   const handleShowPassword = () => {
