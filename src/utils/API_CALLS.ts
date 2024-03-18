@@ -1,7 +1,7 @@
 import { IgnitionReport, replayreport } from "@/types/IgnitionReport";
 import { zonelistType } from "@/types/zoneType";
 
-var URL =  "https://backend.vtracksolutions.com";
+var URL = "https://backend.vtracksolutions.com";
 // var URL = 'http://172.16.10.47:80'
 
 // surakhSha api
@@ -350,18 +350,15 @@ export async function forgetEmailByClientId({
   newformdata: any;
 }) {
   try {
-    const response = await fetch(
-      "http://172.16.10.71:3001/forgotpassword/forgotpassword",
-      {
-        method: "POST",
-        headers: {
-          accept: "application/json, text/plain, */*",
-          authorization: `Bearer ${token}`,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(newformdata),
-      }
-    );
+    const response = await fetch(`${URL}/forgotpassword/forgotpassword`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(newformdata),
+    });
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
     }

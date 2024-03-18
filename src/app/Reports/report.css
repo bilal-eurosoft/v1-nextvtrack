@@ -78,7 +78,7 @@
     height: "75vh",
     marginTop: "-0.5%",
   }} */
-  padding-top: 1%;
+  margin-top: 1%;
   width: 100%;
   overflow-y: auto;
   height: 73vh;
@@ -104,6 +104,6 @@
 
 .css-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar
   .MuiTablePagination-actions {
-  -ms-flex-negative: 0;
-  display: flex;
+  -ms-flex-negative: 0 !important;
+  display: flex !important;
 }

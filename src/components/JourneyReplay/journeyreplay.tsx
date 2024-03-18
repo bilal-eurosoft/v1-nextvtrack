@@ -157,9 +157,11 @@ export default function journeyReplayComp() {
     TimeZone: session?.timezone || "",
     VehicleReg: "",
     clientId: session?.clientId || "",
-    fromDateTime: new Date(),
+    // fromDateTime: new Date(),
+    fromDateTime: "",
     period: "",
-    toDateTime: new Date(),
+    // toDateTime: new Date(),
+    toDateTime: "",
     unit: session?.unit || "",
   });
 
@@ -505,151 +507,156 @@ export default function journeyReplayComp() {
     setDataResponse(null);
     setExpanded(null);
 
-    if (!Ignitionreport.period || !Ignitionreport.VehicleReg) {
-      toast.error("Select Vehicle And Days ");
-    }
     if (polylinedata.length > 0) {
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
     }
     setCurrentPositionIndex(0);
     setLoading(true);
     setClearMapData(true);
-    if (session) {
-      const { VehicleReg, period } = await Ignitionreport;
-      if (period == "week") {
-        setWeekData(true);
-      }
-      if (period == "today") {
-        setWeekData(false);
-      }
-      if (VehicleReg && period) {
-        let newdata = {
-          ...Ignitionreport,
-        };
-        const timestart: string = "00:00:00";
-        const timeend: string = "23:59:59";
-        const currentDayOfWeek = new Date().getDay();
-        const currentDay = new Date().getDay();
-        const daysUntilMonday =
-          currentDayOfWeek === currentDay ? 7 : currentDayOfWeek - 1;
-        const fromDateTime = new Date();
-        fromDateTime.setDate(fromDateTime.getDate() - daysUntilMonday);
-        const toDateTime = new Date(fromDateTime);
-        toDateTime.setDate(toDateTime.getDate() + 6);
-        const formattedFromDateTime = formatDate(fromDateTime);
-        const formattedToDateTime = formatDate(toDateTime);
-        if (isCustomPeriod) {
-          newdata = {
-            ...newdata,
-            fromDateTime: `${
-              weekData ? formattedFromDateTime : Ignitionreport.fromDateTime
-            }T${timestart}Z`,
-            toDateTime: `${
-              weekData ? formattedToDateTime : Ignitionreport.toDateTime
-            }T${timeend}Z`,
-          };
-        } else {
-          newdata = {
-            ...newdata,
-            fromDateTime: `${
-              weekData ? formattedFromDateTime : currentDate
-            }T${timestart}Z`,
-            toDateTime: `${
-              weekData ? formattedToDateTime : currentDate
-            }T${timeend}Z`,
-          };
+    if (
+      Ignitionreport.VehicleReg &&
+      (Ignitionreport.period ||
+        (Ignitionreport.period == "custom" &&
+          Ignitionreport.toDateTime &&
+          Ignitionreport.fromDateTime))
+    ) {
+      if (session) {
+        const { VehicleReg, period } = await Ignitionreport;
+        if (period == "week") {
+          setWeekData(true);
         }
-        setIgnitionreport(newdata);
-        // if (
-        //   Ignitionreport.period == "today" ||
-        //   Ignitionreport.period == "yesterday"
-        // ) {
-        //   setTimeout(() => setweekDataGrouped(false), 1000);
-        // }
-        // if (
-        //   Ignitionreport.period == "week" ||
-        //   Ignitionreport.period == "custom"
-        // ) {
-        //   setTimeout(() => setweekDataGrouped(true), 3000);
-        // }
-        try {
-          const response = await toast.promise(
-            TripsByBucketAndVehicle({
-              token: session.accessToken,
-              payload: newdata,
-            }),
-
-            {
-              loading: "Loading...",
-              success: "",
-              error: "",
-            },
-            {
-              style: {
-                border: "1px solid #00B56C",
-                padding: "16px",
-                color: "#1A202C",
-              },
-              success: {
-                duration: 10,
-                iconTheme: {
-                  primary: "#00B56C",
-                  secondary: "#FFFAEE",
-                },
-              },
-              error: {
-                duration: 10,
-                iconTheme: {
-                  primary: "#00B56C",
-                  secondary: "#FFFAEE",
-                },
-              },
-            }
-          );
-          if (
-            Ignitionreport.period == "today" ||
-            Ignitionreport.period == "yesterday"
-          ) {
-            // setTimeout(() => setweekDataGrouped(false), 1000);
-            setweekDataGrouped(false);
-          }
-          if (
-            Ignitionreport.period == "week" ||
-            Ignitionreport.period == "custom"
-          ) {
-            // setTimeout(() => setweekDataGrouped(true), 3000);
-            setweekDataGrouped(true);
-          }
-          setDataResponse(response?.data);
-
-          if (response.success === true) {
-            toast.success(`${response.message}`, {
-              style: {
-                border: "1px solid #00B56C",
-                padding: "16px",
-                color: "#1A202C",
-              },
-              duration: 4000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            });
+        if (period == "today") {
+          setWeekData(false);
+        }
+        if (VehicleReg && period) {
+          let newdata = {
+            ...Ignitionreport,
+          };
+          const timestart: string = "00:00:00";
+          const timeend: string = "23:59:59";
+          const currentDayOfWeek = new Date().getDay();
+          const currentDay = new Date().getDay();
+          const daysUntilMonday =
+            currentDayOfWeek === currentDay ? 7 : currentDayOfWeek - 1;
+          const fromDateTime = new Date();
+          fromDateTime.setDate(fromDateTime.getDate() - daysUntilMonday);
+          const toDateTime = new Date(fromDateTime);
+          toDateTime.setDate(toDateTime.getDate() + 6);
+          const formattedFromDateTime = formatDate(fromDateTime);
+          const formattedToDateTime = formatDate(toDateTime);
+          if (isCustomPeriod) {
+            newdata = {
+              ...newdata,
+              fromDateTime: `${
+                weekData ? formattedFromDateTime : Ignitionreport.fromDateTime
+              }T${timestart}Z`,
+              toDateTime: `${
+                weekData ? formattedToDateTime : Ignitionreport.toDateTime
+              }T${timeend}Z`,
+            };
           } else {
-            toast.error(`${response.message}`, {
-              style: {
-                border: "1px solid red",
-                padding: "16px",
-                color: "red",
-              },
-              iconTheme: {
-                primary: "red",
-                secondary: "white",
-              },
-            });
+            newdata = {
+              ...newdata,
+              fromDateTime: `${
+                weekData ? formattedFromDateTime : currentDate
+              }T${timestart}Z`,
+              toDateTime: `${
+                weekData ? formattedToDateTime : currentDate
+              }T${timeend}Z`,
+            };
           }
-        } catch (error) {
-          console.error(`Error calling API for ${newdata}:`, error);
+          setIgnitionreport(newdata);
+          // if (
+          //   Ignitionreport.period == "today" ||
+          //   Ignitionreport.period == "yesterday"
+          // ) {
+          //   setTimeout(() => setweekDataGrouped(false), 1000);
+          // }
+          // if (
+          //   Ignitionreport.period == "week" ||
+          //   Ignitionreport.period == "custom"
+          // ) {
+          //   setTimeout(() => setweekDataGrouped(true), 3000);
+          // }
+          try {
+            const response = await toast.promise(
+              TripsByBucketAndVehicle({
+                token: session.accessToken,
+                payload: newdata,
+              }),
+
+              {
+                loading: "Loading...",
+                success: "",
+                error: "",
+              },
+              {
+                style: {
+                  border: "1px solid #00B56C",
+                  padding: "16px",
+                  color: "#1A202C",
+                },
+                success: {
+                  duration: 10,
+                  iconTheme: {
+                    primary: "#00B56C",
+                    secondary: "#FFFAEE",
+                  },
+                },
+                error: {
+                  duration: 10,
+                  iconTheme: {
+                    primary: "#00B56C",
+                    secondary: "#FFFAEE",
+                  },
+                },
+              }
+            );
+            if (
+              Ignitionreport.period == "today" ||
+              Ignitionreport.period == "yesterday"
+            ) {
+              // setTimeout(() => setweekDataGrouped(false), 1000);
+              setweekDataGrouped(false);
+            }
+            if (
+              Ignitionreport.period == "week" ||
+              Ignitionreport.period == "custom"
+            ) {
+              // setTimeout(() => setweekDataGrouped(true), 3000);
+              setweekDataGrouped(true);
+            }
+            setDataResponse(response?.data);
+
+            if (response.success === true) {
+              toast.success(`${response.message}`, {
+                style: {
+                  border: "1px solid #00B56C",
+                  padding: "16px",
+                  color: "#1A202C",
+                },
+                duration: 4000,
+                iconTheme: {
+                  primary: "#00B56C",
+                  secondary: "#FFFAEE",
+                },
+              });
+            } else {
+              toast.error(`${response.message}`, {
+                style: {
+                  border: "1px solid red",
+                  padding: "16px",
+                  color: "red",
+                },
+                iconTheme: {
+                  primary: "red",
+                  secondary: "white",
+                },
+              });
+            }
+          } catch (error) {
+            console.error(`Error calling API for ${newdata}:`, error);
+          }
         }
       }
     }
@@ -710,12 +717,14 @@ export default function journeyReplayComp() {
     setlat(null);
     setlng(null);
     setPlayBtn(true);
-    setStopBtn(true);
-    setPauseBtn(true);
+    setStopBtn(false);
     setStopDetailsOpen(true);
+    setIsPlaying(false);
+    setIsPaused(false);
+    setstopVehicle(false);
     try {
-      setIsPlaying(false);
       setTravelHistoryresponse([]);
+      setIsPauseColor(false);
       setProgressWidth(0);
       // if (polylinedata.length > 0) {
       //   setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
@@ -1287,6 +1296,7 @@ export default function journeyReplayComp() {
                         handleDateChange("fromDateTime", newDate)
                       }
                       variant="inline"
+                      placeholder="Start Date"
                       maxDate={currenTDates}
                       autoOk
                       inputProps={{ readOnly: true }}
@@ -1303,9 +1313,10 @@ export default function journeyReplayComp() {
                         handleDateChange("toDateTime", newDate)
                       }
                       variant="inline"
-                      maxDate={currenTDates}
-                      inputProps={{ readOnly: true }}
                       // maxDate={currenTDates}
+                      placeholder="End Date"
+                      inputProps={{ readOnly: true }}
+                      maxDate={currenTDates}
                       // shouldDisableDate={(date) => !isCurrentDate(date)}
                       autoOk
                     />
@@ -1457,10 +1468,9 @@ export default function journeyReplayComp() {
           </div>
 
           <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold flex justify-center items-center mt-2">
-            {clearMapData ? (
+            {/* {clearMapData ? (
               <button
                 onClick={handleClickClear}
-                // className={`bg-green py-2 px-8  rounded-md shadow-md  hover:shadow-gray transition duration-500 c`}
                 className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
                 ${
                   (Ignitionreport.VehicleReg &&
@@ -1478,16 +1488,11 @@ export default function journeyReplayComp() {
                 Search
               </button>
             ) : (
-              <button
-                onClick={handleSubmit}
-                // className={`bg-green py-2 px-8  rounded-md shadow-md  ${
-                //   searchJourney
-                //     ? "cursor-not-allowed" ||
-                //       "hover:shadow-gray transition duration-500 "
-                //     : ""
-                // }`}
-                // disabled={searchJourney}
-                className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
+           
+            )} */}
+            <button
+              onClick={handleSubmit}
+              className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
                         ${
                           (Ignitionreport.VehicleReg &&
                             Ignitionreport.period === "today") ||
@@ -1496,14 +1501,15 @@ export default function journeyReplayComp() {
                           (Ignitionreport.VehicleReg &&
                             Ignitionreport.period === "week") ||
                           (Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "custom")
+                            Ignitionreport.period === "custom" &&
+                            Ignitionreport.toDateTime &&
+                            Ignitionreport.fromDateTime)
                             ? ""
                             : "opacity-50 cursor-not-allowed"
                         }`}
-              >
-                Search
-              </button>
-            )}
+            >
+              Search
+            </button>
           </div>
           <div className="xl:col-span-3 lg:col-span-1 col-span-12 "> </div>
           {TravelHistoryresponse.length > 0 && (

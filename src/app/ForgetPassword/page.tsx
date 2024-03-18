@@ -32,48 +32,51 @@ export default function ForgetPassword() {
       clientId: session?.clientId,
     };
 
-    const response = await toast.promise(
-      forgetEmailByClientId({
-        token: session?.accessToken,
-        newformdata: newformdata,
-      }),
-      {
-        loading: "Saving data...",
-        error: "Error saving data. Please try again.",
-      },
-      {
-        style: {
-          border: "1px solid #00B56C",
-          padding: "16px",
-          color: "#1A202C",
-        },
-        success: {
-          duration: 2000,
-          iconTheme: {
-            primary: "#00B56C",
-            secondary: "#FFFAEE",
-          },
-        },
-        error: {
-          duration: 2000,
-          iconTheme: {
-            primary: "#00B56C",
-            secondary: "#FFFAEE",
-          },
-        },
-      }
-    );
-    toast.success(response.Msg, {
-      position: "top-center",
+    const response = await forgetEmailByClientId({
+      token: session?.accessToken,
+      newformdata: newformdata,
     });
 
-    console.log("response", response);
+    // {
+    //   loading: "Saving data...",
+    //   error: "Error saving data. Please try again.",
+    // },
+    // {
+    // style: {
+    //   border: "1px solid #00B56C",
+    //   padding: "16px",
+    //   color: "#1A202C",
+    // },
+    // success: {
+    //   duration: 2000,
+    //   iconTheme: {
+    //     primary: "#00B56C",
+    //     secondary: "",
+    //   },
+    // },
+    // error: {
+    //   duration: 2000,
+    //   iconTheme: {
+    //     primary: "#00B56C",
+    //     secondary: "#FFFAEE",
+    //   },
+    // },
+    // }
+    // );
+
     setFormData({
       userName: "",
       email: "",
     });
     if (response.Msg == "Reset Link send successfully") {
       setshowVerificationText(true);
+      toast.success(response.Msg, {
+        position: "top-center",
+      });
+    } else {
+      toast.error(response.Msg, {
+        position: "top-center",
+      });
     }
     // if (session) {
     //   const newformdata: any = {

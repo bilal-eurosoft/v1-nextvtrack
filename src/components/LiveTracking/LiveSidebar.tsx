@@ -132,7 +132,7 @@ const LiveSidebar = ({
   };
 
   return (
-    <div className="xl:col-span-1  lg:col-span-3  md:col-span-2 sm:col-span-5  col-span-5 main_sider_bar">
+    <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-5  col-span-5 main_sider_bar">
       <div className="grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3 search_live_tracking">
         <div className="lg:col-span-7 w-full  md:col-span-5 sm:col-span-5 col-span-6 sticky top-0">
           <div className="grid grid-cols-12 vehicle_search_left">
