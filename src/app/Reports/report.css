@@ -68,6 +68,8 @@
 
 .height_report_form {
   height: 7vh;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+    rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
 }
 .height_table {
   /* style={{
@@ -76,8 +78,32 @@
     height: "75vh",
     marginTop: "-0.5%",
   }} */
+  padding-top: 1%;
   width: 100%;
   overflow-y: auto;
-  height: 75vh;
+  height: 73vh;
   margin-top: -0.5%;
+}
+.report_pagination {
+  height: 7vh;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .height_report_form {
+    height: auto;
+  }
+  .height_table {
+    height: auto;
+  }
+}
+.MuiButtonBase-root {
+  display: block !important;
+  text-align: center !important;
+}
+
+.css-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar
+  .MuiTablePagination-actions {
+  -ms-flex-negative: 0;
+  display: flex;
 }

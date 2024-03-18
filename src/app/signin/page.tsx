@@ -25,26 +25,26 @@ export default function LoginPage() {
   const clientIdparams = searchParams.get("clientId");
   const pageparams = searchParams.get("page");
   const agent = new https.Agent({
-    rejectUnauthorized: false
+    rejectUnauthorized: false,
   });
 
   const [formData, setFormData] = useState({
     userName: "",
-    password: ""
+    password: "",
   });
   const { data: session } = useSession();
   const handleInputChange = (e: any) => {
     const value = e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
   };
-
+  /* 
   const handleClick = async () => {
     setLoading(true);
     const { userName, password } = formData;
     const data = await signIn("credentials", {
       userName,
       password,
-      redirect: false
+      redirect: false,
     });
 
     if (data?.status === 200) {
@@ -52,12 +52,34 @@ export default function LoginPage() {
     }
     if (data?.status === 401) {
       toast.error("Invalid User Or Password", {
-        position: "top-center"
+        position: "top-center",
       });
+    }
+
+    // else {
+    //   toast.error("License  is Expire", {
+    //     position: "top-center",
+    //   });
+    // }
+    setLoading(false);
+  }; */
+
+  const handleClick = async () => {
+    setLoading(true);
+    const { userName, password } = formData;
+    const data = await signIn("credentials", {
+      userName,
+      password,
+      redirect: false,
+    });
+    if (data?.error) {
+      if (data.error) {
+        toast.error(data.error, {
+          position: "top-center",
+        });
+      }
     } else {
-      toast.error("License  is Expire", {
-        position: "top-center"
-      });
+      router.push("/liveTracking");
     }
     setLoading(false);
   };
@@ -86,12 +108,12 @@ export default function LoginPage() {
       try {
         const users = await GetUsersByClientId({
           // token: session.accessToken,
-          clientId: clientIdparams
+          clientId: clientIdparams,
         });
 
         const licenseInfo = await GetLicenseById({
           // token: session.accessToken,
-          id: clientIdparams
+          id: clientIdparams,
         });
 
         let config = {
@@ -99,17 +121,15 @@ export default function LoginPage() {
           maxBodyLength: Infinity,
           url: "https://backend.vtracksolutions.com/Portallogin",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
           httpsAgent: agent,
           data: {
             userName: licenseInfo[0].accountCode + "@" + users[0].userName,
-            password: users[0].password
-          }
+            password: users[0].password,
+          },
         };
-
         const response = await axios.request(config);
-
         if (response?.data?.accessToken) {
           // localStorage.setItem(
           //   "user_id",
@@ -143,7 +163,7 @@ export default function LoginPage() {
         position: "relative",
         backgroundImage: "url(Images/bgLogo.png)",
         backgroundRepeat: "no-repeat",
-        backgroundSize: "cover"
+        backgroundSize: "cover",
         // filter: "blur(4px)",
         // zIndex: "-1 !important",
       }}
@@ -156,7 +176,7 @@ export default function LoginPage() {
               display: "flex",
               height: "100vh",
               justifyContent: "center",
-              alignItems: "center"
+              alignItems: "center",
             }}
           >
             <Image

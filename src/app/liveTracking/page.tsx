@@ -10,7 +10,7 @@ import {
   getClientSettingByClinetIdAndToken,
   getVehicleDataByClientId,
   getZoneListByClientId,
-  getAllVehicleByUserId
+  getAllVehicleByUserId,
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { socket } from "@/utils/socket";
@@ -49,7 +49,7 @@ const LiveMap = dynamic(() => import("@/components/LiveTracking/LiveMap"), {
   //     </div>
   //   </div>
   // ),
-  ssr: false
+  ssr: false,
 });
 
 const LiveTracking = () => {
@@ -99,7 +99,7 @@ const LiveTracking = () => {
       if (session && session.userRole === "Controller") {
         const data = await getAllVehicleByUserId({
           token: session.accessToken,
-          userId: session.userId
+          userId: session.userId,
         });
         console.log("data", data.data);
         setuserVehicle(data.data);
@@ -143,7 +143,7 @@ const LiveTracking = () => {
 
         const clientSettingData = await getClientSettingByClinetIdAndToken({
           token: session?.accessToken,
-          clientId: session?.clientId
+          clientId: session?.clientId,
         });
         if (clientSettingData) {
           setClientSettings(clientSettingData);
@@ -181,7 +181,7 @@ const LiveTracking = () => {
     isFirstTimeFetchedFromGraphQL,
     session?.clientId,
     lastDataReceivedTimestamp,
-    fetchTimeoutGraphQL
+    fetchTimeoutGraphQL,
   ]);
 
   // This useEffect is responsible for getting the data from socket and updating it into the state.
@@ -239,7 +239,7 @@ const LiveTracking = () => {
 
   return (
     <>
-      <div className="grid lg:grid-cols-5 sm:grid-cols-5 md:grid-cols-5 grid-cols-1 ">
+      <div className="grid lg:grid-cols-5 sm:grid-cols-5 md:grid-cols-5 grid-cols-1">
         <LiveSidebar
           carData={carData.current}
           countMoving={countMoving}

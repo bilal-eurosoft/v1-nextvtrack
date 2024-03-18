@@ -45,6 +45,7 @@ export default function Reports() {
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [startdate, setstartdate] = useState(new Date());
   const [enddate, setenddate] = useState(new Date());
+  const [customDate, setcustomDate] = useState(true);
   // suraksha code
   const [trisdata, setTrisdata] = useState<TripsByBucket[]>([]);
   const [rowsPerPages, setRowsPerPage] = useState(18);
@@ -243,343 +244,360 @@ export default function Reports() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let startDateTime;
-    let endDateTime;
 
-    if (session) {
-      const { reportType, VehicleReg, period } = Ignitionreport;
-      if (period === "today") {
-        const today = moment();
-        startDateTime =
-          today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        endDateTime =
-          today.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        // Handle other periods if needed
-      }
-      if (period === "yesterday") {
-        const yesterday = moment().subtract(1, "day");
-        startDateTime =
-          yesterday.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        endDateTime =
-          yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-      }
-      if (period === "week") {
-        //console.log("week is starting");
-        const startOfWeek = moment().subtract(7, "days").startOf("day");
-        //console.log("start of week", startOfWeek);
-        const oneday = moment().subtract(1, "day");
+    if (
+      Ignitionreport.reportType &&
+      Ignitionreport.VehicleReg &&
+      (Ignitionreport.period === "today" ||
+        Ignitionreport.period === "yesterday" ||
+        Ignitionreport.period === "week" ||
+        (Ignitionreport.toDateTime && Ignitionreport.fromDateTime))
+    ) {
+      let startDateTime;
+      let endDateTime;
 
-        startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        //console.log("start date time ", startDateTime);
-        endDateTime =
-          oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        //console.log("end date time", endDateTime);
-      }
-      if (period === "custom") {
-        startDateTime =
-          moment(startdate).startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        endDateTime;
-        moment(enddate).endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-      }
-      if (reportType && VehicleReg && period) {
-        let newdata = { ...Ignitionreport };
+      if (session) {
+        const { reportType, VehicleReg, period } = Ignitionreport;
+        if (period === "today") {
+          const today = moment();
+          startDateTime =
+            today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+          endDateTime =
+            today.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+          // Handle other periods if needed
+        }
+        if (period === "yesterday") {
+          const yesterday = moment().subtract(1, "day");
+          startDateTime =
+            yesterday.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
+            "Z";
+          endDateTime =
+            yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+        }
+        if (period === "week") {
+          //console.log("week is starting");
+          const startOfWeek = moment().subtract(7, "days").startOf("day");
+          //console.log("start of week", startOfWeek);
+          const oneday = moment().subtract(1, "day");
 
-        const apiFunctions: Record<
-          string,
-          (data: {
-            token: string;
-            clientId: string;
-            payload: any;
-          }) => Promise<any>
-        > = {
-          Trip: IgnitionReportByTrip,
-          DailyActivity: IgnitionReportByDailyactivity,
-          Ignition: IgnitionReportByIgnition,
-          Events: IgnitionReportByEvents,
-          DetailReportByStreet: IgnitionReportByDetailReport,
-          IdlingActivity: IgnitionReportByIdlingActivity,
-        };
+          startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
+          //console.log("start date time ", startDateTime);
+          endDateTime =
+            oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+          //console.log("end date time", endDateTime);
+        }
+        if (period === "custom") {
+          startDateTime =
+            moment(startdate).startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
+            "Z";
+          endDateTime;
+          moment(enddate).endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+        }
+        if (reportType && VehicleReg && period) {
+          let newdata = { ...Ignitionreport };
 
-        if (apiFunctions[newdata.reportType]) {
-          const apiFunction = apiFunctions[newdata.reportType];
-          if (isCustomPeriod) {
-            newdata = {
-              ...newdata,
-              fromDateTime: `${Ignitionreport.fromDateTime}T00:00:00Z`,
-              toDateTime: `${Ignitionreport.toDateTime}T23:59:59Z`,
-            };
-          } else {
-            newdata = {
-              // ...newdata,
-              unit: session?.unit,
-              reportType: 0,
-              period: period,
-              VehicleReg: VehicleReg,
-              TimeZone: session?.timezone,
-              clientId: session?.clientId,
-              fromDateTime: startDateTime,
-              toDateTime: endDateTime,
-              // fromDateTime: "2024-02-01T00:00:00Z",
-              // toDateTime: "2024-02-01T23:59:59Z",
-            };
-          }
-          try {
-            const response = await toast.promise(
-              apiFunction({
-                token: session.accessToken,
-                clientId: session.clientId,
-                payload: newdata,
-              }),
-              {
-                loading: "Loading...",
-                success: "",
-                error: "",
-              },
-              {
-                style: {
-                  border: "1px solid #00B56C",
-                  padding: "16px",
-                  color: "#1A202C",
+          const apiFunctions: Record<
+            string,
+            (data: {
+              token: string;
+              clientId: string;
+              payload: any;
+            }) => Promise<any>
+          > = {
+            Trip: IgnitionReportByTrip,
+            DailyActivity: IgnitionReportByDailyactivity,
+            Ignition: IgnitionReportByIgnition,
+            Events: IgnitionReportByEvents,
+            DetailReportByStreet: IgnitionReportByDetailReport,
+            IdlingActivity: IgnitionReportByIdlingActivity,
+          };
+
+          if (apiFunctions[newdata.reportType]) {
+            const apiFunction = apiFunctions[newdata.reportType];
+            if (isCustomPeriod) {
+              newdata = {
+                ...newdata,
+                fromDateTime: `${Ignitionreport.fromDateTime}T00:00:00Z`,
+                toDateTime: `${Ignitionreport.toDateTime}T23:59:59Z`,
+              };
+            } else {
+              newdata = {
+                // ...newdata,
+                unit: session?.unit,
+                reportType: 0,
+                period: period,
+                VehicleReg: VehicleReg,
+                TimeZone: session?.timezone,
+                clientId: session?.clientId,
+                fromDateTime: startDateTime,
+                toDateTime: endDateTime,
+                // fromDateTime: "2024-02-01T00:00:00Z",
+                // toDateTime: "2024-02-01T23:59:59Z",
+              };
+            }
+            try {
+              const response = await toast.promise(
+                apiFunction({
+                  token: session.accessToken,
+                  clientId: session.clientId,
+                  payload: newdata,
+                }),
+                {
+                  loading: "Loading...",
+                  success: "",
+                  error: "",
                 },
-                success: {
-                  duration: 10,
-                  iconTheme: {
-                    primary: "#00B56C",
-                    secondary: "#FFFAEE",
+                {
+                  style: {
+                    border: "1px solid #00B56C",
+                    padding: "16px",
+                    color: "#1A202C",
                   },
-                },
-                error: {
-                  duration: 10,
-                  iconTheme: {
-                    primary: "#00B56C",
-                    secondary: "#FFFAEE",
+                  success: {
+                    duration: 10,
+                    iconTheme: {
+                      primary: "#00B56C",
+                      secondary: "#FFFAEE",
+                    },
                   },
-                },
-              }
-            );
-            // suraksha code
-            if (response.success === true) {
-              // console.log("Trips Data isssssssss:", response);
-              //  setIsFormSubmitted(true);
-              setTrisdata(response.data.tableData);
+                  error: {
+                    duration: 10,
+                    iconTheme: {
+                      primary: "#00B56C",
+                      secondary: "#FFFAEE",
+                    },
+                  },
+                }
+              );
+              // suraksha code
+              if (response.success === true) {
+                // console.log("Trips Data isssssssss:", response);
+                //  setIsFormSubmitted(true);
+                setTrisdata(response.data.tableData);
 
-              let newColumnHeaders: (
-                | "BeginingDateTime"
-                | "DriverName"
-                | "0"
-                | "1"
-                | "2"
-                | "3"
-                | "4"
-                | "5"
-                | "6"
-                | "7"
-                | "Start Date"
-                | "streetCount"
-                | "EndTime"
-                | "Mileage"
-                | "Total Time"
-                | "Max Speed"
-                | "Idling Point"
-                | "Time Duration"
-                | "duration"
-                | "AvgSpeed"
-                | "Millage"
-                | "MaxSpeed"
-                | "TripStart"
-                | "Starting Location"
-                | "InitialLocation"
-                | "EndingDateTime"
-                | "Duration"
-                | "event"
-                | "date"
-                | "Address"
-                | "BegginingTime"
-                | "StartingPoint"
-                | "TripEnd"
-                | "Final Location"
-                | "TripDuration"
-                | "TotalDistance"
-                | "Avg Speed"
-                | "AverageSpeed"
-                | "MaxSpeed"
-                | "IMEI"
-                | "Status"
-                | "Type"
-              )[] = [];
-              let custom1HeaderTitles: (
-                | "BeginingDateTime"
-                | "0"
-                | "1"
-                | "2"
-                | "3"
-                | "4"
-                | "5"
-                | "6"
-                | "7"
-                | "Start Date"
-                | "streetCount"
-                | "EndTime"
-                | "Mileage"
-                | "Total Time"
-                | "Max Speed"
-                | "Idling Point"
-                | "Time Duration"
-                | "duration"
-                | "AvgSpeed"
-                | "Millage"
-                | "MaxSpeed"
-                | "TripStart"
-                | "InitialLocation"
-                | "Starting Location"
-                | "EndingDateTime"
-                | "Duration"
-                | "event"
-                | "date"
-                | "Address"
-                | "BegginingTime"
-                | "StartingPoint"
-                | "TripEnd"
-                | "Final Location"
-                | "TripDuration"
-                | "TotalDistance"
-                | "AverageSpeed"
-                | "Avg Speed"
-                | "MaxSpeed"
-                | "IMEI"
-                | "Status"
-                | "Type"
-              )[] = [];
-              if (Ignitionreport.reportType.toString() === "Trip") {
-                // console.log("trips data ", response.data);
+                let newColumnHeaders: (
+                  | "BeginingDateTime"
+                  | "DriverName"
+                  | "0"
+                  | "1"
+                  | "2"
+                  | "3"
+                  | "4"
+                  | "5"
+                  | "6"
+                  | "7"
+                  | "Start Date"
+                  | "streetCount"
+                  | "EndTime"
+                  | "Mileage"
+                  | "Total Time"
+                  | "Max Speed"
+                  | "Idling Point"
+                  | "Time Duration"
+                  | "duration"
+                  | "AvgSpeed"
+                  | "Millage"
+                  | "MaxSpeed"
+                  | "TripStart"
+                  | "Starting Location"
+                  | "InitialLocation"
+                  | "EndingDateTime"
+                  | "Duration"
+                  | "event"
+                  | "date"
+                  | "Address"
+                  | "BegginingTime"
+                  | "StartingPoint"
+                  | "TripEnd"
+                  | "Final Location"
+                  | "TripDuration"
+                  | "TotalDistance"
+                  | "Avg Speed"
+                  | "AverageSpeed"
+                  | "MaxSpeed"
+                  | "IMEI"
+                  | "Status"
+                  | "Type"
+                )[] = [];
+                let custom1HeaderTitles: (
+                  | "BeginingDateTime"
+                  | "0"
+                  | "1"
+                  | "2"
+                  | "3"
+                  | "4"
+                  | "5"
+                  | "6"
+                  | "7"
+                  | "Start Date"
+                  | "streetCount"
+                  | "EndTime"
+                  | "Mileage"
+                  | "Total Time"
+                  | "Max Speed"
+                  | "Idling Point"
+                  | "Time Duration"
+                  | "duration"
+                  | "AvgSpeed"
+                  | "Millage"
+                  | "MaxSpeed"
+                  | "TripStart"
+                  | "InitialLocation"
+                  | "Starting Location"
+                  | "EndingDateTime"
+                  | "Duration"
+                  | "event"
+                  | "date"
+                  | "Address"
+                  | "BegginingTime"
+                  | "StartingPoint"
+                  | "TripEnd"
+                  | "Final Location"
+                  | "TripDuration"
+                  | "TotalDistance"
+                  | "AverageSpeed"
+                  | "Avg Speed"
+                  | "MaxSpeed"
+                  | "IMEI"
+                  | "Status"
+                  | "Type"
+                )[] = [];
+                if (Ignitionreport.reportType.toString() === "Trip") {
+                  // console.log("trips data ", response.data);
 
-                if (response.data.clientModelProfile) {
-                  newColumnHeaders = [
-                    "AverageSpeed",
-                    "IMEI",
-                    "Status",
-                    "TripDuration",
-                    "TotalDistance",
-                    "DriverName",
+                  if (response.data.clientModelProfile) {
+                    newColumnHeaders = [
+                      "AverageSpeed",
+                      "IMEI",
+                      "Status",
+                      "TripDuration",
+                      "TotalDistance",
+                      "DriverName",
+                    ];
+                  } else {
+                    newColumnHeaders = [
+                      "AverageSpeed",
+                      "IMEI",
+                      "Status",
+                      "TripDuration",
+                      "TotalDistance",
+                    ];
+                  }
+
+                  setcustomHeaderTitles(newColumnHeaders);
+                } else if (
+                  Ignitionreport.reportType.toString() === "DailyActivity"
+                ) {
+                  newColumnHeaders = ["0", "1", "2", "3", "4", "5", "6", "7"];
+                  custom1HeaderTitles = [
+                    "BegginingTime",
+                    "Starting Location",
+                    "EndTime",
+                    "Final Location",
+                    "Total Time",
+                    "Mileage",
+                    "Avg Speed",
+                    "Max Speed",
                   ];
-                } else {
-                  newColumnHeaders = [
-                    "AverageSpeed",
-                    "IMEI",
-                    "Status",
-                    "TripDuration",
-                    "TotalDistance",
+
+                  setcustomHeaderTitles(custom1HeaderTitles);
+                } else if (
+                  Ignitionreport.reportType.toString() === "Ignition"
+                ) {
+                  // console.log("ignition", response.data.tableData);
+                  newColumnHeaders = ["0", "1", "2", "3", "4", "5"];
+                  custom1HeaderTitles = [
+                    "event",
+                    "date",
+                    "Address",
+                    "event",
+                    "date",
+                    "Address",
                   ];
+                  setcustomHeaderTitles(custom1HeaderTitles);
+                } else if (Ignitionreport.reportType.toString() === "Events") {
+                  // console.log("event", response.data.tableData);
+                  const filteredData = response.data.tableData.filter(
+                    (eventitem: { event: string }) =>
+                      eventitem.event !== "ignitionOn" &&
+                      eventitem.event !== "ignitionOff"
+                  );
+                  setTrisdata(filteredData);
+                  newColumnHeaders = ["event", "date", "Address"];
+                  setcustomHeaderTitles(newColumnHeaders);
+                } else if (
+                  Ignitionreport.reportType.toString() === "IdlingActivity"
+                ) {
+                  // console.log("idling---------", response.data.tableData);
+
+                  // Constructing new column headers based on the data format
+                  newColumnHeaders = ["0", "1", "2"];
+                  custom1HeaderTitles = ["date", "Address", "duration"];
+                  setcustomHeaderTitles(custom1HeaderTitles);
+                } else if (
+                  Ignitionreport.reportType.toString() ===
+                  "DetailReportByStreet"
+                ) {
+                  newColumnHeaders = ["0", "1", "2", "3", "4", "5", "6", "7"];
+                  custom1HeaderTitles = [
+                    "BeginingDateTime",
+                    "AvgSpeed",
+                    "streetCount",
+                    "Millage",
+                    "MaxSpeed",
+                    "InitialLocation",
+                    "EndingDateTime",
+                    "Duration",
+                  ];
+                  setcustomHeaderTitles(custom1HeaderTitles);
                 }
 
-                setcustomHeaderTitles(newColumnHeaders);
-              } else if (
-                Ignitionreport.reportType.toString() === "DailyActivity"
-              ) {
-                newColumnHeaders = ["0", "1", "2", "3", "4", "5", "6", "7"];
-                custom1HeaderTitles = [
-                  "BegginingTime",
-                  "Starting Location",
-                  "EndTime",
-                  "Final Location",
-                  "Total Time",
-                  "Mileage",
-                  "Avg Speed",
-                  "Max Speed",
-                ];
-
-                setcustomHeaderTitles(custom1HeaderTitles);
-              } else if (Ignitionreport.reportType.toString() === "Ignition") {
-                // console.log("ignition", response.data.tableData);
-                newColumnHeaders = ["0", "1", "2", "3", "4", "5"];
-                custom1HeaderTitles = [
-                  "event",
-                  "date",
-                  "Address",
-                  "event",
-                  "date",
-                  "Address",
-                ];
-                setcustomHeaderTitles(custom1HeaderTitles);
-              } else if (Ignitionreport.reportType.toString() === "Events") {
-                // console.log("event", response.data.tableData);
-                const filteredData = response.data.tableData.filter(
-                  (eventitem: { event: string }) =>
-                    eventitem.event !== "ignitionOn" &&
-                    eventitem.event !== "ignitionOff"
-                );
-                setTrisdata(filteredData);
-                newColumnHeaders = ["event", "date", "Address"];
-                setcustomHeaderTitles(newColumnHeaders);
-              } else if (
-                Ignitionreport.reportType.toString() === "IdlingActivity"
-              ) {
-                // console.log("idling---------", response.data.tableData);
-
-                // Constructing new column headers based on the data format
-                newColumnHeaders = ["0", "1", "2"];
-                custom1HeaderTitles = ["date", "Address", "duration"];
-                setcustomHeaderTitles(custom1HeaderTitles);
-              } else if (
-                Ignitionreport.reportType.toString() === "DetailReportByStreet"
-              ) {
-                newColumnHeaders = ["0", "1", "2", "3", "4", "5", "6", "7"];
-                custom1HeaderTitles = [
-                  "BeginingDateTime",
-                  "AvgSpeed",
-                  "streetCount",
-                  "Millage",
-                  "MaxSpeed",
-                  "InitialLocation",
-                  "EndingDateTime",
-                  "Duration",
-                ];
-                setcustomHeaderTitles(custom1HeaderTitles);
+                setColumnHeaders(newColumnHeaders);
+              } else {
+                toast.error(`${response.message}`, {
+                  style: {
+                    border: "1px solid red",
+                    padding: "16px",
+                    color: "red",
+                  },
+                  iconTheme: {
+                    primary: "red",
+                    secondary: "white",
+                  },
+                });
               }
-
-              setColumnHeaders(newColumnHeaders);
-            } else {
-              toast.error(`${response.message}`, {
-                style: {
-                  border: "1px solid red",
-                  padding: "16px",
-                  color: "red",
-                },
-                iconTheme: {
-                  primary: "red",
-                  secondary: "white",
-                },
-              });
+            } catch (error) {
+              console.error(
+                `Error calling API for ${newdata.reportType}:`,
+                error
+              );
             }
-          } catch (error) {
-            console.error(
-              `Error calling API for ${newdata.reportType}:`,
-              error
-            );
+          } else {
+            console.error(`API function not found for ${newdata.reportType}`);
           }
         } else {
-          console.error(`API function not found for ${newdata.reportType}`);
-        }
-      } else {
-        console.error(
-          "Please fill in all three fields: reportType, VehicleReg, and period"
-        );
+          console.error(
+            "Please fill in all three fields: reportType, VehicleReg, and period"
+          );
 
-        toast.error(
-          "Please fill in all three fields: reportType, VehicleReg, and period",
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
-            },
-            iconTheme: {
-              primary: "#00B56C",
-              secondary: "#FFFAEE",
-            },
-          }
-        );
+          toast.error(
+            "Please fill in all three fields: reportType, VehicleReg, and period",
+            {
+              style: {
+                border: "1px solid #00B56C",
+                padding: "16px",
+                color: "#1A202C",
+              },
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            }
+          );
+        }
       }
+    } else {
+      return null; // or simply omit this else block as it defaults to undefined
     }
   };
   const handleInputChangeSelect = (e: any) => {
@@ -617,182 +635,195 @@ export default function Reports() {
   // handle exportPdf
   const handleExportPdf = async (e: React.FormEvent) => {
     e.preventDefault();
-    let startDateTime;
-    let endDateTime;
+    if (
+      Ignitionreport.reportType &&
+      Ignitionreport.VehicleReg &&
+      (Ignitionreport.period === "today" ||
+        Ignitionreport.period === "yesterday" ||
+        Ignitionreport.period === "week" ||
+        (Ignitionreport.toDateTime && Ignitionreport.fromDateTime))
+    ) {
+      let startDateTime;
+      let endDateTime;
 
-    if (session) {
-      const { reportType, VehicleReg, period } = Ignitionreport;
-      if (period === "today") {
-        const today = moment();
-        startDateTime =
-          today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        endDateTime =
-          today.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        // Handle other periods if needed
-      }
-      if (period === "yesterday") {
-        const yesterday = moment().subtract(1, "day");
-        startDateTime =
-          yesterday.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        endDateTime =
-          yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-      }
-      if (period === "week") {
-        //console.log("week is starting");
-        const startOfWeek = moment().subtract(7, "days").startOf("day");
-        //console.log("start of week", startOfWeek);
-        const oneday = moment().subtract(1, "day");
+      if (session) {
+        const { reportType, VehicleReg, period } = Ignitionreport;
+        if (period === "today") {
+          const today = moment();
+          startDateTime =
+            today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+          endDateTime =
+            today.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+          // Handle other periods if needed
+        }
+        if (period === "yesterday") {
+          const yesterday = moment().subtract(1, "day");
+          startDateTime =
+            yesterday.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
+            "Z";
+          endDateTime =
+            yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+        }
+        if (period === "week") {
+          //console.log("week is starting");
+          const startOfWeek = moment().subtract(7, "days").startOf("day");
+          //console.log("start of week", startOfWeek);
+          const oneday = moment().subtract(1, "day");
 
-        startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        //console.log("start date time ", startDateTime);
-        endDateTime =
-          oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        //console.log("end date time", endDateTime);
-      }
-      if (period === "custom") {
-        startDateTime =
-          moment(startdate).startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        endDateTime;
-        moment(enddate).endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-      }
-      if (reportType && VehicleReg && period) {
-        let newdata = { ...Ignitionreport };
+          startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
+          //console.log("start date time ", startDateTime);
+          endDateTime =
+            oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+          //console.log("end date time", endDateTime);
+        }
+        if (period === "custom") {
+          startDateTime =
+            moment(startdate).startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
+            "Z";
+          endDateTime;
+          moment(enddate).endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+        }
+        if (reportType && VehicleReg && period) {
+          let newdata = { ...Ignitionreport };
 
-        const apiFunctions: Record<
-          string,
-          (data: {
-            token: string;
-            clientId: string;
-            payload: any;
-          }) => Promise<any>
-        > = {
-          Trip: IgnitionReportByTrip,
-          DailyActivity: IgnitionReportByDailyactivity,
-          Ignition: IgnitionReportByIgnition,
-          Events: IgnitionReportByEvents,
-          DetailReportByStreet: IgnitionReportByDetailReport,
-          IdlingActivity: IgnitionReportByIdlingActivity,
-        };
+          const apiFunctions: Record<
+            string,
+            (data: {
+              token: string;
+              clientId: string;
+              payload: any;
+            }) => Promise<any>
+          > = {
+            Trip: IgnitionReportByTrip,
+            DailyActivity: IgnitionReportByDailyactivity,
+            Ignition: IgnitionReportByIgnition,
+            Events: IgnitionReportByEvents,
+            DetailReportByStreet: IgnitionReportByDetailReport,
+            IdlingActivity: IgnitionReportByIdlingActivity,
+          };
 
-        if (apiFunctions[newdata.reportType]) {
-          const apiFunction = apiFunctions[newdata.reportType];
-          if (isCustomPeriod) {
-            newdata = {
-              ...newdata,
-              fromDateTime: `${Ignitionreport.fromDateTime}T00:00:00Z`,
-              toDateTime: `${Ignitionreport.toDateTime}T23:59:59Z`,
-            };
-          } else {
-            newdata = {
-              // ...newdata,
-              unit: session?.unit,
-              reportType: 0,
-              period: period,
-              VehicleReg: VehicleReg,
-              TimeZone: session?.timezone,
-              clientId: session?.clientId,
-              fromDateTime: startDateTime,
-              toDateTime: endDateTime,
-              // fromDateTime: "2024-02-01T00:00:00Z",
-              // toDateTime: "2024-02-01T23:59:59Z",
-            };
-          }
-          try {
-            const response = await toast.promise(
-              apiFunction({
-                token: session.accessToken,
-                clientId: session.clientId,
-                payload: newdata,
-              }),
-              {
-                loading: "Loading...",
-                success: "",
-                error: "",
-              },
-              {
-                style: {
-                  border: "1px solid #00B56C",
-                  padding: "16px",
-                  color: "#1A202C",
-                },
-                success: {
-                  duration: 10,
-                  iconTheme: {
-                    primary: "#00B56C",
-                    secondary: "#FFFAEE",
-                  },
-                },
-                error: {
-                  duration: 10,
-                  iconTheme: {
-                    primary: "#00B56C",
-                    secondary: "#FFFAEE",
-                  },
-                },
-              }
-            );
-
-            if (response.success === true) {
-              const buffer = Buffer.from(response.data.pdfData, "base64");
-
-              window.open(
-                URL.createObjectURL(
-                  new Blob([buffer], { type: "application/pdf" })
-                )
-              );
-              toast.success(`${response.message}`, {
-                style: {
-                  border: "1px solid #00B56C",
-                  padding: "16px",
-                  color: "#1A202C",
-                },
-                duration: 4000,
-                iconTheme: {
-                  primary: "#00B56C",
-                  secondary: "#FFFAEE",
-                },
-              });
+          if (apiFunctions[newdata.reportType]) {
+            const apiFunction = apiFunctions[newdata.reportType];
+            if (isCustomPeriod) {
+              newdata = {
+                ...newdata,
+                fromDateTime: `${Ignitionreport.fromDateTime}T00:00:00Z`,
+                toDateTime: `${Ignitionreport.toDateTime}T23:59:59Z`,
+              };
             } else {
-              toast.error(`${response.message}`, {
-                style: {
-                  border: "1px solid red",
-                  padding: "16px",
-                  color: "red",
-                },
-                iconTheme: {
-                  primary: "red",
-                  secondary: "white",
-                },
-              });
+              newdata = {
+                // ...newdata,
+                unit: session?.unit,
+                reportType: 0,
+                period: period,
+                VehicleReg: VehicleReg,
+                TimeZone: session?.timezone,
+                clientId: session?.clientId,
+                fromDateTime: startDateTime,
+                toDateTime: endDateTime,
+                // fromDateTime: "2024-02-01T00:00:00Z",
+                // toDateTime: "2024-02-01T23:59:59Z",
+              };
             }
-          } catch (error) {
-            console.error(
-              `Error calling API for ${newdata.reportType}:`,
-              error
-            );
+            try {
+              const response = await toast.promise(
+                apiFunction({
+                  token: session.accessToken,
+                  clientId: session.clientId,
+                  payload: newdata,
+                }),
+                {
+                  loading: "Loading...",
+                  success: "",
+                  error: "",
+                },
+                {
+                  style: {
+                    border: "1px solid #00B56C",
+                    padding: "16px",
+                    color: "#1A202C",
+                  },
+                  success: {
+                    duration: 10,
+                    iconTheme: {
+                      primary: "#00B56C",
+                      secondary: "#FFFAEE",
+                    },
+                  },
+                  error: {
+                    duration: 10,
+                    iconTheme: {
+                      primary: "#00B56C",
+                      secondary: "#FFFAEE",
+                    },
+                  },
+                }
+              );
+
+              if (response.success === true) {
+                const buffer = Buffer.from(response.data.pdfData, "base64");
+
+                window.open(
+                  URL.createObjectURL(
+                    new Blob([buffer], { type: "application/pdf" })
+                  )
+                );
+                toast.success(`${response.message}`, {
+                  style: {
+                    border: "1px solid #00B56C",
+                    padding: "16px",
+                    color: "#1A202C",
+                  },
+                  duration: 4000,
+                  iconTheme: {
+                    primary: "#00B56C",
+                    secondary: "#FFFAEE",
+                  },
+                });
+              } else {
+                toast.error(`${response.message}`, {
+                  style: {
+                    border: "1px solid red",
+                    padding: "16px",
+                    color: "red",
+                  },
+                  iconTheme: {
+                    primary: "red",
+                    secondary: "white",
+                  },
+                });
+              }
+            } catch (error) {
+              console.error(
+                `Error calling API for ${newdata.reportType}:`,
+                error
+              );
+            }
+          } else {
+            console.error(`API function not found for ${newdata.reportType}`);
           }
         } else {
-          console.error(`API function not found for ${newdata.reportType}`);
+          console.error(
+            "Please fill in all three fields: reportType, VehicleReg, and period"
+          );
+
+          toast.error(
+            "Please fill in all three fields: reportType, VehicleReg, and period",
+            {
+              style: {
+                border: "1px solid #00B56C",
+                padding: "16px",
+                color: "#1A202C",
+              },
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            }
+          );
         }
       } else {
-        console.error(
-          "Please fill in all three fields: reportType, VehicleReg, and period"
-        );
-
-        toast.error(
-          "Please fill in all three fields: reportType, VehicleReg, and period",
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
-            },
-            iconTheme: {
-              primary: "#00B56C",
-              secondary: "#FFFAEE",
-            },
-          }
-        );
+        return null;
       }
     }
   };
@@ -845,7 +876,7 @@ export default function Reports() {
       </p>
       <form
         className="  bg-bgLight   height_report_form"
-        onSubmit={handleSubmit}
+        // onSubmit={handleSubmit}
       >
         <div className="bg-green-50 mt-5">
           <div className="grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-2 mt-5 mb-1 grid-cols-2  px-10 gap-2 ">
@@ -1036,7 +1067,7 @@ export default function Reports() {
                       checked={Ignitionreport.period === "today"}
                       onChange={handleInputChange}
                     />
-                    &nbsp;&nbsp;Today
+                    &nbsp;&nbsp;<b>Today</b>
                   </label>
                 </div>
                 <div
@@ -1053,7 +1084,7 @@ export default function Reports() {
                       checked={Ignitionreport.period === "yesterday"}
                       onChange={handleInputChange}
                     />
-                    &nbsp;&nbsp;Yesterday
+                    &nbsp;&nbsp;<b>Yesterday</b>
                   </label>
                 </div>
                 <div
@@ -1070,7 +1101,7 @@ export default function Reports() {
                       checked={Ignitionreport.period === "week"}
                       onChange={handleInputChange}
                     />
-                    &nbsp;&nbsp;Week
+                    &nbsp;&nbsp;<b>Week</b>
                   </label>
                 </div>
                 <div
@@ -1088,7 +1119,7 @@ export default function Reports() {
                       onChange={handleInputChange}
                       onClick={hanldeCustomClick}
                     />
-                    &nbsp;&nbsp;Custom
+                    &nbsp;&nbsp;<b>Custom</b>
                   </label>
                 </div>{" "}
               </>
@@ -1175,23 +1206,20 @@ export default function Reports() {
               <button
                 className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
                         ${
-                          (Ignitionreport.reportType &&
-                            Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "today") ||
-                          (Ignitionreport.reportType &&
-                            Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "yesterday") ||
-                          (Ignitionreport.reportType &&
-                            Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "week") ||
-                          (Ignitionreport.reportType &&
-                            Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "custom")
+                          Ignitionreport.reportType &&
+                          Ignitionreport.VehicleReg &&
+                          (Ignitionreport.period === "today" ||
+                            Ignitionreport.period === "yesterday" ||
+                            Ignitionreport.period === "week" ||
+                            (Ignitionreport.toDateTime &&
+                              Ignitionreport.fromDateTime))
                             ? ""
                             : "opacity-50 cursor-not-allowed"
                         }`}
+                // disabled={customDate}
                 type="submit"
                 onClick={handleSubmit}
+
                 // disabled={
                 //   !Ignitionreport.reportType ||
                 //   !Ignitionreport.VehicleReg ||
@@ -1206,22 +1234,16 @@ export default function Reports() {
             <div className="xl:col-span-1 lg:col-span-2 -ms-5">
               <button
                 className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
-              ${
-                (Ignitionreport.reportType &&
+                ${
+                  Ignitionreport.reportType &&
                   Ignitionreport.VehicleReg &&
-                  Ignitionreport.period === "today") ||
-                (Ignitionreport.reportType &&
-                  Ignitionreport.VehicleReg &&
-                  Ignitionreport.period === "yesterday") ||
-                (Ignitionreport.reportType &&
-                  Ignitionreport.VehicleReg &&
-                  Ignitionreport.period === "week") ||
-                (Ignitionreport.reportType &&
-                  Ignitionreport.VehicleReg &&
-                  Ignitionreport.period === "custom")
-                  ? ""
-                  : "opacity-50 cursor-not-allowed"
-              }`}
+                  (Ignitionreport.period === "today" ||
+                    Ignitionreport.period === "yesterday" ||
+                    Ignitionreport.period === "week" ||
+                    (Ignitionreport.toDateTime && Ignitionreport.fromDateTime))
+                    ? ""
+                    : "opacity-50 cursor-not-allowed"
+                }`}
                 onClick={handleExportPdf}
               >
                 Export Pdf
@@ -1490,17 +1512,21 @@ export default function Reports() {
               </table>
             </div>
           </div>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 18, 25]} // Add 11 to the rowsPerPageOptions array
-            component="div"
-            count={trisdata.length}
-            rowsPerPage={rowsPerPages}
-            page={currentPage}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            className="bg-bgLight table_pagination"
-            style={{ height: "5vh" }}
-          />
+          <div
+            className="pagination-wrapper"
+            style={{ width: "100%" }} // Set the width to 100% using inline style
+          >
+            <TablePagination
+              rowsPerPageOptions={[10, 18, 50, 100]}
+              component="div"
+              count={trisdata.length}
+              rowsPerPage={rowsPerPages}
+              page={currentPage}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              className="report_pagination"
+            />
+          </div>
         </div>
       )}
 
