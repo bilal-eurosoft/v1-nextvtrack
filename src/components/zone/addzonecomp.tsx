@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { ClientSettings } from "@/types/clientSettings";
 import {
   getClientSettingByClinetIdAndToken,
-  postZoneDataByClientId,
+  postZoneDataByClientId
 } from "@/utils/API_CALLS";
 import L, { LatLngTuple } from "leaflet";
 import { Toaster, toast } from "react-hot-toast";
@@ -16,6 +16,9 @@ import { Polygon } from "react-leaflet/Polygon";
 import { Circle } from "react-leaflet/Circle";
 import { LayerGroup } from "leaflet";
 import { MenuItem, Select } from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
+import "leaflet/dist/leaflet.css";
+import "leaflet-draw/dist/leaflet.draw.css";
 import "./editZone.css";
 const MapContainer = dynamic(
   () => import("react-leaflet").then((module) => module.MapContainer),
@@ -51,7 +54,7 @@ export default function AddZoneComp() {
   >([]);
   const [circleData, setCircleData] = useState({
     latlng: "",
-    radius: "",
+    radius: ""
   });
 
   const [clientsetting, setClientsetting] = useState<ClientSettings[] | null>(
@@ -64,7 +67,7 @@ export default function AddZoneComp() {
     zoneName: "",
     zoneShortName: "",
     zoneType: "",
-    latlngCordinates: "",
+    latlngCordinates: ""
   });
 
   const router = useRouter();
@@ -75,12 +78,14 @@ export default function AddZoneComp() {
         if (session) {
           const clientSettingData = await getClientSettingByClinetIdAndToken({
             token: session?.accessToken,
-            clientId: session?.clientId,
+            clientId: session?.clientId
           });
 
           if (clientSettingData) {
             //   const centervalue = await clientSettingData?.[0].PropertyValue;
-            const mapObject = clientSettingData.find((obj: { PropertDesc: string; }) => obj.PropertDesc === "Map");
+            const mapObject = clientSettingData.find(
+              (obj: { PropertDesc: string }) => obj.PropertDesc === "Map"
+            );
 
             // Get the PropertyValue from the found object
             const centervalue = mapObject ? mapObject.PropertyValue : null;
@@ -101,7 +106,7 @@ export default function AddZoneComp() {
       })();
     }
   }, []);
-  console.log("fvfdvdfvbfdvfdvdf", mapcenter)
+  console.log("fvfdvdfvbfdvfdvdf", mapcenter);
   const clientZoomSettings = clientsetting?.filter(
     (el) => el?.PropertDesc === "Zoom"
   )[0]?.PropertyValue;
@@ -115,24 +120,24 @@ export default function AddZoneComp() {
           latlngCordinates: JSON.stringify(
             polygondata.map(({ latitude, longitude }) => ({
               lat: latitude,
-              lng: longitude,
+              lng: longitude
             }))
           ),
           centerPoints: "",
-          zoneType: "Polygon",
+          zoneType: "Polygon"
         });
       } else if (circleData.radius) {
         setForm({
           ...Form,
           latlngCordinates: circleData.radius.toString(),
           centerPoints: circleData.latlng,
-          zoneType: "Circle",
+          zoneType: "Circle"
         });
       } else {
         setForm((prevForm) => ({
           ...prevForm,
           latlngCordinates: "",
-          centerPoints: "",
+          centerPoints: ""
         }));
       }
     }
@@ -141,14 +146,14 @@ export default function AddZoneComp() {
   const handlePolygonSave = (coordinates: [number, number][]) => {
     const zoneCoords = coordinates.slice(0, -1).map(([lat, lng]) => ({
       latitude: lat,
-      longitude: lng,
+      longitude: lng
     }));
 
     if (drawShape == true) {
       const formattedCoordinate: [number, number][] = zoneCoords.map(
         (coord: { latitude: number; longitude: number }) => [
           coord.latitude,
-          coord.longitude,
+          coord.longitude
         ]
       );
 
@@ -173,7 +178,7 @@ export default function AddZoneComp() {
       const updateCircleData = (newLatlng: string, newRadius: string): void => {
         setCircleData({
           latlng: newLatlng,
-          radius: newRadius,
+          radius: newRadius
         });
       };
       updateCircleData(circlePoint, radius);
@@ -190,7 +195,6 @@ export default function AddZoneComp() {
     if (value === "Restricted-Area") {
       setForm({ ...Form, GeoFenceType: value });
     }
-
   };
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -208,39 +212,39 @@ export default function AddZoneComp() {
       if (session) {
         const newformdata = {
           ...Form,
-          clientId: session?.clientId,
+          clientId: session?.clientId
         };
 
         const response = await toast.promise(
           postZoneDataByClientId({
             token: session?.accessToken,
-            newformdata: newformdata,
+            newformdata: newformdata
           }),
           {
             loading: "Saving data...",
             success: "Data saved successfully!",
-            error: "Error saving data. Please try again.",
+            error: "Error saving data. Please try again."
           },
           {
             style: {
               border: "1px solid #00B56C",
               padding: "16px",
-              color: "#1A202C",
+              color: "#1A202C"
             },
             success: {
               duration: 2000,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
+                secondary: "#FFFAEE"
+              }
             },
             error: {
               duration: 2000,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
+                secondary: "#FFFAEE"
+              }
+            }
           }
         );
 
@@ -286,7 +290,7 @@ export default function AddZoneComp() {
         ).map((latLng: L.LatLng) => [latLng.lat, latLng.lng]);
         const zoneCoords = coordinates.map(([lat, lng]) => ({
           latitude: lat,
-          longitude: lng,
+          longitude: lng
         }));
         setPolygondata(zoneCoords);
       } else if (layer instanceof L.Circle) {
@@ -354,10 +358,9 @@ export default function AddZoneComp() {
                 <MenuItem value="Off-Site">Off-Site</MenuItem>
                 <MenuItem value="City-Area">City-Area</MenuItem>
                 <MenuItem value="Restricted-Area">Restricted-Area</MenuItem>
-
-              </Select>)
-              :
-              (<Select
+              </Select>
+            ) : (
+              <Select
                 onChange={handleChange}
                 value={Form?.GeoFenceType}
                 className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
@@ -371,10 +374,8 @@ export default function AddZoneComp() {
                 </MenuItem>
                 <MenuItem value="On-Site">On-Site</MenuItem>
                 <MenuItem value="Off-Site">Off-Site</MenuItem>
-
-
-              </Select>)
-            }
+              </Select>
+            )}
             <br></br>
             <br></br>
             <label className="text-black text-md w-full font-popins font-medium">
@@ -391,7 +392,7 @@ export default function AddZoneComp() {
               required
             />
             <div className="flex justify-start">
-              <div className="grid lg:grid-cols-6 grid-cols-6 bg-green shadow-md  w-24 rounded-md   hover:shadow-gray transition duration-500 ">
+              {/* <div className="grid lg:grid-cols-8 grid-cols-6 bg-green shadow-md  w-24 rounded-md   hover:shadow-gray transition duration-500 ">
                 <div className="col-span-2">
                   <svg
                     className="h-10 py-3 w-full text-white"
@@ -415,14 +416,72 @@ export default function AddZoneComp() {
                     Save
                   </button>
                 </div>
-
+                <div className="col-span-2">
+                  <ClearIcon />
+                </div>
                 <div className="col-span-2 ">
                   <button
-                    className="ms-14  font-popins font-bold  h-10 bg-white text-labelColor px-6 rounded-md shadow-md  hover:shadow-gray transition duration-500"
-                    onClick={() => router.push("/Zone")}
+                    className="ms-14  font-popins font-bold  h-10 bg-red text-white px-6 rounded-md shadow-md  hover:shadow-gray transition duration-500"
+                    onClick={() => router.push("http://localhost:3010/Zone")}
                   >
                     Cancel
                   </button>
+                </div>
+              </div> */}
+              <div
+                className="grid grid-cols-12  
+                "
+              >
+                <div
+                  className="col-span-5 bg-green 
+                rounded-md shadow-md  hover:shadow-gray transition duration-500"
+                >
+                  <div className="grid grid-cols-12 gap-2">
+                    <div className="col-span-1"></div>
+                    <div className="col-span-3 ">
+                      <svg
+                        className="h-10 py-2  w-full text-white"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                        <polyline points="17 21 17 13 7 13 7 21" />
+                        <polyline points="7 3 7 8 15 8" />
+                      </svg>
+                    </div>
+                    <div className="col-span-8">
+                      <button
+                        className="text-white font-popins font-bold h-10 bg-[#00B56C] "
+                        type="submit"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-span-1"></div>
+                <div
+                  className="col-span-5 bg-red
+                rounded-md shadow-md  hover:shadow-gray transition duration-500"
+                >
+                  <div className="grid grid-cols-12 gap-2">
+                    <div className="col-span-1"></div>
+                    <div className="col-span-3 ">
+                      <ClearIcon className="mt-2 font-bold" />
+                    </div>
+                    <div className="col-span-8">
+                      <button
+                        className="text-white font-popins font-bold h-10 bg-red "
+                        onClick={() => router.push("/Zone")}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -503,7 +562,7 @@ export default function AddZoneComp() {
                           circle: drawShape,
                           marker: false,
                           circlemarker: false,
-                          rectangle: false,
+                          rectangle: false
                         }}
                       />
                       {shapeType === "Polygon" && polygondataById.length > 0 ? (
@@ -511,9 +570,9 @@ export default function AddZoneComp() {
                       ) : null}
 
                       {shapeType === "Circle" &&
-                        !isNaN(mapcenter[0]) &&
-                        !isNaN(mapcenter[1]) &&
-                        !isNaN(Number(circleDataById?.radius)) ? (
+                      !isNaN(mapcenter[0]) &&
+                      !isNaN(mapcenter[1]) &&
+                      !isNaN(Number(circleDataById?.radius)) ? (
                         <Circle
                           radius={Number(circleDataById?.radius)}
                           center={mapcenter}
@@ -535,7 +594,7 @@ export default function AddZoneComp() {
                           circle: true,
                           marker: false,
                           circlemarker: false,
-                          rectangle: false,
+                          rectangle: false
                         }}
                       />
                       {shapeType === "Polygon" && polygondataById.length > 0 ? (
@@ -543,9 +602,9 @@ export default function AddZoneComp() {
                       ) : null}
 
                       {shapeType === "Circle" &&
-                        !isNaN(mapcenter[0]) &&
-                        !isNaN(mapcenter[1]) &&
-                        !isNaN(Number(circleDataById?.radius)) ? (
+                      !isNaN(mapcenter[0]) &&
+                      !isNaN(mapcenter[1]) &&
+                      !isNaN(Number(circleDataById?.radius)) ? (
                         <Circle
                           radius={Number(circleDataById?.radius)}
                           center={mapcenter}

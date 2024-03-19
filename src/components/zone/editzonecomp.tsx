@@ -11,6 +11,7 @@ import L, { LatLngTuple } from "leaflet";
 import { Toaster, toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { MenuItem, Select } from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
 import "./editZone.css";
 
 const MapContainer = dynamic(
@@ -375,8 +376,9 @@ export default function EditZoneComp() {
         <div className="grid lg:grid-cols-6 sm:grid-cols-5 md:grid-cols-6 grid-cols-1  pt-8">
           <div className=" xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-4 col-span-4 bg-gray-200 mx-5">
             <form onSubmit={handleSave}>
-              <label className="text-black text-md w-full font-popins font-medium">
-                <span className="text-red">*</span> Please Enter Zone Name:{" "}
+              <label className="text-md font-popins text-black font-semibold">
+                <span className="text-red  font-extraboldbold">*</span> Please
+                Enter Zone Name:{" "}
               </label>
               <input
                 onChange={handleChange}
@@ -387,8 +389,8 @@ export default function EditZoneComp() {
                 placeholder="Enter Zone Name"
                 required
               />
-              <label className="text-black text-md font-popins font-medium">
-                <span className="text-red">*</span> Geofence:{" "}
+              <label className="text-md font-popins text-black font-semibold">
+                <span className="text-red font-extraboldbold">*</span> Geofence:{" "}
               </label>
               <Select
                 onChange={handleChange}
@@ -425,8 +427,9 @@ export default function EditZoneComp() {
               </Select>
               <br></br>
               <br></br>
-              <label className="text-black text-md font-popins font-medium">
-                <span className="text-red">*</span> Zone Short Name:{" "}
+              <label className="text-md font-popins text-black font-semibold">
+                <span className="text-red font-extraboldbold">*</span> Zone
+                Short Name:{" "}
               </label>
               <input
                 aria-required
@@ -440,32 +443,59 @@ export default function EditZoneComp() {
               />
               <div className="flex justify-center">
                 <div
-                  className="grid lg:grid-cols-2 grid-cols-2 bg-green w-24
-                rounded-md shadow-md  hover:shadow-gray transition duration-50
+                  className="grid grid-cols-12  
                 "
                 >
-                  <div className="col-span-1">
-                    <svg
-                      className="h-10 py-3 w-full text-white"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                      <polyline points="17 21 17 13 7 13 7 21" />
-                      <polyline points="7 3 7 8 15 8" />
-                    </svg>
+                  <div
+                    className="col-span-5 bg-green 
+                rounded-md shadow-md  hover:shadow-gray transition duration-500"
+                  >
+                    <div className="grid grid-cols-12 gap-2">
+                      <div className="col-span-1"></div>
+                      <div className="col-span-3 ">
+                        <svg
+                          className="h-10 py-2  w-full text-white"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                          <polyline points="17 21 17 13 7 13 7 21" />
+                          <polyline points="7 3 7 8 15 8" />
+                        </svg>
+                      </div>
+                      <div className="col-span-8">
+                        <button
+                          className="text-white font-popins font-bold h-10 bg-[#00B56C] "
+                          type="submit"
+                        >
+                          Update
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="col-span-1">
-                    <button
-                      className="text-white font-popins font-bold h-10 bg-[#00B56C] -ms-2"
-                      type="submit"
-                    >
-                      Save
-                    </button>
+                  <div className="col-span-1"></div>
+                  <div
+                    className="col-span-5 bg-red
+                rounded-md shadow-md  hover:shadow-gray transition duration-500"
+                  >
+                    <div className="grid grid-cols-12 gap-2">
+                      <div className="col-span-1"></div>
+                      <div className="col-span-3 ">
+                        <ClearIcon className="mt-2 font-bold" />
+                      </div>
+                      <div className="col-span-8">
+                        <button
+                          className="text-white font-popins font-bold h-10 bg-red "
+                          onClick={() => router.push("/Zone")}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -475,7 +505,7 @@ export default function EditZoneComp() {
 
           <div className="xl:col-span-5 lg:col-span-4 md:col-span-4 sm:col-span-5 col-span-4 mx-3 edit-zone_map_child">
             <div className="edit_zone_map_text">
-              <label className="text-black text-md font-popins font-medium">
+              <label className="text-md font-popins text-black font-semibold">
                 please enter text to search{" "}
               </label>
               <input
@@ -489,7 +519,7 @@ export default function EditZoneComp() {
             <div className="grid lg:grid-cols-3 grid-cols-3 bg-green w-24 edit_zone_map_btn rounded-md shadow-md  hover:shadow-gray transition duration-500">
               <div className="col-span-1">
                 <svg
-                  className="h-10 py-3 w-full text-white"
+                  className="h-10 py-2 w-full text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

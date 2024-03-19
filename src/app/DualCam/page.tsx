@@ -36,7 +36,7 @@ export default function DualCam() {
   const [selectedFileType, setSelectedFileType] = useState(null);
   const [selectedDateFilter, setSelectedDateFilter] = useState(null);
   const [customDate, setCustomDate] = useState(false);
-
+const [showDurationTab, setshowDurationTab] = useState(false);
 
   
   const recordsPerPage = 6;
@@ -150,7 +150,14 @@ export default function DualCam() {
     setSelectedCameraType(event.target.value);
   };
   const handleFileTypeChange =  (event: { target: { value: any; }; }) => {
-    setSelectedFileType(event.target.value);
+    let filetype = event.target.value
+    setSelectedFileType(filetype);
+    console.log("fdvdfv", event.target.value)
+    if(filetype === "Video"){
+    setshowDurationTab(true)}
+    else {
+      setshowDurationTab(false)
+    }
   };
 
   const handleDateFilterChange = (event: { target: { value: any; }; }) => {
@@ -217,11 +224,11 @@ export default function DualCam() {
     }
     console.log("foemvalues", formvalues)
 
-    if (session) {
+    if (session) { }
     // const resp = await portalGprsCommand({   token: session?.accessToken, payload: formvalues})
 
     // }
-    const response = await toast.promise(
+   /*  const response = await toast.promise(
       portalGprsCommand({
         token: session?.accessToken, payload: formvalues
       }),
@@ -252,7 +259,7 @@ export default function DualCam() {
         },
       }
     );
-    }
+    } */
     // Perform any further actions, such as sending the selected values to the server
   };
 
@@ -459,7 +466,7 @@ export default function DualCam() {
       </div> */}
 
 
-
+{showDurationTab && 
       <div className="dateTimeForm">
       <h2>Select Date and Time</h2>
       <form >
@@ -500,8 +507,9 @@ export default function DualCam() {
     {/*     <button type="submit">Submit</button> */}
       </form>
     </div>
+    }
     <div className="col-span-1">
-          <button className="bg-green px-5 py-2 text-white mt-2"  onClick={handleSubmit}>Request</button>
+          <button className="bg-green px-5 py-2 text-white mt-2 ml-[850px]"  onClick={handleSubmit}>Request</button>
         </div>
       <div>
         <p className="bg-green h-8 mt-5"> </p>

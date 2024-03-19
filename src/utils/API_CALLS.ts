@@ -1,7 +1,8 @@
-import { IgnitionReport, replayreport, commandrequest } from "@/types/IgnitionReport";
+import { IgnitionReport, replayreport} from "@/types/IgnitionReport";
+import { commandrequest} from "@/types/commandrequest";
 import { zonelistType } from "@/types/zoneType";
 
-var URL ="http://localhost:3001"// "https://backend.vtracksolutions.com"; //""http://172.16.11.210:3001; //"http://172.16.11.210:3001";
+var URL = "https://backend.vtracksolutions.com"; //""http://172.16.11.210:3001; //"http://172.16.11.210:3001";
 // https://backend.vtracksolutions.com
 export async function getVehicleDataByClientId(clientId: string) {
   try {
@@ -110,7 +111,6 @@ export async function vehicleListByClientId({
   }
 }
 
-
 export async function getAllVehicleByUserId({
   token,
   userId,
@@ -141,12 +141,6 @@ export async function getAllVehicleByUserId({
     return [];
   }
 }
-
-
-
-
-
-
 
 export async function IgnitionReportByTrip({
   token,
@@ -380,7 +374,38 @@ export async function forgetEmailByClientId({
   newformdata: any;
 }) {
   try {
-    const response = await fetch(`${URL}/forgotpassword/forgotpassword`, {
+    const response = await fetch(
+      `${URL}/forgotpassword/forgotpassword`,
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(newformdata),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log("Error fetching data", error);
+    return [];
+  }
+}
+
+export async function forgetPasswordClientId({
+  token,
+  newformdata,
+}: {
+  token: any;
+  newformdata: any;
+}) {
+  try {
+    const response = await fetch(`${URL}/forgotpassword/Passwordreset`, {
       method: "POST",
       headers: {
         accept: "application/json, text/plain, */*",
@@ -1059,6 +1084,68 @@ export async function getCurrentAddress({
         },
       }
     );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+
+export async function GetLicenseById({
+  // token,
+  id,
+}: {
+  // token: string
+  id: string;
+}) {
+  try {
+    const response = await fetch(`${URL}/GetLicenseById`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        // authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"id\":\"${id}\"}`,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+
+export async function GetUsersByClientId({
+  // token,
+  clientId,
+}: {
+  // token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(`${URL}/GetUsersByClientId`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        // authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"clientId\":\"${clientId}\"}`,
+    });
 
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");

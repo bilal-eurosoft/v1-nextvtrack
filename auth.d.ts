@@ -20,5 +20,7 @@ declare module 'next-auth' {
     jti: string
     userRole: string
     clickToCall: Boolean
+    cameraProfile:Boolean,
+    driverProfile:Boolean
   }
 }

@@ -4,6 +4,18 @@
 #table_head {
   font-size: 18px;
 }
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: rgb(255, 255, 255);
+}
+.bg_hover_rfid:hover {
+  background-color: #00b56c;
+  color: white;
+}
+::-webkit-scrollbar-thumb {
+  background: #29303b;
+  border-radius: 7px;
+}
 .MuiOutlinedInput-notchedOutline {
   /* border-width: 1px !important; */
   border-color: #d3d3d3 !important;
@@ -113,10 +125,7 @@
     font-size: 16px;
   }
 }
-::-webkit-scrollbar-thumb {
-  background: #29303b;
-  border-radius: 7px;
-}
+
 @media (max-width: 1200px) and (min-width: 810px) {
   .popup_style {
     width: 65%;
@@ -135,3 +144,42 @@
     margin-top: 30%;
   }
 }
+
+.custom-select {
+  position: relative;
+  display: inline-block;
+}
+
+.selected-option {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.options {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+}
+
+.option {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.option:hover {
+  background-color: #00b56c; /* Change to your desired hover background color */
+  color: #fff; /* Change to your desired text color on hover */
+}
+
+/* .MuiButtonBase-root {
+  width: 100% !important;
+} */
