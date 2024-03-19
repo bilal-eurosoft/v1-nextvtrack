@@ -48,7 +48,7 @@ export default function Reports() {
   const [customDate, setcustomDate] = useState(true);
   // suraksha code
   const [trisdata, setTrisdata] = useState<TripsByBucket[]>([]);
-  const [rowsPerPages, setRowsPerPage] = useState(18);
+  const [rowsPerPages, setRowsPerPage] = useState(20);
   const [currentPage, setCurrentPage] = useState(0);
   const [columnHeaders, setColumnHeaders] = useState<
     (
@@ -884,7 +884,7 @@ export default function Reports() {
               <div className="grid grid-cols-12">
                 <div className="xl:col-span-3 lg:col-span-4 sm:col-span-10 col-span-12 mt-2">
                   <label className="text-labelColor ">
-                    Report Type: &nbsp;&nbsp;
+                    <b>Report Type:</b> &nbsp;&nbsp;
                   </label>
                 </div>
                 <div className="lg:col-span-8 md:col-span-8 col-span-12">
@@ -985,7 +985,7 @@ export default function Reports() {
               <div className="grid grid-cols-12">
                 <div className="lg:col-span-2 col-span-12 mt-2">
                   <label className="text-labelColor">
-                    Vehicle: &nbsp;&nbsp;{" "}
+                    <b>Vehicle:</b> &nbsp;&nbsp;{" "}
                   </label>
                 </div>
                 {/* <Select
@@ -1128,7 +1128,8 @@ export default function Reports() {
               <>
                 <div className="xl:col-span-2 lg:col-span-3 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4 ">
                   <label className="text-labelColor">
-                    From Date: &nbsp;&nbsp;&nbsp;
+                    <label className="text-green"> From Date:</label>{" "}
+                    &nbsp;&nbsp;&nbsp;
                     <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
                       <KeyboardDatePicker
                         format="MM/DD/yyyy"
@@ -1159,38 +1160,36 @@ export default function Reports() {
                   </label>
                 </div>
                 <div className="xl:col-span-2 lg:col-span-3  md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0  w-full ">
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "end",
-                      paddingLeft: "-15%",
-                    }}
-                  >
-                    <button
-                      className="text-green -mt-5 -mb-5 text-2xl font-bold"
-                      onClick={hanldeCloseDateTap}
-                    >
-                      x
-                    </button>
+                  <div className="grid grid-cols-12">
+                    <div className="col-span-10">
+                      <label className="text-green"> To Date:</label>
+                      <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
+                        <KeyboardDatePicker
+                          format="MM/DD/yyyy"
+                          value={Ignitionreport.toDateTime}
+                          onChange={(newDate: any) =>
+                            handleCustomDateChange("toDateTime", newDate)
+                          }
+                          variant="inline"
+                          maxDate={currenTDates}
+                          autoOk
+                          inputProps={{ readOnly: true }}
+                          placeholder="End Date"
+                          // className="xl:w-80  lg:w-80 w-auto"
+                          // style={{ width: "70%" }}
+                        />
+                      </MuiPickersUtilsProvider>
+                    </div>
+                    <div className="col-span-2">
+                      <button
+                        className="text-green -mt-5 -mb-5 text-2xl font-bold"
+                        onClick={hanldeCloseDateTap}
+                      >
+                        x
+                      </button>
+                    </div>
                   </div>
-                  <label className="text-labelColor "></label>
-                  To Date: &nbsp;&nbsp;&nbsp;
-                  <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
-                    <KeyboardDatePicker
-                      format="MM/DD/yyyy"
-                      value={Ignitionreport.toDateTime}
-                      onChange={(newDate: any) =>
-                        handleCustomDateChange("toDateTime", newDate)
-                      }
-                      variant="inline"
-                      maxDate={currenTDates}
-                      autoOk
-                      inputProps={{ readOnly: true }}
-                      placeholder="End Date"
-                      // className="xl:w-80  lg:w-80 w-auto"
-                      // style={{ width: "70%" }}
-                    />
-                  </MuiPickersUtilsProvider>
+
                   {/* <input
                   type="date"
                   className="h-8 lg:w-4/6 w-full  text-labelColor  outline-green border border-grayLight px-1"
@@ -1517,14 +1516,15 @@ export default function Reports() {
             style={{ width: "100%" }} // Set the width to 100% using inline style
           >
             <TablePagination
-              rowsPerPageOptions={[10, 18, 50, 100]}
+              rowsPerPageOptions={[10, 20, 50, 100]}
               component="div"
               count={trisdata.length}
               rowsPerPage={rowsPerPages}
               page={currentPage}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
-              className="report_pagination"
+              // className="report_paginations"
+              style={{ display: "block" }}
             />
           </div>
         </div>

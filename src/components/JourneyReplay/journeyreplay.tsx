@@ -2339,7 +2339,7 @@ export default function journeyReplayComp() {
                   </button>
                 </div>
               </div> */}
-              {zoneList.length > 1 && (
+              {zoneList !== null && zoneList.length > 0 && (
                 <div
                   className="grid grid-cols-1 absolute lg:top-10 xl:top-1 md:top-10 top-5 right-10 bg-bgLight py-2 px-2"
                   style={{
