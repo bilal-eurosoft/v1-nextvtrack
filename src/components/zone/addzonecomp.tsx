@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { ClientSettings } from "@/types/clientSettings";
 import {
   getClientSettingByClinetIdAndToken,
-  postZoneDataByClientId
+  postZoneDataByClientId,
 } from "@/utils/API_CALLS";
 import L, { LatLngTuple } from "leaflet";
 import { Toaster, toast } from "react-hot-toast";
@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { Polygon } from "react-leaflet/Polygon";
 import { Circle } from "react-leaflet/Circle";
 import { LayerGroup } from "leaflet";
-import { MenuItem, Select } from "@mui/material";
+import { Button, MenuItem, Select } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
@@ -54,7 +54,7 @@ export default function AddZoneComp() {
   >([]);
   const [circleData, setCircleData] = useState({
     latlng: "",
-    radius: ""
+    radius: "",
   });
 
   const [clientsetting, setClientsetting] = useState<ClientSettings[] | null>(
@@ -67,7 +67,7 @@ export default function AddZoneComp() {
     zoneName: "",
     zoneShortName: "",
     zoneType: "",
-    latlngCordinates: ""
+    latlngCordinates: "",
   });
 
   const router = useRouter();
@@ -78,7 +78,7 @@ export default function AddZoneComp() {
         if (session) {
           const clientSettingData = await getClientSettingByClinetIdAndToken({
             token: session?.accessToken,
-            clientId: session?.clientId
+            clientId: session?.clientId,
           });
 
           if (clientSettingData) {
@@ -120,24 +120,24 @@ export default function AddZoneComp() {
           latlngCordinates: JSON.stringify(
             polygondata.map(({ latitude, longitude }) => ({
               lat: latitude,
-              lng: longitude
+              lng: longitude,
             }))
           ),
           centerPoints: "",
-          zoneType: "Polygon"
+          zoneType: "Polygon",
         });
       } else if (circleData.radius) {
         setForm({
           ...Form,
           latlngCordinates: circleData.radius.toString(),
           centerPoints: circleData.latlng,
-          zoneType: "Circle"
+          zoneType: "Circle",
         });
       } else {
         setForm((prevForm) => ({
           ...prevForm,
           latlngCordinates: "",
-          centerPoints: ""
+          centerPoints: "",
         }));
       }
     }
@@ -146,14 +146,14 @@ export default function AddZoneComp() {
   const handlePolygonSave = (coordinates: [number, number][]) => {
     const zoneCoords = coordinates.slice(0, -1).map(([lat, lng]) => ({
       latitude: lat,
-      longitude: lng
+      longitude: lng,
     }));
 
     if (drawShape == true) {
       const formattedCoordinate: [number, number][] = zoneCoords.map(
         (coord: { latitude: number; longitude: number }) => [
           coord.latitude,
-          coord.longitude
+          coord.longitude,
         ]
       );
 
@@ -178,7 +178,7 @@ export default function AddZoneComp() {
       const updateCircleData = (newLatlng: string, newRadius: string): void => {
         setCircleData({
           latlng: newLatlng,
-          radius: newRadius
+          radius: newRadius,
         });
       };
       updateCircleData(circlePoint, radius);
@@ -212,48 +212,48 @@ export default function AddZoneComp() {
       if (session) {
         const newformdata = {
           ...Form,
-          clientId: session?.clientId
+          clientId: session?.clientId,
         };
 
         const response = await toast.promise(
           postZoneDataByClientId({
             token: session?.accessToken,
-            newformdata: newformdata
+            newformdata: newformdata,
           }),
           {
             loading: "Saving data...",
             success: "Data saved successfully!",
-            error: "Error saving data. Please try again."
+            error: "Error saving data. Please try again.",
           },
           {
             style: {
               border: "1px solid #00B56C",
               padding: "16px",
-              color: "#1A202C"
+              color: "#1A202C",
             },
             success: {
               duration: 2000,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE"
-              }
+                secondary: "#FFFAEE",
+              },
             },
             error: {
               duration: 2000,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE"
-              }
-            }
+                secondary: "#FFFAEE",
+              },
+            },
           }
         );
 
-        if (response.id !== null) {
-          // Delay the redirection by 4 seconds
-          setTimeout(() => {
-            router.push("/Zone");
-          }, 2000);
-        }
+        // if (response.id !== null) {
+
+        //   setTimeout(() => {
+        //     router.push("/Zone");
+        //   }, 2000);
+        // }
       }
     } catch (error) {
       console.error("Error fetching zone data:", error);
@@ -290,7 +290,7 @@ export default function AddZoneComp() {
         ).map((latLng: L.LatLng) => [latLng.lat, latLng.lng]);
         const zoneCoords = coordinates.map(([lat, lng]) => ({
           latitude: lat,
-          longitude: lng
+          longitude: lng,
         }));
         setPolygondata(zoneCoords);
       } else if (layer instanceof L.Circle) {
@@ -470,16 +470,16 @@ export default function AddZoneComp() {
                 >
                   <div className="grid grid-cols-12 gap-2">
                     <div className="col-span-1"></div>
-                    <div className="col-span-3 ">
+                    <div className="col-span-2 ">
                       <ClearIcon className="mt-2 font-bold" />
                     </div>
-                    <div className="col-span-8">
-                      <button
-                        className="text-white font-popins font-bold h-10 bg-red "
+                    <div className="col-span-8 bg-red  rounded-md">
+                      <Button
+                        className="text-white font-popins font-bold h-10 text-center"
                         onClick={() => router.push("/Zone")}
                       >
                         Cancel
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -562,7 +562,7 @@ export default function AddZoneComp() {
                           circle: drawShape,
                           marker: false,
                           circlemarker: false,
-                          rectangle: false
+                          rectangle: false,
                         }}
                       />
                       {shapeType === "Polygon" && polygondataById.length > 0 ? (
@@ -594,7 +594,7 @@ export default function AddZoneComp() {
                           circle: true,
                           marker: false,
                           circlemarker: false,
-                          rectangle: false
+                          rectangle: false,
                         }}
                       />
                       {shapeType === "Polygon" && polygondataById.length > 0 ? (

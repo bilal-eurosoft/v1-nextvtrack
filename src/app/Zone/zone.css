@@ -31,23 +31,27 @@
   font-weight: 600;
 }
 #zone_hover:hover {
-  background-color: #00b56c;
+  background-color: #00b56c !important;
   color: white;
   font-weight: 600;
 }
 .MuiOutlinedInput-notchedOutline {
-  /* border-width: 1px !important; */
   border-color: #d3d3d3 !important;
-  outline: #00b56c;
+  outline: #00b56c !important;
 }
 
 .MuiOutlinedInput-notchedOutline:hover {
-  /* border-width: 1px !important; */
   border: #00b56c !important;
 }
 
 .Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: #00b56c !important;
+}
+.css-1chpzqh {
+  display: none !important;
+}
+.css-8nphli .MuiTablePagination-actions {
+  display: none !important;
 }
 /* .icon_delete_edit {
   margin-left: 73%;

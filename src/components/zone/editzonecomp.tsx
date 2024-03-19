@@ -10,8 +10,9 @@ import { ZoneFindById, postZoneDataByClientId } from "@/utils/API_CALLS";
 import L, { LatLngTuple } from "leaflet";
 import { Toaster, toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { MenuItem, Select } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
+import { Button, MenuItem, Select } from "@mui/material";
+
 import "./editZone.css";
 
 const MapContainer = dynamic(
@@ -484,16 +485,16 @@ export default function EditZoneComp() {
                   >
                     <div className="grid grid-cols-12 gap-2">
                       <div className="col-span-1"></div>
-                      <div className="col-span-3 ">
+                      <div className="col-span-2 ">
                         <ClearIcon className="mt-2 font-bold" />
                       </div>
-                      <div className="col-span-8">
-                        <button
-                          className="text-white font-popins font-bold h-10 bg-red "
+                      <div className="col-span-8 bg-red  rounded-md">
+                        <Button
+                          className="text-white font-popins font-bold h-10"
                           onClick={() => router.push("/Zone")}
                         >
                           Cancel
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -573,16 +574,17 @@ export default function EditZoneComp() {
                           }}
                         />
                         {shapeType === "Polygon" &&
-                          polygondataById.length > 0 ? (
-
+                        polygondataById.length > 0 ? (
                           <>
-                            {zoneDataById?.GeoFenceType === "Restricted-Area" && (
+                            {zoneDataById?.GeoFenceType ===
+                              "Restricted-Area" && (
                               <Polygon
                                 positions={polygondataById}
                                 color="red"
                               />
                             )}
-                            {zoneDataById?.GeoFenceType !== "Restricted-Area" && (
+                            {zoneDataById?.GeoFenceType !==
+                              "Restricted-Area" && (
                               <Polygon
                                 positions={polygondataById}
                                 color="#97009c"
@@ -598,18 +600,20 @@ export default function EditZoneComp() {
                         ) : null}
 
                         {shapeType === "Circle" &&
-                          !isNaN(mapcenter[0]) &&
-                          !isNaN(mapcenter[1]) &&
-                          !isNaN(Number(circleDataById?.radius)) ? (
+                        !isNaN(mapcenter[0]) &&
+                        !isNaN(mapcenter[1]) &&
+                        !isNaN(Number(circleDataById?.radius)) ? (
                           <>
-                            {zoneDataById?.GeoFenceType === "Restricted-Area" && (
+                            {zoneDataById?.GeoFenceType ===
+                              "Restricted-Area" && (
                               <Circle
                                 radius={Number(circleDataById?.radius)}
                                 center={mapcenter}
                                 color="red"
                               />
                             )}
-                            {zoneDataById?.GeoFenceType !== "Restricted-Area" && (
+                            {zoneDataById?.GeoFenceType !==
+                              "Restricted-Area" && (
                               <Circle
                                 radius={Number(circleDataById?.radius)}
                                 center={mapcenter}
@@ -643,7 +647,7 @@ export default function EditZoneComp() {
                           }}
                         />
                         {shapeType === "Polygon" &&
-                          polygondataById.length > 0 ? (
+                        polygondataById.length > 0 ? (
                           <Polygon
                             positions={polygondataById}
                             color="#97009c"
@@ -651,9 +655,9 @@ export default function EditZoneComp() {
                         ) : null}
 
                         {shapeType === "Circle" &&
-                          !isNaN(mapcenter[0]) &&
-                          !isNaN(mapcenter[1]) &&
-                          !isNaN(Number(circleDataById?.radius)) ? (
+                        !isNaN(mapcenter[0]) &&
+                        !isNaN(mapcenter[1]) &&
+                        !isNaN(Number(circleDataById?.radius)) ? (
                           <Circle
                             radius={Number(circleDataById?.radius)}
                             center={mapcenter}

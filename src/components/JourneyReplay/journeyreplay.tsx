@@ -2797,9 +2797,9 @@ export default function journeyReplayComp() {
                           onChange={(e: any) => setSpeedFactor(Number(e.value))}
                           options={SpeedOption}
                           placeholder="1x"
-                          isSearchable
-                          noOptionsMessage={() => "No options available"}
+                          isSearchable={false}
                           className="rounded-md h-10 -mt-3 w-full outline-green border border-grayLight"
+                          defaultValue={SpeedOption[0]}
                           styles={{
                             control: (provided, state) => ({
                               ...provided,
@@ -2813,7 +2813,6 @@ export default function journeyReplayComp() {
                               top: "auto",
                               bottom: "100%", // Position the menu above the select input
                             }),
-
                             option: (provided, state) => ({
                               ...provided,
                               backgroundColor: state.isSelected
@@ -2831,18 +2830,6 @@ export default function journeyReplayComp() {
                                 color: "white",
                               },
                             }),
-
-                            // option: (provided, state) => ({
-                            //   ...provided,
-                            //   backgroundColor: state.isFocused
-                            //     ? "#00B56C"
-                            //     : "transparent",
-                            //   color: state.isFocused ? "white" : "black",
-                            //   "&:hover": {
-                            //     backgroundColor: "#00B56C",
-                            //     color: "white",
-                            //   },
-                            // }),
                           }}
                         />
                       )}

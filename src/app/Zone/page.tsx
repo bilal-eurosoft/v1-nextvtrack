@@ -953,28 +953,41 @@ export default function Zone() {
                 </TableCell> */}
                       <TableCell
                         align="left"
-                        className="border-r border-green  font-popins text-black font-normal"
-                        style={{ fontSize: "16px" }}
+                        className="border-r   font-popins text-black font-normal"
+                        style={{
+                          fontSize: "16px",
+                          border: "1px solid #00b56c",
+                        }}
                       >
                         {item.zoneName}
                       </TableCell>
                       <TableCell
                         align="left"
-                        className="border-r border-green  font-popins text-black font-normal"
-                        style={{ fontSize: "16px" }}
+                        className="border-r   font-popins text-black font-normal"
+                        style={{
+                          fontSize: "16px",
+                          border: "1px solid #00b56c",
+                        }}
                       >
                         {item.zoneShortName}
                       </TableCell>
                       <TableCell
                         align="left"
-                        className="border-r border-green  font-popins text-black font-normal"
-                        style={{ fontSize: "16px" }}
+                        className="border-r   font-popins text-black font-normal"
+                        style={{
+                          fontSize: "16px",
+                          border: "1px solid #00b56c",
+                        }}
                       >
                         {item.zoneType}
                       </TableCell>
                       <TableCell
                         align="center" // Set align to center
-                        className="border-r border-green font-popins text-black font-normal"
+                        className="border-r 
+                         font-popins text-black font-normal"
+                        style={{
+                          border: "1px solid #00b56c",
+                        }}
                       >
                         <Link href={`/EditZone?id=${item.id}`}>
                           <BorderColorIcon
@@ -1048,28 +1061,40 @@ export default function Zone() {
                 </TableCell> */}
                           <TableCell
                             align="left"
-                            className="border-r border-green  font-popins text-black font-normal"
-                            style={{ fontSize: "16px" }}
+                            className="border-r   font-popins text-black font-normal"
+                            style={{
+                              fontSize: "16px",
+                              border: "1px solid #00b56c",
+                            }}
                           >
                             {item.zoneName}
                           </TableCell>
                           <TableCell
                             align="left"
-                            className="border-r border-green  font-popins text-black font-normal"
-                            style={{ fontSize: "16px" }}
+                            className="border-r  font-popins text-black font-normal"
+                            style={{
+                              fontSize: "16px",
+                              border: "1px solid #00b56c",
+                            }}
                           >
                             {item.zoneShortName}
                           </TableCell>
                           <TableCell
                             align="left"
-                            className="border-r border-green  font-popins text-black font-normal"
-                            style={{ fontSize: "16px" }}
+                            className="border-r   font-popins text-black font-normal"
+                            style={{
+                              fontSize: "16px",
+                              border: "1px solid #00b56c",
+                            }}
                           >
                             {item.zoneType}
                           </TableCell>
                           <TableCell
                             align="center" // Set align to center
-                            className="border-r border-green font-popins text-black font-normal"
+                            className="border-r font-popins text-black font-normal"
+                            style={{
+                              border: "1px solid #00b56c",
+                            }}
                           >
                             <Link href={`/EditZone?id=${item.id}`}>
                               <BorderColorIcon
