@@ -1233,7 +1233,7 @@ export default function Zone() {
             <div className="-mt-3">
               <TablePagination
                 component="div"
-                // rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
+                rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
                 count={zoneList.length}
                 rowsPerPage={rowsPerPage}
                 page={currentPage}

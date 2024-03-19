@@ -492,6 +492,7 @@ export default function EditZoneComp() {
                         <Button
                           className="text-white font-popins font-bold h-10"
                           onClick={() => router.push("/Zone")}
+                          style={{ color: "white" }}
                         >
                           Cancel
                         </Button>

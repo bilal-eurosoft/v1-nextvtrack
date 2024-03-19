@@ -475,8 +475,9 @@ export default function AddZoneComp() {
                     </div>
                     <div className="col-span-8 bg-red  rounded-md">
                       <Button
-                        className="text-white font-popins font-bold h-10 text-center"
+                        className=" font-popins font-bold h-10 text-center"
                         onClick={() => router.push("/Zone")}
+                        style={{ color: "white" }}
                       >
                         Cancel
                       </Button>
