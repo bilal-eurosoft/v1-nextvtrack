@@ -105,6 +105,10 @@ export default function Zone() {
   // }, []);
 
   const router = useRouter();
+  if (session?.userRole === "Controller") {
+    router.push("/signin");
+    return null;
+  }
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   let displayedData;
@@ -323,7 +327,7 @@ export default function Zone() {
           </button>
         </div>
       ));
-      allZone();
+      await allZone();
     } catch (error) {
       // Show an error toast
       toast.error("Failed to delete zone", {

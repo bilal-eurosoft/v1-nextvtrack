@@ -101,7 +101,7 @@ const DynamicCarMap = ({
 
   return (
     <>
-      <div className="xl:col-span-4 lg:col-span-3  md:col-span-3  sm:col-span-5 col-span-4 ">
+      <div className="xl:col-span-4 lg:col-span-2  md:col-span-3  sm:col-span-5 col-span-4 ">
         <div className="relative" onClick={handleClear}>
           {mapCoordinates !== null && zoom !== null && (
             <MapContainer
@@ -133,11 +133,7 @@ const DynamicCarMap = ({
                       ]}
                       radius={radius}
                       color={
-                        isCityArea
-                          ? "green"
-                          : isRestrictedArea
-                          ? "#b30000"
-                          : "blue"
+                        isCityArea ? "green" : isRestrictedArea ? "red" : "blue"
                       }
                     >
                       <Popup>{singleRecord.zoneName}</Popup>

@@ -201,8 +201,13 @@ export default function AddZoneComp() {
     e.preventDefault();
 
     // Check if any of the required fields are empty
-    if (!Form.latlngCordinates) {
-      toast.error("Please Draw a Zone");
+    if (
+      !Form.latlngCordinates ||
+      !Form.GeoFenceType ||
+      !Form.zoneName ||
+      !Form.zoneShortName
+    ) {
+      toast.error("Please Select All Field");
       return;
     } else if (polygondataById.length == 0 && circleDataById?.radius == null) {
       toast.error("Please Draw a Zone");
@@ -258,6 +263,16 @@ export default function AddZoneComp() {
     } catch (error) {
       console.error("Error fetching zone data:", error);
     }
+    setForm({
+      GeoFenceType: "",
+      centerPoints: "",
+      id: "",
+      zoneName: "",
+      zoneShortName: "",
+      zoneType: "",
+      latlngCordinates: "",
+    });
+    router.push("/Zone");
   };
   const handleCreated = (e: any) => {
     const createdLayer = e.layer;

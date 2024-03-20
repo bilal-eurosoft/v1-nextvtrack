@@ -10,7 +10,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Button from "@mui/material/Button";
 import { toast, Toaster } from "react-hot-toast";
-
+import { useRouter } from "next/navigation";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -160,6 +160,7 @@ const style = {
 };
 
 export default function DriverProfile() {
+  const router = useRouter();
   const { data: session } = useSession();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -167,6 +168,10 @@ export default function DriverProfile() {
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
+  if (session?.userRole === "Controller") {
+    router.push("/signin");
+    return null;
+  }
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>

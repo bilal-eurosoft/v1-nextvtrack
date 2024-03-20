@@ -57,6 +57,34 @@ input[type="checkbox"]:hover {
 .main_sider_bar {
   height: 93vh;
 }
+/* @media only screen and (max-width: 1400px) and (min-width: 1230px) {
+  .main_sider_bar {
+    height: 80vh;
+    width: 23rem;
+  }
+  #scroll_side_bar {
+    height: 82vh;
+  }
+  #maps {
+    height: 93vh;
+    width: 88%;
+    margin-left: 7.6rem;
+  }
+}
+@media only screen and (max-width: 1550px) and (min-width: 1400px) {
+  .main_sider_bar {
+    height: 80vh;
+    width: 23rem;
+  }
+  #scroll_side_bar {
+    height: 82vh;
+  }
+  #maps {
+    height: 93vh;
+    width: 96%;
+    margin-left: 5.6rem;
+  }
+} */
 @media only screen and (max-width: 1440px) and (min-width: 700px) and (max-height: 900px) {
   .main_sider_bar {
     height: 77vh;
