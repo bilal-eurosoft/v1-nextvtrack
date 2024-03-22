@@ -359,6 +359,8 @@ export default function journeyReplayComp() {
               setzoomToFly(zoomlevel);
               setzoom(zoomlevel);
               setPlayBtn(true);
+              setPauseBtn(false);
+              setStopBtn(false);
             }
           }
         };
@@ -790,7 +792,7 @@ export default function journeyReplayComp() {
         stopPoints.map(async function (singlePoint: any) {
           var completeAddress = await axios
             .get(
-              `https://eurosofttechosm.com/nominatim/reverse.php?lat=${singlePoint.lat}&lon=${singlePoint.lng}&zoom=19&format=jsonv2`
+              `http://osm.vtracksolutions.com/nominatim/reverse.php?lat=${singlePoint.lat}&lon=${singlePoint.lng}&zoom=19&format=jsonv2`
             )
             .then(async (response: any) => {
               return response.data;
@@ -1039,7 +1041,6 @@ export default function journeyReplayComp() {
       setlng(item?.lng);
     }
   };
-
   const handleChangeValueSlider = (value: any) => {
     // if (TravelHistoryresponse.length > 100) {
     //   setCurrentPositionIndex(value.target.value + currentPositionIndex);
@@ -1152,7 +1153,7 @@ export default function journeyReplayComp() {
               isClearable
               isSearchable
               noOptionsMessage={() => "No options available"}
-              className="   rounded-md w-full  outline-green border border-grayLight  "
+              className="   rounded-md w-full  outline-green border border-grayLight flex items-center "
               styles={{
                 control: (provided, state) => ({
                   ...provided,
@@ -1164,16 +1165,16 @@ export default function journeyReplayComp() {
                   backgroundColor: state.isSelected
                     ? "#00B56C"
                     : state.isFocused
-                    ? "#00B56C"
+                    ? "#e1f0e3"
                     : "transparent",
                   color: state.isSelected
                     ? "white"
                     : state.isFocused
-                    ? "white"
+                    ? "black"
                     : "black",
                   "&:hover": {
-                    backgroundColor: "#00B56C",
-                    color: "white",
+                    backgroundColor: "#e1f0e3",
+                    color: "black",
                   },
                 }),
               }}
@@ -1289,7 +1290,6 @@ export default function journeyReplayComp() {
               <div className="grid lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-12  -mt-2  grid-cols-12  xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2 flex justify-center ">
                 <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0  ">
                   <label className="text-green">From</label>
-
                   <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
                     <KeyboardDatePicker
                       format="MM/DD/yyyy"
@@ -1297,6 +1297,7 @@ export default function journeyReplayComp() {
                       onChange={(newDate: any) =>
                         handleDateChange("fromDateTime", newDate)
                       }
+                      style={{ marginTop: "-3%" }}
                       variant="inline"
                       placeholder="Start Date"
                       maxDate={currenTDates}
@@ -1309,6 +1310,7 @@ export default function journeyReplayComp() {
                   <label className="text-green">To</label>
                   <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
                     <KeyboardDatePicker
+                      style={{ marginTop: "-3%" }}
                       format="MM/DD/yyyy"
                       value={Ignitionreport.toDateTime}
                       onChange={(newDate: any) =>
@@ -1492,7 +1494,48 @@ export default function journeyReplayComp() {
             ) : (
            
             )} */}
-            <button
+            <div
+              onClick={handleSubmit}
+              className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
+                    ${
+                      (Ignitionreport.VehicleReg &&
+                        Ignitionreport.period === "today") ||
+                      (Ignitionreport.VehicleReg &&
+                        Ignitionreport.period === "yesterday") ||
+                      (Ignitionreport.VehicleReg &&
+                        Ignitionreport.period === "week") ||
+                      (Ignitionreport.VehicleReg &&
+                        Ignitionreport.period === "custom" &&
+                        Ignitionreport.toDateTime &&
+                        Ignitionreport.fromDateTime)
+                        ? ""
+                        : "opacity-50 cursor-not-allowed"
+                    }`}
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <div className="col-span-3">
+                <svg
+                  className="h-11 py-3 px-2 w-full text-white"
+                  width="24"
+                  // height="24"
+                  viewBox="0 0 24 24"
+                  strokeWidth="4"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  {" "}
+                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                  <circle cx="10" cy="10" r="7" />{" "}
+                  <line x1="21" y1="21" x2="15" y2="15" />
+                </svg>
+              </div>
+              <div className="col-span-8">
+                <button>Search</button>
+              </div>
+            </div>
+            {/* <button
               onClick={handleSubmit}
               className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
                         ${
@@ -1511,8 +1554,9 @@ export default function journeyReplayComp() {
                         }`}
             >
               Search
-            </button>
+            </button> */}
           </div>
+
           <div className="xl:col-span-3 lg:col-span-1 col-span-12 "> </div>
           {TravelHistoryresponse.length > 0 && (
             <div className="xl:col-span-1 lg:col-span-2 col-span-6  -mt-1 ">
@@ -1521,7 +1565,7 @@ export default function journeyReplayComp() {
                   <Image src={markerA} alt="harshIcon" className="h-6" />
                   <Image src={markerB} alt="harshIcon" className="h-6 mt-1" />
                 </div>
-                <div className="col-span-10 text-sm">
+                <div className="col-span-10 text-sm font-semibold">
                   location Start
                   <br></br>
                   <p className="mt-3">Location End</p>
@@ -1545,7 +1589,7 @@ export default function journeyReplayComp() {
                     className="h-6 "
                   />
                 </div>
-                <div className="col-span-10 text-sm">
+                <div className="col-span-10 text-sm font-semibold">
                   Harsh Acc.. (x
                   {TravelHistoryresponse.reduce((count, item) => {
                     return (
@@ -1572,11 +1616,11 @@ export default function journeyReplayComp() {
                   <Image
                     src={harshAcceleration}
                     alt="harshIcon"
-                    className="h-6 mt-"
+                    className="h-6 mt-1"
                   />
                 </div>
                 <div className="col-span-10 text-sm">
-                  <p className="mt-2">
+                  <p className="mt-2 font-semibold">
                     Harsh Break (x
                     {TravelHistoryresponse.reduce((count, item) => {
                       return (
@@ -2268,7 +2312,12 @@ export default function journeyReplayComp() {
                                   iconAnchor: [16, 37],
                                 })
                               }
-                            ></Marker>
+                            >
+                              <Popup>
+                                {/* Add your popup content here */}
+                                Harsh Break
+                              </Popup>
+                            </Marker>
                           ) : (
                             ""
                           );
@@ -2285,7 +2334,12 @@ export default function journeyReplayComp() {
                                   iconAnchor: [16, 37],
                                 })
                               }
-                            ></Marker>
+                            >
+                              <Popup>
+                                {/* Add your popup content here */}
+                                Harsh Acceleration
+                              </Popup>
+                            </Marker>
                           ) : (
                             ""
                           );
@@ -2297,8 +2351,8 @@ export default function journeyReplayComp() {
               )}
             </div>
 
-            <div className="absolute lg:top-4 lg:left-20 lg:right-5 left-12 top-6 right-2 grid lg:grid-cols-10 md:grid-cols-10 sm:grid-cols-10 grid-cols-10 lg:mt-0 gap-9 ">
-              <div className="xl:col-span-2 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6">
+            <div className="absolute lg:top-4 lg:left-20 lg:right-5 left-12 top-6 right-2 grid lg:grid-cols-10 md:grid-cols-10 sm:grid-cols-10 grid-cols-10 lg:mt-0 ">
+              <div className="xl:col-span-2 mr-5 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6">
                 <div
                   className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg  rounded-md cursor-pointer"
                   onClick={() => stopDetailsOpen && handleShowDetails()}

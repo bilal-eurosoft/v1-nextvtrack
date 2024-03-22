@@ -505,15 +505,23 @@ export default function Zone() {
                 control: (provided, state) => ({
                   ...provided,
                   border: "none",
-                  boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                  boxShadow: state.isFocused ? null : null,
                 }),
                 option: (provided, state) => ({
                   ...provided,
-                  backgroundColor: state.isFocused ? "white" : "transparent", // Change 'blue' to your desired hover color
-                  color: state.isFocused ? "black" : "black", // Change 'white' to your desired text color
+                  backgroundColor: state.isSelected
+                    ? "#00B56C"
+                    : state.isFocused
+                    ? "#e1f0e3"
+                    : "transparent",
+                  color: state.isSelected
+                    ? "white"
+                    : state.isFocused
+                    ? "black"
+                    : "black",
                   "&:hover": {
-                    backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
-                    color: "white", // Change 'white' to your desired text color
+                    backgroundColor: "#e1f0e3",
+                    color: "black",
                   },
                 }),
               }}
@@ -580,15 +588,23 @@ export default function Zone() {
                 control: (provided, state) => ({
                   ...provided,
                   border: "none",
-                  boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                  boxShadow: state.isFocused ? null : null,
                 }),
                 option: (provided, state) => ({
                   ...provided,
-                  backgroundColor: state.isFocused ? "white" : "transparent", // Change 'blue' to your desired hover color
-                  color: state.isFocused ? "black" : "black", // Change 'white' to your desired text color
+                  backgroundColor: state.isSelected
+                    ? "#00B56C"
+                    : state.isFocused
+                    ? "#e1f0e3"
+                    : "transparent",
+                  color: state.isSelected
+                    ? "white"
+                    : state.isFocused
+                    ? "black"
+                    : "black",
                   "&:hover": {
-                    backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
-                    color: "white", // Change 'white' to your desired text color
+                    backgroundColor: "#e1f0e3",
+                    color: "black",
                   },
                 }),
               }}
@@ -670,15 +686,23 @@ export default function Zone() {
                 control: (provided, state) => ({
                   ...provided,
                   border: "none",
-                  boxShadow: state.isFocused ? null : null, // Add any box-shadow you want here
+                  boxShadow: state.isFocused ? null : null,
                 }),
                 option: (provided, state) => ({
                   ...provided,
-                  backgroundColor: state.isFocused ? "white" : "transparent", // Change 'blue' to your desired hover color
-                  color: state.isFocused ? "black" : "black", // Change 'white' to your desired text color
+                  backgroundColor: state.isSelected
+                    ? "#00B56C"
+                    : state.isFocused
+                    ? "#e1f0e3"
+                    : "transparent",
+                  color: state.isSelected
+                    ? "white"
+                    : state.isFocused
+                    ? "black"
+                    : "black",
                   "&:hover": {
-                    backgroundColor: "#00B56C", // Change 'blue' to your desired hover color
-                    color: "white", // Change 'white' to your desired text color
+                    backgroundColor: "#e1f0e3",
+                    color: "black",
                   },
                 }),
               }}

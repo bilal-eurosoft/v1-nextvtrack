@@ -369,10 +369,27 @@ export default function AddZoneComp() {
                 <MenuItem value="" selected disabled hidden>
                   Select Geofence Type
                 </MenuItem>
-                <MenuItem value="On-Site">On-Site</MenuItem>
-                <MenuItem value="Off-Site">Off-Site</MenuItem>
-                <MenuItem value="City-Area">City-Area</MenuItem>
-                <MenuItem value="Restricted-Area">Restricted-Area</MenuItem>
+                <MenuItem value="On-Site" className="bg-green hover:text-white">
+                  On-Site
+                </MenuItem>
+                <MenuItem
+                  className="hover:bg-green hover:text-white"
+                  value="Off-Site"
+                >
+                  Off-Site
+                </MenuItem>
+                <MenuItem
+                  className="hover:bg-green hover:text-white"
+                  value="City-Area"
+                >
+                  City-Area
+                </MenuItem>
+                <MenuItem
+                  className="hover:bg-green hover:text-white"
+                  value="Restricted-Area"
+                >
+                  Restricted-Area
+                </MenuItem>
               </Select>
             ) : (
               <Select

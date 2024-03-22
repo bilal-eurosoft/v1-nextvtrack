@@ -1047,7 +1047,7 @@ export async function getCurrentAddress({
 }) {
   try {
     const response = await fetch(
-      `https://eurosofttechosm.com/nominatim/reverse.php?lat=${lat}&lon=${lon}&zoom=19&format=jsonv2`,
+      `http://osm.vtracksolutions.com/nominatim/reverse.php?lat=${lat}&lon=${lon}&zoom=19&format=jsonv2`,
       {
         method: "GET",
         headers: {

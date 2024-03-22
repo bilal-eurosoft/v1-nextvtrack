@@ -29,7 +29,7 @@ import {
   PopoverHandler,
   PopoverContent,
   Typography,
-  Tooltip
+  Tooltip,
 } from "@material-tailwind/react";
 import "./layout.css";
 import BlinkingTime from "../General/BlinkingTime";
@@ -39,39 +39,39 @@ import { stringify } from "querystring";
 const drawerWidth = 58;
 
 const Main = styled("main", {
-  shouldForwardProp: (prop) => prop !== "open"
+  shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen
+    duration: theme.transitions.duration.leavingScreen,
   }),
   marginLeft: `-${drawerWidth}px`,
   ...(open && {
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen
+      duration: theme.transitions.duration.enteringScreen,
     }),
-    marginLeft: 0
-  })
+    marginLeft: 0,
+  }),
 }));
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open"
+  shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen
+    duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: `${drawerWidth}px`,
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen
-    })
-  })
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
 }));
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -80,11 +80,11 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
-  justifyContent: "flex-end"
+  justifyContent: "flex-end",
 }));
 
 export default function RootLayout({
-  children
+  children,
 }: {
   children: React.ReactNode;
 }) {
@@ -108,7 +108,7 @@ export default function RootLayout({
   };
 
   const triggers = {
-    onClick: handleOpenPopUp
+    onClick: handleOpenPopUp,
   };
   type MySessionData = {
     // Define the properties you expect in your session object
@@ -136,7 +136,7 @@ export default function RootLayout({
         try {
           const allzoneList = await getZoneListByClientId({
             token: session.accessToken,
-            clientId: session.clientId
+            clientId: session.clientId,
           });
           setZoneList(allzoneList);
         } catch (error) {
@@ -239,7 +239,7 @@ export default function RootLayout({
                   style={{
                     color: pathname == "/liveTracking" ? "green" : "white",
                     backgroundColor: pathname == "/liveTracking" ? "white" : "",
-                    border: pathname == "/liveTracking" ? "none" : ""
+                    border: pathname == "/liveTracking" ? "none" : "",
                   }}
                 >
                   <path
@@ -277,7 +277,8 @@ export default function RootLayout({
                   strokeLinejoin="round"
                   style={{
                     color: pathname == "/journeyReplay" ? "green" : "white",
-                    backgroundColor: pathname == "/journeyReplay" ? "white" : ""
+                    backgroundColor:
+                      pathname == "/journeyReplay" ? "white" : "",
                   }}
                 >
                   {" "}
@@ -321,7 +322,7 @@ export default function RootLayout({
                         pathname == "/AddZone" ||
                         `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
                           ? "none"
-                          : ""
+                          : "",
                     }}
                   >
                     {" "}
@@ -422,7 +423,7 @@ export default function RootLayout({
                             border:
                               pathname == "/DualCam" || pathname == "/DualCam"
                                 ? "none"
-                                : ""
+                                : "",
                           }}
                         >
                           {" "}
@@ -445,7 +446,8 @@ export default function RootLayout({
                         href="/DualCam"
                         style={{
                           color: pathname == "/DualCam" ? "black" : "white",
-                          backgroundColor: pathname == "/DualCam" ? "white" : ""
+                          backgroundColor:
+                            pathname == "/DualCam" ? "white" : "",
                         }}
                       >
                         Get Image And Video
@@ -522,7 +524,7 @@ export default function RootLayout({
                   style={{
                     color: pathname == "/Reports" ? "green" : "white",
                     backgroundColor: pathname == "/Reports" ? "white" : "",
-                    border: pathname == "/Reports" ? "none" : ""
+                    border: pathname == "/Reports" ? "none" : "",
                   }}
                 >
                   <path d="M9 7V2.13a2.98 2.98 0 0 0-1.293.749L4.879 5.707A2.98 2.98 0 0 0 4.13 7H9Z" />
@@ -573,7 +575,7 @@ export default function RootLayout({
                               pathname == "/DriverProfile" ||
                               pathname == "/ActiveDriver"
                                 ? "none"
-                                : ""
+                                : "",
                           }}
                         >
                           {" "}
@@ -595,7 +597,7 @@ export default function RootLayout({
                           color:
                             pathname == "/DriverProfile" ? "black" : "white",
                           backgroundColor:
-                            pathname == "/DriverProfile" ? "white" : ""
+                            pathname == "/DriverProfile" ? "white" : "",
                         }}
                       >
                         Driver Profile
@@ -610,7 +612,7 @@ export default function RootLayout({
                           color:
                             pathname == "/DriverAssign" ? "black" : "white",
                           backgroundColor:
-                            pathname == "/DriverAssign" ? "white" : ""
+                            pathname == "/DriverAssign" ? "white" : "",
                         }}
                       >
                         Assign Driver
@@ -663,8 +665,8 @@ export default function RootLayout({
                       flexShrink: 0,
                       "& .MuiDrawer-paper": {
                         width: drawerWidth,
-                        boxSizing: "border-box"
-                      }
+                        boxSizing: "border-box",
+                      },
                     }}
                     anchor="left"
                     open={open}
@@ -845,7 +847,7 @@ export default function RootLayout({
                                         pathname == "/DualCam" ||
                                         pathname == "/DualCam"
                                           ? "none"
-                                          : ""
+                                          : "",
                                     }}
                                   >
                                     {" "}
@@ -875,7 +877,7 @@ export default function RootLayout({
                                         ? "black"
                                         : "white",
                                     backgroundColor:
-                                      pathname == "/DualCam" ? "white" : ""
+                                      pathname == "/DualCam" ? "white" : "",
                                   }}
                                 >
                                   Get Image And Video
@@ -1009,7 +1011,7 @@ export default function RootLayout({
                                         pathname == "/DriverProfile" ||
                                         pathname == "/ActiveDriver"
                                           ? "none"
-                                          : ""
+                                          : "",
                                     }}
                                   >
                                     {" "}
@@ -1038,7 +1040,7 @@ export default function RootLayout({
                                     backgroundColor:
                                       pathname == "/DriverProfile"
                                         ? "white"
-                                        : ""
+                                        : "",
                                   }}
                                 >
                                   Driver Profile
@@ -1055,7 +1057,9 @@ export default function RootLayout({
                                         ? "black"
                                         : "white",
                                     backgroundColor:
-                                      pathname == "/DriverAssign" ? "white" : ""
+                                      pathname == "/DriverAssign"
+                                        ? "white"
+                                        : "",
                                   }}
                                 >
                                   Assign Driver
@@ -1074,15 +1078,12 @@ export default function RootLayout({
                 </Box>
               </div>
 
-              <div
-                className="grid lg:grid-cols-12 grid-cols-12  lg:gap-5 "
-                style={{
-                  display: "flex",
-                  justifyContent: "end",
-                  alignItems: "center"
-                }}
-              >
-                <div className="lg:col-span-2  col-span-4  lg:mt-1 md:mt-3  sm:mt-3 mt-5 ">
+              <div className="grid lg:grid-cols-12 grid-cols-12  lg:gap-5 header_client_name_end">
+                <div
+                  className="lg:col-span-2  col-span-10  lg:mt-1 md:mt-3  sm:mt-3 mt-5 
+                client_name 
+                "
+                >
                   <span className="text-black">
                     {" "}
                     &nbsp;
@@ -1094,8 +1095,8 @@ export default function RootLayout({
                     </span>
                   </span>
                 </div>
-                <div className="lg:col-span-4 md:col-span-4 sm:col-span-4 col-span-7 lg:mx-0 md:mx-4 sm:mx-4 mx-4  lg:mt-2 md:mt-4  sm:mt-4 mt-6">
-                  <a className=" lg:-mt-0 text-white font-popins text-xl ">
+                <div className="lg:col-span-4 md:col-span-4 sm:col-span-4 col-span-1 lg:mx-0 md:mx-4 sm:mx-4 mx-4  lg:mt-2 md:mt-4  sm:mt-4 mt-6">
+                  <a className=" lg:-mt-0 text-white font-popins text-xl time_none ">
                     <BlinkingTime timezone={session?.timezone} />
                   </a>
                 </div>

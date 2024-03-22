@@ -964,16 +964,16 @@ export default function Reports() {
                         backgroundColor: state.isSelected
                           ? "#00B56C"
                           : state.isFocused
-                          ? "#00B56C"
+                          ? "#e1f0e3"
                           : "transparent",
                         color: state.isSelected
                           ? "white"
                           : state.isFocused
-                          ? "white"
+                          ? "black"
                           : "black",
                         "&:hover": {
-                          backgroundColor: "#00B56C",
-                          color: "white",
+                          backgroundColor: "#e1f0e3",
+                          color: "black",
                         },
                       }),
                     }}
@@ -1034,16 +1034,16 @@ export default function Reports() {
                         backgroundColor: state.isSelected
                           ? "#00B56C"
                           : state.isFocused
-                          ? "#00B56C"
+                          ? "#e1f0e3"
                           : "transparent",
                         color: state.isSelected
                           ? "white"
                           : state.isFocused
-                          ? "white"
+                          ? "black"
                           : "black",
                         "&:hover": {
-                          backgroundColor: "#00B56C",
-                          color: "white",
+                          backgroundColor: "#e1f0e3",
+                          color: "black",
                         },
                       }),
                     }}
