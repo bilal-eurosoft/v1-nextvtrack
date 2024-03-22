@@ -1338,7 +1338,7 @@ export default function journeyReplayComp() {
                 className="grid xl:grid-cols-11 lg:grid-cols-12  md:grid-cols-12 grid-cols-12 -mt-2 "
                 // style={{ display: "flex", justifyContent: "start" }}
               >
-                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2 col-span-3">
+                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2 col-span-4">
                   <label className="text-sm text-black font-bold font-popins ">
                     <input
                       type="radio"
@@ -1354,7 +1354,7 @@ export default function journeyReplayComp() {
                   </label>
                 </div>
 
-                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2  lg:-ms-4 col-span-3 ">
+                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2  lg:-ms-4 col-span-4 ">
                   <label className="text-sm  text-black font-bold font-popins  w-full pt-3 ">
                     <input
                       type="radio"
@@ -1370,7 +1370,7 @@ export default function journeyReplayComp() {
                   </label>
                 </div>
 
-                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3  lg:-ms-1 col-span-3">
+                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3  lg:-ms-1 col-span-4">
                   <label className="text-sm text-black font-bold font-popins  ">
                     <input
                       type="radio"
@@ -1386,7 +1386,7 @@ export default function journeyReplayComp() {
                   </label>
                 </div>
 
-                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3 -ms-4 col-span-3">
+                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3 -ms-4 col-span-4 margin_custom">
                   <label className="text-sm text-black font-bold font-popins ">
                     <input
                       type="radio"
@@ -2297,8 +2297,8 @@ export default function journeyReplayComp() {
               )}
             </div>
 
-            <div className="absolute lg:top-4 lg:left-20 lg:right-5 left-12 top-6 right-2 grid lg:grid-cols-10 md:grid-cols-10 sm:grid-cols-10 grid-cols-10 lg:mt-0  ">
-              <div className="xl:col-span-2 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-5">
+            <div className="absolute lg:top-4 lg:left-20 lg:right-5 left-12 top-6 right-2 grid lg:grid-cols-10 md:grid-cols-10 sm:grid-cols-10 grid-cols-10 lg:mt-0 gap-9 ">
+              <div className="xl:col-span-2 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6">
                 <div
                   className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg  rounded-md cursor-pointer"
                   onClick={() => stopDetailsOpen && handleShowDetails()}
@@ -2351,7 +2351,7 @@ export default function journeyReplayComp() {
                 </div>
 
                 {getShowdetails ? (
-                  <div className="bg-white h-60 overflow-y-scroll">
+                  <div className="bg-white lg:h-60 md:h-60 sm:h-60 h-16 overflow-y-scroll">
                     {stops?.map((item: any) => {
                       return loadingMap ? (
                         <div
@@ -2363,8 +2363,8 @@ export default function journeyReplayComp() {
                           </p>
 
                           <div className="grid grid-cols-12">
-                            <div className="col-span-6"></div>
-                            <div className="col-span-5 mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red">
+                            <div className="lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-2"></div>
+                            <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-7  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red">
                               {moment(item?.date)
                                 .tz("Europe/London")
                                 .format("HH:mm:ss A")}
@@ -2415,7 +2415,7 @@ export default function journeyReplayComp() {
               </div> */}
               {zoneList !== null && zoneList.length > 0 && (
                 <div
-                  className="grid grid-cols-1 absolute lg:top-10 xl:top-1 md:top-10 top-5 right-10 bg-bgLight py-2 px-2"
+                  className="grid grid-cols-1 absolute lg:top-10 xl:top-1 md:top-10 top-0 xl:right-10 lg:right-10 md:right-10 sm:right-10 right-1  bg-bgLight py-2 px-2"
                   style={{
                     borderRadius: "10px",
                     borderColor: "green",
@@ -2516,7 +2516,11 @@ export default function journeyReplayComp() {
                       segmentColors={["#3a4848"]}
                     /> */}
                     <Speedometer
-                      value={getSpeedAndDistance()?.speed.replace("Mph", "")}
+                      value={
+                        getSpeedAndDistance()?.speed.includes("Mph")
+                          ? getSpeedAndDistance()?.speed.replace("Mph", "")
+                          : getSpeedAndDistance()?.speed.replace("Kph", "")
+                      }
                       max={140}
                       angle={160}
                       fontFamily="squada-one"
@@ -2664,10 +2668,10 @@ export default function journeyReplayComp() {
                     </div>
                   </div> */}
                 </div>
-                <div className="xl:col-span-4 lg:col-span-8 col-span-8   ">
+                <div className="xl:col-span-4 lg:col-span-8 col-span-12   ">
                   <div className="grid lg:grid-cols-12 grid-cols-12 gap-1 lg:py-5 py-2 mt-8 pt-4 lg:pt-4 rounded-md  mx-2 px-5 bg-white space-x-4">
                     <div
-                      className="lg:col-span-10 col-span-10"
+                      className="lg:col-span-10 col-span-8"
                       // style={{ height: "4vh" }}
                     >
                       <Slider
@@ -2825,7 +2829,7 @@ export default function journeyReplayComp() {
                       </div> */}
                     </div>
 
-                    <div className="lg:col-span-2 col-span-1 mt-2">
+                    <div className="lg:col-span-2 col-span-4 mt-2">
                       {isPlaying && (
                         // <Select
                         //   className="text-black  outline-green border h-8 w-16 border-grayLight px-1"

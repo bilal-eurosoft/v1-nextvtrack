@@ -199,6 +199,7 @@ input[type="checkbox"]:hover {
     height: auto;
   }
   .select_box_journey {
+    margin-top: 4% !important;
     height: auto;
   }
   .journey_sidebar {
@@ -208,10 +209,13 @@ input[type="checkbox"]:hover {
     height: auto;
   }
   #trips_handle {
-    height: auto;
+    height: 30vh;
   }
   .journey_map {
-    height: 50vh;
+    height: 80vh;
+  }
+  .margin_custom {
+    margin-left: 0%;
   }
 }
 @media (max-width: 500px) {
