@@ -73,6 +73,10 @@ export default function EditZoneComp() {
   });
 
   const router = useRouter();
+  if (session?.userRole === "Controller") {
+    router.push("/signin");
+    return null;
+  }
   const [zoom, setZoom] = useState(10);
 
   useEffect(() => {
@@ -397,27 +401,45 @@ export default function EditZoneComp() {
               <label className="text-md font-popins text-black font-semibold">
                 <span className="text-red font-extraboldbold">*</span> Geofence:{" "}
               </label>
-              <Select
-                onChange={handleChange}
-                value={Form?.GeoFenceType}
-                id="select_box_journey"
-                className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
-                required
-                name="GeoFenceType"
-              >
-                <MenuItem className="hover_select" value="On-Site">
-                  On-Site
-                </MenuItem>
-                <MenuItem className="hover_select" value="Off-Site">
-                  Off-Site
-                </MenuItem>
-                <MenuItem className="hover_select" value="City-Area">
-                  City-Area
-                </MenuItem>
-                <MenuItem className="hover_select" value="Restricted-Area">
-                  Restricted-Area
-                </MenuItem>
-              </Select>
+              {session?.clickToCall === true ? (
+                <Select
+                  onChange={handleChange}
+                  value={Form?.GeoFenceType}
+                  id="select_box_journey"
+                  className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
+                  required
+                  name="GeoFenceType"
+                >
+                  <MenuItem className="hover_select" value="On-Site">
+                    On-Site
+                  </MenuItem>
+                  <MenuItem className="hover_select" value="Off-Site">
+                    Off-Site
+                  </MenuItem>
+                  <MenuItem className="hover_select" value="City-Area">
+                    City-Area
+                  </MenuItem>
+                  <MenuItem className="hover_select" value="Restricted-Area">
+                    Restricted-Area
+                  </MenuItem>
+                </Select>
+              ) : (
+                <Select
+                  onChange={handleChange}
+                  value={Form?.GeoFenceType}
+                  id="select_box_journey"
+                  className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
+                  required
+                  name="GeoFenceType"
+                >
+                  <MenuItem className="hover_select" value="On-Site">
+                    On-Site
+                  </MenuItem>
+                  <MenuItem className="hover_select" value="Off-Site">
+                    Off-Site
+                  </MenuItem>
+                </Select>
+              )}
               <br></br>
               <br></br>
               <label className="text-md font-popins text-black font-semibold">

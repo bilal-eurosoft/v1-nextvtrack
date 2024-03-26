@@ -71,7 +71,10 @@ export default function AddZoneComp() {
   });
 
   const router = useRouter();
-
+  if (session?.userRole === "Controller") {
+    router.push("/signin");
+    return null;
+  }
   useEffect(() => {
     if (typeof window !== "undefined") {
       (async function () {
@@ -369,25 +372,16 @@ export default function AddZoneComp() {
                 <MenuItem value="" selected disabled hidden>
                   Select Geofence Type
                 </MenuItem>
-                <MenuItem value="On-Site" className="bg-green hover:text-white">
+                <MenuItem value="On-Site" className="hover_select">
                   On-Site
                 </MenuItem>
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="Off-Site"
-                >
+                <MenuItem className="hover_select" value="Off-Site">
                   Off-Site
                 </MenuItem>
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="City-Area"
-                >
+                <MenuItem className="hover_select" value="City-Area">
                   City-Area
                 </MenuItem>
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="Restricted-Area"
-                >
+                <MenuItem className="hover_select" value="Restricted-Area">
                   Restricted-Area
                 </MenuItem>
               </Select>
@@ -404,8 +398,12 @@ export default function AddZoneComp() {
                 <MenuItem value="" selected disabled hidden>
                   Select Geofence Type
                 </MenuItem>
-                <MenuItem value="On-Site">On-Site</MenuItem>
-                <MenuItem value="Off-Site">Off-Site</MenuItem>
+                <MenuItem className="hover_select" value="On-Site">
+                  On-Site
+                </MenuItem>
+                <MenuItem className="hover_select" value="Off-Site">
+                  Off-Site
+                </MenuItem>
               </Select>
             )}
             <br></br>
