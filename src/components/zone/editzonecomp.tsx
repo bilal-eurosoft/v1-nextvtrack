@@ -229,7 +229,7 @@ export default function EditZoneComp() {
     const newlatlng = circlePoint?.split(",").map(Number);
     console.log("newlatlng", newlatlng, drawShape);
 
-    if (drawShape == false) {
+    if (drawShape == true || drawShape == false) {
       setCircleDataById({ radius: radius });
       const updateCircleData = (newLatlng: string, newRadius: string): void => {
         console.log("updateCircleData", newLatlng, newRadius);
@@ -239,9 +239,7 @@ export default function EditZoneComp() {
         });
       };
       updateCircleData(circlePoint, radius);
-
       setMapcenter([newlatlng[0], newlatlng[1]]);
-      setDrawShape(true);
     }
   };
   console.log("circledata", circleData);
@@ -330,13 +328,13 @@ export default function EditZoneComp() {
         const radius: number = layer.getRadius();
         console.log("vsdfvfd", latlng, radius);
         handleCircleSave(latlng, radius.toString());
-
-        // setDrawShape(!drawShape);
+        setDrawShape(true);
       }
     });
   };
 
   const handleredraw = (e: any) => {
+    setDrawShape(true);
     if (polygondataById.length > 0) {
       setDrawShape(true);
       setPolygondataById([]);
@@ -345,11 +343,10 @@ export default function EditZoneComp() {
     } else if (circleDataById !== null) {
       setCircleDataById(null);
       setCircleData({ radius: "", latlng: "" });
-
       setForm({ ...Form, zoneType: "" });
       setDrawShape(true);
     } else {
-      setDrawShape(drawShape);
+      setDrawShape(true);
     }
   };
   console.log("form", Form, drawShape);
@@ -411,11 +408,7 @@ export default function EditZoneComp() {
                 <MenuItem className="hover_select" value="On-Site">
                   On-Site
                 </MenuItem>
-                <MenuItem
-                  // className="hover:bg-green hover:text-white"
-                  className="hover_select"
-                  value="Off-Site"
-                >
+                <MenuItem className="hover_select" value="Off-Site">
                   Off-Site
                 </MenuItem>
                 <MenuItem className="hover_select" value="City-Area">
@@ -558,71 +551,114 @@ export default function EditZoneComp() {
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
                     />
-                    {/* {drawShape == false && ( */}
-                    <FeatureGroup>
-                      <EditControl
-                        position="topright"
-                        onEdited={handleEdited}
-                        onCreated={handleCreated}
-                        draw={{
-                          polyline: false,
-                          polygon: drawShape,
-                          circle: drawShape,
-                          marker: false,
-                          circlemarker: false,
-                          rectangle: false,
-                        }}
-                      />
-                      {shapeType === "Polygon" && polygondataById.length > 0 ? (
-                        <>
-                          {zoneDataById?.GeoFenceType === "Restricted-Area" && (
-                            <Polygon positions={polygondataById} color="red" />
-                          )}
-                          {zoneDataById?.GeoFenceType !== "Restricted-Area" && (
-                            <Polygon
-                              positions={polygondataById}
-                              color="#97009c"
-                            />
-                          )}
-                          {zoneDataById?.GeoFenceType === "City-Area" && (
-                            <Polygon
-                              positions={polygondataById}
-                              color="green"
-                            />
-                          )}
-                        </>
-                      ) : null}
+                    {drawShape == false && (
+                      <FeatureGroup>
+                        <EditControl
+                          position="topright"
+                          onEdited={handleEdited}
+                          onCreated={handleCreated}
+                          draw={{
+                            polyline: false,
+                            polygon: drawShape,
+                            circle: drawShape,
+                            marker: false,
+                            circlemarker: false,
+                            rectangle: false,
+                          }}
+                        />
+                        {shapeType === "Polygon" &&
+                        polygondataById.length > 0 ? (
+                          <>
+                            {zoneDataById?.GeoFenceType ===
+                              "Restricted-Area" && (
+                              <Polygon
+                                positions={polygondataById}
+                                color="red"
+                              />
+                            )}
+                            {zoneDataById?.GeoFenceType !==
+                              "Restricted-Area" && (
+                              <Polygon
+                                positions={polygondataById}
+                                color="#97009c"
+                              />
+                            )}
+                            {zoneDataById?.GeoFenceType === "City-Area" && (
+                              <Polygon
+                                positions={polygondataById}
+                                color="green"
+                              />
+                            )}
+                          </>
+                        ) : null}
 
-                      {shapeType === "Circle" &&
-                      !isNaN(mapcenter[0]) &&
-                      !isNaN(mapcenter[1]) &&
-                      !isNaN(Number(circleDataById?.radius)) ? (
-                        <>
-                          {zoneDataById?.GeoFenceType === "Restricted-Area" && (
-                            <Circle
-                              radius={Number(circleDataById?.radius)}
-                              center={mapcenter}
-                              color="red"
-                            />
-                          )}
-                          {zoneDataById?.GeoFenceType !== "Restricted-Area" && (
-                            <Circle
-                              radius={Number(circleDataById?.radius)}
-                              center={mapcenter}
-                              color="#97009c"
-                            />
-                          )}
-                          {zoneDataById?.GeoFenceType === "City-Area" && (
-                            <Circle
-                              radius={Number(circleDataById?.radius)}
-                              center={mapcenter}
-                              color="green"
-                            />
-                          )}
-                        </>
-                      ) : null}
-                    </FeatureGroup>
-                    {/* // )} */}
+                        {shapeType === "Circle" &&
+                        !isNaN(mapcenter[0]) &&
+                        !isNaN(mapcenter[1]) &&
+                        !isNaN(Number(circleDataById?.radius)) ? (
+                          <>
+                            {zoneDataById?.GeoFenceType ===
+                              "Restricted-Area" && (
+                              <Circle
+                                radius={Number(circleDataById?.radius)}
+                                center={mapcenter}
+                                color="red"
+                              />
+                            )}
+                            {zoneDataById?.GeoFenceType !==
+                              "Restricted-Area" && (
+                              <Circle
+                                radius={Number(circleDataById?.radius)}
+                                center={mapcenter}
+                                color="#97009c"
+                              />
+                            )}
+                            {zoneDataById?.GeoFenceType === "City-Area" && (
+                              <Circle
+                                radius={Number(circleDataById?.radius)}
+                                center={mapcenter}
+                                color="green"
+                              />
+                            )}
+                          </>
+                        ) : null}
+                      </FeatureGroup>
+                    )}
+                    {drawShape == true && (
+                      <FeatureGroup>
+                        <EditControl
+                          position="topright"
+                          onEdited={handleEdited}
+                          onCreated={handleCreated}
+                          draw={{
+                            polyline: false,
+                            polygon: true,
+                            circle: true,
+                            marker: false,
+                            circlemarker: false,
+                            rectangle: false,
+                          }}
+                        />
+                        {shapeType === "Polygon" &&
+                        polygondataById.length > 0 ? (
+                          <Polygon
+                            positions={polygondataById}
+                            color="#97009c"
+                          />
+                        ) : null}
+
+                        {shapeType === "Circle" &&
+                        !isNaN(mapcenter[0]) &&
+                        !isNaN(mapcenter[1]) &&
+                        !isNaN(Number(circleDataById?.radius)) ? (
+                          <Circle
+                            radius={Number(circleDataById?.radius)}
+                            center={mapcenter}
+                            color="#97009c"
+                          />
+                        ) : null}
+                      </FeatureGroup>
+                    )}
                   </MapContainer>
                 )}
               </div>
