@@ -99,7 +99,7 @@
 }
 .assign_driver_hover:hover {
   background-color: #00b56c !important;
-  color: white;
+  color: white !important;
 }
 
 @media (max-width: 800px) and (min-width: 510px) {

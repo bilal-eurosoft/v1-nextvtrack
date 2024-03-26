@@ -408,28 +408,20 @@ export default function EditZoneComp() {
                 required
                 name="GeoFenceType"
               >
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="On-Site"
-                >
+                <MenuItem className="hover_select" value="On-Site">
                   On-Site
                 </MenuItem>
                 <MenuItem
-                  className="hover:bg-green hover:text-white"
+                  // className="hover:bg-green hover:text-white"
+                  className="hover_select"
                   value="Off-Site"
                 >
                   Off-Site
                 </MenuItem>
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="City-Area"
-                >
+                <MenuItem className="hover_select" value="City-Area">
                   City-Area
                 </MenuItem>
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="Restricted-Area"
-                >
+                <MenuItem className="hover_select" value="Restricted-Area">
                   Restricted-Area
                 </MenuItem>
               </Select>
