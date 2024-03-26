@@ -139,7 +139,7 @@ export default function EditZoneComp() {
           ]);
         }
       }
-    } else {
+    } else if (zoneDataById?.zoneType === "Circle") {
       let circledata = Number(zoneDataById?.latlngCordinates);
       const newcenterPoints = zoneDataById?.centerPoints;
       const latlng = newcenterPoints?.split(",").map(Number);
@@ -225,10 +225,14 @@ export default function EditZoneComp() {
     };
 
     let circlePoint = formatCenterPoints(latlng.lat, latlng.lng);
+
     const newlatlng = circlePoint?.split(",").map(Number);
-    if (drawShape == true) {
+    console.log("newlatlng", newlatlng, drawShape);
+
+    if (drawShape == false) {
       setCircleDataById({ radius: radius });
       const updateCircleData = (newLatlng: string, newRadius: string): void => {
+        console.log("updateCircleData", newLatlng, newRadius);
         setCircleData({
           latlng: newLatlng,
           radius: newRadius,
@@ -237,16 +241,16 @@ export default function EditZoneComp() {
       updateCircleData(circlePoint, radius);
 
       setMapcenter([newlatlng[0], newlatlng[1]]);
-
-      setDrawShape(!drawShape);
+      setDrawShape(true);
     }
   };
-
+  console.log("circledata", circleData);
   const handleChange = (e: any) => {
     const { name, value } = e.target;
+    console.log("e", name, value);
     setForm({ ...Form, [name]: value });
   };
-
+  // console.log(drawShape);
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -257,7 +261,7 @@ export default function EditZoneComp() {
       toast.error("Please Draw a Zone");
       return;
     }
-
+    console.log("[pqwoepiwqouwiy", Form);
     try {
       if (session) {
         const newformdata = {
@@ -324,7 +328,10 @@ export default function EditZoneComp() {
       } else if (layer instanceof L.Circle) {
         const latlng: L.LatLng = layer.getLatLng();
         const radius: number = layer.getRadius();
+        console.log("vsdfvfd", latlng, radius);
         handleCircleSave(latlng, radius.toString());
+
+        // setDrawShape(!drawShape);
       }
     });
   };
@@ -345,7 +352,7 @@ export default function EditZoneComp() {
       setDrawShape(drawShape);
     }
   };
-
+  console.log("form", Form, drawShape);
   const handleCreated = (e: any) => {
     const createdLayer = e.layer;
     const type = e.layerType;
@@ -559,114 +566,71 @@ export default function EditZoneComp() {
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
                     />
-                    {drawShape == false && (
-                      <FeatureGroup>
-                        <EditControl
-                          position="topright"
-                          onEdited={handleEdited}
-                          onCreated={handleCreated}
-                          draw={{
-                            polyline: false,
-                            polygon: drawShape,
-                            circle: drawShape,
-                            marker: false,
-                            circlemarker: false,
-                            rectangle: false,
-                          }}
-                        />
-                        {shapeType === "Polygon" &&
-                        polygondataById.length > 0 ? (
-                          <>
-                            {zoneDataById?.GeoFenceType ===
-                              "Restricted-Area" && (
-                              <Polygon
-                                positions={polygondataById}
-                                color="red"
-                              />
-                            )}
-                            {zoneDataById?.GeoFenceType !==
-                              "Restricted-Area" && (
-                              <Polygon
-                                positions={polygondataById}
-                                color="#97009c"
-                              />
-                            )}
-                            {zoneDataById?.GeoFenceType === "City-Area" && (
-                              <Polygon
-                                positions={polygondataById}
-                                color="green"
-                              />
-                            )}
-                          </>
-                        ) : null}
+                    {/* {drawShape == false && ( */}
+                    <FeatureGroup>
+                      <EditControl
+                        position="topright"
+                        onEdited={handleEdited}
+                        onCreated={handleCreated}
+                        draw={{
+                          polyline: false,
+                          polygon: drawShape,
+                          circle: drawShape,
+                          marker: false,
+                          circlemarker: false,
+                          rectangle: false,
+                        }}
+                      />
+                      {shapeType === "Polygon" && polygondataById.length > 0 ? (
+                        <>
+                          {zoneDataById?.GeoFenceType === "Restricted-Area" && (
+                            <Polygon positions={polygondataById} color="red" />
+                          )}
+                          {zoneDataById?.GeoFenceType !== "Restricted-Area" && (
+                            <Polygon
+                              positions={polygondataById}
+                              color="#97009c"
+                            />
+                          )}
+                          {zoneDataById?.GeoFenceType === "City-Area" && (
+                            <Polygon
+                              positions={polygondataById}
+                              color="green"
+                            />
+                          )}
+                        </>
+                      ) : null}
 
-                        {shapeType === "Circle" &&
-                        !isNaN(mapcenter[0]) &&
-                        !isNaN(mapcenter[1]) &&
-                        !isNaN(Number(circleDataById?.radius)) ? (
-                          <>
-                            {zoneDataById?.GeoFenceType ===
-                              "Restricted-Area" && (
-                              <Circle
-                                radius={Number(circleDataById?.radius)}
-                                center={mapcenter}
-                                color="red"
-                              />
-                            )}
-                            {zoneDataById?.GeoFenceType !==
-                              "Restricted-Area" && (
-                              <Circle
-                                radius={Number(circleDataById?.radius)}
-                                center={mapcenter}
-                                color="#97009c"
-                              />
-                            )}
-                            {zoneDataById?.GeoFenceType === "City-Area" && (
-                              <Circle
-                                radius={Number(circleDataById?.radius)}
-                                center={mapcenter}
-                                color="green"
-                              />
-                            )}
-                          </>
-                        ) : null}
-                      </FeatureGroup>
-                    )}
-                    {drawShape == true && (
-                      <FeatureGroup>
-                        <EditControl
-                          position="topright"
-                          onEdited={handleEdited}
-                          onCreated={handleCreated}
-                          draw={{
-                            polyline: false,
-                            polygon: true,
-                            circle: true,
-                            marker: false,
-                            circlemarker: false,
-                            rectangle: false,
-                          }}
-                        />
-                        {shapeType === "Polygon" &&
-                        polygondataById.length > 0 ? (
-                          <Polygon
-                            positions={polygondataById}
-                            color="#97009c"
-                          />
-                        ) : null}
-
-                        {shapeType === "Circle" &&
-                        !isNaN(mapcenter[0]) &&
-                        !isNaN(mapcenter[1]) &&
-                        !isNaN(Number(circleDataById?.radius)) ? (
-                          <Circle
-                            radius={Number(circleDataById?.radius)}
-                            center={mapcenter}
-                            color="#97009c"
-                          />
-                        ) : null}
-                      </FeatureGroup>
-                    )}
+                      {shapeType === "Circle" &&
+                      !isNaN(mapcenter[0]) &&
+                      !isNaN(mapcenter[1]) &&
+                      !isNaN(Number(circleDataById?.radius)) ? (
+                        <>
+                          {zoneDataById?.GeoFenceType === "Restricted-Area" && (
+                            <Circle
+                              radius={Number(circleDataById?.radius)}
+                              center={mapcenter}
+                              color="red"
+                            />
+                          )}
+                          {zoneDataById?.GeoFenceType !== "Restricted-Area" && (
+                            <Circle
+                              radius={Number(circleDataById?.radius)}
+                              center={mapcenter}
+                              color="#97009c"
+                            />
+                          )}
+                          {zoneDataById?.GeoFenceType === "City-Area" && (
+                            <Circle
+                              radius={Number(circleDataById?.radius)}
+                              center={mapcenter}
+                              color="green"
+                            />
+                          )}
+                        </>
+                      ) : null}
+                    </FeatureGroup>
+                    {/* // )} */}
                   </MapContainer>
                 )}
               </div>
