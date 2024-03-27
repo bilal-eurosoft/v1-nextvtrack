@@ -245,7 +245,7 @@ const LiveSidebar = ({
                 key={item?.IMEI}
                 className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 md:space-x-4 text-center py-2"
               >
-                <div className="xl:col-span-5 lg:col-span-5  md:col-span-4 sm:col-span-6 col-span-4">
+                <div className="xl:col-span-6 lg:col-span-5  md:col-span-4 sm:col-span-6 col-span-4">
                   <div className=" font-popins font-semibold text-start w-full lg:text-2xl text-1xl">
                     {item.vehicleStatus === "Parked" ? (
                       <p className="text-[#CF000F] text-start">
@@ -273,11 +273,11 @@ const LiveSidebar = ({
                   </div>
                 </div>
                 <div
-                  className=" xl:col-span-3 lg:col-span-3 md:col-span-3 sm:col-span-3 col-span-3"
+                  className=" xl:col-span-2 lg:col-span-3 md:col-span-3 sm:col-span-3 col-span-3"
                   style={{
                     display: "flex",
                     justifyContent: "start",
-                    marginLeft: "-5%",
+                    marginLeft: "-15%",
                   }}
                   id="btn_left_margin"
                 >

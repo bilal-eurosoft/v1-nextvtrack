@@ -150,7 +150,6 @@ export default function journeyReplayComp() {
   const [mapcenterToFly, setMapcenterToFly] = useState<LatLngTuple | null>(
     null
   );
-  console.log("stop", stops);
   const [zoomToFly, setzoomToFly] = useState(10);
   const [zoom, setzoom] = useState(10);
   const [polylinedata, setPolylinedata] = useState<[number, number][]>([]);
@@ -520,11 +519,11 @@ export default function journeyReplayComp() {
     setCurrentPositionIndex(0);
     setClearMapData(true);
     if (
-      Ignitionreport.VehicleReg &&
-      (Ignitionreport.period ||
-        (Ignitionreport.period == "custom" &&
-          Ignitionreport.toDateTime &&
-          Ignitionreport.fromDateTime))
+      Ignitionreport?.VehicleReg &&
+      (Ignitionreport?.period ||
+        (Ignitionreport?.period == "custom" &&
+          Ignitionreport?.toDateTime &&
+          Ignitionreport?.fromDateTime))
     ) {
       if (session) {
         const { VehicleReg, period } = await Ignitionreport;
@@ -573,8 +572,6 @@ export default function journeyReplayComp() {
           }
           const fromDate: any = new Date(Ignitionreport?.fromDateTime);
           const toDate: any = new Date(Ignitionreport?.toDateTime);
-          console.log("fromDate", fromDate);
-          console.log("toDate", toDate);
 
           const differenceMs = toDate - fromDate;
 
@@ -593,7 +590,6 @@ export default function journeyReplayComp() {
           // ) {
           //   setTimeout(() => setweekDataGrouped(true), 3000);
           // }
-          console.log("moment(fromDate).isValid()", moment(fromDate).isValid());
           if (differenceDays > 5 || differenceDays < 0) {
             toast.error("please Select 0nly Five Days");
           } else {
@@ -972,7 +968,6 @@ export default function journeyReplayComp() {
   // };
 
   const handleDateChange = (fieldName: string, newDate: any) => {
-    console.log("fieldName", fieldName, newDate.toISOString());
     // if (newDate && moment(newDate, 'MM/DD/yyyy', true).isValid()) {
     //   const formattedDate = moment(newDate, 'MM/DD/yyyy').toDate()
     //   setIgnitionreport((prevReport: any) => ({
@@ -1018,9 +1013,18 @@ export default function journeyReplayComp() {
   //   const value = "yesterday";
   //   setSelectedOption(newValue);
   // };
+  const handleMenuClose = () => {
+    setIgnitionreport([]);
+  };
   const handleInputChangeSelect = (e: any) => {
     setsearchJourney(false);
-    if (!e) return;
+    if (!e) {
+      return setIgnitionreport((prevReport: any) => ({
+        ...prevReport,
+        VehicleReg: null,
+        period: "",
+      }));
+    }
     const { value, label } = e;
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
@@ -1030,7 +1034,6 @@ export default function journeyReplayComp() {
   };
 
   const handleInputChange: any = (e: any) => {
-    console.log("e", e);
     setClearMapData(false);
     // if (e.target == undefined) {
     //   const { name, value } = e;
@@ -1152,7 +1155,6 @@ export default function journeyReplayComp() {
     { value: "4", label: "4X" },
     { value: "6", label: "6X" },
   ];
-  console.log("----->", new Date(Ignitionreport.fromDateTime));
   return (
     <>
       <div className="main_journey">
@@ -1187,7 +1189,7 @@ export default function journeyReplayComp() {
           <div
             className="xl:col-span-1 lg:col-span-2 md:col-span-2  col-span-12
           "
-            style={{ gridColumnEnd: "span 1.5" }}
+            // style={{ gridColumnEnd: "span 1.5" }}
           >
             <Select
               // value={Ignitionreport}
@@ -1197,7 +1199,7 @@ export default function journeyReplayComp() {
               isClearable
               isSearchable
               noOptionsMessage={() => "No options available"}
-              className="   rounded-md w-full  outline-green border border-grayLight flex items-center "
+              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
               styles={{
                 control: (provided, state) => ({
                   ...provided,
@@ -1393,7 +1395,7 @@ export default function journeyReplayComp() {
                       name="period"
                       disabled={loading}
                       value="today"
-                      checked={Ignitionreport.period === "today"}
+                      checked={Ignitionreport?.period === "today"}
                       onChange={handleInputChange}
                     />
                     &nbsp;Today
@@ -1409,7 +1411,7 @@ export default function journeyReplayComp() {
                       disabled={loading}
                       value="yesterday"
                       style={{ accentColor: "green", height: "1.5vh" }}
-                      checked={Ignitionreport.period === "yesterday"}
+                      checked={Ignitionreport?.period === "yesterday"}
                       onChange={handleInputChange}
                     />
                     &nbsp;Yesterday
@@ -1425,7 +1427,7 @@ export default function journeyReplayComp() {
                       disabled={loading}
                       value="week"
                       style={{ accentColor: "green", height: "1.5vh" }}
-                      checked={Ignitionreport.period === "week"}
+                      checked={Ignitionreport?.period === "week"}
                       onChange={handleInputChange}
                     />
                     &nbsp;&nbsp;Week
@@ -1441,7 +1443,7 @@ export default function journeyReplayComp() {
                       name="period"
                       value="custom"
                       style={{ accentColor: "green", height: "1.5vh" }}
-                      checked={Ignitionreport.period === "custom"}
+                      checked={Ignitionreport?.period === "custom"}
                       onChange={handleInputChange}
                       onClick={handleClick}
                     />
@@ -1515,7 +1517,7 @@ export default function journeyReplayComp() {
             )}
           </div>
 
-          <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12   text-white font-bold flex justify-center items-center mt-2">
+          <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12 text-white font-bold flex justify-center items-center mt-2">
             {/* {clearMapData ? (
               <button
                 onClick={handleClickClear}
@@ -1540,18 +1542,18 @@ export default function journeyReplayComp() {
             )} */}
             <div
               onClick={(e) => seacrhLoading && handleSubmit(e)}
-              className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
+              className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    
                     ${
-                      (Ignitionreport.VehicleReg &&
-                        Ignitionreport.period === "today") ||
-                      (Ignitionreport.VehicleReg &&
-                        Ignitionreport.period === "yesterday") ||
-                      (Ignitionreport.VehicleReg &&
-                        Ignitionreport.period === "week") ||
-                      (Ignitionreport.VehicleReg &&
-                        Ignitionreport.period === "custom" &&
-                        Ignitionreport.toDateTime &&
-                        Ignitionreport.fromDateTime)
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "today") ||
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "yesterday") ||
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "week") ||
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "custom" &&
+                        Ignitionreport?.toDateTime &&
+                        Ignitionreport?.fromDateTime)
                         ? ""
                         : "opacity-50 cursor-not-allowed"
                     }`}

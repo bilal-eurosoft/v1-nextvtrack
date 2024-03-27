@@ -198,7 +198,6 @@ export default function RootLayout({
 
     filterZoneIds();
   }, [zoneList]);
-
   return (
     // <div className={inter.className}>
     <div>
@@ -1102,13 +1101,29 @@ export default function RootLayout({
                 </div>
                 <div className="lg:col-span-2 col-span-1">
                   <Popover>
-                    <PopoverHandler {...triggers}>
+                    {/* <PopoverHandler {...triggers}>
                       <img
                         className=" cursor-pointer lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0  lg:w-10 md:w-10 sm:w-10  h-12 rounded-full"
                         src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
                         alt="Rounded avatar"
                       />
+                    </PopoverHandler> */}
+                    <PopoverHandler {...triggers}>
+                      {session?.image !== "" && session?.image !== "null" ? (
+                        <img
+                          className="cursor-pointer bg-white lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0 lg:w-10 md:w-10 sm:w-10 h-12 rounded-full"
+                          src={session?.image}
+                          alt="Rounded avatar"
+                        />
+                      ) : (
+                        <img
+                          className="cursor-pointer lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0 lg:w-10 md:w-10 sm:w-10 h-12 rounded-full"
+                          src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
+                          alt="Rounded avatar"
+                        />
+                      )}
                     </PopoverHandler>
+
                     <PopoverContent
                       {...triggers}
                       className="z-50  lg:w-auto md:w-auto w-full"
@@ -1128,18 +1143,19 @@ export default function RootLayout({
                           />
                         </Typography>
                       </div> */}
-                      <div className="grid grid-cols-12 w-full">
-                        <div className="col-span-2">
+                      <div
+                        className="grid grid-cols-12 w-full "
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
+                        {/* <div className="col-span-2">
                           <img
                             className="mb-5 w-10 lg:h-10 h-10 rounded-full"
                             src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
                             alt="Rounded avatar"
                           />
-                        </div>
-                        <div className="col-span-9 ms-2 text-lg font-popins text-start text-black">
-                          <p className="text-2xl text-start">
-                            {session?.FullName}
-                          </p>
+                        </div> */}
+                        <div className="col-span-9 ms-2 text-lg font-popins text-center text-black">
+                          <p className="text-2xl ">{session?.FullName}</p>
                           {session?.Email}
                         </div>
                       </div>

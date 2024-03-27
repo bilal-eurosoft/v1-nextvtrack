@@ -109,7 +109,6 @@ export default function AddZoneComp() {
       })();
     }
   }, []);
-  console.log("fvfdvdfvbfdvfdvdf", mapcenter);
   const clientZoomSettings = clientsetting?.filter(
     (el) => el?.PropertDesc === "Zoom"
   )[0]?.PropertyValue;
@@ -345,7 +344,10 @@ export default function AddZoneComp() {
         <div className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-4 col-span-4 bg-gray-200 mx-5">
           <form onSubmit={handleSave}>
             <label className="text-black text-md w-full font-popins font-medium">
-              <span className="text-red">*</span> Please Enter Zone Name:{" "}
+              <span className="text-red">
+                <b> *</b>
+              </span>
+              <b> Please Enter Zone Name:</b>{" "}
             </label>
             <input
               onChange={handleChange}
@@ -357,7 +359,10 @@ export default function AddZoneComp() {
               required
             />
             <label className="text-black text-md w-full font-popins font-medium">
-              <span className="text-red">*</span> Geofence:{" "}
+              <span className="text-red">
+                <b>*</b>
+              </span>
+              <b> Geofence:</b>{" "}
             </label>
             {session?.clickToCall === true ? (
               <Select
@@ -409,7 +414,10 @@ export default function AddZoneComp() {
             <br></br>
             <br></br>
             <label className="text-black text-md w-full font-popins font-medium">
-              <span className="text-red">*</span> Zone Short Name:{" "}
+              <span className="text-red">
+                <b>*</b>
+              </span>
+              <b> Zone Short Name:</b>{" "}
             </label>
             <input
               aria-required
@@ -505,9 +513,13 @@ export default function AddZoneComp() {
                     </div>
                     <div className="col-span-8 bg-red  rounded-md">
                       <Button
-                        className=" font-popins font-bold h-10 text-center"
+                        className="font-popins font-bold h-10 text-center"
                         onClick={() => router.push("/Zone")}
-                        style={{ color: "white" }}
+                        style={{
+                          color: "white",
+                          textTransform: "capitalize",
+                          border: "none",
+                        }}
                       >
                         Cancel
                       </Button>
@@ -523,7 +535,7 @@ export default function AddZoneComp() {
         <div className="xl:col-span-5 lg:col-span-4 md:col-span-3 sm:col-span-5 col-span-4 mx-3 edit-zone_map_child ">
           <div className="edit_zone_map_text">
             <label className="text-black text-md w-full font-popins font-medium ">
-              Please Enter Text To Search{" "}
+              <b>Please Enter Text To Search </b>
             </label>
             <input
               type="text"

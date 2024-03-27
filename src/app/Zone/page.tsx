@@ -213,6 +213,12 @@ export default function Zone() {
     { value: "City-Area", label: "City-Area" },
     { value: "Restricted-Area", label: "Restricted-Area" },
   ];
+
+  let GeofenceOptionDisable = [
+    { value: "On-Site", label: "On-Site" },
+    { value: "Off-Site", label: "Off-Site" },
+  ];
+
   const handleClear = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setSearchCriteria({
@@ -673,10 +679,15 @@ export default function Zone() {
                 Restricted-Area
               </MenuItem>
             </Select> */}
+
             <Select
               value={searchCriteria.GeoFenceType}
               onChange={handleGeoFence}
-              options={GeofenceOption}
+              options={
+                session?.clickToCall === true
+                  ? GeofenceOption
+                  : GeofenceOptionDisable
+              }
               placeholder="GeoFence"
               isClearable
               isSearchable

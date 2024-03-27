@@ -506,7 +506,10 @@ export default function EditZoneComp() {
                         <Button
                           className="text-white font-popins font-bold h-10"
                           onClick={() => router.push("/Zone")}
-                          style={{ color: "white" }}
+                          style={{
+                            color: "white",
+                            textTransform: "capitalize",
+                          }}
                         >
                           Cancel
                         </Button>
@@ -526,7 +529,7 @@ export default function EditZoneComp() {
               </label>
               <input
                 type="text"
-                className="  block py-2 px-0 w-11/12 text-sm text-labelColor bg-white-10 border border-grayLight appearance-none px-3 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-green mb-5"
+                className="   block py-2 px-0 w-full text-sm text-labelColor bg-white-10 border border-grayLight appearance-none px-3 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-green mb-5"
                 placeholder="Search"
                 required
               />
