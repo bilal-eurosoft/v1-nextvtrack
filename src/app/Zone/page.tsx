@@ -72,16 +72,16 @@ export default function Zone() {
   });
   const [rowsPerPage, setRowsPerPage] = useState<any>(10);
   const totalPages = Math.ceil(zoneList.length / rowsPerPage);
-
   const [filterZonepage, setFilterZonePage] = useState(1);
   const [filterZonePerPage, setfilterZonePerPage] = useState(10);
   const [filteredDataIsNotAvaialable, setFilteredDataIsNotAvaialable] =
     useState<boolean>(true);
   const lastIndexFilter = filterZonePerPage * filterZonepage;
   const firstIndexFilter = lastIndexFilter - filterZonePerPage;
-  let filterZoneResult;
-  filterZoneResult = filteredZones.slice(firstIndexFilter, lastIndexFilter);
-  const totalPagesFilter = Math.ceil(filteredZones.length / filterZonePerPage);
+  // let filterZoneResult;
+  // filterZoneResult = filteredZones.slice(firstIndexFilter, lastIndexFilter);
+  // const totalPagesFilter = Math.ceil(filteredZones.length / filterZonePerPage);
+  // console.log("filteredZones", filterZoneResult);
 
   const handleClickPagination = () => {
     setCurrentPage(input);
@@ -111,7 +111,7 @@ export default function Zone() {
   }
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  let displayedData;
+  let displayedData: any;
   displayedData = zoneList.slice(startIndex, endIndex);
   function handleSearchClick(e: any) {
     e.preventDefault();
@@ -123,30 +123,31 @@ export default function Zone() {
             (typeof zone.zoneName === "string" &&
               zone.zoneName
                 .toLowerCase()
-                .includes(zoneName.value.toLowerCase()))) &&
+                .includes(zoneName?.value?.toLowerCase()))) &&
           (zoneShortName === "" ||
             (zone?.zoneShortName &&
               zone?.zoneShortName
                 ?.toLowerCase()
-                .includes(zoneShortName.value?.toLowerCase()))) &&
+                .includes(zoneShortName?.value?.toLowerCase()))) &&
           (GeoFenceType === "" ||
             (zone.GeoFenceType !== undefined &&
               zone.GeoFenceType.toLowerCase() ===
-                GeoFenceType.value.toLowerCase())) &&
+                GeoFenceType?.value?.toLowerCase())) &&
           (zoneType === "" ||
             (zone.zoneType !== undefined &&
-              zone.zoneType.toLowerCase() === zoneType.toLowerCase()))
+              zone.zoneType?.toLowerCase() === zoneType.toLowerCase()))
         );
       });
+      setFilteredZones(filteredZone);
 
-      if (filteredZone.length > 0) {
+      if (filteredZone.length >= 0) {
         setFilteredDataIsNotAvaialable(true);
         setFilteredZones(filteredZone);
       } else {
         displayedData = [];
         setFilteredDataIsNotAvaialable(false);
         setFilteredZones([]);
-        filterZoneResult = [];
+        // filterZoneResult = [];
       }
     }
   }
@@ -227,15 +228,14 @@ export default function Zone() {
       GeoFenceType: "",
       zoneType: "",
     });
-    console.log("optionZoneName", optionZoneName);
     setFilteredDataIsNotAvaialable(true);
     setselectedZoneTypeCircle(false);
     setselectedZoneTypePolyGone(false);
     setSelectedZones([]);
     setInput("");
-    setFilterZonePage(1);
+    // setFilterZonePage(1);
     setRowsPerPage(10);
-    setFilteredZones(initialzoneList);
+    setFilteredZones([]);
     setCurrentPage(1);
   };
 
@@ -417,17 +417,27 @@ export default function Zone() {
   };
 
   const handleZoneName = (e: any) => {
-    // const { value, label } = e;
-    // console.log("value", value);
+    if (!e) {
+      return setSearchCriteria((preData: any) => ({
+        ...preData,
+        zoneName: "",
+      }));
+    }
     setSearchCriteria({
       ...searchCriteria,
       zoneName: e,
-      // ["label"]: label,
     });
   };
+
   const handleZoneSortName = (e: any) => {
     // const { value, label } = e;
     // console.log("value", value);
+    if (!e) {
+      return setSearchCriteria((PreData: any) => ({
+        ...PreData,
+        zoneShortName: "",
+      }));
+    }
     setSearchCriteria({
       ...searchCriteria,
       zoneShortName: e,
@@ -435,6 +445,12 @@ export default function Zone() {
     });
   };
   const handleGeoFence = (e: any) => {
+    if (!e) {
+      return setSearchCriteria((preData: any) => ({
+        ...preData,
+        GeoFenceType: "",
+      }));
+    }
     setSearchCriteria({
       ...searchCriteria,
       GeoFenceType: e,
@@ -898,7 +914,7 @@ export default function Zone() {
           <AddBoxIcon className="mx-3" />
         </div>
         <div className="col-span-1">
-          <button className="text-white font-popins font-bold  h-10 bg-[#00B56C] -ms-6 text-md ">
+          <button className="text-white font-popins font-bold  h-10 bg-[#00B56C] -ms-6 text-md">
             AddZone
           </button>
         </div>
@@ -962,10 +978,10 @@ export default function Zone() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filterZoneResult.length > 0 ? (
+              {filteredZones.length > 0 ? (
                 <>
                   {" "}
-                  {filterZoneResult.map((item: zonelistType, index) => (
+                  {filteredZones.map((item: zonelistType, index) => (
                     <TableRow
                       key={index}
                       className="cursor-pointer hover:bg-[#e2f6f0]"
@@ -1185,7 +1201,7 @@ export default function Zone() {
       </TableContainer>
 
       <div className="table_pagination">
-        {filterZoneResult.length > 0 ? (
+        {filteredZones.length > 0 ? (
           <div className="flex  justify-end lg:w-full w-screen bg-bgLight">
             <div className="grid lg:grid-cols-4 grid-cols-4   ">
               <div className="lg:col-span-1 col-span-1">
@@ -1197,7 +1213,7 @@ export default function Zone() {
               <div className="lg:col-span-2 md:col-span-2 m:col-span-2 col-span-12 table_pagination">
                 <Stack spacing={2}>
                   <Pagination
-                    count={totalPagesFilter}
+                    // count={totalPagesFilter}
                     page={filterZonepage}
                     onChange={handlePageChangeFiter}
                     sx={{ color: "green" }}
@@ -1226,7 +1242,7 @@ export default function Zone() {
               <TablePagination
                 component="div"
                 rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
-                count={filterZoneResult.length} // or zoneList.length depending on the context
+                count={filteredZones.length} // or zoneList.length depending on the context
                 rowsPerPage={filterZonePerPage} // or rowsPerPage depending on the context
                 page={filterZonepage} // or currentPage depending on the context
                 onRowsPerPageChange={handleChangeRowsPerPageFilter} // or handleChangeRowsPerPage depending on the context

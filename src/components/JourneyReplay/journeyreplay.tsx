@@ -519,11 +519,12 @@ export default function journeyReplayComp() {
     setCurrentPositionIndex(0);
     setClearMapData(true);
     if (
-      Ignitionreport?.VehicleReg &&
-      (Ignitionreport?.period ||
-        (Ignitionreport?.period == "custom" &&
-          Ignitionreport?.toDateTime &&
-          Ignitionreport?.fromDateTime))
+      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "today") ||
+      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "yesterday") ||
+      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "week") ||
+      (Ignitionreport?.VehicleReg &&
+        Ignitionreport?.toDateTime &&
+        Ignitionreport?.fromDateTime)
     ) {
       if (session) {
         const { VehicleReg, period } = await Ignitionreport;
@@ -1021,7 +1022,7 @@ export default function journeyReplayComp() {
     if (!e) {
       return setIgnitionreport((prevReport: any) => ({
         ...prevReport,
-        VehicleReg: null,
+        // VehicleReg: null,
         period: "",
       }));
     }
@@ -1551,7 +1552,6 @@ export default function journeyReplayComp() {
                       (Ignitionreport?.VehicleReg &&
                         Ignitionreport?.period === "week") ||
                       (Ignitionreport?.VehicleReg &&
-                        Ignitionreport?.period === "custom" &&
                         Ignitionreport?.toDateTime &&
                         Ignitionreport?.fromDateTime)
                         ? ""
