@@ -3,7 +3,10 @@
   border-color: #d3d3d3 !important;
   outline: #00b56c;
 }
-
+.hover_select:hover {
+  background-color: #00b56c !important;
+  color: white !important;
+}
 .MuiOutlinedInput-notchedOutline:hover {
   /* border-width: 1px !important; */
   border: #00b56c !important;
