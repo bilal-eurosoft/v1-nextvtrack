@@ -73,6 +73,10 @@ export default function EditZoneComp() {
   });
 
   const router = useRouter();
+  if (session?.userRole === "Controller") {
+    router.push("/signin");
+    return null;
+  }
   const [zoom, setZoom] = useState(10);
 
   useEffect(() => {
@@ -139,7 +143,7 @@ export default function EditZoneComp() {
           ]);
         }
       }
-    } else {
+    } else if (zoneDataById?.zoneType === "Circle") {
       let circledata = Number(zoneDataById?.latlngCordinates);
       const newcenterPoints = zoneDataById?.centerPoints;
       const latlng = newcenterPoints?.split(",").map(Number);
@@ -225,28 +229,30 @@ export default function EditZoneComp() {
     };
 
     let circlePoint = formatCenterPoints(latlng.lat, latlng.lng);
+
     const newlatlng = circlePoint?.split(",").map(Number);
-    if (drawShape == true) {
+    console.log("newlatlng", newlatlng, drawShape);
+
+    if (drawShape == true || drawShape == false) {
       setCircleDataById({ radius: radius });
       const updateCircleData = (newLatlng: string, newRadius: string): void => {
+        console.log("updateCircleData", newLatlng, newRadius);
         setCircleData({
           latlng: newLatlng,
           radius: newRadius,
         });
       };
       updateCircleData(circlePoint, radius);
-
       setMapcenter([newlatlng[0], newlatlng[1]]);
-
-      setDrawShape(!drawShape);
     }
   };
-
+  console.log("circledata", circleData);
   const handleChange = (e: any) => {
     const { name, value } = e.target;
+    console.log("e", name, value);
     setForm({ ...Form, [name]: value });
   };
-
+  // console.log(drawShape);
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -257,7 +263,7 @@ export default function EditZoneComp() {
       toast.error("Please Draw a Zone");
       return;
     }
-
+    console.log("[pqwoepiwqouwiy", Form);
     try {
       if (session) {
         const newformdata = {
@@ -324,12 +330,15 @@ export default function EditZoneComp() {
       } else if (layer instanceof L.Circle) {
         const latlng: L.LatLng = layer.getLatLng();
         const radius: number = layer.getRadius();
+        console.log("vsdfvfd", latlng, radius);
         handleCircleSave(latlng, radius.toString());
+        setDrawShape(true);
       }
     });
   };
 
   const handleredraw = (e: any) => {
+    setDrawShape(true);
     if (polygondataById.length > 0) {
       setDrawShape(true);
       setPolygondataById([]);
@@ -338,14 +347,13 @@ export default function EditZoneComp() {
     } else if (circleDataById !== null) {
       setCircleDataById(null);
       setCircleData({ radius: "", latlng: "" });
-
       setForm({ ...Form, zoneType: "" });
       setDrawShape(true);
     } else {
-      setDrawShape(drawShape);
+      setDrawShape(true);
     }
   };
-
+  console.log("form", Form, drawShape);
   const handleCreated = (e: any) => {
     const createdLayer = e.layer;
     const type = e.layerType;
@@ -393,39 +401,45 @@ export default function EditZoneComp() {
               <label className="text-md font-popins text-black font-semibold">
                 <span className="text-red font-extraboldbold">*</span> Geofence:{" "}
               </label>
-              <Select
-                onChange={handleChange}
-                value={Form?.GeoFenceType}
-                id="select_box_journey"
-                className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
-                required
-                name="GeoFenceType"
-              >
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="On-Site"
+              {session?.clickToCall === true ? (
+                <Select
+                  onChange={handleChange}
+                  value={Form?.GeoFenceType}
+                  id="select_box_journey"
+                  className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
+                  required
+                  name="GeoFenceType"
                 >
-                  On-Site
-                </MenuItem>
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="Off-Site"
+                  <MenuItem className="hover_select" value="On-Site">
+                    On-Site
+                  </MenuItem>
+                  <MenuItem className="hover_select" value="Off-Site">
+                    Off-Site
+                  </MenuItem>
+                  <MenuItem className="hover_select" value="City-Area">
+                    City-Area
+                  </MenuItem>
+                  <MenuItem className="hover_select" value="Restricted-Area">
+                    Restricted-Area
+                  </MenuItem>
+                </Select>
+              ) : (
+                <Select
+                  onChange={handleChange}
+                  value={Form?.GeoFenceType}
+                  id="select_box_journey"
+                  className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
+                  required
+                  name="GeoFenceType"
                 >
-                  Off-Site
-                </MenuItem>
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="City-Area"
-                >
-                  City-Area
-                </MenuItem>
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="Restricted-Area"
-                >
-                  Restricted-Area
-                </MenuItem>
-              </Select>
+                  <MenuItem className="hover_select" value="On-Site">
+                    On-Site
+                  </MenuItem>
+                  <MenuItem className="hover_select" value="Off-Site">
+                    Off-Site
+                  </MenuItem>
+                </Select>
+              )}
               <br></br>
               <br></br>
               <label className="text-md font-popins text-black font-semibold">
@@ -492,9 +506,12 @@ export default function EditZoneComp() {
                         <Button
                           className="text-white font-popins font-bold h-10"
                           onClick={() => router.push("/Zone")}
-                          style={{ color: "white" }}
+                          style={{
+                            color: "white",
+                            textTransform: "capitalize",
+                          }}
                         >
-                          Cancel
+                          <b> Cancel</b>
                         </Button>
                       </div>
                     </div>
@@ -512,7 +529,7 @@ export default function EditZoneComp() {
               </label>
               <input
                 type="text"
-                className="  block py-2 px-0 w-11/12 text-sm text-labelColor bg-white-10 border border-grayLight appearance-none px-3 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-green mb-5"
+                className="   block py-2 px-0 w-full text-sm text-labelColor bg-white-10 border border-grayLight appearance-none px-3 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-green mb-5"
                 placeholder="Search"
                 required
               />
