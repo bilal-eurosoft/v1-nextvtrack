@@ -141,6 +141,26 @@ input[type="checkbox"]:hover {
 .journey_map {
   height: 83vh;
 }
+@media only screen and (max-width: 1650px) and (min-width: 800px) {
+  .select_box_journey {
+    display: flex;
+    grid-template-columns: 10% 10%;
+    gap: 2%;
+    margin: 0;
+    padding: 0;
+    height: 10vh;
+  }
+  .select_vehicle {
+    width: 15rem;
+    margin-left: 2%;
+  }
+  .days_select {
+    width: 30rem;
+  }
+
+  /* .xl\:grid-cols-11 {
+  } */
+}
 @media (max-width: 1000px) and (min-width: 750px) {
   .main_journey {
     height: 87vh !important;

@@ -117,9 +117,7 @@ export default function RootLayout({
   const { data: session } = useSession();
   const [loginTime, setLoginTime] = useState(new Date());
   const [elapsedTime, setElapsedTime] = useState(0);
-
-  const fullparams = searchParams.get("screen");
-  // console.log("fullparams", fullparams);
+  const fullparams = searchParams?.get("screen");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -220,7 +218,7 @@ export default function RootLayout({
           <div
             className={
               fullparams == "full"
-                ? "sidebar-hide"
+                ? "hidden"
                 : "basis-20 py-6 bg-[#29303b] h-screen lg:block md:hidden sm:hidden hidden sticky top-0"
             }
           >
@@ -631,7 +629,7 @@ export default function RootLayout({
             <nav
               className={
                 fullparams == "full"
-                  ? "sidebar-hide"
+                  ? "hidden"
                   : "flex items-center justify-between  lg:mt-0 md:mt-14 sm:mt-14   flex-wrap bg-green px-5 py-2 sticky top-0 z-10 w-full"
               }
               // style={{ height: "7vh" }}

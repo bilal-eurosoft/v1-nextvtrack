@@ -85,7 +85,7 @@ input[type="checkbox"]:hover {
     margin-left: 5.6rem;
   }
 } */
-@media only screen and (max-width: 1440px) and (min-width: 1281px) and (max-height: 900px) {
+@media only screen and (max-width: 1440px) and (min-width: 1190px) and (max-height: 900px) {
   .main_sider_bar {
     height: 77vh;
     width: 80%;
@@ -129,7 +129,7 @@ input[type="checkbox"]:hover {
   }
   #maps {
     height: 88vh;
-    margin-left: 14% !important;
+    margin-left: -9% !important;
   }
   .search_live_tracking {
     height: 7vh;
@@ -273,4 +273,27 @@ input[type="checkbox"]:hover {
 
 .leaflet-marker-icon.custom-icon.leaflet-zoom-animated.leaflet-interactive {
   margin-top: -25px !important;
+}
+
+@media only screen and (max-width: 1650px) and (min-width: 1200px) {
+  .lg\:grid-cols-5 {
+    display: grid;
+    grid-template-columns: 30% 70%;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+  }
+  .mph_speed {
+    width: 7rem;
+  }
+  #scroll_side_bar {
+    height: 82vh;
+  }
+  .lg\:grid-cols-5 .main_sider_bar {
+    height: 88vh;
+    width: 100%;
+  }
+  .lg\:grid-cols-5 .xl\:col-span-4 {
+    grid-column: auto;
+  }
 }

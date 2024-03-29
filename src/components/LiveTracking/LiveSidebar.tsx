@@ -298,7 +298,7 @@ const LiveSidebar = ({
                   </button>
                 </div>
                 <div
-                  className="xl:col-span-4 lg:col-span-4 col-span-5 "
+                  className="xl:col-span-4 lg:col-span-4 col-span-5 mph_speed"
                   // id="mph_left"
                 >
                   <div className="grid grid-cols-4">

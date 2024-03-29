@@ -1201,7 +1201,7 @@ export default function journeyReplayComp() {
               isClearable
               isSearchable
               noOptionsMessage={() => "No options available"}
-              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green select_vehicle"
               styles={{
                 control: (provided, state) => ({
                   ...provided,
@@ -1333,7 +1333,7 @@ export default function journeyReplayComp() {
               autoOk
             />
           </MuiPickersUtilsProvider> */}
-          <div className="xl:col-span-3 lg:col-span-4 md:col-span-6 col-span-12">
+          <div className="xl:col-span-3 lg:col-span-4 md:col-span-6 col-span-12 days_select">
             {getShowRadioButton ? (
               <div className="grid lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-12  -mt-2  grid-cols-12  xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2 flex justify-center ">
                 <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0  ">
