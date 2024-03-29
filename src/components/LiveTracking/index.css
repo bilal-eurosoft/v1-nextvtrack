@@ -57,35 +57,7 @@ input[type="checkbox"]:hover {
 .main_sider_bar {
   height: 93vh;
 }
-/* @media only screen and (max-width: 1400px) and (min-width: 1230px) {
-  .main_sider_bar {
-    height: 80vh;
-    width: 23rem;
-  }
-  #scroll_side_bar {
-    height: 82vh;
-  }
-  #maps {
-    height: 93vh;
-    width: 88%;
-    margin-left: 7.6rem;
-  }
-}
-@media only screen and (max-width: 1550px) and (min-width: 1400px) {
-  .main_sider_bar {
-    height: 80vh;
-    width: 23rem;
-  }
-  #scroll_side_bar {
-    height: 82vh;
-  }
-  #maps {
-    height: 93vh;
-    width: 96%;
-    margin-left: 5.6rem;
-  }
-} */
-@media only screen and (max-width: 1440px) and (min-width: 1190px) and (max-height: 900px) {
+@media only screen and (max-width: 1440px) and (max-height: 900px) {
   .main_sider_bar {
     height: 77vh;
     width: 80%;
@@ -102,7 +74,7 @@ input[type="checkbox"]:hover {
   }
   #maps {
     height: 88vh;
-    /* margin-left: -13%; */
+    margin-left: -13%;
   }
   .vehicle_search_left {
     width: 80%;
@@ -118,71 +90,7 @@ input[type="checkbox"]:hover {
     margin-left: -10%;
   }
 }
-
-@media only screen and (max-width: 1282px) and (min-width: 1060px) and (max-height: 900px) {
-  .main_sider_bar {
-    height: 80vh;
-    width: 24rem;
-  }
-  #scroll_side_bar {
-    height: 75vh;
-  }
-  #maps {
-    height: 88vh;
-    margin-left: -13% !important;
-  }
-  .search_live_tracking {
-    height: 7vh;
-  }
-
-  .vehicle_summary {
-    height: 6vh;
-  }
-
-  .vehicle_search_left {
-    width: 98%;
-  }
-  /* .btn_left_margin {
-    margin-left: -50% ;
-  } */
-  /* .show_vehicle_left {
-    margin-left: -17%;
-    width: 10rem;
-  }
-  #btn_left_margin {
-    margin-left: -25% !important;
-  }
-  #mph_left {
-    margin-left: -10%;
-  } */
-}
-
-@media only screen and (max-width: 1050px) and (min-width: 750px) {
-  .main_sider_bar {
-    height: 77vh;
-    /* width: 23rem; */
-  }
-  #scroll_side_bar {
-    height: 68vh;
-  }
-  #maps {
-    height: 88vh;
-    /* margin-left: 14% !important; */
-  }
-  .search_live_tracking {
-    height: 10vh;
-  }
-
-  .vehicle_summary {
-    height: 6vh;
-  }
-
-  .vehicle_search_left {
-    width: 98%;
-  }
-}
-
-/* @media (max-width: 1000px) and (min-width: 750px) {
+@media (max-width: 1000px) and (min-width: 750px) {
   .main_sider_bar {
     height: 87.5vh;
   }
@@ -206,51 +114,23 @@ input[type="checkbox"]:hover {
     height: 87.5vh;
     padding: 10px;
   }
-} */
-/* .main_sider_bar  {
-  display: grid;
-  grid-template-columns: 24rem;
-  gap: 1%;
-} */
+}
 
-@media (max-width: 750px) and (min-width: 600px) {
-  #maps {
-    height: 92vh;
-  }
-
-  .search_live_tracking {
-    height: auto;
-  }
-
-  .vehicle_summary {
-    height: auto;
-  }
-
+@media (max-width: 450px) {
   #scroll_side_bar {
-    height: 80vh;
+    height: 20vh;
   }
 
-  .main_sider_bar {
-    height: 80vh;
+  #maps {
+    height: 38vh;
   }
 }
-/* @media only screen and (max-width: 320px) and (max-height: 570px) {
-  .show_vehicle_left {
-    width: 100% !important  ;
-  }
-  #maps {
-    height: 22vh !important;
-    margin-top: 16%;
-  }
-} */
-@media (max-width: 590px) {
-  #scroll_side_bar {
-    height: 20vh;
-  }
 
+@media (max-width: 750px) {
   #maps {
     height: 38vh;
   }
+
   .search_live_tracking {
     height: auto;
   }
@@ -266,34 +146,8 @@ input[type="checkbox"]:hover {
   .main_sider_bar {
     height: 38vh;
   }
-  /* #btn_left_margin {
-    margin-left: -55% !important;
-  } */
 }
 
 .leaflet-marker-icon.custom-icon.leaflet-zoom-animated.leaflet-interactive {
   margin-top: -25px !important;
 }
-
-/* @media only screen and (max-width: 1650px) and (min-width: 1200px) {
-  .lg\:grid-cols-5 {
-    display: grid;
-    grid-template-columns: 30% 70%;
-    gap: 0;
-    margin: 0;
-    padding: 0;
-  }
-  .mph_speed {
-    width: 7rem;
-  }
-  #scroll_side_bar {
-    height: 82vh;
-  }
-  .lg\:grid-cols-5 .main_sider_bar {
-    height: 88vh;
-    width: 100%;
-  }
-  .lg\:grid-cols-5 .xl\:col-span-4 {
-    grid-column: auto;
-  }
-} */
