@@ -37,6 +37,9 @@ export default function LoginPage() {
     const value = e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
   };
+  if (session?.failed == false) {
+    router.push("/signin");
+  }
   /* 
   const handleClick = async () => {
     setLoading(true);
@@ -179,11 +182,7 @@ export default function LoginPage() {
               alignItems: "center",
             }}
           >
-            <Image
-              src={loadings}
-              alt=""
-              style={{ height: "7vh", width: "12%", marginTop: "-3%" }}
-            />
+            <Image src={loadings} alt="" className="loading_all_page" />
             <br></br>
           </div>
           <div role="status">

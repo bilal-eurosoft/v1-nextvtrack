@@ -11,11 +11,7 @@ const Loading = () => {
           alignItems: "center",
         }}
       >
-        <Image
-          src={logo}
-          alt=""
-          style={{ height: "7vh", width: "12%", marginTop: "-3%" }}
-        />
+        <Image src={logo} alt="" className="loading_all_page" />
         <br></br>
       </div>
       <div role="status">

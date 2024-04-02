@@ -630,19 +630,11 @@ export default function RootLayout({
               className={
                 fullparams == "full"
                   ? "hidden"
-                  : "flex items-center justify-between  lg:mt-0 md:mt-14 sm:mt-14   flex-wrap bg-green px-5 py-2 sticky top-0 z-10 w-full"
+                  : "lg:mt-0 md:mt-14 sm:mt-14   flex-wrap bg-green  py-2 sticky top-0 z-10 w-full"
               }
               // style={{ height: "7vh" }}
               id="nav_height"
             >
-              <div className="flex items-center flex-shrink-0 text-white">
-                <Image
-                  src={logo}
-                  className="xl:h-12 lg:h-14 lg:w-44 w-20 h-6   lg:block md:block sm:block hidden  "
-                  alt=""
-                />
-              </div>
-
               <div className="basis-20 py-6  lg:hidden  sticky top-0">
                 <Box>
                   <CssBaseline />
@@ -681,15 +673,22 @@ export default function RootLayout({
                     <List className="bg-[#29303b] h-screen">
                       <Link href="/liveTracking">
                         <Tooltip
-                          className="bg-white text-[#00B56C]  shadow-lg rounded"
+                          className="bg-[#00B56C] text-white shadow-lg rounded"
                           placement="right"
                           content="Live Map"
                         >
                           <svg
-                            className="w-14 h-14 py-3   border-y-2 mt-12  text-[white]  text-white-10 dark:text-white"
+                            className="w-20 h-14 py-3 border-y-2 -ms-3 mt-12  text-white text-white-10 dark:text-white"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
+                            style={{
+                              color:
+                                pathname == "/liveTracking" ? "green" : "white",
+                              backgroundColor:
+                                pathname == "/liveTracking" ? "white" : "",
+                              border: pathname == "/liveTracking" ? "none" : "",
+                            }}
                           >
                             <path
                               strokeLinecap="round"
@@ -706,20 +705,32 @@ export default function RootLayout({
                           </svg>
                         </Tooltip>
                       </Link>
-                      <Link href="/journeyReplay">
+                      <Link href="/journeyReplay" style={{ zIndex: "999" }}>
                         <Tooltip
-                          className="bg-white text-[#00B56C] shadow-lg rounded"
+                          className="bg-[#00B56C] text-white shadow-lg rounded"
                           placement="right"
                           content="Journey Replay"
                         >
                           <svg
-                            className="w-14 h-14 py-3  -my-1  text-[white]  text-white-10  dark:text-white"
+                            className={`w-20 h-14 py-3  -my-1  -ms-3  text-white-10  dark:text-white ${
+                              session?.userRole === "Controller"
+                                ? "border-b-2 border-white"
+                                : ""
+                            }`}
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
+                            style={{
+                              color:
+                                pathname == "/journeyReplay"
+                                  ? "green"
+                                  : "white",
+                              backgroundColor:
+                                pathname == "/journeyReplay" ? "white" : "",
+                            }}
                           >
                             {" "}
                             <circle cx="12" cy="12" r="10" />{" "}
@@ -727,39 +738,64 @@ export default function RootLayout({
                           </svg>
                         </Tooltip>
                       </Link>
-                      <Link href="/Zone">
-                        <Tooltip
-                          className="bg-white text-[#00B56C] rounded shadow-lg"
-                          placement="right"
-                          content="Zone"
-                        >
-                          <svg
-                            className="w-14 h-14 py-3  border-y-2   text-[white]  text-white-10  dark:text-white"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            strokeWidth="2"
-                            stroke="currentColor"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                      {session?.userRole === "Controller" ? null : (
+                        <Link href="/Zone">
+                          <Tooltip
+                            className="bg-[#00B56C] text-white rounded shadow-lg"
+                            placement="right"
+                            content="Zones"
                           >
-                            {" "}
-                            <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r=".5"
-                              fill="currentColor"
-                            />{" "}
-                            <circle cx="12" cy="12" r="7" />{" "}
-                            <line x1="12" y1="3" x2="12" y2="5" />{" "}
-                            <line x1="3" y1="12" x2="5" y2="12" />{" "}
-                            <line x1="12" y1="19" x2="12" y2="21" />{" "}
-                            <line x1="19" y1="12" x2="21" y2="12" />
-                          </svg>
-                        </Tooltip>
-                      </Link>
+                            <svg
+                              className="w-20 h-14 py-3  border-y-2  -ms-3 text-[white]  text-white-10  dark:text-white"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              strokeWidth="2"
+                              stroke="currentColor"
+                              fill="none"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              style={{
+                                color:
+                                  pathname == "/Zone" ||
+                                  pathname == "/AddZone" ||
+                                  `EditZone?id=${filterId}` ==
+                                    `EditZone?id=${pathName}`
+                                    ? "green"
+                                    : "white",
+                                backgroundColor:
+                                  pathname == "/Zone" ||
+                                  pathname == "/AddZone" ||
+                                  `EditZone?id=${filterId}` ==
+                                    `EditZone?id=${pathName}`
+                                    ? "white"
+                                    : "",
+                                border:
+                                  pathname == "/Zone" ||
+                                  pathname == "/AddZone" ||
+                                  `EditZone?id=${filterId}` ==
+                                    `EditZone?id=${pathName}`
+                                    ? "none"
+                                    : "",
+                              }}
+                            >
+                              {" "}
+                              <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r=".5"
+                                fill="currentColor"
+                              />{" "}
+                              <circle cx="12" cy="12" r="7" />{" "}
+                              <line x1="12" y1="3" x2="12" y2="5" />{" "}
+                              <line x1="3" y1="12" x2="5" y2="12" />{" "}
+                              <line x1="12" y1="19" x2="12" y2="21" />{" "}
+                              <line x1="19" y1="12" x2="21" y2="12" />
+                            </svg>
+                          </Tooltip>
+                        </Link>
+                      )}
 
                       {/* <Popover placement="right-start">
                         <Tooltip
@@ -902,12 +938,15 @@ export default function RootLayout({
                       )}
                       <Link href="/Reports">
                         <Tooltip
-                          className="bg-white text-[#00B56C] shadow-lg rounded"
+                          className="bg-[#00B56C] text-white shadow-lg rounded"
                           placement="right"
                           content="Reports"
                         >
                           <svg
-                            className="w-14 h-14 py-3 border-y-2 text-[white] text-white-10  dark:text-white"
+                            className={`w-20 h-14 py-3 border-b-2 -ms-3
+                  text-white-10  dark:text-white ${
+                    session?.cameraProfile ? "border-y-2" : "border-b-2"
+                  }`}
                             width="24"
                             height="24"
                             viewBox="0 0 24 24"
@@ -916,56 +955,19 @@ export default function RootLayout({
                             fill="none"
                             strokeLinecap="round"
                             strokeLinejoin="round"
+                            style={{
+                              color: pathname == "/Reports" ? "green" : "white",
+                              backgroundColor:
+                                pathname == "/Reports" ? "white" : "",
+                              border: pathname == "/Reports" ? "none" : "",
+                            }}
                           >
                             <path d="M9 7V2.13a2.98 2.98 0 0 0-1.293.749L4.879 5.707A2.98 2.98 0 0 0 4.13 7H9Z" />
                             <path d="M18.066 2H11v5a2 2 0 0 1-2 2H4v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 20 20V4a1.97 1.97 0 0 0-1.934-2ZM10 18a1 1 0 1 1-2 0v-2a1 1 0 1 1 2 0v2Zm3 0a1 1 0 0 1-2 0v-6a1 1 0 1 1 2 0v6Zm3 0a1 1 0 0 1-2 0v-4a1 1 0 1 1 2 0v4Z" />
                           </svg>
                         </Tooltip>
                       </Link>
-                      {/* <Popover placement="right-start">
-                        <Tooltip
-                          className="bg-white text-green shadow-lg rounded border-none"
-                          placement="right"
-                          content="Driver"
-                        >
-                          <PopoverHandler>
-                            <svg
-                              className="w-14 h-14 py-3 border-b-2 text-[white] text-white-10  dark:text-white"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              strokeWidth="2"
-                              stroke="currentColor"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              {" "}
-                              <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                              <circle cx="7" cy="17" r="2" />{" "}
-                              <circle cx="17" cy="17" r="2" />{" "}
-                              <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" />
-                            </svg>
-                          </PopoverHandler>
-                        </Tooltip>
-                        <PopoverContent className="border-none  cursor-pointer bg-green">
-                          <span
-                            className=" w-full text-white"
-                            onClick={() => router.push("/DriverProfile")}
-                          >
-                            Driver Profilesss
-                          </span>
-                          <br></br>
-                          <br></br>
-                          <span
-                            className=" w-full text-white"
-                            onClick={() => router.push("/DriverAssign")}
-                          >
-                            Assign Driver
-                          </span>
-                          <br></br>
-                        </PopoverContent>
-                      </Popover> */}
+
                       {(session?.userRole == "SuperAdmin" ||
                         session?.userRole == "Admin") && (
                         <div>
@@ -980,7 +982,7 @@ export default function RootLayout({
                               >
                                 <PopoverHandler>
                                   <svg
-                                    className="w-20 h-14 py-3 border-b-2 text-[white] text-white-10  dark:text-white"
+                                    className="w-20 h-14 py-3 border-b-2 -ms-3 text-[white] text-white-10  dark:text-white"
                                     width="24"
                                     height="24"
                                     viewBox="0 0 24 24"
@@ -1075,9 +1077,21 @@ export default function RootLayout({
                 </Box>
               </div>
 
-              <div className="grid lg:grid-cols-12 grid-cols-12  lg:gap-5 header_client_name_end">
+              <div
+                className="grid lg:grid-cols-12 grid-cols-12  lg:gap-5 lg:mt-0 md:-mt-10 "
+                // style={{ alignContent: "center" }}
+              >
+                <div className="lg:col-span-7 md:col-span-2  col-span-6 text-white lg:px-5 px-0 logo_header">
+                  <Image
+                    src={logo}
+                    className="xl:h-12 lg:h-14 lg:w-44 h-12 
+           lg:block md:block"
+                    alt=""
+                  />
+                </div>
+
                 <div
-                  className="lg:col-span-2  col-span-10  lg:mt-1 md:mt-3  sm:mt-3 mt-5 
+                  className="lg:col-span-3 md:col-span-5 lg:ms-20 md:-ms-2  ms-2 col-span-12  lg:mt-1 md:mt-3  sm:mt-3 mt-5 
                 client_name 
                 "
                 >
@@ -1086,26 +1100,19 @@ export default function RootLayout({
                     &nbsp;
                     <span className="lg:text-1xl text-sm">
                       {" "}
-                      <p className="text-white font-popins  text-2xl -mt-5 ">
+                      <p className="text-white font-popins text-end text-2xl -mt-4 ">
                         {session?.clientName}
                       </p>
                     </span>
                   </span>
                 </div>
-                <div className="lg:col-span-4 md:col-span-4 sm:col-span-4 col-span-1 lg:mx-0 md:mx-4 sm:mx-4 mx-4  lg:mt-2 md:mt-4  sm:mt-4 mt-6">
-                  <a className=" lg:-mt-0 text-white font-popins text-xl time_none ">
+                <div className="lg:col-span-1 w-72 md:col-span-1 sm:col-span-4 col-span-10 lg:mx-0 md:mx-4 sm:mx-4 mx-4  lg:mt-4 md:mt-4  sm:mt-4 mt-6 time_header">
+                  <a className=" lg:-mt-0 text-white font-popins text-xl  ">
                     <BlinkingTime timezone={session?.timezone} />
                   </a>
                 </div>
-                <div className="lg:col-span-2 col-span-1">
+                <div className="lg:col-span-1 lg:ms-20   col-span-2 logout_popup">
                   <Popover>
-                    {/* <PopoverHandler {...triggers}>
-                      <img
-                        className=" cursor-pointer lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0  lg:w-10 md:w-10 sm:w-10  h-12 rounded-full"
-                        src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
-                        alt="Rounded avatar"
-                      />
-                    </PopoverHandler> */}
                     <PopoverHandler {...triggers}>
                       {session?.image !== "" && session?.image !== "null" ? (
                         <img

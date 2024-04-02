@@ -31,52 +31,53 @@ export default function ForgetPassword() {
       ...formData,
       clientId: session?.clientId,
     };
-
-    const response = await forgetEmailByClientId({
-      token: session?.accessToken,
-      newformdata: newformdata,
-    });
-
-    // {
-    //   loading: "Saving data...",
-    //   error: "Error saving data. Please try again.",
-    // },
-    // {
-    // style: {
-    //   border: "1px solid #00B56C",
-    //   padding: "16px",
-    //   color: "#1A202C",
-    // },
-    // success: {
-    //   duration: 2000,
-    //   iconTheme: {
-    //     primary: "#00B56C",
-    //     secondary: "",
-    //   },
-    // },
-    // error: {
-    //   duration: 2000,
-    //   iconTheme: {
-    //     primary: "#00B56C",
-    //     secondary: "#FFFAEE",
-    //   },
-    // },
-    // }
-    // );
-
-    setFormData({
-      userName: "",
-      email: "",
-    });
-    if (response.Msg == "Reset Link send successfully") {
-      setshowVerificationText(true);
-      toast.success(response.Msg, {
-        position: "top-center",
+    if (showVerificationText == false) {
+      const response = await forgetEmailByClientId({
+        token: session?.accessToken,
+        newformdata: newformdata,
       });
-    } else {
-      toast.error(response.Msg, {
-        position: "top-center",
+
+      // {
+      //   loading: "Saving data...",
+      //   error: "Error saving data. Please try again.",
+      // },
+      // {
+      // style: {
+      //   border: "1px solid #00B56C",
+      //   padding: "16px",
+      //   color: "#1A202C",
+      // },
+      // success: {
+      //   duration: 2000,
+      //   iconTheme: {
+      //     primary: "#00B56C",
+      //     secondary: "",
+      //   },
+      // },
+      // error: {
+      //   duration: 2000,
+      //   iconTheme: {
+      //     primary: "#00B56C",
+      //     secondary: "#FFFAEE",
+      //   },
+      // },
+      // }
+      // );
+
+      setFormData({
+        userName: "",
+        email: "",
       });
+      if (response.Msg == "Reset Link send successfully") {
+        setshowVerificationText(true);
+        toast.success(response.Msg, {
+          position: "top-center",
+        });
+      } else {
+        toast.error(response.Msg, {
+          position: "top-center",
+        });
+      }
     }
     // if (session) {
     //   const newformdata: any = {
