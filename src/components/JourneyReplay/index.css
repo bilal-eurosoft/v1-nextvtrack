@@ -141,7 +141,7 @@ input[type="checkbox"]:hover {
 .journey_map {
   height: 83vh;
 }
-@media only screen and (max-width: 1650px) and (min-width: 800px) {
+@media only screen and (max-width: 1650px) and (min-width: 850px) {
   .select_box_journey {
     display: flex;
     grid-template-columns: 10% 10%;
@@ -155,13 +155,43 @@ input[type="checkbox"]:hover {
     margin-left: 2%;
   }
   .days_select {
-    width: 30rem;
+    grid-column: span 10 / span 10;
+    /* width: 30rem; */
   }
-
-  /* .xl\:grid-cols-11 {
-  } */
+  .trips_journey {
+    grid-column: span 2 / span 2;
+    width: 75%;
+  }
+  .journey_map {
+    grid-column: span 3 / span 3;
+    margin-left: -3.6rem;
+  }
+  .journey_replay_search {
+    grid-column: span 3 / span 3;
+    margin-left: -5rem;
+  }
+  .stop_journey {
+    grid-column: span 3 / span 3;
+  }
+  .journey_replay_slider {
+    grid-column: span 6 / span 6;
+  }
+  .select_journey_speed {
+    grid-column: span 2 / span 2;
+  }
+  .journey_replay_center_box {
+    right: 30%;
+    width: 80%;
+    left: 1%;
+  }
+  .journey_replay_harsh {
+    grid-column: span 1 / span 1;
+  }
+  .journey_replay_harsh_child {
+    grid-column: span 1 / span 1;
+  }
 }
-@media (max-width: 1000px) and (min-width: 750px) {
+@media (max-width: 799px) and (min-width: 750px) {
   .main_journey {
     height: 87vh !important;
   }

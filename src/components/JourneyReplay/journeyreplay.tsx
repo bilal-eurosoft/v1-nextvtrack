@@ -1519,7 +1519,7 @@ export default function journeyReplayComp() {
             )}
           </div>
 
-          <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12 text-white font-bold flex justify-center items-center mt-2">
+          <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12 text-white font-bold flex justify-center items-center mt-2 journey_replay_search">
             {/* {clearMapData ? (
               <button
                 onClick={handleClickClear}
@@ -1605,9 +1605,9 @@ export default function journeyReplayComp() {
             </button> */}
           </div>
 
-          <div className="xl:col-span-3 lg:col-span-1 col-span-12 "> </div>
+          <div className="xl:col-span-3 lg:col-span-1 col-span-12 journey_replay_harsh"> </div>
           {TravelHistoryresponse.length > 0 && (
-            <div className="xl:col-span-1 lg:col-span-2 col-span-6  -mt-1 ">
+            <div className="xl:col-span-1 lg:col-span-2 col-span-6  -mt-1 journey_replay_harsh_child  ">
               <div className="grid grid-cols-12  ">
                 <div className="col-span-2">
                   <Image src={markerA} alt="harshIcon" className="h-6" />
@@ -1621,7 +1621,7 @@ export default function journeyReplayComp() {
               </div>
             </div>
           )}
-          <div className="xl:col-span-1  lg:col-span-2 col-span-6 mt-1 -ms-5 mb-3">
+          <div className="xl:col-span-1  lg:col-span-2 md:col-span-1 col-span-6 mt-1 -ms-5 mb-3">
             {TravelHistoryresponse.filter((item: any) => {
               return (
                 item.vehicleEvents.filter(
@@ -1686,7 +1686,7 @@ export default function journeyReplayComp() {
           </div>
         </div>
         <div className="grid lg:grid-cols-5  sm:grid-cols-5 md:grid-cols-12 sm:grid-cols-12 grid-cols-1 journey_sidebar">
-          <div className="xl:col-span-1 lg:col-span-2 md:col-span-5 sm:col-span-12 col-span-4 ">
+          <div className="xl:col-span-1 lg:col-span-2 md:col-span-5 sm:col-span-12 col-span-4 trips_journey">
             <p className="bg-green px-4 py-1 text-white font-semibold journey_sidebar_text">
               Trips ({dataresponse?.length})
             </p>
@@ -2400,7 +2400,7 @@ export default function journeyReplayComp() {
             </div>
 
             <div className="absolute lg:top-4 lg:left-20 lg:right-5 left-12 top-6 right-2 grid lg:grid-cols-10 md:grid-cols-10 sm:grid-cols-10 grid-cols-10 lg:mt-0 ">
-              <div className="xl:col-span-2 mr-5 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6">
+              <div className="xl:col-span-2 mr-5 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6 stop_journey">
                 <div
                   className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg  rounded-md cursor-pointer"
                   onClick={() => stopDetailsOpen && handleShowDetails()}
@@ -2679,10 +2679,12 @@ export default function journeyReplayComp() {
               //   right: "5%",
               //   bottom: "0%",
               // }}
-              className="absolute xl:left-56 lg:left-10 xl:right-20 lg:right-10 xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8  bottom-2  left-1 right-3"
+              className="absolute xl:left-56 lg:left-10 xl:right-20 lg:right-10 xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8  bottom-2  left-1 right-3
+              journey_replay_center_box
+              "
             >
               <div className="grid xl:grid-cols-7 lg:grid-cols-12 md:grid-12 grid-cols-12 lg:gap-5 gap-2 ">
-                <div className="xl:col-span-1 mt-5  lg:col-span-4 md:col-span-4 col-span-4  ">
+                <div className="xl:col-span-1 mt-5  lg:col-span-4 md:col-span-4 col-span-4">
                   {/* <div className="bg-bgPlatBtn rounded-md">
                     <div className="lg:text-xl text-white font-medium text-center  py-2 text-md mx-1">
                       <BlinkingTime timezone={session?.timezone} />
@@ -2698,7 +2700,7 @@ export default function journeyReplayComp() {
                           }`}
                         >
                           <svg
-                            className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6  mx-1 "
+                            className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6  mx-1"
                             // style={{
                             //   color: stopVehicle === true ? "gray" : "white",
                             // }}
@@ -2770,8 +2772,8 @@ export default function journeyReplayComp() {
                     </div>
                   </div> */}
                 </div>
-                <div className="xl:col-span-4 lg:col-span-8 col-span-12   ">
-                  <div className="grid lg:grid-cols-12 grid-cols-12 gap-1 lg:py-5 py-2 mt-8 pt-4 lg:pt-4 rounded-md  mx-2 px-5 bg-white space-x-4">
+                <div className="xl:col-span-4 lg:col-span-8 col-span-12  journey_replay_slider ">
+                  <div className="grid lg:grid-cols-12 grid-cols-12 gap-1 lg:py-5 py-2 mt-8 pt-4 lg:pt-4 rounded-md  mx-2 px-5 bg-white space-x-4 ">
                     <div
                       className="lg:col-span-10 col-span-8"
                       // style={{ height: "4vh" }}
@@ -2931,7 +2933,7 @@ export default function journeyReplayComp() {
                       </div> */}
                     </div>
 
-                    <div className="lg:col-span-2 col-span-4 mt-2">
+                    <div className="lg:col-span-2 col-span-4 mt-2 select_journey_speed">
                       {isPlaying && (
                         // <Select
                         //   className="text-black  outline-green border h-8 w-16 border-grayLight px-1"
