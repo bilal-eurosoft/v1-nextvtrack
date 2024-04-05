@@ -25,6 +25,7 @@ import {
   IgnitionReportByEvents,
   IgnitionReportByDetailReport,
   IgnitionReportByIdlingActivity,
+  getAllVehicleByUserId,
 } from "@/utils/API_CALLS";
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -172,12 +173,20 @@ export default function Reports() {
   useEffect(() => {
     const vehicleListData = async () => {
       try {
-        if (session) {
+        if (session?.userRole == "Admin" || session?.userRole == "SuperAmin") {
           const Data = await vehicleListByClientId({
             token: session.accessToken,
             clientId: session?.clientId,
           });
           setVehicleList(Data);
+        } else {
+          if (session) {
+            const data = await getAllVehicleByUserId({
+              token: session.accessToken,
+              userId: session.userId,
+            });
+            setVehicleList(data);
+          }
         }
       } catch (error) {
         console.error("Error fetching zone data:", error);
@@ -875,14 +884,14 @@ export default function Reports() {
         Reports Filter
       </p>
       <form
-        className="  bg-bgLight   height_report_form"
+        className="bg-bgLight  height_report_form"
         // onSubmit={handleSubmit}
       >
         <div className="bg-green-50 mt-5">
-          <div className="grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-2 mt-5 mb-1 grid-cols-2  px-10 gap-2 ">
-            <div className="xl:col-span-3 lg:col-span-5 md:col-span-1 sm:col-span-1 col-span-2 ">
-              <div className="grid grid-cols-12">
-                <div className="xl:col-span-3 lg:col-span-4 sm:col-span-10 col-span-12 mt-2">
+          <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 mt-5 mb-1 grid-cols-2  px-10 gap-2 ">
+            <div className="xl:col-span-3 lg:col-span-6 md:col-span-6 sm:col-span-5 col-span-2 ">
+              <div className="grid grid-cols-12 roport_vehicle">
+                <div className="xl:col-span-3 lg:col-span-4 md:col-span-12  sm:col-span-10  col-span-12 mt-2 ">
                   <label className="text-labelColor ">
                     <b>Report Type:</b> &nbsp;&nbsp;
                   </label>
@@ -981,8 +990,8 @@ export default function Reports() {
                 </div>
               </div>
             </div>
-            <div className="xl:col-span-3 lg:col-span-6 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4">
-              <div className="grid grid-cols-12">
+            <div className="xl:col-span-3 lg:col-span-6 md:col-span-6 sm:col-span-7 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4 ">
+              <div className="grid grid-cols-12 roport_vehicle">
                 <div className="lg:col-span-2 col-span-12 mt-2">
                   <label className="text-labelColor">
                     <b>Vehicle:</b> &nbsp;&nbsp;{" "}
@@ -1013,7 +1022,7 @@ export default function Reports() {
                     </MenuItem>
                   ))}
                 </Select> */}
-                <div className="lg:col-span-8 col-span-12">
+                <div className="lg:col-span-8 md:col-span-9 sm:col-span-9  col-span-12 ">
                   <Select
                     value={Ignitionreport.vehicleNo}
                     onChange={handleInputChangeSelect}
@@ -1054,13 +1063,13 @@ export default function Reports() {
             {showWeekDays && (
               <>
                 <div
-                  className="xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2 mt-2"
+                  className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3  mt-2 report_periods_today"
                   style={{ display: "flex", justifyContent: "center" }}
                 >
                   <label>
                     <input
                       type="radio"
-                      className="w-5 h-4 form-radio  "
+                      className="w-5 h-4 form-radio"
                       style={{ accentColor: "green" }}
                       name="period"
                       value="today"
@@ -1071,7 +1080,7 @@ export default function Reports() {
                   </label>
                 </div>
                 <div
-                  className="xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2 mt-2"
+                  className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 mt-2 report_periods"
                   style={{ display: "flex", justifyContent: "center" }}
                 >
                   <label>
@@ -1088,7 +1097,9 @@ export default function Reports() {
                   </label>
                 </div>
                 <div
-                  className="xl:col-span-1 lg:col-span-2 md:col-span-1 mt-2"
+                  className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 mt-2 
+                  report_periods_today
+                  "
                   style={{ display: "flex", justifyContent: "center" }}
                 >
                   <label>
@@ -1105,7 +1116,7 @@ export default function Reports() {
                   </label>
                 </div>
                 <div
-                  className="xl:col-span-1 lg:col-span-2 md:col-span-1 mt-2"
+                  className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 mt-2 report_periods"
                   style={{ display: "flex", justifyContent: "center" }}
                 >
                   <label>
@@ -1126,7 +1137,7 @@ export default function Reports() {
             )}
             {isCustomPeriod && (
               <>
-                <div className="xl:col-span-2 lg:col-span-3 md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4 ">
+                <div className="xl:col-span-2 lg:col-span-3 md:col-span-4 sm:col-span-3 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 mt-4">
                   <label className="text-labelColor">
                     <label className="text-green"> From Date:</label>{" "}
                     &nbsp;&nbsp;&nbsp;
@@ -1159,7 +1170,7 @@ export default function Reports() {
                   /> */}
                   </label>
                 </div>
-                <div className="xl:col-span-2 lg:col-span-3  md:col-span-1 sm:col-span-1 col-span-2 lg:mt-0 md:mt-0 sm:mt-0  w-full ">
+                <div className="xl:col-span-2 lg:col-span-3  md:col-span-4 sm:col-span-3 col-span-2 lg:mt-0 md:mt-0 sm:mt-0  w-full ">
                   <div className="grid grid-cols-12">
                     <div className="col-span-10">
                       <label className="text-green"> To Date:</label>
@@ -1180,7 +1191,7 @@ export default function Reports() {
                         />
                       </MuiPickersUtilsProvider>
                     </div>
-                    <div className="col-span-2">
+                    <div className="lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-2 lg:mt-0 md:mt-0 sm:mt-0 lg:ms-0 md:ms-0 sm:ms-0 -mt-16 ms-4">
                       <button
                         className="text-green -mt-5 -mb-5 text-2xl font-bold"
                         onClick={hanldeCloseDateTap}
@@ -1201,7 +1212,7 @@ export default function Reports() {
                 </div>
               </>
             )}
-            <div className="xl:col-span-1 lg:col-span-2">
+            <div className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 submit_report_btn">
               <button
                 className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
                         ${
@@ -1230,7 +1241,7 @@ export default function Reports() {
                 Submit
               </button>{" "}
             </div>
-            <div className="xl:col-span-1 lg:col-span-2 -ms-5">
+            <div className="xl:col-span-1 lg:col-span-2 sm:col-span-3 md:col-span-2 -ms-5 submit_report_btn">
               <button
                 className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
                 ${

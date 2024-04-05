@@ -58,7 +58,10 @@ export default function DriverProfile() {
   const [getRfid, setRfid] = useState([]);
   const [selectedRFID, setSelectedRFID] = useState("");
   const [inactiveRFIDs, setInactiveRFIDs] = useState<any>([]);
-  if (session?.userRole === "Controller") {
+  if (
+    session?.userRole === "Controller" ||
+    (session?.userRole == "Admin" && session?.driverProfile === false)
+  ) {
     router.push("/signin");
     return null;
   }

@@ -1189,7 +1189,7 @@ export default function journeyReplayComp() {
         {/* <p className="bg-[#00B56C] px-4 py-1 text-white">JourneyReplay</p> */}
         <div className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-5 px-4 text-start  bg-bgLight select_box_journey">
           <div
-            className="xl:col-span-1 lg:col-span-2 md:col-span-2  col-span-12
+            className="xl:col-span-1 lg:col-span-2 md:col-span-3   col-span-12
           "
             // style={{ gridColumnEnd: "span 1.5" }}
           >
@@ -1519,7 +1519,7 @@ export default function journeyReplayComp() {
             )}
           </div>
 
-          <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12 text-white font-bold flex justify-center items-center mt-2 journey_replay_search">
+          <div className="xl:col-span-1 lg:col-span-1 md:col-span-1 col-span-12 text-white font-bold flex justify-center items-center mt-2 journey_replay_search">
             {/* {clearMapData ? (
               <button
                 onClick={handleClickClear}
@@ -1605,13 +1605,19 @@ export default function journeyReplayComp() {
             </button> */}
           </div>
 
-          <div className="xl:col-span-3 lg:col-span-1 col-span-12 journey_replay_harsh"> </div>
+          <div className="xl:col-span-3 lg:col-span-1 md:col-span-12 col-span-12 journey_replay_harsh">
+            {" "}
+          </div>
           {TravelHistoryresponse.length > 0 && (
-            <div className="xl:col-span-1 lg:col-span-2 col-span-6  -mt-1 journey_replay_harsh_child  ">
+            <div className="xl:col-span-1 lg:col-span-2  md:col-span-12 col-span-6  -mt-1 journey_replay_harsh_child  ">
               <div className="grid grid-cols-12  ">
                 <div className="col-span-2">
-                  <Image src={markerA} alt="harshIcon" className="h-6" />
-                  <Image src={markerB} alt="harshIcon" className="h-6 mt-1" />
+                  <Image
+                    src={markerA}
+                    alt="harshIcon"
+                    className="h-6 journay_HarshAcceleration"
+                  />
+                  <Image src={markerB} alt="harshIcon" className="h-6 mt-1 " />
                 </div>
                 <div className="col-span-10 text-sm font-semibold">
                   location Start
@@ -1621,7 +1627,7 @@ export default function journeyReplayComp() {
               </div>
             </div>
           )}
-          <div className="xl:col-span-1  lg:col-span-2 md:col-span-1 col-span-6 mt-1 -ms-5 mb-3">
+          <div className="xl:col-span-1  lg:col-span-2 md:col-span-1 col-span-6 mt-1 -ms-5 mb-3 journey_replay_harsh_acce">
             {TravelHistoryresponse.filter((item: any) => {
               return (
                 item.vehicleEvents.filter(
@@ -1634,7 +1640,7 @@ export default function journeyReplayComp() {
                   <Image
                     src={HarshAccelerationIcon}
                     alt="harshIcon "
-                    className="h-6 "
+                    className="h-6 journay_HarshAcceleration"
                   />
                 </div>
                 <div className="col-span-10 text-sm font-semibold">
@@ -1664,7 +1670,7 @@ export default function journeyReplayComp() {
                   <Image
                     src={harshAcceleration}
                     alt="harshIcon"
-                    className="h-6 mt-1"
+                    className="h-6 mt-1 journay_HarshAcceleration"
                   />
                 </div>
                 <div className="col-span-10 text-sm">

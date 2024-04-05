@@ -625,14 +625,15 @@ export default function RootLayout({
           </div>
 
           <hr></hr>
-          <div className="basis-1/1 w-screen">
+          <div className="">
             <nav
               className={
                 fullparams == "full"
                   ? "hidden"
-                  : "lg:mt-0 md:mt-14 sm:mt-14   flex-wrap bg-green  py-2 sticky top-0 z-10 w-full"
+                  : "lg:mt-0     flex-wrap bg-green py-2  sticky top-0 z-10 w-full"
               }
               // style={{ height: "7vh" }}
+              // style={{ display: "flex", alignItems: "center" }}
               id="nav_height"
             >
               <div className="basis-20 py-6  lg:hidden  sticky top-0">
@@ -1076,42 +1077,33 @@ export default function RootLayout({
                   </Drawer>
                 </Box>
               </div>
-
-              <div
-                className="grid lg:grid-cols-12 grid-cols-12  lg:gap-5 lg:mt-0 md:-mt-10 "
-                // style={{ alignContent: "center" }}
-              >
-                <div className="lg:col-span-7 md:col-span-2  col-span-6 text-white lg:px-5 px-0 logo_header">
+              <div className="grid grid-cols-12 flex items-center justify-end gap-0">
+                <div className="col-span-6 ">
                   <Image
                     src={logo}
-                    className="xl:h-12 lg:h-14 lg:w-44 h-12 
-           lg:block md:block"
+                    className="xl:h-12 lg:h-10 w-44 md:h-12 sm:h-10 h-12 lg:float-left
+                    md:float-left sm:float-left
+                    lg:mt-0 md:mt-3 sm:mt-4 lg:mx-0 md:mx-0 sm:mx-0 mx-auto block  sm:text-center"
                     alt=""
                   />
                 </div>
-
-                <div
-                  className="lg:col-span-3 md:col-span-5 lg:ms-20 md:-ms-2  ms-2 col-span-12  lg:mt-1 md:mt-3  sm:mt-3 mt-5 
-                client_name 
-                "
-                >
-                  <span className="text-black">
-                    {" "}
-                    &nbsp;
-                    <span className="lg:text-1xl text-sm">
-                      {" "}
-                      <p className="text-white font-popins text-end text-2xl -mt-4 ">
-                        {session?.clientName}
-                      </p>
-                    </span>
-                  </span>
+                <div className="col-span-3 text-end ">
+                  <p className="text-white lg:py-0 md:py-1 sm:py-2 font-popins  lg:text-2xl md:text-xl sm:text-md  ">
+                    {session?.clientName}
+                  </p>
                 </div>
-                <div className="lg:col-span-1 w-72 md:col-span-1 sm:col-span-4 col-span-10 lg:mx-0 md:mx-4 sm:mx-4 mx-4  lg:mt-4 md:mt-4  sm:mt-4 mt-6 time_header">
-                  <a className=" lg:-mt-0 text-white font-popins text-xl  ">
+                <div className="col-span-2  text-end ">
+                  <p
+                    className="text-white font-popins lg:text-xl md:text-xl 
+                  sm:text-md"
+                  >
                     <BlinkingTime timezone={session?.timezone} />
-                  </a>
+                  </p>
                 </div>
-                <div className="lg:col-span-1 lg:ms-20   col-span-2 logout_popup">
+                <div
+                  className="col-span-1 text-center px-2"
+                  style={{ display: "flex", justifyContent: "center" }}
+                >
                   <Popover>
                     <PopoverHandler {...triggers}>
                       {session?.image !== "" && session?.image !== "null" ? (
@@ -1122,7 +1114,7 @@ export default function RootLayout({
                         />
                       ) : (
                         <img
-                          className="cursor-pointer lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0 lg:w-10 md:w-10 sm:w-10 h-12 rounded-full"
+                          className="cursor-pointer lg:mt-0 md:mt-3 sm:mt-3 mt-12  lg:ms-0 lg:w-10 md:w-10 sm:w-10 h-12  rounded-full"
                           src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
                           alt="Rounded avatar"
                         />
@@ -1131,34 +1123,12 @@ export default function RootLayout({
 
                     <PopoverContent
                       {...triggers}
-                      className="z-50  lg:w-auto md:w-auto w-full"
+                      className="z-50 lg:w-auto md:w-auto w-full"
                     >
-                      {/* <div className="mb-2 flex items-center gap-3 px-20">
-                        <Typography
-                          as="a"
-                          href="#"
-                          variant="h6"
-                          color="blue-gray"
-                          className="font-medium transition-colors hover:text-gray-900 w-full"
-                        >
-                          <img
-                            className="ms-auto mr-auto mt-5 mb-5 w-10 h-10 rounded-full"
-                            src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
-                            alt="Rounded avatar"
-                          />
-                        </Typography>
-                      </div> */}
                       <div
-                        className="grid grid-cols-12 w-full "
+                        className="grid grid-cols-12 w-full"
                         style={{ display: "flex", justifyContent: "center" }}
                       >
-                        {/* <div className="col-span-2">
-                          <img
-                            className="mb-5 w-10 lg:h-10 h-10 rounded-full"
-                            src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
-                            alt="Rounded avatar"
-                          />
-                        </div> */}
                         <div className="col-span-9 ms-2 text-lg font-popins text-center text-black">
                           <p className="text-2xl ">{session?.FullName}</p>
                           {session?.Email}
@@ -1178,7 +1148,7 @@ export default function RootLayout({
                       >
                         <div className="flex justify-center">
                           <button
-                            className="bg-green shadow-md  hover:shadow-gray transition duration-500 cursor px-5 py-2 rounded-lg text-white "
+                            className="bg-green shadow-md hover:shadow-gray transition duration-500 cursor px-5 py-2 rounded-lg text-white "
                             onClick={() => {
                               signOut();
                             }}

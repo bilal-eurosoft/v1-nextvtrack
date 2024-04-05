@@ -37,6 +37,8 @@ export default function LoginPage() {
     const value = e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
   };
+  console.log("session", session);
+
   if (session?.failed == false) {
     router.push("/signin");
   }

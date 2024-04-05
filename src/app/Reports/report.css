@@ -88,7 +88,104 @@
   height: 7vh;
   width: 100%;
 }
+@media (max-width: 1740px) and (min-width: 1400px) {
+  .height_report_form {
+    height: auto;
+  }
+  .report_periods {
+    grid-column: span 1;
+    display: flex;
+    align-items: center;
+  }
+  .report_periods_today {
+    grid-column: span 1;
+    display: flex;
+    align-items: center;
+  }
+  .submit_report_btn {
+    grid-column: span 1;
+    display: flex;
+    align-items: center;
+  }
+}
+@media (max-width: 1800px) and (min-width: 1570px) {
+  .height_report_form {
+    height: auto;
+  }
+  .roport_vehicle {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .report_periods_today {
+    grid-column: span 1;
+    display: flex;
+    align-items: center;
+  }
+  .report_periods {
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+  }
+  .submit_report_btn {
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+  }
+}
 
+@media (max-width: 1571px) and (min-width: 1195px) {
+  .height_report_form {
+    height: auto;
+  }
+  .roport_vehicle {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .report_periods_today {
+    grid-column: span 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .report_periods {
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+  }
+  .submit_report_btn {
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+  }
+}
+
+@media (max-width: 1200px) and (min-width: 1050px) {
+  .height_report_form {
+    height: auto;
+  }
+  .roport_vehicle {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .report_periods_today {
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+  }
+
+  .report_periods {
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+  }
+  .submit_report_btn {
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+  }
+}
+@media (max-width: 1049px) and (min-width: 610px) {
+  .height_report_form {
+    height: auto;
+  }
+}
 @media (max-width: 600px) {
   .height_report_form {
     height: auto;

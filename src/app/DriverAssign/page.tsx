@@ -168,7 +168,7 @@ export default function DriverProfile() {
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
-  if (session?.userRole === "Controller") {
+  if (session?.userRole === "Controller" || session?.userRole == "Admin" && session?.driverProfile === false) {
     router.push("/signin");
     return null;
   }

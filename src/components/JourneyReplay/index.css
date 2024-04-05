@@ -141,7 +141,7 @@ input[type="checkbox"]:hover {
 .journey_map {
   height: 83vh;
 }
-@media only screen and (max-width: 1650px) and (min-width: 850px) {
+@media only screen and (max-width: 1650px) and (min-width: 1040px) and (max-height: 900px) {
   .select_box_journey {
     display: flex;
     grid-template-columns: 10% 10%;
@@ -156,7 +156,14 @@ input[type="checkbox"]:hover {
   }
   .days_select {
     grid-column: span 10 / span 10;
-    /* width: 30rem; */
+    /* gap: 70rem; */
+    width: 30rem;
+  }
+  .journey_sidebar_text {
+    height: 4vh;
+  }
+  .journey_heading {
+    height: 5vh;
   }
   .trips_journey {
     grid-column: span 2 / span 2;
@@ -168,10 +175,10 @@ input[type="checkbox"]:hover {
   }
   .journey_replay_search {
     grid-column: span 3 / span 3;
-    margin-left: -5rem;
+    /* margin-left: -5rem; */
   }
   .stop_journey {
-    grid-column: span 3 / span 3;
+    grid-column: span 4 / span 4;
   }
   .journey_replay_slider {
     grid-column: span 6 / span 6;
@@ -190,7 +197,98 @@ input[type="checkbox"]:hover {
   .journey_replay_harsh_child {
     grid-column: span 1 / span 1;
   }
+  .journey_replay_harsh_acce {
+    grid-column: span 1 / span 1;
+    margin-left: -9rem;
+    /* margin-top: -1rem; */
+    /* margin-right: -5rem; */
+  }
+  .journay_HarshAcceleration {
+    width: 100%;
+  }
 }
+
+@media only screen and (max-width: 1050px) and (min-width: 859px) {
+  .select_box_journey {
+    /* display: flex; */
+    /* grid-template-columns: 10% 10%; */
+
+    gap: 2%;
+    margin: 0;
+    padding: 0;
+    height: 10vh;
+  }
+  .select_vehicle {
+    width: 15rem;
+    margin-left: 2%;
+  }
+  .days_select {
+    grid-column: span 10 / span 10;
+    /* gap: 70rem; */
+    width: 30rem;
+  }
+  .journey_sidebar_text {
+    height: 6vh;
+  }
+
+  .journey_heading {
+    height: 6vh;
+    /* margin-top: 0.9%; */
+  }
+  .trips_journey {
+    grid-column: span 2 / span 2;
+    width: 95%;
+  }
+  .journey_map {
+    grid-column: span 3 / span 3;
+    margin-left: -0.5rem;
+  }
+  .journey_replay_search {
+    grid-column: span 3 / span 3;
+    /* margin-left: -5rem; */
+  }
+  .stop_journey {
+    grid-column: span 4 / span 4;
+  }
+  .journey_replay_slider {
+    grid-column: span 6 / span 6;
+  }
+  .select_journey_speed {
+    grid-column: span 2 / span 2;
+  }
+  .journey_replay_center_box {
+    right: 30%;
+    width: 45rem;
+    left: -16rem;
+  }
+  .journey_replay_harsh {
+    grid-column: span 1 / span 1;
+  }
+  .journey_replay_harsh_child {
+    grid-column: span 1 / span 1;
+  }
+  .journey_replay_harsh_acce {
+    grid-column: span 1 / span 1;
+    margin-left: -9rem;
+    /* margin-top: -1rem; */
+    /* margin-right: -5rem; */
+  }
+  .journay_HarshAcceleration {
+    width: 100%;
+  }
+  .main_journey {
+    height: 88vh;
+    overflow: hidden;
+  }
+
+  #trips_handle {
+    height: 65vh;
+  }
+  .journey_map {
+    height: 73vh;
+  }
+}
+
 @media (max-width: 799px) and (min-width: 750px) {
   .main_journey {
     height: 87vh !important;
