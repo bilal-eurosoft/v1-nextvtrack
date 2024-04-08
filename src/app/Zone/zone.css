@@ -85,28 +85,45 @@
   border-radius: 7px;
 }
 
-@media (max-width: 1000px) and (min-width: 750px) {
-  #zone_main {
-    height: 87vh !important;
-  }
-  .zone_heading {
-    height: 4vh;
-    margin-top: 1px;
-  }
-  .zone_form {
-    height: 24vh;
-  }
+@media (max-width: 1900px) and (min-width: 1570px) {
   .table_zone {
-    height: 52vh;
-    /* overflow-y: scroll; */
+    height: 60vh;
   }
-  .table_pagination {
-    height: 3.5vh;
-    margin-top: 1.5%;
+  .table_scroll {
+    margin-top: 0.8%;
+  }
+}
+
+@media (max-width: 1571px) and (min-width: 1195px) {
+  .table_zone {
+    height: 60vh;
+  }
+  .table_scroll {
+    margin-top: 1%;
+  }
+}
+
+@media (max-width: 1200px) and (min-width: 1050px) {
+  .table_zone {
+    height: 60vh;
+  }
+  .table_scroll {
+    margin-top: 1%;
+  }
+}
+@media (max-width: 1049px) and (min-width: 610px) {
+  .table_zone {
+    height: 60vh;
+  }
+  .table_scroll {
+    margin-top: 3%;
   }
 }
 
 @media (max-width: 750px) {
+  .table_scroll {
+    margin-top: 15%;
+  }
   #zone_main {
     height: auto;
   }

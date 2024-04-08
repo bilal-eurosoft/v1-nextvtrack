@@ -125,10 +125,17 @@
     display: flex;
     align-items: center;
   }
-  .submit_report_btn {
-    grid-column: span 2;
+  #submit_btn {
+    grid-column: span 11;
     display: flex;
     align-items: center;
+    justify-content: end;
+  }
+  .submit_report_btn {
+    grid-column: span 1;
+    display: flex;
+    align-items: center;
+    justify-content: end;
   }
 }
 
@@ -150,10 +157,17 @@
     display: flex;
     align-items: center;
   }
+  #submit_btn {
+    grid-column: span 10;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+  }
   .submit_report_btn {
     grid-column: span 2;
     display: flex;
     align-items: center;
+    justify-content: center;
   }
 }
 

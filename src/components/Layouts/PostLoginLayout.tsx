@@ -625,18 +625,19 @@ export default function RootLayout({
           </div>
 
           <hr></hr>
-          <div className="">
+          <div className="basis-1/1 w-screen">
             <nav
               className={
                 fullparams == "full"
                   ? "hidden"
                   : "lg:mt-0     flex-wrap bg-green py-2  sticky top-0 z-10 w-full"
               }
+              // id="nav_height"
               // style={{ height: "7vh" }}
               // style={{ display: "flex", alignItems: "center" }}
-              id="nav_height"
+              // id="nav_height"
             >
-              <div className="basis-20 py-6  lg:hidden  sticky top-0">
+              <div className="basis-20 py-6  lg:hidden  sticky top-0 sider_bar_hidden">
                 <Box>
                   <CssBaseline />
                   <AppBar position="fixed" open={open}>
@@ -648,6 +649,84 @@ export default function RootLayout({
                       >
                         <MenuIcon />
                       </IconButton>
+
+                      <div className="grid grid-cols-12 ">
+                        <div className="col-span-10 mt-1  ">
+                          <Image
+                            src={logo}
+                            className="xl:h-12 lg:h-10 w-32 md:h-12 sm:h-10 h-10 lg:float-left
+                    md:float-left sm:float-left
+                    lg:mt-0 md:mt-3 sm:mt-4 lg:mx-0 md:mx-0 sm:mx-0 mx-auto block  sm:text-center"
+                            alt=""
+                          />
+                        </div>
+                        <div className="col-span-2 h-8">
+                          <Popover>
+                            <PopoverHandler {...triggers}>
+                              {session?.image !== "" &&
+                              session?.image !== "null" ? (
+                                <img
+                                  className="cursor-pointer bg-white lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0 lg:w-10 md:w-10 sm:w-10 h-12 rounded-full"
+                                  src={session?.image}
+                                  alt="Rounded avatar"
+                                />
+                              ) : (
+                                <img
+                                  className="cursor-pointer   rounded-full"
+                                  src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
+                                  alt="Rounded avatar"
+                                />
+                              )}
+                            </PopoverHandler>
+
+                            <PopoverContent
+                              {...triggers}
+                              className="z-50 lg:w-auto md:w-auto w-full"
+                            >
+                              <div
+                                className="grid grid-cols-12 w-full"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <div className="col-span-9 ms-2 text-lg font-popins text-center text-black">
+                                  <p className="text-2xl ">
+                                    {session?.FullName}
+                                  </p>
+                                  {session?.Email}
+                                </div>
+                              </div>
+                              <hr></hr>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                }}
+                                className="py-2 font-popins font-semibold"
+                              >
+                                {/* <TimeCounter /> */}
+                              </div>
+                              <Typography
+                                variant="small"
+                                color="gray"
+                                className="font-normal "
+                              >
+                                <div className="flex justify-center">
+                                  <button
+                                    className="bg-green shadow-md hover:shadow-gray transition duration-500 cursor px-5 py-2 rounded-lg text-white "
+                                    onClick={() => {
+                                      signOut();
+                                    }}
+                                  >
+                                    <PowerSettingsNewIcon /> Log Out
+                                  </button>
+                                </div>
+                              </Typography>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </div>
                     </Toolbar>
                   </AppBar>
                   <Drawer
@@ -1077,7 +1156,8 @@ export default function RootLayout({
                   </Drawer>
                 </Box>
               </div>
-              <div className="grid grid-cols-12 flex items-center justify-end gap-0">
+
+              <div className="grid grid-cols-12 flex items-center justify-end ">
                 <div className="col-span-6 ">
                   <Image
                     src={logo}
@@ -1085,14 +1165,15 @@ export default function RootLayout({
                     md:float-left sm:float-left
                     lg:mt-0 md:mt-3 sm:mt-4 lg:mx-0 md:mx-0 sm:mx-0 mx-auto block  sm:text-center"
                     alt=""
+                    id="logo_hidden"
                   />
                 </div>
-                <div className="col-span-3 text-end ">
+                <div className="lg:col-span-3 md:col-span-3 sm:col-span-3 col-span-12 text-center lg:mt-0 md:mt-0 sm:mt-0 mt-3 ">
                   <p className="text-white lg:py-0 md:py-1 sm:py-2 font-popins  lg:text-2xl md:text-xl sm:text-md  ">
                     {session?.clientName}
                   </p>
                 </div>
-                <div className="col-span-2  text-end ">
+                <div className="lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-12 text-center ">
                   <p
                     className="text-white font-popins lg:text-xl md:text-xl 
                   sm:text-md"
@@ -1101,8 +1182,12 @@ export default function RootLayout({
                   </p>
                 </div>
                 <div
-                  className="col-span-1 text-center px-2"
-                  style={{ display: "flex", justifyContent: "center" }}
+                  className="col-span-1 text-center "
+                  id="logo_hidden"
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
                 >
                   <Popover>
                     <PopoverHandler {...triggers}>

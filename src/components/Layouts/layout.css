@@ -78,12 +78,15 @@
   /* display: none; */
   overflow: hidden !important;
 }
-@media only screen and (max-width: 1070px) and (min-width: 650px) {
+@media only screen and (max-width: 1070px) and (min-width: 620px) {
   #nav_height {
     height: auto !important;
     display: flex;
     align-items: center;
     /* margin-top: -0.1%; */
+  }
+  .sider_bar_hidden {
+    display: none;
   }
   .logo_header {
     width: 10rem;
@@ -108,16 +111,14 @@
     height: 12vh;
   }
 } */
-@media (max-width: 750px) and (min-width: 610px) {
-  #nav_height {
-    height: auto !important;
-  }
-}
 
-@media (max-width: 600px) {
+@media (max-width: 620px) {
   #nav_height {
     height: auto !important;
     margin-top: 2.5%;
+  }
+  #logo_hidden {
+    display: none !important;
   }
 
   .time_none {

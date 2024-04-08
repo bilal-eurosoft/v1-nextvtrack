@@ -1190,6 +1190,7 @@ export default function journeyReplayComp() {
         <div className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-5 px-4 text-start  bg-bgLight select_box_journey">
           <div
             className="xl:col-span-1 lg:col-span-2 md:col-span-3   col-span-12
+            select_box_column
           "
             // style={{ gridColumnEnd: "span 1.5" }}
           >
@@ -1388,7 +1389,7 @@ export default function journeyReplayComp() {
                 className="grid xl:grid-cols-11 lg:grid-cols-12  md:grid-cols-12 grid-cols-12 -mt-2 "
                 // style={{ display: "flex", justifyContent: "start" }}
               >
-                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2 col-span-4">
+                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2 col-span-4 period_select">
                   <label className="text-sm text-black font-bold font-popins ">
                     <input
                       type="radio"
@@ -1404,7 +1405,7 @@ export default function journeyReplayComp() {
                   </label>
                 </div>
 
-                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2  lg:-ms-4 col-span-4 ">
+                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2  lg:-ms-4 col-span-4 period_select">
                   <label className="text-sm  text-black font-bold font-popins  w-full pt-3 ">
                     <input
                       type="radio"
@@ -1420,7 +1421,7 @@ export default function journeyReplayComp() {
                   </label>
                 </div>
 
-                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3  lg:-ms-1 col-span-4">
+                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3  lg:-ms-1 col-span-4 period_select">
                   <label className="text-sm text-black font-bold font-popins  ">
                     <input
                       type="radio"
@@ -1436,7 +1437,7 @@ export default function journeyReplayComp() {
                   </label>
                 </div>
 
-                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3 -ms-4 col-span-4 margin_custom">
+                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3 -ms-4 col-span-3 period_select_custom">
                   <label className="text-sm text-black font-bold font-popins ">
                     <input
                       type="radio"
@@ -2472,7 +2473,7 @@ export default function journeyReplayComp() {
 
                           <div className="grid grid-cols-12">
                             <div className="lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-2"></div>
-                            <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-7  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red">
+                            <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-7  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
                               {moment(item?.date)
                                 .tz("Europe/London")
                                 .format("HH:mm:ss A")}

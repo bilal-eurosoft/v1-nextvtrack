@@ -1212,7 +1212,7 @@ export default function Reports() {
                 </div>
               </>
             )}
-            <div className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 submit_report_btn">
+            <div className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 submit_report_btn" id="submit_btn">
               <button
                 className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
                         ${
