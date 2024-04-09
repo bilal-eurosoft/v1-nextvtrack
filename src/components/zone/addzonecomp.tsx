@@ -341,7 +341,7 @@ export default function AddZoneComp() {
       </p>
 
       <div className="grid lg:grid-cols-6 sm:grid-cols-5 md:grid-cols-5 grid-cols-1 pt-8 edit_zone_map">
-        <div className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-4 col-span-4 bg-gray-200 mx-5">
+        <div className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-6 col-span-4 bg-gray-200 mx-5 edit_zone_side_bar">
           <form onSubmit={handleSave}>
             <label className="text-black text-md w-full font-popins font-medium">
               <span className="text-red">
@@ -471,7 +471,7 @@ export default function AddZoneComp() {
                 "
               >
                 <div
-                  className="col-span-5 bg-green 
+                  className="lg:col-span-5 md:col-span-5 sm:col-span-2 col-span-4 bg-green 
                 rounded-md shadow-md  hover:shadow-gray transition duration-500"
                 >
                   <div className="grid grid-cols-12 gap-2">
@@ -503,7 +503,7 @@ export default function AddZoneComp() {
                 </div>
                 <div className="col-span-1"></div>
                 <div
-                  className="col-span-5 bg-red
+                  className="lg:col-span-5 md:col-span-5 sm:col-span-2 col-span-4 bg-red
                 rounded-md shadow-md  hover:shadow-gray transition duration-500"
                 >
                   <div className="grid grid-cols-12 gap-2">
@@ -552,10 +552,14 @@ export default function AddZoneComp() {
             Redraw
           </button> */}
 
-          <div className="grid lg:grid-cols-3 grid-cols-3 bg-green w-24 edit_zone_map_btn rounded-md shadow-md  hover:shadow-gray transition duration-500">
-            <div className="col-span-1">
+          <div
+            className="grid lg:grid-cols-3 grid-cols-3  bg-green lg:w-28 md:w-28 sm:w-28
+            w-32
+              rounded-md shadow-md  hover:shadow-gray transition duration-500 h-10 redraw_btn"
+          >
+            <div className="col-span-1  ms-1">
               <svg
-                className="h-10 py-3 w-full text-white"
+                className="h-10 py-2 w-full text-white"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -568,9 +572,9 @@ export default function AddZoneComp() {
                 />
               </svg>
             </div>
-            <div className="col-span-2">
+            <div className="col-span-2 mt-1 ">
               <button
-                className="text-white  font-popins font-bold h-10    "
+                className="text-white  font-popins font-bold h-9 px-3"
                 type="submit"
                 onClick={handleredraw}
               >

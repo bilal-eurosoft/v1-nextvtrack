@@ -91,11 +91,11 @@ input[type="checkbox"]:hover {
 @media (max-width: 1200px) and (min-width: 1050px) {
   .main_sider_bar {
     grid-column: 2 span;
-    width: 80%;
+    width: 90%;
   }
   .main_map {
     grid-column: 3 span;
-    margin-left: -13%;
+    margin-left: -7%;
   }
 }
 @media (max-width: 1049px) and (min-width: 900px) {

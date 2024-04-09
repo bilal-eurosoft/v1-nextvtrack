@@ -650,7 +650,7 @@ export default function RootLayout({
                         <MenuIcon />
                       </IconButton>
 
-                      <div className="grid grid-cols-12 ">
+                      <div className="grid grid-cols-12 h-10">
                         <div className="col-span-10 mt-1  ">
                           <Image
                             src={logo}
@@ -660,7 +660,7 @@ export default function RootLayout({
                             alt=""
                           />
                         </div>
-                        <div className="col-span-2 h-8">
+                        <div className="col-span-2 ">
                           <Popover>
                             <PopoverHandler {...triggers}>
                               {session?.image !== "" &&
@@ -672,7 +672,7 @@ export default function RootLayout({
                                 />
                               ) : (
                                 <img
-                                  className="cursor-pointer   rounded-full"
+                                  className="cursor-pointer user_avator_image"
                                   src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
                                   alt="Rounded avatar"
                                 />
@@ -1168,12 +1168,12 @@ export default function RootLayout({
                     id="logo_hidden"
                   />
                 </div>
-                <div className="lg:col-span-3 md:col-span-3 sm:col-span-3 col-span-12 text-center lg:mt-0 md:mt-0 sm:mt-0 mt-3 ">
+                <div className="lg:col-span-3 md:col-span-3 sm:col-span-3 col-span-12 lg:text-end md:text-end sm:text-end text-center lg:mt-0 md:mt-0 sm:mt-0 mt-3 ">
                   <p className="text-white lg:py-0 md:py-1 sm:py-2 font-popins  lg:text-2xl md:text-xl sm:text-md  ">
                     {session?.clientName}
                   </p>
                 </div>
-                <div className="lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-12 text-center ">
+                <div className="lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-12 lg:text-end md:text-end sm:text-end text-center">
                   <p
                     className="text-white font-popins lg:text-xl md:text-xl 
                   sm:text-md"
@@ -1182,11 +1182,11 @@ export default function RootLayout({
                   </p>
                 </div>
                 <div
-                  className="col-span-1 text-center "
+                  className="col-span-1 text-center px-3 "
                   id="logo_hidden"
                   style={{
                     display: "flex",
-                    justifyContent: "center",
+                    justifyContent: "end",
                   }}
                 >
                   <Popover>

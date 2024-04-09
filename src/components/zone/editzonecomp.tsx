@@ -12,7 +12,6 @@ import { Toaster, toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import ClearIcon from "@mui/icons-material/Clear";
 import { Button, MenuItem, Select } from "@mui/material";
-
 import "./editZone.css";
 
 const MapContainer = dynamic(
@@ -128,10 +127,8 @@ export default function EditZoneComp() {
           const maxLat = Math.max(...lats);
           const minLng = Math.min(...lngs);
           const maxLng = Math.max(...lngs);
-
           const latDistance = maxLat - minLat;
           const lngDistance = maxLng - minLng;
-
           const latZoom = Math.floor(Math.log2(360 / (0.5 * latDistance)));
           const lngZoom = Math.floor(Math.log2(360 / (0.5 * lngDistance)));
 
@@ -383,7 +380,7 @@ export default function EditZoneComp() {
           Edit Zone
         </p>
         <div className="grid lg:grid-cols-6 sm:grid-cols-5 md:grid-cols-6 grid-cols-1  pt-8">
-          <div className=" xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-4 col-span-4 bg-gray-200 mx-5">
+          <div className=" xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-6 col-span-4 bg-gray-200 mx-5 edit_zone_side_bar">
             <form onSubmit={handleSave}>
               <label className="text-md font-popins text-black font-semibold">
                 <span className="text-red  font-extraboldbold">*</span> Please
@@ -462,7 +459,7 @@ export default function EditZoneComp() {
                 "
                 >
                   <div
-                    className="col-span-5 bg-green 
+                    className="lg:col-span-5 md:col-span-5 sm:col-span-2 col-span-4 bg-green 
                 rounded-md shadow-md  hover:shadow-gray transition duration-500"
                   >
                     <div className="grid grid-cols-12 gap-2">
@@ -494,8 +491,8 @@ export default function EditZoneComp() {
                   </div>
                   <div className="col-span-1"></div>
                   <div
-                    className="col-span-5 bg-red
-                rounded-md shadow-md  hover:shadow-gray transition duration-500"
+                    className="lg:col-span-5 md:col-span-5 sm:col-span-2 col-span-4 bg-red
+                    rounded-md shadow-md  hover:shadow-gray transition duration-500"
                   >
                     <div className="grid grid-cols-12 gap-2">
                       <div className="col-span-1"></div>
@@ -535,7 +532,16 @@ export default function EditZoneComp() {
               />
             </div>
 
-            <div className="grid lg:grid-cols-3 grid-cols-3 bg-green w-24 edit_zone_map_btn rounded-md shadow-md  hover:shadow-gray transition duration-500">
+            <div
+              className="grid lg:grid-cols-3 grid-cols-3  bg-green lg:w-28 md:w-28 sm:w-28
+            w-32
+              rounded-md shadow-md  hover:shadow-gray transition duration-500 h-10 redraw_btn"
+              // style={{
+              //   display: "flex",
+              //   justifyContent: "center",
+              //   height: "4.5vh",
+              // }}
+            >
               <div className="col-span-1">
                 <svg
                   className="h-10 py-2 w-full text-white"
@@ -553,7 +559,7 @@ export default function EditZoneComp() {
               </div>
               <div className="col-span-2">
                 <button
-                  className="text-white font-popins font-bold pt-2      "
+                  className="text-white font-popins font-bold pt-2    px-2  "
                   type="submit"
                   onClick={handleredraw}
                 >
