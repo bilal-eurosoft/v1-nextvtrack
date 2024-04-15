@@ -625,18 +625,23 @@ export default function RootLayout({
           </div>
 
           <hr></hr>
-          <div className="basis-1/1 w-screen">
+          <div className="basis-1/1 w-screen  ">
             <nav
-              className={
+              className={`${
                 fullparams == "full"
                   ? "hidden"
-                  : "lg:mt-0     flex-wrap bg-green py-2  sticky top-0 z-10 w-full"
-              }
-              // id="nav_height"
+                  : "flex items-center justify-between  lg:mt-0 md:mt-14 sm:mt-14   flex-wrap bg-green px-5 py-2 sticky top-0 z-10 w-full"
+              }`}
               // style={{ height: "7vh" }}
-              // style={{ display: "flex", alignItems: "center" }}
-              // id="nav_height"
+              id="nav_height"
             >
+              <div className="flex items-center flex-shrink-0 text-white">
+                <Image
+                  src={logo}
+                  className="xl:h-12 lg:h-14 lg:w-44 sm:w-24    w-20 h-6   lg:block md:block sm:block hidden"
+                  alt=""
+                />
+              </div>
               <div className="basis-20 py-6  lg:hidden  sticky top-0 sider_bar_hidden">
                 <Box>
                   <CssBaseline />
@@ -650,7 +655,7 @@ export default function RootLayout({
                         <MenuIcon />
                       </IconButton>
 
-                      <div className="grid grid-cols-12 h-10">
+                      <div className="grid grid-cols-12 h-10 hidden_top_popup">
                         <div className="col-span-10 mt-1  ">
                           <Image
                             src={logo}
@@ -1156,84 +1161,70 @@ export default function RootLayout({
                   </Drawer>
                 </Box>
               </div>
-
-              <div className="grid grid-cols-12 flex items-center justify-end ">
-                <div className="col-span-6 ">
-                  <Image
-                    src={logo}
-                    className="xl:h-12 lg:h-10 w-44 md:h-12 sm:h-10 h-12 lg:float-left
-                    md:float-left sm:float-left
-                    lg:mt-0 md:mt-3 sm:mt-4 lg:mx-0 md:mx-0 sm:mx-0 mx-auto block  sm:text-center"
-                    alt=""
-                    id="logo_hidden"
-                  />
-                </div>
-                <div className="lg:col-span-3 md:col-span-3 sm:col-span-3 col-span-12 lg:text-end md:text-end sm:text-end text-center lg:mt-0 md:mt-0 sm:mt-0 mt-3 ">
-                  <p className="text-white lg:py-0 md:py-1 sm:py-2 font-popins  lg:text-2xl md:text-xl sm:text-md  ">
+              <div className=" grid lg:grid-cols-12 grid-cols-12  lg:gap-5  px-4  header_client_name">
+                <div className="lg:col-span-2  col-span-12  ">
+                  <p className="text-white text-start font-popins lg:text-2xl md:text-xl sm:text-md ">
                     {session?.clientName}
                   </p>
                 </div>
-                <div className="lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-12 lg:text-end md:text-end sm:text-end text-center">
-                  <p
-                    className="text-white font-popins lg:text-xl md:text-xl 
-                  sm:text-md"
-                  >
+                <div className="lg:col-span-4  md:col-span-4 sm:col-span-4  col-span-12 lg:mx-0 md:mx-4 sm:mx-4 mx-4  lg:mt-2">
+                  <a className="  text-white text-center font-popins text-xl sm:text-md">
                     <BlinkingTime timezone={session?.timezone} />
-                  </p>
+                  </a>
                 </div>
-                <div
-                  className="col-span-1 text-center px-3 "
-                  id="logo_hidden"
-                  style={{
-                    display: "flex",
-                    justifyContent: "end",
-                  }}
-                >
+                <div className="lg:col-span-2  md:col-span-1 sm:col-span-1 col-span-1  popup_mob_screen">
                   <Popover>
                     <PopoverHandler {...triggers}>
-                      {session?.image !== "" && session?.image !== "null" ? (
-                        <img
-                          className="cursor-pointer bg-white lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0 lg:w-10 md:w-10 sm:w-10 h-12 rounded-full"
-                          src={session?.image}
-                          alt="Rounded avatar"
-                        />
-                      ) : (
-                        <img
-                          className="cursor-pointer lg:mt-0 md:mt-3 sm:mt-3 mt-12  lg:ms-0 lg:w-10 md:w-10 sm:w-10 h-12  rounded-full"
-                          src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
-                          alt="Rounded avatar"
-                        />
-                      )}
+                      <img
+                        className=" cursor-pointer lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0  lg:w-10 md:w-10 sm:w-10  h-12 rounded-full"
+                        src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
+                        alt="Rounded avatar"
+                      />
                     </PopoverHandler>
-
-                    <PopoverContent
-                      {...triggers}
-                      className="z-50 lg:w-auto md:w-auto w-full"
-                    >
-                      <div
-                        className="grid grid-cols-12 w-full"
-                        style={{ display: "flex", justifyContent: "center" }}
-                      >
-                        <div className="col-span-9 ms-2 text-lg font-popins text-center text-black">
-                          <p className="text-2xl ">{session?.FullName}</p>
+                    <PopoverContent {...triggers} className="z-50  w-auto">
+                      {/* <div className="mb-2 flex items-center gap-3 px-20">
+                        <Typography
+                          as="a"
+                          href="#"
+                          variant="h6"
+                          color="blue-gray"
+                          className="font-medium transition-colors hover:text-gray-900 w-full"
+                        >
+                          <img
+                            className="ms-auto mr-auto mt-5 mb-5 w-10 h-10 rounded-full"
+                            src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
+                            alt="Rounded avatar"
+                          />
+                        </Typography>
+                      </div> */}
+                      <div className="grid grid-cols-12">
+                        <div className="col-span-2">
+                          <img
+                            className="mb-5 w-10 lg:h-10 h-10 rounded-full"
+                            src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
+                            alt="Rounded avatar"
+                          />
+                        </div>
+                        <div className="col-span-9 ms-2 text-lg font-popins text-start text-black">
+                          <p className="text-2xl text-center">
+                            {session?.FullName}
+                          </p>
                           {session?.Email}
                         </div>
-                      </div>
-                      <hr></hr>
-                      <div
-                        style={{ display: "flex", justifyContent: "center" }}
-                        className="py-2 font-popins font-semibold"
-                      >
-                        {/* <TimeCounter /> */}
                       </div>
                       <Typography
                         variant="small"
                         color="gray"
                         className="font-normal "
                       >
+                        {/* <p className=" mb-3 text-center">{session?.FullName}</p> */}
+                        <hr className="text-green w-full"></hr>
+                        <p className="text-center pt-2 text-md font-popins font-bold ms-5">
+                          {/* login Time: {formatTime(elapsedTime)} */}
+                        </p>
                         <div className="flex justify-center">
                           <button
-                            className="bg-green shadow-md hover:shadow-gray transition duration-500 cursor px-5 py-2 rounded-lg text-white "
+                            className="bg-green shadow-md  hover:shadow-gray transition duration-500 cursor px-5 py-2 rounded-lg text-white mt-5"
                             onClick={() => {
                               signOut();
                             }}

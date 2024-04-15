@@ -20,6 +20,11 @@
 #nav_height {
   height: 7vh !important;
 }
+.header_client_name {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+}
 .header_client_name_end {
   display: flex;
   justify-content: end;
@@ -78,16 +83,22 @@
   /* display: none; */
   overflow: hidden !important;
 }
-@media only screen and (max-width: 1070px) and (min-width: 620px) {
+@media only screen and (max-width: 1070px) and (min-width: 820px) {
   #nav_height {
     height: auto !important;
     display: flex;
     align-items: center;
     /* margin-top: -0.1%; */
   }
-  .sider_bar_hidden {
+  .header_client_name {
+    margin-top: -0.2%;
+  }
+  .hidden_top_popup {
     display: none;
   }
+  /* .sider_bar_hidden {
+    display: none;
+  } */
   .logo_header {
     width: 10rem;
     /* grid-column: span 2 / span 3;
@@ -116,11 +127,23 @@
   height: 42px;
   border-radius: 50%;
 }
-
-@media (max-width: 620px) {
+@media (max-width: 810px) and (min-width: 608px) {
   #nav_height {
     height: auto !important;
-    margin-top: 2.5%;
+    display: ruby-text;
+    align-items: center !important;
+    /* margin-top: -0.1%; */
+  }
+  .hidden_top_popup {
+    display: none;
+  }
+}
+@media (max-width: 609px) and (min-width: 319px) {
+  #nav_height {
+    height: 20vh !important;
+    /* margin-top: 2.5%; */
+    display: flex;
+    text-align: center;
   }
   #logo_hidden {
     display: none !important;
@@ -129,17 +152,63 @@
   .time_none {
     display: none;
   }
+  .popup_mob_screen {
+    display: none;
+  }
 
   /* .header_client_name_end {
   } */
   .time_header {
     text-align: center;
   }
-  .client_name {
+  .header_client_name {
+    display: ruby;
+    /* justify-content: center;
+    align-items: center; */
+  }
+  /* .client_name {
     display: flex;
     justify-content: center;
     margin-bottom: -4%;
+  } */
+  .sidebar-hide {
+    display: none;
   }
+}
+
+@media (max-width: 320px) {
+  #nav_height {
+    height: 30vh !important;
+    /* margin-top: 2.5%; */
+    display: flex;
+    text-align: center;
+  }
+  #logo_hidden {
+    display: none !important;
+  }
+
+  .time_none {
+    display: none;
+  }
+  .popup_mob_screen {
+    display: none;
+  }
+
+  /* .header_client_name_end {
+  } */
+  .time_header {
+    text-align: center;
+  }
+  .header_client_name {
+    display: ruby;
+    /* justify-content: center;
+    align-items: center; */
+  }
+  /* .client_name {
+    display: flex;
+    justify-content: center;
+    margin-bottom: -4%;
+  } */
   .sidebar-hide {
     display: none;
   }

@@ -1023,7 +1023,6 @@ export default function journeyReplayComp() {
     if (!e) {
       return setIgnitionreport((prevReport: any) => ({
         ...prevReport,
-        // VehicleReg: null,
         period: "",
       }));
     }
