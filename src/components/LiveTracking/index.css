@@ -121,7 +121,8 @@ input[type="checkbox"]:hover {
     height: 40vh;
   }
   #scroll_side_bar {
-    height: 25vh;
+    height: 20vh;
+    overflow-y: scroll;
   }
   .search_live_tracking {
     height: 6.7vh;
@@ -130,7 +131,8 @@ input[type="checkbox"]:hover {
     height: 7.5vh;
   }
   #maps {
-    height: 42vh;
+    margin-top: -10%;
+    height: 48vh;
   }
 }
 @media (max-width: 320px) {
@@ -146,7 +148,7 @@ input[type="checkbox"]:hover {
     height: 40vh;
   }
   #scroll_side_bar {
-    height: 25vh;
+    height: 30vh !important;
   }
   .search_live_tracking {
     height: 6.7vh;
@@ -156,6 +158,7 @@ input[type="checkbox"]:hover {
   }
   #maps {
     height: 42vh;
+    margin-top: 10%;
   }
 }
 .leaflet-marker-icon.custom-icon.leaflet-zoom-animated.leaflet-interactive {

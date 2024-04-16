@@ -1186,10 +1186,13 @@ export default function journeyReplayComp() {
           })}
         </div> */}
         {/* <p className="bg-[#00B56C] px-4 py-1 text-white">JourneyReplay</p> */}
-        <div className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-5 px-4 text-start  bg-bgLight select_box_journey">
+        <div
+          className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-2
+         lg:px-4 text-start  bg-bgLight select_box_journey"
+        >
           <div
             className="xl:col-span-1 lg:col-span-2 md:col-span-3   col-span-12
-            select_box_column
+            select_box_column 
           "
             // style={{ gridColumnEnd: "span 1.5" }}
           >

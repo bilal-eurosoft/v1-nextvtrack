@@ -90,28 +90,6 @@ input[type="checkbox"]:hover {
   border-color: #00b56c !important;
 }
 
-/* .css-i4bv87-MuiSvgIcon-root {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  width: 1em;
-  height: 1em;
-  display: inline-block;
-  -webkit-flex-shrink: 0;
-  -ms-flex-negative: 0;
-  flex-shrink: 0;
-  -webkit-transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  font-size: 1.5rem;
-} */
-/* style={{
-  paddingTop: "4%",
-  paddingBottom: "4%",
-  paddingLeft: "2%",
-  display: "flex",
-  justifyContent: "start",
-}} */
 #select_slider {
   padding-top: 5%;
   padding-bottom: 5%;
@@ -128,6 +106,7 @@ input[type="checkbox"]:hover {
 .select_box_journey {
   height: 6vh;
   align-items: center;
+  gap: 10px;
 }
 .journey_sidebar {
   height: 83vh;
@@ -153,9 +132,10 @@ input[type="checkbox"]:hover {
 
   .select_box_column {
     grid-column: 2 span;
+    width: 90%;
   }
   .period_select {
-    grid-column: 3 span;
+    grid-column: 2 span;
   }
   .trips_journey {
     grid-column: 2 span;
@@ -165,9 +145,28 @@ input[type="checkbox"]:hover {
     grid-column: 3 span;
     margin-left: -13.4%;
   }
+  .journey_replay_harsh_child {
+    grid-column: 1 span;
+  }
+  .journey_replay_harsh {
+    grid-column: 2 span;
+  }
+  .journey_replay_harsh_acce {
+    grid-column: 1 span;
+  }
+  .stop_journey {
+    grid-column: 3 span;
+  }
+  .journey_replay_slider {
+    grid-column: 5 span;
+  }
+  .journey_replay_center_box {
+    left: -1%;
+    right: 10%;
+  }
 }
 
-@media (max-width: 1571px) and (min-width: 1300px) {
+@media (max-width: 1571px) and (min-width: 1484px) {
   .select_box_column {
     grid-column: 2 span;
   }
@@ -186,8 +185,33 @@ input[type="checkbox"]:hover {
     grid-column: 3 span;
     margin-left: -11.6%;
   }
+  .journey_replay_harsh_child {
+    grid-column: 1 span;
+  }
+  .journey_replay_harsh {
+    grid-column: 2 span;
+  }
+  .journey_replay_harsh_acce {
+    grid-column: 1 span;
+  }
+  .stop_journey {
+    grid-column: 3 span;
+  }
+  .journey_heading {
+    height: 6vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
-@media (max-width: 1301px) and (min-width: 1199px) {
+
+@media (max-width: 1485px) and (min-width: 1300px) {
+  .journey_heading {
+    height: 6vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   .select_box_column {
     grid-column: 2 span;
   }
@@ -200,6 +224,49 @@ input[type="checkbox"]:hover {
   }
   .trips_journey {
     grid-column: 2 span;
+    width: 63%;
+  }
+  .journey_map {
+    grid-column: 3 span;
+    margin-left: -11.6%;
+  }
+  .journey_replay_harsh_child {
+    grid-column: 1 span;
+    margin-left: -18%;
+  }
+  .journey_replay_harsh {
+    grid-column: 1 span;
+  }
+  .journey_replay_harsh_acce {
+    grid-column: 2 span;
+  }
+  .stop_journey {
+    grid-column: 3 span;
+  }
+  .journey_replay_slider {
+    grid-column: 6 span;
+  }
+  .journey_replay_center_box {
+    left: -6%;
+    right: 20%;
+  }
+}
+@media (max-width: 1301px) and (min-width: 1199px) {
+  .select_box_column {
+    grid-column: 2 span;
+  }
+  .period_select {
+    grid-column: 3 span;
+  }
+
+  .select_box_journey {
+    height: 8vh;
+    align-items: center;
+    display: grid;
+    gap: 0 !important;
+  }
+  .trips_journey {
+    grid-column: 2 span;
     width: 72%;
   }
   .journey_map {
@@ -208,6 +275,9 @@ input[type="checkbox"]:hover {
   }
   .journey_heading {
     height: 6vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .journey_sidebar_text {
     height: 4vh;
@@ -219,21 +289,44 @@ input[type="checkbox"]:hover {
     grid-column: 7 span;
   }
   .journey_replay_slider {
-    grid-column: 6 span;
+    grid-column: 8 span;
   }
-  /* .journey_replay_center_box {
-    left: 15;
-  } */
+  .journey_replay_center_box {
+    left: 20% !important;
+    right: 25% !important;
+    margin-left: -10%;
+  }
+  #trips_handle {
+    height: 73vh;
+    overflow-y: scroll;
+  }
+  #map {
+    height: 78vh;
+  }
+  .journey_replay_harsh_child {
+    grid-column: 1 span;
+    margin-left: -22%;
+  }
+  .journey_replay_harsh {
+    grid-column: 1 span;
+  }
+  .journey_replay_harsh_acce {
+    grid-column: 2 span;
+  }
+  .stop_journey {
+    grid-column: 4 span;
+  }
 }
 
-@media (max-width: 1200px) and (min-width: 1050px) {
+@media (max-width: 1200px) and (min-width: 1048px) {
   .select_box_journey {
     height: 7vh;
-    margin-top: -1%;
-    align-items: center;
   }
   .journey_heading {
     height: 6vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .select_box_column {
     grid-column: 2 span;
@@ -241,8 +334,25 @@ input[type="checkbox"]:hover {
   .period_select {
     grid-column: 3 span;
   }
+  .stop_journey {
+    grid-column: 5 span;
+  }
+  .journey_replay_slider {
+    grid-column: 11 span;
+  }
 }
 @media (max-width: 1049px) and (min-width: 769px) {
+  #speed_meter {
+    position: absolute;
+    top: 22%;
+    left: 5%;
+    right: 6% !important;
+    display: flex;
+    justify-content: end;
+  }
+  .select_box_column {
+    margin: 0% 4% !important;
+  }
   .select_box_journey {
     height: 10vh;
     align-items: center;
@@ -254,7 +364,7 @@ input[type="checkbox"]:hover {
     height: 5vh;
   }
   .journey_heading {
-    height: 7vh;
+    height: 5vh;
   }
   .stop_journey {
     grid-column: 5 span;
@@ -263,24 +373,89 @@ input[type="checkbox"]:hover {
     grid-column: 7 span;
   }
   .journey_replay_slider {
-    grid-column: 11 span;
+    grid-column: 12 span;
+  }
+  #trips_handle {
+    height: 58vh;
+    overflow-y: scroll;
+  }
+  #map {
+    height: 60vh;
+  }
+  .journey_replay_center_box {
+    bottom: 30% !important;
+  }
+  .select_box_journey {
+    height: auto;
+  }
+  .journey_replay_harsh_child {
+    grid-column: 2 span;
+  }
+  .journey_replay_harsh {
+    grid-column: 1 span;
+  }
+  .journey_replay_harsh_acce {
+    grid-column: 3 span;
   }
 }
 @media (max-width: 770px) and (min-width: 610px) {
   .select_box_column {
     margin-top: 3%;
   }
+  .select_box_column {
+    margin: 2% 2% !important;
+  }
+  #speed_meter {
+    position: absolute;
+    top: 22%;
+    left: 5%;
+    right: 6% !important;
+    display: flex;
+    justify-content: end;
+  }
   .select_box_journey {
     height: 20vh;
     align-items: center;
   }
   .period_select {
+    margin-left: 12%;
     grid-column: 2 span;
+  }
+  .select_box_journey {
+    height: auto;
+  }
+  .journey_replay_harsh_child {
+    grid-column: 2 span;
+  }
+  .journey_replay_harsh {
+    grid-column: 1 span;
+  }
+  .journey_replay_harsh_acce {
+    grid-column: 2 span;
+  }
+  .journey_replay_slider {
+    grid-column: 10 span;
+  }
+  .journey_replay_center_box {
+    left: 20% !important;
+  }
+  #trips_handle {
+    height: 30vh;
+    overflow-y: scroll;
+  }
+  .journey_heading {
+    height: 5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 @media (max-width: 600px) {
+  .journey_sidebar_text {
+    height: 5.5vh;
+  }
   .select_box_column {
-    margin-top: 3%;
+    margin: 3% 2% !important;
   }
   .select_box_journey {
     height: auto;
@@ -288,12 +463,28 @@ input[type="checkbox"]:hover {
   }
   .period_select {
     grid-column: 3 span;
+    margin-left: 3%;
   }
   .period_select_custom {
     grid-column: 3 span;
   }
   .journey_heading {
-    height: 6vh;
+    height: 5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #trips_handle {
+    height: 30vh;
+    overflow-y: scroll;
+  }
+  #speed_meter {
+    position: absolute;
+    top: 22%;
+    left: 5%;
+    right: 8% !important;
+    display: flex;
+    justify-content: end;
   }
 }
 
