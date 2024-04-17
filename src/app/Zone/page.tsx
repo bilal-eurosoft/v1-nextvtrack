@@ -779,9 +779,13 @@ export default function Zone() {
           <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 search_zone_btn">
             <div className="grid xl:grid-cols-7 gap-2 -mt-2 lg:grid-cols-4  md:grid-cols-3 grid-cols-2 search_zone_btn_grid ">
               <Button
-                className="bg-green text-white font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none "
+                className=" text-white font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none "
                 variant="outlined"
-                style={{ fontSize: "16px" }}
+                style={{
+                  fontSize: "16px",
+                  backgroundColor: "#00b56c",
+                  color: "white",
+                }}
                 startIcon={
                   <span style={{ fontWeight: "600" }}>
                     <SearchIcon />
