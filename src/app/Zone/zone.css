@@ -99,13 +99,13 @@
 
 @media (max-width: 1571px) and (min-width: 1195px) {
   .table_zone {
-    height: 60vh;
+    height: 46vh;
   }
   .table_scroll {
     margin-top: 1%;
   }
   .zone_form {
-    height: 12vh !important;
+    height: 32vh !important;
   }
   .search_zone_btn {
     grid-column: 4 span;
