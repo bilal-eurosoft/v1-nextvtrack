@@ -785,6 +785,7 @@ export default function Zone() {
                   fontSize: "16px",
                   backgroundColor: "#00b56c",
                   color: "white",
+                  border: "none",
                 }}
                 startIcon={
                   <span style={{ fontWeight: "600" }}>
@@ -833,7 +834,12 @@ export default function Zone() {
                 className=" bg-white text-black font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-white border-none hover:border-none "
                 variant="outlined"
                 onClick={handleClear}
-                style={{ fontSize: "16px" }}
+                style={{
+                  fontSize: "16px",
+                  backgroundColor: "white",
+                  color: "black",
+                  border: "none",
+                }}
                 startIcon={
                   <span style={{ fontWeight: "600" }}>
                     <HighlightOffIcon />

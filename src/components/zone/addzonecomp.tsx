@@ -503,11 +503,16 @@ export default function AddZoneComp() {
                     </div>
                   </div> */}
                   <Button
-                    className=" bg-green shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none h-10 "
+                    className="  shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none h-10 "
                     variant="outlined"
                     type="submit"
                     // onClick={handleClear}
-                    style={{ fontSize: "16px" }}
+                    style={{
+                      fontSize: "16px",
+                      backgroundColor: "#00b56c",
+                      color: "white",
+                      border: "none",
+                    }}
                     startIcon={
                       <span style={{ fontWeight: "600" }}>
                         <SaveIcon className="-mt-1" />
@@ -545,7 +550,12 @@ export default function AddZoneComp() {
                     className=" bg-red shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-red border-none hover:border-none h-10 "
                     variant="outlined"
                     onClick={() => router.push("/Zone")}
-                    style={{ fontSize: "16px" }}
+                    style={{
+                      fontSize: "16px",
+                      backgroundColor: "red",
+                      color: "white",
+                      border: "none",
+                    }}
                     startIcon={
                       <span style={{ fontWeight: "600" }}>
                         <ClearIcon className="-mt-1" />
@@ -587,7 +597,12 @@ export default function AddZoneComp() {
             className=" bg-green shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none h-10 "
             variant="outlined"
             onClick={handleredraw}
-            style={{ fontSize: "16px" }}
+            style={{
+              fontSize: "16px",
+              backgroundColor: "#00b56c",
+              color: "white",
+              border: "none",
+            }}
             startIcon={
               <span style={{ fontWeight: "600" }}>
                 <EditRoadIcon className="-mt-1" />
