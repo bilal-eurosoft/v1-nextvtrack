@@ -15,7 +15,9 @@ import { useRouter } from "next/navigation";
 import { Polygon } from "react-leaflet/Polygon";
 import { Circle } from "react-leaflet/Circle";
 import { LayerGroup } from "leaflet";
+import EditRoadIcon from "@mui/icons-material/EditRoad";
 import { Button, MenuItem, Select } from "@mui/material";
+import SaveIcon from "@mui/icons-material/Save";
 import ClearIcon from "@mui/icons-material/Clear";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
@@ -471,10 +473,10 @@ export default function AddZoneComp() {
                 "
               >
                 <div
-                  className="lg:col-span-5 md:col-span-5 sm:col-span-2 col-span-4 bg-green 
-                rounded-md shadow-md  hover:shadow-gray transition duration-500"
+                  className="lg:col-span-5 md:col-span-5 sm:col-span-2 col-span-4    
+"
                 >
-                  <div className="grid grid-cols-12 gap-2">
+                  {/* <div className="grid grid-cols-12 gap-2">
                     <div className="col-span-1"></div>
                     <div className="col-span-3 ">
                       <svg
@@ -499,14 +501,28 @@ export default function AddZoneComp() {
                         Save
                       </button>
                     </div>
-                  </div>
+                  </div> */}
+                  <Button
+                    className=" bg-green shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none h-10 "
+                    variant="outlined"
+                    type="submit"
+                    // onClick={handleClear}
+                    style={{ fontSize: "16px" }}
+                    startIcon={
+                      <span style={{ fontWeight: "600" }}>
+                        <SaveIcon className="-mt-1" />
+                      </span>
+                    }
+                  >
+                    <b>S</b>{" "}
+                    <span style={{ textTransform: "lowercase" }}>
+                      <b>ave</b>
+                    </span>
+                  </Button>
                 </div>
                 <div className="col-span-1"></div>
-                <div
-                  className="lg:col-span-5 md:col-span-5 sm:col-span-2 col-span-4 bg-red
-                rounded-md shadow-md  hover:shadow-gray transition duration-500"
-                >
-                  <div className="grid grid-cols-12 gap-2">
+                <div className="lg:col-span-5 md:col-span-5 sm:col-span-2 col-span-4 ">
+                  {/* <div className="grid grid-cols-12 gap-2">
                     <div className="col-span-1"></div>
                     <div className="col-span-2 ">
                       <ClearIcon className="mt-2 font-bold" />
@@ -524,7 +540,23 @@ export default function AddZoneComp() {
                         <b> Cancel</b>
                       </Button>
                     </div>
-                  </div>
+                  </div> */}
+                  <Button
+                    className=" bg-red shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-red border-none hover:border-none h-10 "
+                    variant="outlined"
+                    onClick={() => router.push("/Zone")}
+                    style={{ fontSize: "16px" }}
+                    startIcon={
+                      <span style={{ fontWeight: "600" }}>
+                        <ClearIcon className="-mt-1" />
+                      </span>
+                    }
+                  >
+                    <b>C</b>{" "}
+                    <span style={{ textTransform: "lowercase" }}>
+                      <b>ancel</b>
+                    </span>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -551,8 +583,23 @@ export default function AddZoneComp() {
           >
             Redraw
           </button> */}
-
-          <div
+          <Button
+            className=" bg-green shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none h-10 "
+            variant="outlined"
+            onClick={handleredraw}
+            style={{ fontSize: "16px" }}
+            startIcon={
+              <span style={{ fontWeight: "600" }}>
+                <EditRoadIcon className="-mt-1" />
+              </span>
+            }
+          >
+            <b>R</b>{" "}
+            <span style={{ textTransform: "lowercase" }}>
+              <b>edraw</b>
+            </span>
+          </Button>
+          {/* <div
             className="grid lg:grid-cols-3 grid-cols-3  bg-green lg:w-28 md:w-28 sm:w-28
             w-32
               rounded-md shadow-md  hover:shadow-gray transition duration-500 h-10 redraw_btn"
@@ -581,7 +628,7 @@ export default function AddZoneComp() {
                 Redraw
               </button>
             </div>
-          </div>
+          </div> */}
           <div className="flex justify-start"></div>
           <div className="lg:col-span-5  md:col-span-4  sm:col-span-5 col-span-4 mx-3">
             <div className="flex justify-start"></div>

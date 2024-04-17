@@ -168,7 +168,10 @@ export default function DriverProfile() {
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
-  if (session?.userRole === "Controller" || session?.userRole == "Admin" && session?.driverProfile === false) {
+  if (
+    session?.userRole === "Controller" ||
+    (session?.userRole == "Admin" && session?.driverProfile === false)
+  ) {
     router.push("/signin");
     return null;
   }
@@ -634,7 +637,7 @@ export default function DriverProfile() {
                       <div className="flex justify-end">
                         <button
                           type="submit"
-                          className="bg-[#00B56C]  px-4 py-1 mt-10  text-end text-white rounded-md "
+                          className="bg-[#00B56C]  px-6 py-2 mt-10  text-end text-white rounded-md "
                         >
                           Submit
                         </button>

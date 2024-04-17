@@ -958,7 +958,6 @@ export default function DriverProfile() {
                     <button
                       className="bg-green text-white font-bold font-popins  w-full  py-2  rounded-md shadow-md  hover:shadow-gray transition duration-500"
                       type="submit"
-                      // disabled={}
                       style={{
                         float: "right",
                         marginTop: "40%",

@@ -635,7 +635,7 @@ export default function RootLayout({
               // style={{ height: "7vh" }}
               id="nav_height"
             >
-              <div className="flex items-center flex-shrink-0 text-white">
+              <div className="flex items-center flex-shrink-0 text-white logo_none">
                 <Image
                   src={logo}
                   className="xl:h-12 lg:h-14 lg:w-44 sm:w-24    w-20 h-6   lg:block md:block sm:block hidden"
@@ -651,27 +651,35 @@ export default function RootLayout({
                         color="inherit"
                         aria-label="open drawer"
                         onClick={handleDrawerOpen}
+                        className="-ms-4"
                       >
                         <MenuIcon />
                       </IconButton>
 
-                      <div className="grid grid-cols-12 h-10 hidden_top_popup">
-                        <div className="col-span-10 mt-1  ">
+                      <div className="grid grid-cols-12 h-10 w-full hidden_top_popup">
+                        <div className="lg:col-span-10 md:col-span-10 sm:col-span-2 col-span-2 mt-1 logo_top_header ">
                           <Image
                             src={logo}
                             className="xl:h-12 lg:h-10 w-32 md:h-12 sm:h-10 h-10 lg:float-left
                     md:float-left sm:float-left
-                    lg:mt-0 md:mt-3 sm:mt-4 lg:mx-0 md:mx-0 sm:mx-0 mx-auto block  sm:text-center"
+                    lg:mt-0 md:-mt-2 sm:-mt-1 lg:mx-0 md:mx-0 sm:mx-0 mx-auto block  sm:text-center"
                             alt=""
                           />
                         </div>
-                        <div className="col-span-2 ">
+                        <div className="sm:col-span-5 col-span-6 flex items-center justify-center client_name_popup">
+                          {session?.clientName}
+                        </div>
+                        <div className="sm:col-span-4 col-span-3 flex items-center justify-center client_name_popup">
+                          <BlinkingTime timezone={session?.timezone} />
+                        </div>
+
+                        <div className="lg:col-span-2 md:col-span-2 sm:col-span-1 flex justify-end user_icon_top_header">
                           <Popover>
                             <PopoverHandler {...triggers}>
                               {session?.image !== "" &&
                               session?.image !== "null" ? (
                                 <img
-                                  className="cursor-pointer bg-white lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0 lg:w-10 md:w-10 sm:w-10 h-12 rounded-full"
+                                  className="cursor-pointer user_avator_image"
                                   src={session?.image}
                                   alt="Rounded avatar"
                                 />
@@ -1175,11 +1183,19 @@ export default function RootLayout({
                 <div className="lg:col-span-2  md:col-span-1 sm:col-span-1 col-span-1  popup_mob_screen">
                   <Popover>
                     <PopoverHandler {...triggers}>
-                      <img
-                        className=" cursor-pointer lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0  lg:w-10 md:w-10 sm:w-10  h-12 rounded-full"
-                        src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
-                        alt="Rounded avatar"
-                      />
+                      {session?.image !== "" && session?.image !== "null" ? (
+                        <img
+                          className="cursor-pointer user_avator_image"
+                          src={session?.image}
+                          alt="Rounded avatar"
+                        />
+                      ) : (
+                        <img
+                          className="cursor-pointer user_avator_image"
+                          src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
+                          alt="Rounded avatar"
+                        />
+                      )}
                     </PopoverHandler>
                     <PopoverContent {...triggers} className="z-50  w-auto">
                       {/* <div className="mb-2 flex items-center gap-3 px-20">

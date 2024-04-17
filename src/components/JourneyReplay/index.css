@@ -295,6 +295,7 @@ input[type="checkbox"]:hover {
     left: 20% !important;
     right: 25% !important;
     margin-left: -10%;
+    top: 65% !important;
   }
   #trips_handle {
     height: 73vh;
@@ -322,6 +323,10 @@ input[type="checkbox"]:hover {
   .select_box_journey {
     height: 7vh;
   }
+  .show_zone_journey_replay {
+    position: absolute;
+    top: 3%;
+  }
   .journey_heading {
     height: 6vh;
     display: flex;
@@ -341,10 +346,20 @@ input[type="checkbox"]:hover {
     grid-column: 11 span;
   }
 }
-@media (max-width: 1049px) and (min-width: 769px) {
+
+@media (max-width: 1049px) and (min-width: 769px) and (max-height: 650px) {
+  .show_zone_journey_replay {
+    position: absolute;
+    top: 3%;
+  }
+  .journey_replay_center_box {
+    position: absolute;
+    bottom: 3% !important;
+    top: 75% !important;
+  }
   #speed_meter {
     position: absolute;
-    top: 22%;
+    top: 34% !important;
     left: 5%;
     right: 6% !important;
     display: flex;
@@ -376,11 +391,11 @@ input[type="checkbox"]:hover {
     grid-column: 12 span;
   }
   #trips_handle {
-    height: 58vh;
+    height: 90vh !important;
     overflow-y: scroll;
   }
   #map {
-    height: 60vh;
+    height: 95vh !important;
   }
   .journey_replay_center_box {
     bottom: 30% !important;
@@ -398,7 +413,74 @@ input[type="checkbox"]:hover {
     grid-column: 3 span;
   }
 }
-@media (max-width: 770px) and (min-width: 610px) {
+@media (max-width: 1049px) and (min-width: 765px) {
+  .show_zone_journey_replay {
+    position: absolute;
+    top: 3%;
+  }
+  .journey_replay_center_box {
+    position: absolute;
+    top: 55%;
+    right: 0%;
+    /* margin-left: -20%; */
+  }
+  #speed_meter {
+    position: absolute;
+    top: 22%;
+    left: 5%;
+    right: 6% !important;
+    display: flex;
+    justify-content: end;
+  }
+  .select_box_column {
+    margin: 0% 4% !important;
+  }
+  .select_box_journey {
+    height: 10vh;
+    align-items: center;
+  }
+  .period_select {
+    grid-column: 3 span;
+  }
+  .journey_sidebar_text {
+    height: 5vh;
+  }
+  .journey_heading {
+    height: 5vh;
+  }
+  .stop_journey {
+    grid-column: 5 span;
+  }
+  .stop_details_time {
+    grid-column: 7 span;
+  }
+  .journey_replay_slider {
+    grid-column: 12 span !important;
+  }
+  #trips_handle {
+    height: 63vh !important;
+    overflow-y: scroll;
+  }
+  #map {
+    height: 70vh;
+  }
+  .journey_replay_center_box {
+    bottom: 30% !important;
+  }
+  .select_box_journey {
+    height: auto;
+  }
+  .journey_replay_harsh_child {
+    grid-column: 2 span;
+  }
+  .journey_replay_harsh {
+    grid-column: 1 span;
+  }
+  .journey_replay_harsh_acce {
+    grid-column: 3 span;
+  }
+}
+@media (max-width: 771px) and (min-width: 610px) {
   .select_box_column {
     margin-top: 3%;
   }
@@ -419,7 +501,7 @@ input[type="checkbox"]:hover {
   }
   .period_select {
     margin-left: 12%;
-    grid-column: 2 span;
+    grid-column: 3 span;
   }
   .select_box_journey {
     height: auto;
@@ -428,7 +510,7 @@ input[type="checkbox"]:hover {
     grid-column: 2 span;
   }
   .journey_replay_harsh {
-    grid-column: 1 span;
+    grid-column: 2 span;
   }
   .journey_replay_harsh_acce {
     grid-column: 2 span;
@@ -465,6 +547,7 @@ input[type="checkbox"]:hover {
     grid-column: 3 span;
     margin-left: 3%;
   }
+
   .period_select_custom {
     grid-column: 3 span;
   }
@@ -480,11 +563,15 @@ input[type="checkbox"]:hover {
   }
   #speed_meter {
     position: absolute;
-    top: 22%;
+    top: 33% !important;
     left: 5%;
     right: 8% !important;
     display: flex;
     justify-content: end;
+  }
+  .trip_address {
+    height: 12.5vh;
+    overflow-y: scroll;
   }
 }
 

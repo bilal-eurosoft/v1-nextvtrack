@@ -1696,7 +1696,7 @@ export default function journeyReplayComp() {
         </div>
         <div className="grid lg:grid-cols-5  sm:grid-cols-5 md:grid-cols-12 sm:grid-cols-12 grid-cols-1 journey_sidebar">
           <div className="xl:col-span-1 lg:col-span-2 md:col-span-5 sm:col-span-12 col-span-4 trips_journey">
-            <p className="bg-green px-4 py-1 text-white font-semibold journey_sidebar_text">
+            <p className="bg-green px-4 py-1 text-white font-semibold journey_sidebar_text flex items-center">
               Trips ({dataresponse?.length})
             </p>
             <div
@@ -2462,7 +2462,7 @@ export default function journeyReplayComp() {
                 </div>
 
                 {getShowdetails ? (
-                  <div className="bg-white lg:h-60 md:h-60 sm:h-60 h-16 overflow-y-scroll">
+                  <div className="bg-white lg:h-60 md:h-60 sm:h-60 h-24 overflow-y-scroll">
                     {stops?.map((item: any) => {
                       return loadingMap ? (
                         <div
@@ -2470,12 +2470,12 @@ export default function journeyReplayComp() {
                           className="cursor-pointer"
                         >
                           <p className="text-black font-popins px-3 py-3 text-sm">
-                            <b> {item?.address?.substring(0, 50)}</b>
+                            <b>{item?.address?.substring(0, 50)}</b>
                           </p>
 
                           <div className="grid grid-cols-12">
                             <div className="lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-2"></div>
-                            <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-7  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
+                            <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
                               {moment(item?.date)
                                 .tz("Europe/London")
                                 .format("HH:mm:ss A")}
@@ -2526,7 +2526,7 @@ export default function journeyReplayComp() {
               </div> */}
               {zoneList !== null && zoneList.length > 0 && (
                 <div
-                  className="grid grid-cols-1 absolute lg:top-10 xl:top-1 md:top-10 top-0 xl:right-10 lg:right-10 md:right-10 sm:right-10 right-1  bg-bgLight py-2 px-2"
+                  className="grid grid-cols-1 absolute lg:top-10 xl:top-1 md:top-10 top-0 xl:right-10 lg:right-10 md:right-10 sm:right-10 right-1  bg-bgLight py-2 px-2 show_zone_journey_replay"
                   style={{
                     borderRadius: "10px",
                     borderColor: "green",
@@ -2611,7 +2611,7 @@ export default function journeyReplayComp() {
               className="grid lg:grid-cols-10  grid-cols-10"
               id="speed_meter"
             >
-              <div className="col-span-2  lg:w-52 md:w-44 sm:w-44 w-44 rounded-md ">
+              <div className="col-span-2  lg:w-52 md:w-44 sm:w-44 w-48 rounded-md ">
                 {isPlaying || isPaused ? (
                   <div>
                     {/* <ReactSpeedometer
@@ -2652,7 +2652,11 @@ export default function journeyReplayComp() {
                 ) : null}
 
                 {isPaused && (
-                  <p className="bg-bgPlatBtn text-white mt-3 w-full px-2 py-3 rounded-md">
+                  <p
+                    className="bg-bgPlatBtn text-white mt-3 w-full px-2 py-3 rounded-md
+                  trip_address
+                  "
+                  >
                     {TripAddressData}
                   </p>
                 )}

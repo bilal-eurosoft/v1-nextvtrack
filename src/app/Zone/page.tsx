@@ -17,7 +17,10 @@ import { Toaster, toast } from "react-hot-toast";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import { Button } from "@mui/material";
 import {
   getZoneListByClientId,
   modifyCollectionStatus,
@@ -708,7 +711,7 @@ export default function Zone() {
               isClearable
               isSearchable
               noOptionsMessage={() => "No options available"}
-              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              className="rounded-md w-full  outline-green border border-grayLight  hover:border-green"
               styles={{
                 control: (provided, state) => ({
                   ...provided,
@@ -772,10 +775,27 @@ export default function Zone() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 md:grid-cols-2  sm:grid-cols-2 grid-cols-2 px-5 lg:mt-0 mt-5 ">
-          <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2">
-            <div className="grid xl:grid-cols-7 -mt-2 lg:grid-cols-4  md:grid-cols-3 grid-cols-2">
-              <div className="grid  rounded-md lg:grid-cols-3 md:grid-cols-4 grid-cols-5 bg-green shadow-md    hover:shadow-gray transition duration-500 cursor-pointer">
+        <div className="grid lg:grid-cols-2  md:grid-cols-2  sm:grid-cols-2 grid-cols-2 px-5 lg:mt-0 mt-5 search_zone_btn_grid_main  ">
+          <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 search_zone_btn">
+            <div className="grid xl:grid-cols-7 gap-2 -mt-2 lg:grid-cols-4  md:grid-cols-3 grid-cols-2 search_zone_btn_grid ">
+              <Button
+                className="bg-green text-white font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none "
+                variant="outlined"
+                style={{ fontSize: "16px" }}
+                startIcon={
+                  <span style={{ fontWeight: "600" }}>
+                    <SearchIcon />
+                  </span>
+                }
+                onClick={handleSearchClick}
+              >
+                <b> s</b>{" "}
+                <span style={{ textTransform: "lowercase" }}>
+                  <b>earch</b>
+                </span>
+              </Button>
+
+              {/* <div className="grid  rounded-md lg:grid-cols-3 md:grid-cols-4 grid-cols-5  shadow-md    hover:shadow-gray transition duration-500 cursor-pointer">
                 <div className="lg:col-span-1 md:col-span-1 sm:col-span-2  col-span-2">
                   <svg
                     className="h-11 py-3 w-full text-white"
@@ -797,16 +817,31 @@ export default function Zone() {
 
                 <div className="lg:col-span-1 md:col-span-2 sm:col-span-1 col-span-1 text-center">
                   <button
-                    className="text-white font-popins font-bold text-start pt-1 h-10 bg-green text-md "
+                    className="text-white font-popins font-bold text-end pt-1 h-10 bg-green text-md "
                     type="button"
                     onClick={handleSearchClick}
                   >
                     Search
                   </button>
                 </div>
-              </div>
-
-              <div className="grid  rounded-md  xl:grid-cols-3 lg:grid-cols-5 md:ps-3 ms-4 md:grid-cols-4 grid-cols-5 bg-white shadow-md hover:shadow-gray transition duration-500 cursor-pointer">
+              </div> */}
+              <Button
+                className=" bg-white text-black font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-white border-none hover:border-none "
+                variant="outlined"
+                onClick={handleClear}
+                style={{ fontSize: "16px" }}
+                startIcon={
+                  <span style={{ fontWeight: "600" }}>
+                    <HighlightOffIcon />
+                  </span>
+                }
+              >
+                <b> C</b>{" "}
+                <span style={{ textTransform: "lowercase" }}>
+                  <b>lear</b>
+                </span>
+              </Button>
+              {/* <div className="grid  rounded-md  xl:grid-cols-3 lg:grid-cols-5 md:ps-3 ms-4 md:grid-cols-4 grid-cols-5 bg-white shadow-md hover:shadow-gray transition duration-500 cursor-pointer">
                 <div className="xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2  col-span-2">
                   <svg
                     className="h-11 py-3 w-full text-labelColor"
@@ -836,7 +871,7 @@ export default function Zone() {
                   </button>
                 </div>
                 <br></br>
-              </div>
+              </div> */}
 
               {/* <div className="grid rounded-md lg:grid-cols-2 lg:grid-cols-4 grid-cols-5 bg-zonebtnColor shadow-md ms-3 hover:shadow-gray transition duration-500 cursor-pointer">
         <div className="lg:col-span-2   md:col-span-2 col-span-3">
