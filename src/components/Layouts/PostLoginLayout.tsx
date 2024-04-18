@@ -1181,7 +1181,7 @@ export default function RootLayout({
               </div>
               <div className=" grid lg:grid-cols-12 grid-cols-12  lg:gap-5  px-4  header_client_name">
                 <div className="lg:col-span-2 sm:col-span-2  col-span-12 ">
-                  <p className="text-white text-start font-popins lg:text-2xl md:text-xl sm:text-md ">
+                  <p className="text-white lg:text-start md:text-start text-center font-popins lg:text-2xl md:text-xl sm:text-md ">
                     {session?.clientName}
                   </p>
                 </div>
