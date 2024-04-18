@@ -83,6 +83,9 @@ input[type="checkbox"]:hover {
     grid-column: 2 span;
     width: 74%;
   }
+  .search_live_tracking {
+    height: 7vh !important;
+  }
   .main_map {
     grid-column: 3 span;
     margin-left: -17%;
@@ -100,7 +103,12 @@ input[type="checkbox"]:hover {
 }
 @media (max-width: 1049px) and (min-width: 900px) {
   .search_live_tracking {
-    height: 6.4vh;
+    height: 4vh !important;
+  }
+}
+@media (max-width: 1049px) and (min-width: 900px) and (max-height: 900px) {
+  .search_live_tracking {
+    height: 8vh !important;
   }
 }
 @media (max-width: 901px) and (min-width: 635px) {

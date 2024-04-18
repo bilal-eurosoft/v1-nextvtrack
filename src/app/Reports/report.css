@@ -171,7 +171,7 @@
   }
 }
 
-@media (max-width: 1200px) and (min-width: 1050px) {
+@media (min-width: 1050px) and (max-width: 1200px) {
   .height_report_form {
     height: auto;
   }
@@ -208,8 +208,8 @@
     height: auto;
   }
 }
-.MuiButtonBase-root {
-  display: block !important;
+/* .MuiButtonBase-root {
+  display: inline-block !important;
   text-align: center !important;
 }
 
@@ -222,4 +222,4 @@
   flex-shrink: 0 !important;
   margin-left: 20px !important;
   display: contents !important;
-}
+} */

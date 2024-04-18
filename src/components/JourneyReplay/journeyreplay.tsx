@@ -1411,7 +1411,7 @@ export default function journeyReplayComp() {
                   <label className="text-sm  text-black font-bold font-popins  w-full pt-3 ">
                     <input
                       type="radio"
-                      className="lg:w-5 w-3 lg:w-4 md:w-4 md:-ms-3 lg:-ms-0 xl:-ms-0 -ms-2   form-radio text-green"
+                      className="lg:w-5 w-3 lg:w-4 md:w-4 md:-ms-3 lg:-ms-0 xl:-ms-0   form-radio text-green"
                       name="period"
                       disabled={loading}
                       value="yesterday"
@@ -1419,7 +1419,9 @@ export default function journeyReplayComp() {
                       checked={Ignitionreport?.period === "yesterday"}
                       onChange={handleInputChange}
                     />
-                    &nbsp;Yesterday
+                    <span className="lg:ms-1 md:ms-1 sm:ms-1 ms-2">
+                      Yesterday
+                    </span>
                   </label>
                 </div>
 
@@ -1439,7 +1441,10 @@ export default function journeyReplayComp() {
                   </label>
                 </div>
 
-                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3 -ms-4 col-span-3 period_select_custom">
+                <div
+                  className="xl:col-span-2 lg:col-span-3 md:col-span-3 lg:-ms-4
+                md:-ms-4 sm:-ms-4 -ms-0 col-span-3 period_select_custom"
+                >
                   <label className="text-sm text-black font-bold font-popins ">
                     <input
                       type="radio"

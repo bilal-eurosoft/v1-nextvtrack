@@ -1063,8 +1063,9 @@ export default function Reports() {
             {showWeekDays && (
               <>
                 <div
-                  className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3  mt-2 report_periods_today"
-                  style={{ display: "flex", justifyContent: "center" }}
+                  className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3  mt-2 report_periods_today
+                  flex lg:justify-center md:justify-center sm:justify-center justify-start
+                  "
                 >
                   <label>
                     <input
@@ -1079,10 +1080,7 @@ export default function Reports() {
                     &nbsp;&nbsp;<b>Today</b>
                   </label>
                 </div>
-                <div
-                  className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 mt-2 report_periods"
-                  style={{ display: "flex", justifyContent: "center" }}
-                >
+                <div className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 mt-2 report_periods flex lg:justify-center md:justify-center sm:justify-center justify-start">
                   <label>
                     <input
                       type="radio"
@@ -1099,8 +1097,8 @@ export default function Reports() {
                 <div
                   className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 mt-2 
                   report_periods_today
+                  flex lg:justify-center md:justify-center sm:justify-center justify-start
                   "
-                  style={{ display: "flex", justifyContent: "center" }}
                 >
                   <label>
                     <input
@@ -1116,8 +1114,9 @@ export default function Reports() {
                   </label>
                 </div>
                 <div
-                  className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 mt-2 report_periods"
-                  style={{ display: "flex", justifyContent: "center" }}
+                  className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 mt-2 report_periods
+                  flex lg:justify-center md:justify-center sm:justify-center justify-start
+                  "
                 >
                   <label>
                     <input
@@ -1212,7 +1211,10 @@ export default function Reports() {
                 </div>
               </>
             )}
-            <div className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 submit_report_btn" id="submit_btn">
+            <div
+              className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3 submit_report_btn "
+              id="submit_btn"
+            >
               <button
                 className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
                         ${

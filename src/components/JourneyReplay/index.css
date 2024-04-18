@@ -379,7 +379,7 @@ input[type="checkbox"]:hover {
     height: 5vh;
   }
   .journey_heading {
-    height: 5vh;
+    height: 7vh !important;
   }
   .stop_journey {
     grid-column: 5 span;
@@ -544,12 +544,15 @@ input[type="checkbox"]:hover {
     align-items: center;
   }
   .period_select {
-    grid-column: 3 span;
-    margin-left: 3%;
+    grid-column: 6 span;
+    /* margin-left: 3%; */
   }
 
   .period_select_custom {
-    grid-column: 3 span;
+    grid-column: 6 span;
+    display: flex;
+    justify-content: start;
+    margin-left: -2%;
   }
   .journey_heading {
     height: 5vh;

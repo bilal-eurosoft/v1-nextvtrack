@@ -229,14 +229,17 @@ export default function RootLayout({
                 content="Live Map"
               >
                 <svg
-                  className="w-20 h-14 py-3 border-y-2 mt-12  text-white text-white-10 dark:text-white"
+                  className={`w-20 h-14 py-3 mt-12   text-white text-white-10 dark:text-white ${
+                    pathname === "/liveTracking"
+                      ? "border-r-2 border-#29303b"
+                      : "border-y-2"
+                  }`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                   style={{
                     color: pathname == "/liveTracking" ? "green" : "white",
                     backgroundColor: pathname == "/liveTracking" ? "white" : "",
-                    border: pathname == "/liveTracking" ? "none" : "",
                   }}
                 >
                   <path
@@ -265,6 +268,10 @@ export default function RootLayout({
                     session?.userRole === "Controller"
                       ? "border-b-2 border-white"
                       : ""
+                  } ${
+                    pathname === "/journeyReplay"
+                      ? "border-r-2 border-#29303b"
+                      : "border-b-2"
                   }`}
                   viewBox="0 0 24 24"
                   fill="none"
@@ -292,7 +299,13 @@ export default function RootLayout({
                   content="Zones"
                 >
                   <svg
-                    className="w-20 h-14 py-3  border-y-2  text-[white]  text-white-10  dark:text-white"
+                    className={`w-20 h-14 py-3    text-[white]  text-white-10  dark:text-white  ${
+                      pathname == "/Zone" ||
+                      pathname == "/AddZone" ||
+                      `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
+                        ? "border-r-2 #29303b"
+                        : "border-b-2"
+                    }`}
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"
@@ -313,12 +326,6 @@ export default function RootLayout({
                         pathname == "/AddZone" ||
                         `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
                           ? "white"
-                          : "",
-                      border:
-                        pathname == "/Zone" ||
-                        pathname == "/AddZone" ||
-                        `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
-                          ? "none"
                           : "",
                     }}
                   >
@@ -398,7 +405,12 @@ export default function RootLayout({
                     >
                       <PopoverHandler>
                         <svg
-                          className="w-20 h-12 py-2  text-white-10  dark:text-white cursor-pointer"
+                          className={`w-20 h-12 py-2  text-white-10  dark:text-white cursor-pointer
+                          ${
+                            pathname === "/DualCam"
+                              ? "border-r-2 border-#29303b"
+                              : "border-b-2"
+                          }`}
                           width="24"
                           height="24"
                           viewBox="0 0 24 24"
@@ -415,11 +427,6 @@ export default function RootLayout({
                             backgroundColor:
                               pathname == "/DualCam" || pathname == "/DualCam"
                                 ? "white"
-                                : "",
-
-                            border:
-                              pathname == "/DualCam" || pathname == "/DualCam"
-                                ? "none"
                                 : "",
                           }}
                         >
@@ -506,9 +513,13 @@ export default function RootLayout({
                 content="Reports"
               >
                 <svg
-                  className={`w-20 h-14 py-3 border-b-2 
-                  text-white-10  dark:text-white ${
-                    session?.cameraProfile ? "border-y-2" : "border-b-2"
+                  className={`w-20 h-14 py-3 
+                  text-white-10  dark:text-white 
+        
+                  ${
+                    pathname === "/Reports"
+                      ? "border-r-2 border-#29303b -my-1"
+                      : "border-y-1 border-b-2"
                   }`}
                   width="24"
                   height="24"
@@ -521,7 +532,6 @@ export default function RootLayout({
                   style={{
                     color: pathname == "/Reports" ? "green" : "white",
                     backgroundColor: pathname == "/Reports" ? "white" : "",
-                    border: pathname == "/Reports" ? "none" : "",
                   }}
                 >
                   <path d="M9 7V2.13a2.98 2.98 0 0 0-1.293.749L4.879 5.707A2.98 2.98 0 0 0 4.13 7H9Z" />
@@ -538,13 +548,20 @@ export default function RootLayout({
                     {/* <Link href="/DriverProfile"> */}
                     {/* <Link href={pathname ? "/DriverProfile" : "/DriverAssign"}> */}
                     <Tooltip
-                      className="bg-[#00B56C] text-white shadow-lg rounded border-none"
+                      className={`bg-[#00B56C] text-white shadow-lg rounded border-none`}
                       placement="right"
                       content="Driver"
                     >
                       <PopoverHandler>
                         <svg
-                          className="w-20 h-14 py-3 border-b-2 text-[white] text-white-10  dark:text-white"
+                          className={`w-20 h-14 py-3  text-[white] text-white-10  dark:text-white
+                          ${
+                            pathname == "/DriverAssign" ||
+                            pathname == "/DriverProfile" ||
+                            pathname == "/ActiveDriver"
+                              ? "border-r-2 border-#29303b -mt-1"
+                              : "border-b-2"
+                          }`}
                           width="24"
                           height="24"
                           viewBox="0 0 24 24"
@@ -565,13 +582,6 @@ export default function RootLayout({
                               pathname == "/DriverProfile" ||
                               pathname == "/ActiveDriver"
                                 ? "white"
-                                : "",
-
-                            border:
-                              pathname == "/DriverAssign" ||
-                              pathname == "/DriverProfile" ||
-                              pathname == "/ActiveDriver"
-                                ? "none"
                                 : "",
                           }}
                         >
@@ -638,7 +648,7 @@ export default function RootLayout({
               <div className="flex items-center flex-shrink-0 text-white logo_none">
                 <Image
                   src={logo}
-                  className="xl:h-12 lg:h-14 lg:w-44 sm:w-24    w-20 h-6   lg:block md:block sm:block hidden"
+                  className="xl:h-12 lg:h-14 lg:w-44 sm:w-24    w-20 h-6   lg:block md:block  "
                   alt=""
                 />
               </div>
@@ -657,7 +667,7 @@ export default function RootLayout({
                       </IconButton>
 
                       <div className="grid grid-cols-12 h-10 w-full hidden_top_popup">
-                        <div className="lg:col-span-10 md:col-span-10 sm:col-span-2 col-span-2 mt-1 logo_top_header ">
+                        <div className="lg:col-span-10 md:col-span-5 sm:col-span-8 col-span-2 mt-1 logo_top_header">
                           <Image
                             src={logo}
                             className="xl:h-12 lg:h-10 w-32 md:h-12 sm:h-10 h-10 lg:float-left
@@ -666,14 +676,14 @@ export default function RootLayout({
                             alt=""
                           />
                         </div>
-                        <div className="sm:col-span-5 col-span-6 flex items-center justify-center client_name_popup">
+                        <div className="md:col-span-3 sm:col-span-12 col-span-6 flex items-center md:justify-end sm:justify-end client_name_popup">
                           {session?.clientName}
                         </div>
-                        <div className="sm:col-span-4 col-span-3 flex items-center justify-center client_name_popup">
+                        <div className="md:col-span-3 sm:col-span-4 col-span-3 flex items-center text-end md:justify-end sm:justify-center client_name_popup">
                           <BlinkingTime timezone={session?.timezone} />
                         </div>
 
-                        <div className="lg:col-span-2 md:col-span-2 sm:col-span-1 flex justify-end user_icon_top_header">
+                        <div className="lg:col-span-2 md:col-span-1 sm:col-span-1 flex justify-end user_icon_top_header">
                           <Popover>
                             <PopoverHandler {...triggers}>
                               {session?.image !== "" &&
@@ -1170,12 +1180,12 @@ export default function RootLayout({
                 </Box>
               </div>
               <div className=" grid lg:grid-cols-12 grid-cols-12  lg:gap-5  px-4  header_client_name">
-                <div className="lg:col-span-2  col-span-12  ">
+                <div className="lg:col-span-2 sm:col-span-2  col-span-12 ">
                   <p className="text-white text-start font-popins lg:text-2xl md:text-xl sm:text-md ">
                     {session?.clientName}
                   </p>
                 </div>
-                <div className="lg:col-span-4  md:col-span-4 sm:col-span-4  col-span-12 lg:mx-0 md:mx-4 sm:mx-4 mx-4  lg:mt-2">
+                <div className="lg:col-span-4  md:col-span-4 sm:col-span-10  col-span-12 lg:mx-0 md:mx-4 sm:mx-4 mx-4  lg:mt-2">
                   <a className="  text-white text-center font-popins text-xl sm:text-md">
                     <BlinkingTime timezone={session?.timezone} />
                   </a>

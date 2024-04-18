@@ -90,37 +90,6 @@
   /* display: none; */
   overflow: hidden !important;
 }
-@media only screen and (max-width: 1070px) and (min-width: 820px) {
-  #nav_height {
-    height: auto !important;
-    display: flex;
-    align-items: center;
-    /* margin-top: -0.1%; */
-  }
-  .header_client_name {
-    margin-top: -0.2%;
-  }
-
-  /* .sider_bar_hidden {
-    display: none;
-  } */
-  .logo_header {
-    width: 10rem;
-    /* grid-column: span 2 / span 3;
-    margin: 0% !important;
-    display: flex;
-    align-items: center; */
-  }
-  /* .client_name {
-    grid-column: span 6 / span 6;
-  }
-  .logout_popup {
-    grid-column: span 2 / span 2;
-  }
-  .time_header {
-    grid-column: span 2 / span 2;
-  } */
-}
 
 /* @media (max-width: 1028px) and (min-height: 600px) {
   #nav_height {
@@ -133,48 +102,76 @@
   border-radius: 50%;
 }
 
-@media (max-width: 1080px) and (min-width: 765px) {
-  .hidden_top_popup {
+@media (max-width: 1022px) and (min-width: 765px) {
+  /* .hidden_top_popup {
     display: none !important;
+  } */
+  .header_client_name {
+    display: none;
   }
-}
-
-@media (max-width: 764px) and (min-width: 568px) {
   .logo_none {
     display: none;
   }
-  .header_client_name {
+  #nav_height {
+    height: 1px !important;
+  }
+}
+
+@media (max-width: 768px) and (min-width: 568px) {
+  .logo_none {
     display: none !important;
+  }
+  .client_name_popup {
+    display: none;
+  }
+  .logo_top_header {
+    grid-column: 11 span;
+    display: flex;
+    justify-content: center;
+  }
+  .header_client_name {
+    display: ruby;
   }
   .sm\:mt-14 {
     margin-top: 0rem !important;
   }
   #nav_height {
-    height: 1vh !important;
+    height: 14vh !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  .popup_mob_screen {
+    display: none !important;
   }
 }
 
-@media (max-width: 818px) and (min-width: 608px) {
+/* @media (max-width: 818px) and (min-width: 608px) {
   #nav_height {
-    height: auto !important;
-    align-items: center !important;
-    display: ruby-text !important;
+    height: 1px !important;
   }
-}
+} */
 
 @media (max-width: 606px) and (min-width: 505px) {
   .search_live_tracking {
     margin-top: 6%;
   }
 }
-@media (max-width: 569px) and (min-width: 319px) {
+@media (max-width: 669px) and (min-width: 400px) {
   #nav_height {
-    height: 20vh !important;
+    height: 16vh !important;
     display: flex;
-    text-align: start;
+    flex-direction: column;
+    justify-content: center !important;
+    align-items: center !important;
   }
+
   .logo_top_header {
     grid-column: 10 span;
+  }
+  .basis-20 {
+    flex-basis: 0rem;
   }
   .user_icon_top_header {
     grid-column: 2 span;
@@ -185,30 +182,7 @@
   #logo_hidden {
     display: none !important;
   }
-  .time_none {
-    display: none;
-  }
-  .popup_mob_screen {
-    display: none;
-  }
-  .time_header {
-    text-align: center;
-  }
-  .header_client_name {
-    display: ruby;
-  }
-  .sidebar-hide {
-    display: none;
-  }
-}
-
-@media (max-width: 320px) {
-  #nav_height {
-    height: 30vh !important;
-    display: flex;
-    text-align: center;
-  }
-  #logo_hidden {
+  .logo_none {
     display: none !important;
   }
   .time_none {
@@ -221,9 +195,50 @@
     text-align: center;
   }
   .header_client_name {
+    display: block;
+  }
+  .sidebar-hide {
+    display: none;
+  }
+}
+
+@media (max-width: 401px) {
+  #nav_height {
+    height: 17vh !important;
+    display: flex;
+    text-align: center;
+  }
+  .logo_top_header {
+    grid-column: 10 span;
+  }
+  .logo_none {
+    display: none !important;
+  }
+  .time_none {
+    display: none;
+  }
+  #logo_hidden {
+    display: none !important;
+  }
+  .time_none {
+    display: none;
+  }
+  .client_name_popup {
+    display: none !important;
+  }
+  .popup_mob_screen {
+    display: none;
+  }
+  .time_header {
+    text-align: center;
+  }
+  .header_client_name {
     display: ruby;
   }
   .sidebar-hide {
     display: none;
+  }
+  .user_icon_top_header {
+    grid-column: 2 span;
   }
 }
