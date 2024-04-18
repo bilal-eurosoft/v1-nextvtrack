@@ -111,9 +111,22 @@ input[type="checkbox"]:hover {
     height: 8vh !important;
   }
 }
-@media (max-width: 901px) and (min-width: 635px) {
+@media (max-width: 901px) and (min-width: 766px) {
   .search_live_tracking {
     height: 5vh;
+  }
+}
+@media (max-width: 768px) and (min-width: 643px) {
+  .main_sider_bar {
+    grid-column: 3 span !important;
+    width: 80%;
+  }
+  .main_map {
+    grid-column: 2 span;
+    margin-left: -4.6rem;
+  }
+  .status_car_btn {
+    grid-column: 4 span;
   }
 }
 @media (max-width: 634px) and (min-width: 319px) {
