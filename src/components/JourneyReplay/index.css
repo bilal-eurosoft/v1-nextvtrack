@@ -258,7 +258,12 @@ input[type="checkbox"]:hover {
   .period_select {
     grid-column: 3 span;
   }
-
+  .journey_replay_slider_res {
+    grid-column: 9 span;
+  }
+  .select_journey_speed {
+    grid-column: 3 span;
+  }
   .select_box_journey {
     height: 8vh;
     align-items: center;
@@ -289,7 +294,7 @@ input[type="checkbox"]:hover {
     grid-column: 7 span;
   }
   .journey_replay_slider {
-    grid-column: 8 span;
+    grid-column: 12 span;
   }
   .journey_replay_center_box {
     left: 20% !important;
@@ -326,6 +331,12 @@ input[type="checkbox"]:hover {
   .show_zone_journey_replay {
     position: absolute;
     top: 3%;
+  }
+  .journey_replay_slider_res {
+    grid-column: 9 span;
+  }
+  .select_journey_speed {
+    grid-column: 3 span;
   }
   .journey_heading {
     height: 6vh;
@@ -480,6 +491,7 @@ input[type="checkbox"]:hover {
     grid-column: 3 span;
   }
 }
+
 @media (max-width: 771px) and (min-width: 610px) {
   .select_box_column {
     margin-top: 3%;
@@ -516,7 +528,7 @@ input[type="checkbox"]:hover {
     grid-column: 2 span;
   }
   .journey_replay_slider {
-    grid-column: 10 span;
+    grid-column: 12 span;
   }
   .journey_replay_center_box {
     left: 20% !important;
@@ -575,6 +587,9 @@ input[type="checkbox"]:hover {
   .trip_address {
     height: 12.5vh;
     overflow-y: scroll;
+  }
+  .days_select {
+    margin-left: 4%;
   }
 }
 

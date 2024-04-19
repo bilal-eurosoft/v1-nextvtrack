@@ -2793,7 +2793,7 @@ export default function journeyReplayComp() {
                 <div className="xl:col-span-4 lg:col-span-8 col-span-12  journey_replay_slider ">
                   <div className="grid lg:grid-cols-12 grid-cols-12 gap-1 lg:py-5 py-2 mt-8 pt-4 lg:pt-4 rounded-md  mx-2 px-5 bg-white space-x-4 ">
                     <div
-                      className="lg:col-span-10 col-span-8"
+                      className="lg:col-span-10 md:col-span-9 col-span-8 journey_replay_slider_res" 
                       // style={{ height: "4vh" }}
                     >
                       <Slider
@@ -2839,7 +2839,7 @@ export default function journeyReplayComp() {
                                 }`}
                               >
                                 <svg
-                                  className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6  mx-1 "
+                                  className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6 mx-1"
                                   // style={{
                                   //   color: stopVehicle === true ? "gray" : "white",
                                   // }}
@@ -2951,7 +2951,7 @@ export default function journeyReplayComp() {
                       </div> */}
                     </div>
 
-                    <div className="lg:col-span-2 col-span-4 mt-2 select_journey_speed">
+                    <div className="lg:col-span-2 md:col-span-3 col-span-4 mt-2 select_journey_speed">
                       {isPlaying && (
                         // <Select
                         //   className="text-black  outline-green border h-8 w-16 border-grayLight px-1"
