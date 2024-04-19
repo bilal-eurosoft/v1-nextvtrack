@@ -777,85 +777,178 @@ export default function Zone() {
 
         <div className="grid lg:grid-cols-2  md:grid-cols-2  sm:grid-cols-2 grid-cols-2 px-5 lg:mt-0 mt-5 search_zone_btn_grid_main  ">
           <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 search_zone_btn">
-            <div className="grid grid-cols-12 gap-5">
-              <div className="lg:col-span-2 md:col-span-4 sm:col-span-5  col-span-6 sm:mt-5  lg:-mt-2 md:-mt-1   flex justify-start zone_search_btn">
-                <Button
-                  variant="outlined"
-                  className="lg:w-auto md:w-auto sm:w-auto w-full"
-                  style={{
-                    fontSize: "16px",
-                    backgroundColor: "#00b56c",
-                    color: "white",
-                    border: "none",
-                  }}
-                  startIcon={
-                    <span style={{ fontWeight: "600" }}>
-                      <SearchIcon />
-                    </span>
-                  }
-                  onClick={handleSearchClick}
-                >
-                  <b>S</b>{" "}
-                  <span style={{ textTransform: "lowercase" }}>
-                    <b>earch</b>
+            <div className="grid xl:grid-cols-7 lg:gap-2 md:gap-2 sm:gap-2 -mt-2 lg:grid-cols-4 gap-5 md:grid-cols-3 sm:grid-cols-2 grid-cols-2  search_zone_btn_grid">
+              <Button
+                className=" text-white font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none "
+                variant="outlined"
+                style={{
+                  fontSize: "16px",
+                  backgroundColor: "#00b56c",
+                  color: "white",
+                  border: "none",
+                }}
+                startIcon={
+                  <span style={{ fontWeight: "600" }}>
+                    <SearchIcon />
                   </span>
-                </Button>
-              </div>
-              <div
-                className="lg:col-span-3 md:col-span-4 sm:col-span-6  col-span-6 sm:mt-5  lg:-mt-2 md:-mt-1 lg:mb-0 md:mb-0  sm:mb-0  mb-1   flex lg:justify-start md:justify-start justify-end
-              sm:justify-start  lg:-ms-1 md:ms-0 sm:ms-0 ms-0
-              zone_clear_btn "
+                }
+                onClick={handleSearchClick}
               >
-                <Button
-                  className=" bg-white text-black font-popins shadow-lg hover:shadow-gray transition duration-500 lg:w-auto md:w-auto sm:w-auto w-full cursor-pointer hover:bg-white border-none hover:border-none  "
-                  variant="outlined"
-                  style={{
-                    fontSize: "16px",
-                    backgroundColor: "white",
-                    color: "black",
-                    border: "none",
-                  }}
-                  startIcon={
-                    <span style={{ fontWeight: "600" }}>
-                      <HighlightOffIcon />
-                    </span>
-                  }
-                  onClick={handleSearchClick}
-                >
-                  <b>C</b>{" "}
-                  <span style={{ textTransform: "lowercase" }}>
-                    <b>lear</b>
+                <b> s</b>{" "}
+                <span style={{ textTransform: "lowercase" }}>
+                  <b>earch</b>
+                </span>
+              </Button>
+
+              {/* <div className="grid  rounded-md lg:grid-cols-3 md:grid-cols-4 grid-cols-5  shadow-md    hover:shadow-gray transition duration-500 cursor-pointer">
+                <div className="lg:col-span-1 md:col-span-1 sm:col-span-2  col-span-2">
+                  <svg
+                    className="h-11 py-3 w-full text-white"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    strokeWidth="4"
+                    stroke="currentColor"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    {" "}
+                    <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                    <circle cx="10" cy="10" r="7" />{" "}
+                    <line x1="21" y1="21" x2="15" y2="15" />
+                  </svg>
+                </div>
+
+                <div className="lg:col-span-1 md:col-span-2 sm:col-span-1 col-span-1 text-center">
+                  <button
+                    className="text-white font-popins font-bold text-end pt-1 h-10 bg-green text-md "
+                    type="button"
+                    onClick={handleSearchClick}
+                  >
+                    Search
+                  </button>
+                </div>
+              </div> */}
+              <Button
+                className=" bg-white text-black font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-white border-none hover:border-none lg:w-auto md:w-auto sm:w-auto w-auto"
+                variant="outlined"
+                onClick={handleClear}
+                style={{
+                  fontSize: "16px",
+                  backgroundColor: "white",
+                  color: "black",
+                  border: "none",
+                }}
+                startIcon={
+                  <span style={{ fontWeight: "600" }}>
+                    <HighlightOffIcon />
                   </span>
-                </Button>
-              </div>
+                }
+              >
+                <b> C</b>{" "}
+                <span style={{ textTransform: "lowercase" }}>
+                  <b>lear</b>
+                </span>
+              </Button>
+              {/* <div className="grid  rounded-md  xl:grid-cols-3 lg:grid-cols-5 md:ps-3 ms-4 md:grid-cols-4 grid-cols-5 bg-white shadow-md hover:shadow-gray transition duration-500 cursor-pointer">
+                <div className="xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2  col-span-2">
+                  <svg
+                    className="h-11 py-3 w-full text-labelColor"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    strokeWidth="4"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+
+                <div className="lg:col-span-1 md:col-span-2 sm:col-span-1 col-span-1 text-center">
+                  <button
+                    className="text-black font-popins font-bold text-start pt-1 h-10 bg-white text-md "
+                    type="button"
+                    onClick={handleClear}
+                  >
+                    Clear
+                  </button>
+                </div>
+                <br></br>
+              </div> */}
+
+              {/* <div className="grid rounded-md lg:grid-cols-2 lg:grid-cols-4 grid-cols-5 bg-zonebtnColor shadow-md ms-3 hover:shadow-gray transition duration-500 cursor-pointer">
+        <div className="lg:col-span-2   md:col-span-2 col-span-3">
+          <svg
+            className="h-11 py-3 w-full text-labelColor"
+            viewBox="0 0 24 24"
+            fill="none"
+            strokeWidth="4"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <div className="lg:col-span-1 md:col-span-1  col-span-1 pt-1">
+          <button
+            className="text-labelColor font-popins font-bold text-md  h-10 lg:-ms-2 -ms-6"
+            type="button"
+            onClick={handleClear}
+          >
+            Clear
+          </button>
+        </div>
+      </div> */}
             </div>
           </div>
-          <div className="lg:col-span-1 md:col-span-1 sm:col-span-1  col-span-4 sm:mt-5  lg:-mt-2 md:-mt-1 mt-1   flex justify-end bod">
-            <Button
-              variant="outlined"
-              onClick={() => router.push("/AddZone")}
-              style={{
-                fontSize: "16px",
-                backgroundColor: "#00b56c",
-                color: "white",
-                border: "none",
-              }}
-              startIcon={
-                <span
-                  style={{ fontWeight: "600" }}
-                  className="lg:ms-0 md:ms-0 ms-5"
-                >
-                  <HighlightOffIcon />
-                </span>
-              }
-            >
-              <b>A</b>{" "}
-              <span style={{ textTransform: "lowercase" }}>
-                <b>dd Zone</b>
-              </span>
-            </Button>
-          </div>
 
+          <div
+            // style={{ display: "flex", justifyContent: "flex-end" }}
+            className="flex lg:justify-end md:justify-end sm:justify-end"
+          >
+            <Link href="/AddZone">
+              <div className="rounded-sm  grid lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-3 grid-cols-4 bg-green mb-8 lg:-mt-2 md:-mt-1 sm:-mt-1 mt-1 w-full  shadow-md   hover:shadow-gray transition duration-500 ">
+                <div className="col-span-1 ">
+                  <svg
+                    className="h-11 py-3 w-full text-white "
+                    width="24"
+                    viewBox="0 0 24 24"
+                    strokeWidth="4"
+                    stroke="currentColor"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" />
+                    <rect x="4" y="4" width="16" height="16" rx="2" />
+                    <line x1="9" y1="12" x2="15" y2="12" />
+                    <line x1="12" y1="9" x2="12" y2="15" />
+                  </svg>
+                </div>
+                <div className="col-span-2 pt-1">
+                  <button
+                    className="text-white  font-popins font-bold -ms-2 h-10 bg-[#00B56C] px-2 text-md   "
+                    // onClick={handleClick}
+                  >
+                    Add Zone
+                  </button>
+                </div>
+              </div>
+            </Link>
+          </div>
           {/* <div className="lg:col-span-1 md:col-span-1  col-span-2 lg:mt-0 md:mt-0 mt-3  flex justify-end mb-5">
     <div
       className="grid lg:grid-cols-3 md:grid-cols-3  grid-cols-2 cursor-pointer  "
