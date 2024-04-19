@@ -1536,8 +1536,7 @@ export default function Reports() {
               page={currentPage}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
-              // className="report_paginations"
-              style={{ display: "block" }}
+              className="report_paginations_one"
             />
           </div>
         </div>
