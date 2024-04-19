@@ -1391,7 +1391,9 @@ export default function journeyReplayComp() {
                 className="grid xl:grid-cols-11 lg:grid-cols-12  md:grid-cols-12 grid-cols-12 -mt-2 "
                 // style={{ display: "flex", justifyContent: "start" }}
               >
-                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2 col-span-4 period_select">
+                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2 col-span-4 period_select"
+                id="today_journey"
+                >
                   <label className="text-sm text-black font-bold font-popins ">
                     <input
                       type="radio"
@@ -1444,6 +1446,7 @@ export default function journeyReplayComp() {
                 <div
                   className="xl:col-span-2 lg:col-span-3 md:col-span-3 lg:-ms-4
                 md:-ms-4 sm:-ms-4 -ms-0 col-span-3 period_select_custom"
+                id="custom_journey"
                 >
                   <label className="text-sm text-black font-bold font-popins ">
                     <input

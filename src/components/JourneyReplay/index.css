@@ -264,6 +264,12 @@ input[type="checkbox"]:hover {
   .select_journey_speed {
     grid-column: 3 span;
   }
+  #today_journey {
+    margin-left: 6% !important;
+  }
+  #custom_journey {
+    margin-left: -1.4rem !important;
+  }
   .select_box_journey {
     height: 8vh;
     align-items: center;

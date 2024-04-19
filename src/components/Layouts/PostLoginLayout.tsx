@@ -958,7 +958,7 @@ export default function RootLayout({
                               >
                                 <PopoverHandler>
                                   <svg
-                                    className="w-20 h-12 py-2  text-white-10  dark:text-white cursor-pointer"
+                                    className="w-14 h-12 py-2  text-white-10  dark:text-white cursor-pointer"
                                     width="24"
                                     height="24"
                                     viewBox="0 0 24 24"

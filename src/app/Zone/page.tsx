@@ -920,8 +920,8 @@ export default function Zone() {
             className="flex lg:justify-end md:justify-end sm:justify-end"
           >
             <Link href="/AddZone">
-              <div className="rounded-sm  grid lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-3 grid-cols-4 bg-green mb-8 lg:-mt-2 md:-mt-1 sm:-mt-1 mt-1 w-full  shadow-md   hover:shadow-gray transition duration-500 ">
-                <div className="col-span-1 ">
+              <div className="lg:rounded-md md:rounded-md sm:rounded-md rounded-sm  grid lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-3 grid-cols-4 bg-green mb-8 lg:-mt-2 md:-mt-1 sm:-mt-1 mt-1 w-full  shadow-md   hover:shadow-gray transition duration-500 ">
+                <div className="lg:col-span-1 md:col-span-1 sm:col-span-1   col-span-2">
                   <svg
                     className="h-11 py-3 w-full text-white "
                     width="24"
@@ -938,12 +938,12 @@ export default function Zone() {
                     <line x1="12" y1="9" x2="12" y2="15" />
                   </svg>
                 </div>
-                <div className="col-span-2 pt-1">
+                <div className="lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-2   pt-1 flex justify-center ">
                   <button
-                    className="text-white  font-popins font-bold -ms-2 h-10 bg-[#00B56C] px-2 text-md   "
+                    className="text-white  font-popins font-bold lg:-ms-2 md:-ms-2 h-10 bg-[#00B56C] px-2 text-md  sm:-ms-2 -ms-2  "
                     // onClick={handleClick}
                   >
-                    Add Zone
+                    Add zone
                   </button>
                 </div>
               </div>

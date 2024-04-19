@@ -14,6 +14,9 @@
   background-color: #00b56c !important;
   height: 2vh;
 }
+.css-s73ghq-MuiModal-root-MuiDrawer-root .MuiDrawer-paper {
+  overflow: hidden !important;
+}
 .css-1tgyln {
   background-color: #00b56c !important;
 }
