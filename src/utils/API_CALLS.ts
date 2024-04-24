@@ -1,6 +1,6 @@
 import { IgnitionReport, replayreport } from "@/types/IgnitionReport";
 import { zonelistType } from "@/types/zoneType";
-
+import axios from "axios";
 var URL = "https://backend.vtracksolutions.com";
 // var URL = 'http://172.16.10.47:80'
 
@@ -861,7 +861,44 @@ export async function modifyCollectionStatus({
     return [];
   }
 }
+export async function getSearchAddress({
+  query,
+  country,
+}: {
+  query: string;
+  country: string;
+}) {
+  try {
+    /* const response = await fetch(
+      `http://osm.vtracksolutions.com/nominatim/search.php?q=${query}+Pakistan&format=json`,
+      {
+        method: "GET",
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+  //   const data = await response.json();
+  console.log("frtgfbhjn", response) */
+    var response = await axios
+      .get(
+        `http://osm.vtracksolutions.com/nominatim/search.php?q=${query}+${country}&format=json`
+      )
+      .then(async (response) => {
+        //console.log("Response data:", response, response.data)
+        return response.data;
+      });
 
+    return response;
+    /* console.log("Response data:", response);
+const data = await response.json();
+console.log("Response data:", data); */
+    //  return data;
+  } catch (error) {
+    console.log("Error fetching data", error);
+    return [];
+  }
+}
 export async function postZoneDataByClientId({
   token,
   newformdata,

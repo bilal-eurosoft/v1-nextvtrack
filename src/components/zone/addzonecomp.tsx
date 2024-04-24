@@ -5,9 +5,12 @@ import "leaflet-draw/dist/leaflet.draw.css"; */
 import dynamic from "next/dynamic"; // Import dynamic from Next.js
 import { useSession } from "next-auth/react";
 import { ClientSettings } from "@/types/clientSettings";
+import { useMap } from "react-leaflet";
+import Select from "react-select";
 import {
   getClientSettingByClinetIdAndToken,
   postZoneDataByClientId,
+  getSearchAddress,
 } from "@/utils/API_CALLS";
 import L, { LatLngTuple } from "leaflet";
 import { Toaster, toast } from "react-hot-toast";
@@ -16,7 +19,7 @@ import { Polygon } from "react-leaflet/Polygon";
 import { Circle } from "react-leaflet/Circle";
 import { LayerGroup } from "leaflet";
 import EditRoadIcon from "@mui/icons-material/EditRoad";
-import { Button, MenuItem, Select } from "@mui/material";
+import { Button, MenuItem } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import ClearIcon from "@mui/icons-material/Clear";
 import "leaflet/dist/leaflet.css";
@@ -51,6 +54,7 @@ export default function AddZoneComp() {
   const [drawShape, setDrawShape] = useState<boolean>(true);
   const [shapeType, setShapeType] = useState<"Polygon" | "Circle">();
   const [mapcenter, setMapcenter] = useState<LatLngTuple | null>(null);
+  const [selectLatLng, setSelectLatLng] = useState<any>("");
   const [polygondata, setPolygondata] = useState<
     { latitude: number; longitude: number }[]
   >([]);
@@ -63,15 +67,15 @@ export default function AddZoneComp() {
     null
   );
   const [Form, setForm] = useState({
-    GeoFenceType: "",
     centerPoints: "",
     id: "",
     zoneName: "",
     zoneShortName: "",
     zoneType: "",
     latlngCordinates: "",
+    label: "",
   });
-
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const router = useRouter();
   if (session?.userRole === "Controller") {
     router.push("/signin");
@@ -193,11 +197,45 @@ export default function AddZoneComp() {
     }
   };
 
+  const handleSelectAddressOne = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedIndex = e.target.selectedIndex;
+    // setSelectedAddress(addresses[selectedIndex]);
+    const latlng = JSON.parse(e.target.value);
+    if ("lat" in latlng && "lon" in latlng) {
+      setSelectLatLng({ lat: latlng.lat, lon: latlng.lon });
+    } else {
+      console.error("Invalid latlng object:", latlng);
+    }
+  };
+
+  const SetViewfly = () => {
+    const map = useMap();
+    if (selectLatLng) {
+      map.flyTo([selectLatLng.lat, selectLatLng.lon], 18);
+    }
+
+    return null;
+  };
+  const handleAAdressSearch = async (e: any) => {
+    let query: string = e.target.value;
+    if (session) {
+      const getAddress = await getSearchAddress({
+        query: query,
+        country: session?.country,
+      });
+      setAddresses(getAddress);
+    }
+  };
   const handleChange = (e: any) => {
     const { name, value } = e.target;
+    console.log("name, value ", name, value);
     setForm({ ...Form, [name]: value });
+  };
+  const handleChangeSelectValue = (e: any) => {
+    const { label, value } = e;
+    setForm({ ...Form, [label]: value });
     if (value === "Restricted-Area") {
-      setForm({ ...Form, GeoFenceType: value });
+      setForm({ ...Form, label: value });
     }
   };
 
@@ -205,12 +243,7 @@ export default function AddZoneComp() {
     e.preventDefault();
 
     // Check if any of the required fields are empty
-    if (
-      !Form.latlngCordinates ||
-      !Form.GeoFenceType ||
-      !Form.zoneName ||
-      !Form.zoneShortName
-    ) {
+    if (!Form.latlngCordinates || !Form.zoneName || !Form.zoneShortName) {
       toast.error("Please Select All Field");
       return;
     } else if (polygondataById.length == 0 && circleDataById?.radius == null) {
@@ -268,13 +301,13 @@ export default function AddZoneComp() {
       console.error("Error fetching zone data:", error);
     }
     setForm({
-      GeoFenceType: "",
       centerPoints: "",
       id: "",
       zoneName: "",
       zoneShortName: "",
       zoneType: "",
       latlngCordinates: "",
+      label: "",
     });
     router.push("/Zone");
   };
@@ -335,7 +368,18 @@ export default function AddZoneComp() {
       setDrawShape(drawShape);
     }
   };
+  const optionsSiteClickCall: any = [
+    { value: "On-Site", label: "On-Site" },
+    { value: "Off-Site", label: "Off-Site" },
+    { value: "City-Area", label: "City-Area" },
+    { value: "Restricted-Area", label: "Restricted-Area" },
+  ];
+  const optionsSite: any = [
+    { value: "On-Site", label: "On-Site" },
+    { value: "Off-Site", label: "Off-Site" },
+  ];
 
+  console.log("form", Form.GeoFenceType);
   return (
     <div className="shadow-lg bg-bgLight h-5/6  border-t text-white edit_zone_main ">
       <p className="bg-green px-4 py-1 text-black text-center text-2xl text-white font-bold edit_zone_text">
@@ -368,50 +412,76 @@ export default function AddZoneComp() {
             </label>
             {session?.clickToCall === true ? (
               <Select
-                onChange={handleChange}
-                value={Form?.GeoFenceType}
-                className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
-                placeholder="geofence"
-                // required
-                name="GeoFenceType"
-                displayEmpty
-              >
-                <MenuItem value="" selected disabled hidden>
-                  Select Geofence Type
-                </MenuItem>
-                <MenuItem value="On-Site" className="hover_select">
-                  On-Site
-                </MenuItem>
-                <MenuItem className="hover_select" value="Off-Site">
-                  Off-Site
-                </MenuItem>
-                <MenuItem className="hover_select" value="City-Area">
-                  City-Area
-                </MenuItem>
-                <MenuItem className="hover_select" value="Restricted-Area">
-                  Restricted-Area
-                </MenuItem>
-              </Select>
+                // value={Ignitionreport?.vehicleNo}
+                // value={Form?.GeoFenceType}
+                onChange={handleChangeSelectValue}
+                options={optionsSiteClickCall}
+                placeholder="Select Report Type"
+                isSearchable
+                isClearable
+                noOptionsMessage={() => "No options available"}
+                className="   rounded-md w-full  outline-green border border-grayLight"
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    border: "none",
+                    boxShadow: state.isFocused ? null : null,
+                  }),
+                  option: (provided, state) => ({
+                    ...provided,
+                    backgroundColor: state.isSelected
+                      ? "#00B56C"
+                      : state.isFocused
+                      ? "#e1f0e3"
+                      : "transparent",
+                    color: state.isSelected
+                      ? "white"
+                      : state.isFocused
+                      ? "black"
+                      : "black",
+                    "&:hover": {
+                      backgroundColor: "#e1f0e3",
+                      color: "black",
+                    },
+                  }),
+                }}
+              />
             ) : (
               <Select
-                onChange={handleChange}
-                value={Form?.GeoFenceType}
-                className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
-                placeholder="geofence"
-                // required
-                name="GeoFenceType"
-                displayEmpty
-              >
-                <MenuItem value="" selected disabled hidden>
-                  Select Geofence Type
-                </MenuItem>
-                <MenuItem className="hover_select" value="On-Site">
-                  On-Site
-                </MenuItem>
-                <MenuItem className="hover_select" value="Off-Site">
-                  Off-Site
-                </MenuItem>
-              </Select>
+                // value={Ignitionreport?.vehicleNo}
+                // value={Form?.GeoFenceType}
+                onChange={handleChangeSelectValue}
+                options={optionsSite}
+                placeholder="Select Report Type"
+                isSearchable
+                isClearable
+                noOptionsMessage={() => "No options available"}
+                className="   rounded-md w-full  outline-green border border-grayLight"
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    border: "none",
+                    boxShadow: state.isFocused ? null : null,
+                  }),
+                  option: (provided, state) => ({
+                    ...provided,
+                    backgroundColor: state.isSelected
+                      ? "#00B56C"
+                      : state.isFocused
+                      ? "#e1f0e3"
+                      : "transparent",
+                    color: state.isSelected
+                      ? "white"
+                      : state.isFocused
+                      ? "black"
+                      : "black",
+                    "&:hover": {
+                      backgroundColor: "#e1f0e3",
+                      color: "black",
+                    },
+                  }),
+                }}
+              />
             )}
             <br></br>
             <br></br>
@@ -583,8 +653,26 @@ export default function AddZoneComp() {
               type="text"
               className="  block py-2 px-0 w-full text-sm text-labelColor bg-white-10 border border-grayLight appearance-none px-3 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-green mb-5"
               placeholder="Search"
+              onChange={handleAAdressSearch}
               required
             />
+            <select
+              onChange={handleSelectAddressOne}
+              style={{
+                backgroundColor: "green",
+                width: "100%",
+                marginTop: "4%",
+              }}
+            >
+              <option selected disabled hidden>
+                Select Value
+              </option>
+              {addresses.map((address, index) => (
+                <option key={address.place_id} value={JSON.stringify(address)}>
+                  {address.display_name}
+                </option>
+              ))}
+            </select>
           </div>
           {/* <button
             className="text-white px-30px h-10 bg-[#00B56C] "
@@ -658,6 +746,8 @@ export default function AddZoneComp() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
                   />
+
+                  <SetViewfly />
                   {drawShape == false && (
                     <FeatureGroup>
                       <EditControl

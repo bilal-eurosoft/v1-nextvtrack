@@ -27,6 +27,11 @@
 .yellowCarBG {
   background-image: url(../../public//yellowcar.png);
 }
+@media (max-width: 1023px) {
+  div[data-floating-ui-portal] div {
+    z-index: 9999;
+  }
+}
 
 .car {
   width: 40px;

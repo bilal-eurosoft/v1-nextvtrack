@@ -77,11 +77,28 @@ input[type="checkbox"]:hover {
     grid-column: 3 span;
     margin-left: -21%;
   }
+  #maps {
+    height: 92vh;
+    overflow: hidden;
+  }
+  .main_sider_bar {
+    height: 92vh !important;
+    overflow: hidden;
+  }
 }
 @media (max-width: 1301px) and (min-width: 1199px) {
   .main_sider_bar {
     grid-column: 2 span;
     width: 74%;
+  }
+
+  .main_sider_bar {
+    height: 92vh !important;
+    overflow: hidden;
+  }
+  #maps {
+    height: 92vh;
+    overflow: hidden;
   }
   .search_live_tracking {
     height: 7vh !important;
@@ -123,10 +140,23 @@ input[type="checkbox"]:hover {
   }
   .main_map {
     grid-column: 2 span;
-    margin-left: -4.6rem;
+    margin-left: -5.3rem;
   }
   .status_car_btn {
     grid-column: 4 span;
+  }
+  .main_sider_bar {
+    height: 85vh !important;
+    overflow: hidden;
+  }
+  #scroll_side_bar {
+    height: 74vh;
+    /* Dynamic height calculation */
+    overflow-y: auto;
+  }
+  #maps {
+    height: 85vh !important;
+    overflow: hidden;
   }
 }
 @media (max-width: 634px) and (min-width: 319px) {

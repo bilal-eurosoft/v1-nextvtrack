@@ -95,12 +95,39 @@
   .table_scroll {
     margin-top: 0.8%;
   }
+  #zone_main {
+    height: 93vh !important;
+    overflow: hidden !important;
+  }
+
+  .zone_heading {
+    height: 4vh;
+  }
+  .zone_form {
+    height: 24vh;
+  }
+  .table_zone {
+    height: 60.5vh;
+    /* overflow-y: scroll; */
+  }
+  .table_pagination {
+    height: 3.5vh;
+  }
 }
 
 @media (max-width: 1571px) and (min-width: 1195px) {
   .table_zone {
     height: 46vh;
   }
+  #zone_main {
+    height: 93vh !important;
+    overflow: hidden !important;
+  }
+  .table_zone {
+    height: 52.5vh !important;
+    /* overflow-y: scroll; */
+  }
+
   .table_scroll {
     margin-top: 1%;
   }

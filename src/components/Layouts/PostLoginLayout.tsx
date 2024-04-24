@@ -196,6 +196,7 @@ export default function RootLayout({
 
     filterZoneIds();
   }, [zoneList]);
+
   return (
     // <div className={inter.className}>
     <div>
@@ -1127,7 +1128,7 @@ export default function RootLayout({
                                   </svg>
                                 </PopoverHandler>
                               </Tooltip>
-                              <PopoverContent className="border-none cursor-pointer bg-green">
+                              <PopoverContent className="border-none cursor-pointer bg-green ">
                                 {/* <Link className="w-full text-white" href="/DriverProfile">
                   Driver Profile
                 </Link> */}
@@ -1145,7 +1146,7 @@ export default function RootLayout({
                                         : "",
                                   }}
                                 >
-                                  Driver Profiless
+                                  Driver Profile
                                 </Link>
                                 <br></br>
                                 <br></br>
