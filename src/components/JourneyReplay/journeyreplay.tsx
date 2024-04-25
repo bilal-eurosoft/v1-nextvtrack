@@ -1399,7 +1399,7 @@ export default function journeyReplayComp() {
                     <input
                       type="radio"
                       className="w-5 lg:w-4 pt-10 form-radio  "
-                      style={{ accentColor: "green", height: "1.5vh" }}
+                      style={{ accentColor: "green" }}
                       name="period"
                       disabled={loading}
                       value="today"
@@ -1418,7 +1418,7 @@ export default function journeyReplayComp() {
                       name="period"
                       disabled={loading}
                       value="yesterday"
-                      style={{ accentColor: "green", height: "1.5vh" }}
+                      style={{ accentColor: "green" }}
                       checked={Ignitionreport?.period === "yesterday"}
                       onChange={handleInputChange}
                     />
@@ -1436,7 +1436,7 @@ export default function journeyReplayComp() {
                       name="period"
                       disabled={loading}
                       value="week"
-                      style={{ accentColor: "green", height: "1.5vh" }}
+                      style={{ accentColor: "green" }}
                       checked={Ignitionreport?.period === "week"}
                       onChange={handleInputChange}
                     />
@@ -1456,7 +1456,7 @@ export default function journeyReplayComp() {
                       disabled={loading}
                       name="period"
                       value="custom"
-                      style={{ accentColor: "green", height: "1.5vh" }}
+                      style={{ accentColor: "green" }}
                       checked={Ignitionreport?.period === "custom"}
                       onChange={handleInputChange}
                       onClick={handleClick}

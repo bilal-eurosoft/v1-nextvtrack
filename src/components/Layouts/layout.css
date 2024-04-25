@@ -243,7 +243,6 @@
     text-align: center;
   }
   .header_client_name {
-    /* display: ruby; */
     display: flex;
     align-items: center;
     justify-content: center;
