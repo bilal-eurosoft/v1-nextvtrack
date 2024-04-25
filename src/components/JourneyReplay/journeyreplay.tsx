@@ -1398,7 +1398,7 @@ export default function journeyReplayComp() {
                   <label className="text-sm text-black font-bold font-popins ">
                     <input
                       type="radio"
-                      className="w-5 lg:w-4 pt-10 form-radio  "
+                      className="w-5 h-4 form-radio"
                       style={{ accentColor: "green" }}
                       name="period"
                       disabled={loading}
@@ -1414,7 +1414,7 @@ export default function journeyReplayComp() {
                   <label className="text-sm  text-black font-bold font-popins  w-full pt-3 ">
                     <input
                       type="radio"
-                      className="lg:w-5 w-3 lg:w-4 md:w-4 md:-ms-3 lg:-ms-0 xl:-ms-0   form-radio text-green"
+                      className="lg:w-5 w-4  md:w-4 h-4 md:-ms-3 lg:-ms-0 xl:-ms-0   form-radio text-green"
                       name="period"
                       disabled={loading}
                       value="yesterday"
@@ -1432,7 +1432,7 @@ export default function journeyReplayComp() {
                   <label className="text-sm text-black font-bold font-popins  ">
                     <input
                       type="radio"
-                      className="w-5 lg:w-4  "
+                      className="w-5 h-4 lg:w-4  "
                       name="period"
                       disabled={loading}
                       value="week"
@@ -1452,7 +1452,7 @@ export default function journeyReplayComp() {
                   <label className="text-sm text-black font-bold font-popins ">
                     <input
                       type="radio"
-                      className="w-5  lg:w-4 "
+                      className="w-5 h-4  lg:w-4 "
                       disabled={loading}
                       name="period"
                       value="custom"
