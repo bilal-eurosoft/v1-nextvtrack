@@ -90,20 +90,25 @@ export async function vehicleListByClientId({
 // export async function expireForgotLink({
 //   token,
 //   clientId,
+//   payload
 // }: {
 //   token: any;
 //   clientId: any;
+//   payload: any;
 // }) {
 //   try {
-//     const response = await fetch(`${URL}/forgotpassword/UpdateLink`, {
-//       headers: {
-//         accept: "application/json, text/plain, */*",
-//         authorization: `Bearer ${token}`,
-//         "content-type": "application/json",
-//       },
-//       body: `{\"clientId\":\"${clientId}\"}`,
-//       method: "POST",
-//     });
+//     const response = await fetch(
+//       `http://hammadserver:3010/forgotpassword/UpdateLink`,
+//       {
+//         headers: {
+//           accept: "application/json, text/plain, */*",
+//           authorization: `Bearer ${token}`,
+//           "content-type": "application/json",
+//         },
+//         body: `{\"clientId\":\"${clientId}\"}`,
+//         method: "POST",
+//       }
+//     );
 //     if (!response.ok) {
 //       throw new Error("Failed to fetch data from the API");
 //     }
@@ -116,12 +121,11 @@ export async function vehicleListByClientId({
 // }
 export function expireForgotLink(payload: any) {
   const ressult = axios
-    .post(`http://hammadserver:3010/forgotpassword/UpdateLink`, payload)
+    .post(`http://172.16.10.99/forgotpassword/UpdateLink`, payload)
     .then((response: any) => response?.data)
     .catch((error) => {
       console.log("Error Expire Update Link", error);
     });
-  console.log("result", ressult);
   return ressult;
 }
 
@@ -389,7 +393,7 @@ export async function forgetEmailByClientId({
 }) {
   try {
     const response = await fetch(
-      `http://172.16.10.99:3010/forgotpassword/forgotpassword`,
+      `http://172.16.10.99/forgotpassword/forgotpassword`,
       {
         method: "POST",
         headers: {

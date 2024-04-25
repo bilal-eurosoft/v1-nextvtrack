@@ -1414,8 +1414,9 @@ export default function journeyReplayComp() {
                   <label className="text-sm  text-black font-bold font-popins  w-full pt-3 ">
                     <input
                       type="radio"
-                      className="lg:w-5 w-4  md:w-4 h-4 md:-ms-3 lg:-ms-0 xl:-ms-0   form-radio text-green"
+                      className="lg:w-5 w-4  md:w-4 h-4 md:-ms-3 -ms-0 lg:-ms-0 xl:-ms-0   form-radio text-green"
                       name="period"
+                      id="yesterday_radio_button"
                       disabled={loading}
                       value="yesterday"
                       style={{ accentColor: "green" }}

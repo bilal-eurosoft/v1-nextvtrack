@@ -12,7 +12,6 @@ const Loading = () => {
         }}
       >
         <Image src={logo} alt="" className="loading_all_page" />
-        <br></br>
       </div>
       <div role="status">
         <svg

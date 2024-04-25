@@ -576,6 +576,9 @@ input[type="checkbox"]:hover {
   .journey_sidebar_text {
     height: 5.5vh;
   }
+  #yesterday_radio_button {
+    margin-left: -0.5% !important;
+  }
   .select_box_column {
     margin: 3% 2% !important;
   }

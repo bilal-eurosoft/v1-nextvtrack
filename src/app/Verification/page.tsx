@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { forgetPasswordClientId, expireForgotLink } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { Toaster, toast } from "react-hot-toast";
+import moment from "moment";
 
 import logo from "../../../public/Images/logo.png";
 import { base64encode, base64decode } from "nodejs-base64";
@@ -17,10 +18,10 @@ export default function Verification() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setshowConfirmPassword] = useState(false);
+  const [expireLink, setExpireLink] = useState<any>([]);
   const router = useRouter();
   const searchParams = useSearchParams();
   const id: any = searchParams.get("q");
-  console.log("reyhh", id);
   // console.log(base64decode(id))
   // const decodedValue = decodeURIComponent(id);
   // console.log(decodedValue);
@@ -31,7 +32,7 @@ export default function Verification() {
 
   const [inputConfirmPassword, setinputConfirmPassword] = useState("");
   const [lineExpire, setLinkExpire] = useState(false);
-
+  const moment = require("moment-timezone");
   // Use the decoded value in your component
   // console.log('Decoded value of "q":', decodedValue);
   const handleInputChange = (key: any, e: any) => {
@@ -108,13 +109,43 @@ export default function Verification() {
     }
     router.push("/signin");
   };
+
   useEffect(() => {
     const func = async () => {
       const result = await expireForgotLink({ link: base64decode(id) });
-      console.log("api update link hit", result);
+      // console.log("api update link hit", result);
+      setExpireLink(result);
     };
     func();
   }, []);
+  console.log("result", expireLink);
+  if (expireLink) {
+    const timestamps: any = new Date(expireLink.timestamp);
+    const currentTimes: any = new Date();
+    const timeDifference = currentTimes - timestamps;
+    if (timeDifference >= 5 * 60 * 1000) {
+      console.log("5 minutes or more");
+      return;
+    } else {
+      console.log("is less than 5 minutes");
+      // If the difference is less than 5 minutes, return false
+      // return ;
+    }
+  }
+  // console.log("originalTimestamp", originalTimestamp);
+  // const newTimeZone = "Asia/Karachi";
+  // const convertedTime = moment(originalTimestamp).tz(newTimeZone);
+
+  // const currentTime = moment();
+
+  // const diffInMinutes = currentTime.diff(convertedTime, "minutes");
+  // console.log("diffInMinutes", diffInMinutes);
+
+  // if (!isNaN(diffInMinutes) && diffInMinutes <= 5) {
+  //   console.log("The time difference is less than or equal to 5 minutes!");
+  // } else {
+  //   console.log("The time difference is greater than 5 minutes or NaN.");
+  // }
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
