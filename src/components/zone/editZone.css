@@ -1,3 +1,12 @@
+::-webkit-scrollbar {
+  width: 10px !important;
+  background-color: rgb(227, 224, 224) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #29303b !important;
+  border-radius: 7px !important;
+}
 .MuiOutlinedInput-notchedOutline {
   /* border-width: 1px !important; */
   border-color: #d3d3d3 !important;

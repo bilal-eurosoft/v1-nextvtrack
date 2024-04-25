@@ -197,16 +197,46 @@ export default function AddZoneComp() {
     }
   };
 
-  const handleSelectAddressOne = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedIndex = e.target.selectedIndex;
+  const handleSelectAddressOne = (e: any) => {
+    console.log("e", e);
+    // const selectedIndex = e.target.selectedIndex;
     // setSelectedAddress(addresses[selectedIndex]);
-    const latlng = JSON.parse(e.target.value);
+    if (!e) return;
+    const latlng = JSON.parse(e.value);
     if ("lat" in latlng && "lon" in latlng) {
       setSelectLatLng({ lat: latlng.lat, lon: latlng.lon });
     } else {
       console.error("Invalid latlng object:", latlng);
     }
   };
+
+  const handleInputChange = (e: any) => {
+    let query: string = e;
+    if (session) {
+      getSearchAddress({
+        query: query,
+        country: session?.country,
+      })
+        .then((response) => {
+          setAddresses(response);
+        })
+        .catch((error) => {
+          console.log("Error fetching address:", error);
+        });
+    }
+  };
+
+  // const handleAAdressSearch = async (inputValue: any) => {
+  //   console.log("e", inputValue.target.value);
+  //   let query: string = inputValue.target.value;
+  //   if (session) {
+  //     const getAddress = await getSearchAddress({
+  //       query: query,
+  //       country: session?.country,
+  //     });
+  //     setAddresses(getAddress);
+  //   }
+  // };
 
   const SetViewfly = () => {
     const map = useMap();
@@ -215,16 +245,6 @@ export default function AddZoneComp() {
     }
 
     return null;
-  };
-  const handleAAdressSearch = async (e: any) => {
-    let query: string = e.target.value;
-    if (session) {
-      const getAddress = await getSearchAddress({
-        query: query,
-        country: session?.country,
-      });
-      setAddresses(getAddress);
-    }
   };
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -378,8 +398,17 @@ export default function AddZoneComp() {
     { value: "On-Site", label: "On-Site" },
     { value: "Off-Site", label: "Off-Site" },
   ];
+  const optionsCitys: any =
+    addresses?.map((item: any) => ({
+      value: JSON.stringify(item),
+      label: item.display_name,
+    })) || [];
+  // {addresses.map((address, index) => (
+  //   <option key={address.place_id} value={JSON.stringify(address)}>
+  //     {address.display_name}
+  //   </option>
+  // ))}
 
-  console.log("form", Form.GeoFenceType);
   return (
     <div className="shadow-lg bg-bgLight h-5/6  border-t text-white edit_zone_main ">
       <p className="bg-green px-4 py-1 text-black text-center text-2xl text-white font-bold edit_zone_text">
@@ -649,30 +678,49 @@ export default function AddZoneComp() {
             <label className="text-black text-md w-full font-popins font-medium ">
               <b>Please Enter Text To Search </b>
             </label>
-            <input
+            {/* <input
               type="text"
               className="  block py-2 px-0 w-full text-sm text-labelColor bg-white-10 border border-grayLight appearance-none px-3 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-green mb-5"
               placeholder="Search"
               onChange={handleAAdressSearch}
               required
-            />
-            <select
+            /> */}
+
+            <Select
               onChange={handleSelectAddressOne}
-              style={{
-                backgroundColor: "green",
-                width: "100%",
-                marginTop: "4%",
+              onInputChange={handleInputChange}
+              options={optionsCitys}
+              placeholder="Search"
+              isClearable
+              isSearchable
+              noOptionsMessage={() => "No options available"}
+              className="rounded-md w-full outline-green border border-grayLight hover:border-green"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  border: "none",
+                  boxShadow: state.isFocused ? null : null,
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  zIndex: "9999",
+                  backgroundColor: state.isSelected
+                    ? "#00B56C"
+                    : state.isFocused
+                    ? "#e1f0e3"
+                    : "transparent",
+                  color: state.isSelected
+                    ? "white"
+                    : state.isFocused
+                    ? "black"
+                    : "black",
+                  "&:hover": {
+                    backgroundColor: "#e1f0e3",
+                    color: "black",
+                  },
+                }),
               }}
-            >
-              <option selected disabled hidden>
-                Select Value
-              </option>
-              {addresses.map((address, index) => (
-                <option key={address.place_id} value={JSON.stringify(address)}>
-                  {address.display_name}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           {/* <button
             className="text-white px-30px h-10 bg-[#00B56C] "
@@ -740,7 +788,7 @@ export default function AddZoneComp() {
                 <MapContainer
                   zoom={15}
                   center={mapcenter}
-                  className="z-10 edit_zone_map_main"
+                  className="z-0 edit_zone_map_main"
                 >
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

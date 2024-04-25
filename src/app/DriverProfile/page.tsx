@@ -697,7 +697,7 @@ export default function DriverProfile() {
         >
           <h1
             // style={{ fontSize: "19px" }}
-            className=" font-popins font-bold xl:text-xl text-green pt-2"
+            className=" font-popins font-bold xl:text-xl text-green pt-2 text_total_driver"
           >
             Total Active Drivers: {DriverData.length}
           </h1>

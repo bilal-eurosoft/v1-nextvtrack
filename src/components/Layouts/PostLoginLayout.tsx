@@ -1181,12 +1181,12 @@ export default function RootLayout({
                 </Box>
               </div>
               <div className=" grid lg:grid-cols-12 grid-cols-12  lg:gap-5  px-4  header_client_name">
-                <div className="lg:col-span-2 sm:col-span-2  col-span-12 ">
+                <div className="lg:col-span-2 col-span-12 ">
                   <p className="text-white lg:text-start md:text-start text-center font-popins lg:text-2xl md:text-xl sm:text-md ">
                     {session?.clientName}
                   </p>
                 </div>
-                <div className="lg:col-span-4  md:col-span-4 sm:col-span-10  col-span-12 lg:mx-0 md:mx-4 sm:mx-4 mx-4  lg:mt-2">
+                <div className="lg:col-span-4  md:col-span-4 sm:col-span-10  col-span-12 lg:mx-0 md:mx-4 sm:mx-4 mx-4  lg:mt-2 flex items-center">
                   <a className="  text-white text-center font-popins text-xl sm:text-md">
                     <BlinkingTime timezone={session?.timezone} />
                   </a>

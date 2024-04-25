@@ -4,7 +4,7 @@ import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { forgetPasswordClientId } from "@/utils/API_CALLS";
+import { forgetPasswordClientId, expireForgotLink } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { Toaster, toast } from "react-hot-toast";
 
@@ -20,6 +20,7 @@ export default function Verification() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id: any = searchParams.get("q");
+  console.log("reyhh", id);
   // console.log(base64decode(id))
   // const decodedValue = decodeURIComponent(id);
   // console.log(decodedValue);
@@ -41,7 +42,6 @@ export default function Verification() {
     const timeOut = setTimeout(() => {
       setLinkExpire(true);
     }, 60000);
-
     return () => clearTimeout(timeOut);
   }, []);
 
@@ -108,12 +108,20 @@ export default function Verification() {
     }
     router.push("/signin");
   };
+  useEffect(() => {
+    const func = async () => {
+      const result = await expireForgotLink({ link: base64decode(id) });
+      console.log("api update link hit", result);
+    };
+    func();
+  }, []);
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
   const handleShowPasswordConfirm = () => {
     setshowConfirmPassword(!showConfirmPassword);
   };
+
   return (
     <div
       className="w-100 h-screen bg-no-repeat bg-cover bg-center"

@@ -1,6 +1,7 @@
 import { IgnitionReport, replayreport } from "@/types/IgnitionReport";
 import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
+import { error } from "console";
 var URL = "https://backend.vtracksolutions.com";
 // var URL = 'http://172.16.10.47:80'
 
@@ -85,6 +86,43 @@ export async function vehicleListByClientId({
     console.log("Error fetching data");
     return [];
   }
+}
+// export async function expireForgotLink({
+//   token,
+//   clientId,
+// }: {
+//   token: any;
+//   clientId: any;
+// }) {
+//   try {
+//     const response = await fetch(`${URL}/forgotpassword/UpdateLink`, {
+//       headers: {
+//         accept: "application/json, text/plain, */*",
+//         authorization: `Bearer ${token}`,
+//         "content-type": "application/json",
+//       },
+//       body: `{\"clientId\":\"${clientId}\"}`,
+//       method: "POST",
+//     });
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch data from the API");
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.log("Error fetching data");
+//     return [];
+//   }
+// }
+export function expireForgotLink(payload: any) {
+  const ressult = axios
+    .post(`http://hammadserver:3010/forgotpassword/UpdateLink`, payload)
+    .then((response: any) => response?.data)
+    .catch((error) => {
+      console.log("Error Expire Update Link", error);
+    });
+  console.log("result", ressult);
+  return ressult;
 }
 
 export async function getAllVehicleByUserId({
@@ -350,15 +388,18 @@ export async function forgetEmailByClientId({
   newformdata: any;
 }) {
   try {
-    const response = await fetch(`${URL}/forgotpassword/forgotpassword`, {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(newformdata),
-    });
+    const response = await fetch(
+      `http://172.16.10.99:3010/forgotpassword/forgotpassword`,
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(newformdata),
+      }
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
     }
@@ -407,15 +448,18 @@ export async function forgetPasswordByClientId({
   link: any;
 }) {
   try {
-    const response = await fetch(`${URL}/forgotpassword/GetByLink`, {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(newformdata),
-    });
+    const response = await fetch(
+      `http://hammadserver/forgotpassword/GetByLink`,
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(newformdata),
+      }
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
     }

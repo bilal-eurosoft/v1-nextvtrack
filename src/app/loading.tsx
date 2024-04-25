@@ -17,7 +17,7 @@ const Loading = () => {
       <div role="status">
         <svg
           aria-hidden="true"
-          className="inline fixed top-20 right-0 bottom-0 left-0 m-auto w-12 h-12  text-green animate-spin dark:text-green fill-black"
+          className="inline fixed top-20 right-0 bottom-0 left-0 m-auto lg:w-12 lg:h-12 md:w-12 md:h-12 sm:w-12 sm:h-12 w-10 h-10  text-green animate-spin dark:text-green fill-black"
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

@@ -53,8 +53,8 @@
 
 @media (max-width: 600px) {
   .loading_all_page {
-    height: 7.5vh;
-    width: 22%;
+    width: 25%;
+    height: 5vh !important;
     margin-top: -3%;
   }
 }
