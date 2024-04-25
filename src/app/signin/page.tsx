@@ -185,7 +185,6 @@ export default function LoginPage() {
             }}
           >
             <Image src={loadings} alt="" className="loading_all_page" />
-            <br></br>
           </div>
           <div role="status">
             <svg

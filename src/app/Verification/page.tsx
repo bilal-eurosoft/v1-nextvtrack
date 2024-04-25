@@ -13,6 +13,7 @@ import logo from "../../../public/Images/logo.png";
 import { base64encode, base64decode } from "nodejs-base64";
 
 import "./verification.css";
+import { Button } from "@mui/material";
 export default function Verification() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState<boolean>(false);
@@ -39,12 +40,12 @@ export default function Verification() {
     setFormData({ ...formData, [key]: e.target.value });
   };
 
-  useEffect(() => {
-    const timeOut = setTimeout(() => {
-      setLinkExpire(true);
-    }, 60000);
-    return () => clearTimeout(timeOut);
-  }, []);
+  // useEffect(() => {
+  //   const timeOut = setTimeout(() => {
+  //     setLinkExpire(true);
+  //   }, 60000);
+  //   return () => clearTimeout(timeOut);
+  // }, []);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -113,39 +114,23 @@ export default function Verification() {
   useEffect(() => {
     const func = async () => {
       const result = await expireForgotLink({ link: base64decode(id) });
-      // console.log("api update link hit", result);
       setExpireLink(result);
     };
     func();
   }, []);
-  console.log("result", expireLink);
-  if (expireLink) {
-    const timestamps: any = new Date(expireLink.timestamp);
-    const currentTimes: any = new Date();
-    const timeDifference = currentTimes - timestamps;
+
+  useEffect(() => {
+    const originalTimestamp: any = new Date(expireLink.timestamp);
+    const currentTimestamp: any = new Date();
+    const timeDifference = currentTimestamp - originalTimestamp;
+
     if (timeDifference >= 5 * 60 * 1000) {
-      console.log("5 minutes or more");
-      return;
+      setLinkExpire(true);
     } else {
-      console.log("is less than 5 minutes");
-      // If the difference is less than 5 minutes, return false
-      // return ;
+      setLinkExpire(false);
     }
-  }
-  // console.log("originalTimestamp", originalTimestamp);
-  // const newTimeZone = "Asia/Karachi";
-  // const convertedTime = moment(originalTimestamp).tz(newTimeZone);
+  }, [expireLink.timestamp]);
 
-  // const currentTime = moment();
-
-  // const diffInMinutes = currentTime.diff(convertedTime, "minutes");
-  // console.log("diffInMinutes", diffInMinutes);
-
-  // if (!isNaN(diffInMinutes) && diffInMinutes <= 5) {
-  //   console.log("The time difference is less than or equal to 5 minutes!");
-  // } else {
-  //   console.log("The time difference is greater than 5 minutes or NaN.");
-  // }
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -195,9 +180,31 @@ export default function Verification() {
             </div>
 
             {lineExpire ? (
-              <h2 className="text-2xl font-bold text-white font-popins py-16 text-center">
-                Link Has Been Expire Please Try Again
-              </h2>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%",
+                  flexDirection: "column",
+                }}
+              >
+                <h2 className="text-2xl font-bold text-white font-popins py-16 text-center">
+                  Link Has Been Expire Please Try Again
+                </h2>
+                <Button
+                  onClick={() => router.push("/signin")}
+                  style={{
+                    backgroundColor: "#00b56c",
+                    color: "white",
+                    width: "30%",
+                    margin: "0 auto",
+                    display: "block",
+                    marginBottom: "3%",
+                  }}
+                >
+                  Back To Sign In
+                </Button>
+              </div>
             ) : (
               <div>
                 <p className="mt-5 text-start   font-popins text-2xl  leading-9 tracking-tight text-white px-5">
