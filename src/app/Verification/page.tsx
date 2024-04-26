@@ -118,7 +118,10 @@ export default function Verification() {
     };
     func();
   }, []);
-
+  // const originalTimestamp: any = new Date(expireLink.timestamp);
+  // const currentTimestamp: any = expireLink.timestamp;
+  // console.log(originalTimestamp);
+  // console.log("currentTimestamp", currentTimestamp);
   useEffect(() => {
     const originalTimestamp: any = new Date(expireLink.timestamp);
     const currentTimestamp: any = new Date();
@@ -129,7 +132,7 @@ export default function Verification() {
     } else {
       setLinkExpire(false);
     }
-  }, [expireLink.timestamp]);
+  }, [expireLink?.timestamp]);
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);

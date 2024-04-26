@@ -18,7 +18,10 @@
   margin-left: 20px;
   display: none;
 }
-
+.delete_zone_button {
+  margin-left: 20%;
+  margin-top: -18%;
+}
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -215,6 +218,10 @@
   .zone_form {
     height: 27vh !important;
   }
+  .delete_zone_button {
+    margin-left: 20%;
+    margin-top: -1%;
+  }
 }
 @media (max-width: 769px) and (min-width: 760px) {
   .table_scroll {
@@ -243,6 +250,10 @@
   .table_scroll {
     margin-top: 15%;
   }
+  .delete_zone_button {
+    margin-left: 20%;
+    margin-top: -1%;
+  }
 
   .zone_form {
     height: auto !important;
@@ -267,6 +278,11 @@
 @media (max-width: 501px) and (min-width: 400px) {
   .table_scroll {
     margin-top: 15%;
+  }
+
+  .delete_zone_button {
+    margin-left: 20%;
+    margin-top: -1%;
   }
 
   .zone_form {
@@ -295,6 +311,11 @@
   margin-left: 1.5rem !important;
 } */
 @media (max-width: 399px) {
+  .delete_zone_button {
+    margin-left: 20%;
+    margin-top: -1%;
+  }
+
   .table_scroll {
     margin-top: 15%;
   }

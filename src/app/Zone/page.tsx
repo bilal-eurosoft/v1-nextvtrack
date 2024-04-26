@@ -1208,8 +1208,8 @@ export default function Zone() {
                               onClick={() => deleteSelectedZones(item.id)}
                             >
                               <DeleteIcon
-                                className="text-white bg-red p-1 h-7 w-8 rounded-md shadow-md hover:shadow-gray transition duration-500 "
-                                style={{ marginTop: "-18%", marginLeft: "20%" }}
+                                className="text-white bg-red p-1 h-7 w-8 rounded-md shadow-md hover:shadow-gray transition duration-500 delete_zone_button"
+                          
                               />
                             </button>
 
