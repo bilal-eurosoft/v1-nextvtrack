@@ -274,11 +274,11 @@ const LiveSidebar = ({
                 </div>
                 <div
                   className=" xl:col-span-2 lg:col-span-3 md:col-span-3 sm:col-span-3 col-span-3"
-                  style={{
-                    display: "flex",
-                    justifyContent: "start",
-                    marginLeft: "-15%",
-                  }}
+                  // style={{
+                  //   display: "flex",
+                  //   justifyContent: "start",
+                  //   marginLeft: "-15%",
+                  // }}
                   id="btn_left_margin"
                 >
                   <button

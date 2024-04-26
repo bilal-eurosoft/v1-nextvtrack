@@ -12,7 +12,11 @@
 .leaflet-marker-icon.custom-icon.leaflet-zoom-animated.leaflet-interactive {
   margin-top: -45px !important;
 }
-
+#btn_left_margin {
+  display: flex;
+  justify-content: center;
+  /* margin-left: -1%; */
+}
 ::-webkit-scrollbar {
   width: 10px;
   background-color: rgb(227, 224, 224);
@@ -163,6 +167,11 @@ input[type="checkbox"]:hover {
   .vehicle_summary {
     height: 7vh !important;
   }
+  #btn_left_margin {
+    display: flex;
+    justify-content: center;
+    margin-left: -5%;
+  }
   .search_live_tracking {
     display: flex !important;
     align-items: center !important;
@@ -189,6 +198,11 @@ input[type="checkbox"]:hover {
 @media (max-width: 320px) {
   .vehicle_summary {
     height: 10vh !important;
+  }
+  #btn_left_margin {
+    display: flex;
+    justify-content: center;
+    margin-left: -5% !important;
   }
   .search_live_tracking {
     display: flex !important;

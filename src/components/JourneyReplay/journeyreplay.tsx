@@ -2238,7 +2238,7 @@ export default function journeyReplayComp() {
 
                   {loadingMap ? (
                     <Polyline
-                      pathOptions={{ color: "red", weight: 12 }}
+                      pathOptions={{ color: "red", weight: 6 }}
                       positions={polylinedata}
                     />
                   ) : (

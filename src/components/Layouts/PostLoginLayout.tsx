@@ -1226,11 +1226,11 @@ export default function RootLayout({
                       </div> */}
                       <div className="grid grid-cols-12">
                         <div className="col-span-2">
-                          <img
+                          {/* <img
                             className="mb-5 w-10 lg:h-10 h-10 rounded-full"
                             src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
                             alt="Rounded avatar"
-                          />
+                          /> */}
                         </div>
                         <div className="col-span-9 ms-2 text-lg font-popins text-start text-black">
                           <p className="text-2xl text-center">

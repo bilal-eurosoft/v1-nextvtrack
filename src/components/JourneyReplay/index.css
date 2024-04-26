@@ -243,11 +243,11 @@ input[type="checkbox"]:hover {
   }
   .trips_journey {
     grid-column: 2 span;
-    width: 63%;
+    width: 75%;
   }
   .journey_map {
     grid-column: 3 span;
-    margin-left: -11.6%;
+    margin-left: -7.7%;
   }
   .journey_replay_harsh_child {
     grid-column: 1 span;
@@ -297,11 +297,11 @@ input[type="checkbox"]:hover {
   }
   .trips_journey {
     grid-column: 2 span;
-    width: 72%;
+    width: 79%;
   }
   .journey_map {
     grid-column: 3 span;
-    margin-left: -8.8%;
+    margin-left: -6.8%;
   }
   .journey_heading {
     height: 6vh;
