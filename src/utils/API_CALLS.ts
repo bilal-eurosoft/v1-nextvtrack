@@ -922,16 +922,24 @@ export async function getSearchAddress({
     }
   //   const data = await response.json();
   console.log("frtgfbhjn", response) */
-    var response = await axios
-      .get(
-        `http://osm.vtracksolutions.com/nominatim/search.php?q=${query}+${country}&format=json`
-      )
-      .then(async (response) => {
-        //console.log("Response data:", response, response.data)
-        return response.data;
-      });
+    const response = await fetch(
+      `http://osm.vtracksolutions.com/nominatim/search.php?q=${query}+${country}&format=json`,
+      {
+        method: "GET",
+        headers: {
+          accept: "application/json, text/plain, */*",
+          "content-type": "application/json",
+        },
+      }
+    );
 
-    return response;
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+
+    const data = await response.json();
+
+    return data;
     /* console.log("Response data:", response);
 const data = await response.json();
 console.log("Response data:", data); */
