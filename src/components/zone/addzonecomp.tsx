@@ -24,6 +24,8 @@ import SaveIcon from "@mui/icons-material/Save";
 import ClearIcon from "@mui/icons-material/Clear";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import { EditControl } from "react-leaflet-draw";
+
 import "./editZone.css";
 const MapContainer = dynamic(
   () => import("react-leaflet").then((module) => module.MapContainer),
@@ -35,10 +37,6 @@ const TileLayer = dynamic(
 );
 const FeatureGroup = dynamic(
   () => import("react-leaflet").then((module) => module.FeatureGroup),
-  { ssr: false }
-);
-const EditControl = dynamic(
-  () => import("react-leaflet-draw").then((module) => module.EditControl),
   { ssr: false }
 );
 

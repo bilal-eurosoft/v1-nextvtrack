@@ -50,7 +50,6 @@ export function calculateZoomCenter(data: TravelHistoryData[]) {
   if (zoomlevel > 18) {
     zoomlevel = 18;
   }
-  console.log("zoomlevel", zoomlevel);
   return { zoomlevel, centerLat, centerLng };
 }
 
