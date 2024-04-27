@@ -392,18 +392,15 @@ export async function forgetEmailByClientId({
   newformdata: any;
 }) {
   try {
-    const response = await fetch(
-      `http://172.16.10.99/forgotpassword/forgotpassword`,
-      {
-        method: "POST",
-        headers: {
-          accept: "application/json, text/plain, */*",
-          authorization: `Bearer ${token}`,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(newformdata),
-      }
-    );
+    const response = await fetch(`${URL}/forgotpassword/forgotpassword`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(newformdata),
+    });
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
     }
@@ -452,18 +449,15 @@ export async function forgetPasswordByClientId({
   link: any;
 }) {
   try {
-    const response = await fetch(
-      `http://hammadserver/forgotpassword/GetByLink`,
-      {
-        method: "POST",
-        headers: {
-          accept: "application/json, text/plain, */*",
-          authorization: `Bearer ${token}`,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(newformdata),
-      }
-    );
+    const response = await fetch(`${URL}/forgotpassword/GetByLink`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(newformdata),
+    });
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
     }

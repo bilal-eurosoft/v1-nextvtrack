@@ -115,6 +115,9 @@
   .edit_zone_main {
     height: 87vh;
   }
+  #add_zone_redraw_btn {
+    margin-top: 3%;
+  }
   .edit_zone_text {
     height: 6vh !important;
   }

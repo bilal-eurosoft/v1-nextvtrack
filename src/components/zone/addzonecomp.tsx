@@ -737,6 +737,7 @@ export default function AddZoneComp() {
               color: "white",
               border: "none",
             }}
+            id="add_zone_redraw_btn"
             startIcon={
               <span style={{ fontWeight: "600" }}>
                 <EditRoadIcon className="-mt-1" />
