@@ -1,6 +1,7 @@
 import { IgnitionReport, replayreport } from "@/types/IgnitionReport";
 import { zonelistType } from "@/types/zoneType";
-
+import axios from "axios";
+import { error } from "console";
 var URL = "https://backend.vtracksolutions.com";
 // var URL = 'http://172.16.10.47:80'
 
@@ -85,6 +86,47 @@ export async function vehicleListByClientId({
     console.log("Error fetching data");
     return [];
   }
+}
+// export async function expireForgotLink({
+//   token,
+//   clientId,
+//   payload
+// }: {
+//   token: any;
+//   clientId: any;
+//   payload: any;
+// }) {
+//   try {
+//     const response = await fetch(
+//       `http://hammadserver:3010/forgotpassword/UpdateLink`,
+//       {
+//         headers: {
+//           accept: "application/json, text/plain, */*",
+//           authorization: `Bearer ${token}`,
+//           "content-type": "application/json",
+//         },
+//         body: `{\"clientId\":\"${clientId}\"}`,
+//         method: "POST",
+//       }
+//     );
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch data from the API");
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.log("Error fetching data");
+//     return [];
+//   }
+// }
+export function expireForgotLink(payload: any) {
+  const ressult = axios
+    .post(`http://172.16.10.99/forgotpassword/UpdateLink`, payload)
+    .then((response: any) => response?.data)
+    .catch((error) => {
+      console.log("Error Expire Update Link", error);
+    });
+  return ressult;
 }
 
 export async function getAllVehicleByUserId({
@@ -861,7 +903,53 @@ export async function modifyCollectionStatus({
     return [];
   }
 }
+export async function getSearchAddress({
+  query,
+  country,
+}: {
+  query: string;
+  country: string;
+}) {
+  try {
+    /* const response = await fetch(
+      `http://osm.vtracksolutions.com/nominatim/search.php?q=${query}+Pakistan&format=json`,
+      {
+        method: "GET",
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+  //   const data = await response.json();
+  console.log("frtgfbhjn", response) */
+    const response = await fetch(
+      `https://backend.vtracksolutions.com/zoneaddresssearch?q=${query},${country}`,
+      {
+        method: "GET",
+        headers: {
+          accept: "application/json, text/plain, */*",
+          "content-type": "application/json",
+          "Content-Security-Policy": "default-src 'self' https: http:",
+        },
+      }
+    );
 
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+
+    const data = await response.json();
+
+    return data;
+    /* console.log("Response data:", response);
+const data = await response.json();
+console.log("Response data:", data); */
+    //  return data;
+  } catch (error) {
+    console.log("Error fetching data", error);
+    return [];
+  }
+}
 export async function postZoneDataByClientId({
   token,
   newformdata,

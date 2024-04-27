@@ -1023,7 +1023,6 @@ export default function journeyReplayComp() {
     if (!e) {
       return setIgnitionreport((prevReport: any) => ({
         ...prevReport,
-        // VehicleReg: null,
         period: "",
       }));
     }
@@ -1187,9 +1186,13 @@ export default function journeyReplayComp() {
           })}
         </div> */}
         {/* <p className="bg-[#00B56C] px-4 py-1 text-white">JourneyReplay</p> */}
-        <div className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-5 px-4 text-start  bg-bgLight select_box_journey">
+        <div
+          className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-2
+         lg:px-4 text-start  bg-bgLight select_box_journey"
+        >
           <div
-            className="xl:col-span-1 lg:col-span-2 md:col-span-2  col-span-12
+            className="xl:col-span-1 lg:col-span-2 md:col-span-3   col-span-12
+            select_box_column 
           "
             // style={{ gridColumnEnd: "span 1.5" }}
           >
@@ -1201,7 +1204,7 @@ export default function journeyReplayComp() {
               isClearable
               isSearchable
               noOptionsMessage={() => "No options available"}
-              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green select_vehicle"
               styles={{
                 control: (provided, state) => ({
                   ...provided,
@@ -1333,7 +1336,7 @@ export default function journeyReplayComp() {
               autoOk
             />
           </MuiPickersUtilsProvider> */}
-          <div className="xl:col-span-3 lg:col-span-4 md:col-span-6 col-span-12">
+          <div className="xl:col-span-3 lg:col-span-4 md:col-span-6 col-span-12 days_select">
             {getShowRadioButton ? (
               <div className="grid lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-12  -mt-2  grid-cols-12  xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2 flex justify-center ">
                 <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0  ">
@@ -1388,12 +1391,15 @@ export default function journeyReplayComp() {
                 className="grid xl:grid-cols-11 lg:grid-cols-12  md:grid-cols-12 grid-cols-12 -mt-2 "
                 // style={{ display: "flex", justifyContent: "start" }}
               >
-                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2 col-span-4">
+                <div
+                  className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2 col-span-4 period_select"
+                  id="today_journey"
+                >
                   <label className="text-sm text-black font-bold font-popins ">
                     <input
                       type="radio"
-                      className="w-5 lg:w-4 pt-10 form-radio  "
-                      style={{ accentColor: "green", height: "1.5vh" }}
+                      className="w-5 h-4 form-radio"
+                      style={{ accentColor: "green" }}
                       name="period"
                       disabled={loading}
                       value="today"
@@ -1404,31 +1410,34 @@ export default function journeyReplayComp() {
                   </label>
                 </div>
 
-                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2  lg:-ms-4 col-span-4 ">
+                <div className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2  lg:-ms-4 col-span-4 period_select">
                   <label className="text-sm  text-black font-bold font-popins  w-full pt-3 ">
                     <input
                       type="radio"
-                      className="lg:w-5 w-3 lg:w-4 md:w-4 md:-ms-3 lg:-ms-0 xl:-ms-0 -ms-2   form-radio text-green"
+                      className="lg:w-5 w-4  md:w-4 h-4 md:-ms-3 -ms-0 lg:-ms-0 xl:-ms-0   form-radio text-green"
                       name="period"
+                      id="yesterday_radio_button"
                       disabled={loading}
                       value="yesterday"
-                      style={{ accentColor: "green", height: "1.5vh" }}
+                      style={{ accentColor: "green" }}
                       checked={Ignitionreport?.period === "yesterday"}
                       onChange={handleInputChange}
                     />
-                    &nbsp;Yesterday
+                    <span className="lg:ms-1 md:ms-1 sm:ms-1 ms-2">
+                      Yesterday
+                    </span>
                   </label>
                 </div>
 
-                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3  lg:-ms-1 col-span-4">
+                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3  lg:-ms-1 col-span-4 period_select">
                   <label className="text-sm text-black font-bold font-popins  ">
                     <input
                       type="radio"
-                      className="w-5 lg:w-4  "
+                      className="w-5 h-4 lg:w-4  "
                       name="period"
                       disabled={loading}
                       value="week"
-                      style={{ accentColor: "green", height: "1.5vh" }}
+                      style={{ accentColor: "green" }}
                       checked={Ignitionreport?.period === "week"}
                       onChange={handleInputChange}
                     />
@@ -1436,15 +1445,19 @@ export default function journeyReplayComp() {
                   </label>
                 </div>
 
-                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3 -ms-4 col-span-4 margin_custom">
+                <div
+                  className="xl:col-span-2 lg:col-span-3 md:col-span-3 lg:-ms-4
+                md:-ms-4 sm:-ms-4 -ms-0 col-span-3 period_select_custom"
+                  id="custom_journey"
+                >
                   <label className="text-sm text-black font-bold font-popins ">
                     <input
                       type="radio"
-                      className="w-5  lg:w-4 "
+                      className="w-5 h-4  lg:w-4 "
                       disabled={loading}
                       name="period"
                       value="custom"
-                      style={{ accentColor: "green", height: "1.5vh" }}
+                      style={{ accentColor: "green" }}
                       checked={Ignitionreport?.period === "custom"}
                       onChange={handleInputChange}
                       onClick={handleClick}
@@ -1519,7 +1532,7 @@ export default function journeyReplayComp() {
             )}
           </div>
 
-          <div className="xl:col-span-1 lg:col-span-1 md:col-span-4 col-span-12 text-white font-bold flex justify-center items-center mt-2">
+          <div className="xl:col-span-1 lg:col-span-1 md:col-span-1 col-span-12 text-white font-bold flex justify-center items-center mt-2 journey_replay_search">
             {/* {clearMapData ? (
               <button
                 onClick={handleClickClear}
@@ -1544,7 +1557,7 @@ export default function journeyReplayComp() {
             )} */}
             <div
               onClick={(e) => seacrhLoading && handleSubmit(e)}
-              className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    
+              className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    search_btn_journey
                     ${
                       (Ignitionreport?.VehicleReg &&
                         Ignitionreport?.period === "today") ||
@@ -1563,9 +1576,9 @@ export default function journeyReplayComp() {
             >
               <div className="col-span-3">
                 <svg
-                  className="h-11 py-3 px-2 w-full text-white"
-                  width="24"
-                  height="24"
+                  className="lg:h-18 lg:w-10 md:h-12 md:w-12 sm:h-10 sm:w-10 h-12 w-12 py-3 px-2  text-white"
+                  // width="24"
+                  // height="24"
                   viewBox="0 0 24 24"
                   strokeWidth="4"
                   stroke="currentColor"
@@ -1579,7 +1592,7 @@ export default function journeyReplayComp() {
                   <line x1="21" y1="21" x2="15" y2="15" />
                 </svg>
               </div>
-              <div className="col-span-8">
+              <div className="lg:col-span-8 md:col-span-8">
                 <button>Search</button>
               </div>
             </div>
@@ -1605,13 +1618,19 @@ export default function journeyReplayComp() {
             </button> */}
           </div>
 
-          <div className="xl:col-span-3 lg:col-span-1 col-span-12 "> </div>
+          <div className="xl:col-span-3 lg:col-span-1 md:col-span-12 col-span-12 journey_replay_harsh">
+            {" "}
+          </div>
           {TravelHistoryresponse.length > 0 && (
-            <div className="xl:col-span-1 lg:col-span-2 col-span-6  -mt-1 ">
+            <div className="xl:col-span-1 lg:col-span-2  md:col-span-12 col-span-6  -mt-1 journey_replay_harsh_child  ">
               <div className="grid grid-cols-12  ">
                 <div className="col-span-2">
-                  <Image src={markerA} alt="harshIcon" className="h-6" />
-                  <Image src={markerB} alt="harshIcon" className="h-6 mt-1" />
+                  <Image
+                    src={markerA}
+                    alt="harshIcon"
+                    className="h-6 journay_HarshAcceleration"
+                  />
+                  <Image src={markerB} alt="harshIcon" className="h-6 mt-1 " />
                 </div>
                 <div className="col-span-10 text-sm font-semibold">
                   location Start
@@ -1621,7 +1640,7 @@ export default function journeyReplayComp() {
               </div>
             </div>
           )}
-          <div className="xl:col-span-1  lg:col-span-2 col-span-6 mt-1 -ms-5 mb-3">
+          <div className="xl:col-span-1  lg:col-span-2 md:col-span-1 col-span-6 mt-1 -ms-5 mb-3 journey_replay_harsh_acce">
             {TravelHistoryresponse.filter((item: any) => {
               return (
                 item.vehicleEvents.filter(
@@ -1634,7 +1653,7 @@ export default function journeyReplayComp() {
                   <Image
                     src={HarshAccelerationIcon}
                     alt="harshIcon "
-                    className="h-6 "
+                    className="h-6 journay_HarshAcceleration"
                   />
                 </div>
                 <div className="col-span-10 text-sm font-semibold">
@@ -1664,7 +1683,7 @@ export default function journeyReplayComp() {
                   <Image
                     src={harshAcceleration}
                     alt="harshIcon"
-                    className="h-6 mt-1"
+                    className="h-6 mt-1 journay_HarshAcceleration"
                   />
                 </div>
                 <div className="col-span-10 text-sm">
@@ -1686,8 +1705,8 @@ export default function journeyReplayComp() {
           </div>
         </div>
         <div className="grid lg:grid-cols-5  sm:grid-cols-5 md:grid-cols-12 sm:grid-cols-12 grid-cols-1 journey_sidebar">
-          <div className="xl:col-span-1 lg:col-span-2 md:col-span-5 sm:col-span-12 col-span-4 ">
-            <p className="bg-green px-4 py-1 text-white font-semibold journey_sidebar_text">
+          <div className="xl:col-span-1 lg:col-span-2 md:col-span-5 sm:col-span-12 col-span-4 trips_journey">
+            <p className="bg-green px-4 py-1 text-white font-semibold journey_sidebar_text flex items-center">
               Trips ({dataresponse?.length})
             </p>
             <div
@@ -2219,7 +2238,7 @@ export default function journeyReplayComp() {
 
                   {loadingMap ? (
                     <Polyline
-                      pathOptions={{ color: "red", weight: 12 }}
+                      pathOptions={{ color: "red", weight: 6 }}
                       positions={polylinedata}
                     />
                   ) : (
@@ -2400,13 +2419,13 @@ export default function journeyReplayComp() {
             </div>
 
             <div className="absolute lg:top-4 lg:left-20 lg:right-5 left-12 top-6 right-2 grid lg:grid-cols-10 md:grid-cols-10 sm:grid-cols-10 grid-cols-10 lg:mt-0 ">
-              <div className="xl:col-span-2 mr-5 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6">
+              <div className="xl:col-span-2 mr-5 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6 stop_journey">
                 <div
                   className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg  rounded-md cursor-pointer"
                   onClick={() => stopDetailsOpen && handleShowDetails()}
                 >
-                  <div className="lg:col-span-11  md:col-span-10 sm:col-span-10 col-span-11">
-                    <p className="text-white lg:px-3 ps-1 text-lg">
+                  <div className="lg:col-span-11  md:col-span-10 sm:col-span-10 col-span-11 stop_details_responsive">
+                    <p className="text-white lg:px-3 ps-1 text-lg text_responsive">
                       Stop Details ({loadingMap ? stops.length : ""})
                     </p>
                   </div>
@@ -2453,7 +2472,7 @@ export default function journeyReplayComp() {
                 </div>
 
                 {getShowdetails ? (
-                  <div className="bg-white lg:h-60 md:h-60 sm:h-60 h-16 overflow-y-scroll">
+                  <div className="bg-white lg:h-60 md:h-60 sm:h-60 h-24 overflow-y-scroll resposive_stop_details">
                     {stops?.map((item: any) => {
                       return loadingMap ? (
                         <div
@@ -2461,12 +2480,12 @@ export default function journeyReplayComp() {
                           className="cursor-pointer"
                         >
                           <p className="text-black font-popins px-3 py-3 text-sm">
-                            <b> {item?.address?.substring(0, 50)}</b>
+                            <b>{item?.address?.substring(0, 50)}</b>
                           </p>
 
                           <div className="grid grid-cols-12">
                             <div className="lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-2"></div>
-                            <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-7  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red">
+                            <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
                               {moment(item?.date)
                                 .tz("Europe/London")
                                 .format("HH:mm:ss A")}
@@ -2517,7 +2536,7 @@ export default function journeyReplayComp() {
               </div> */}
               {zoneList !== null && zoneList.length > 0 && (
                 <div
-                  className="grid grid-cols-1 absolute lg:top-10 xl:top-1 md:top-10 top-0 xl:right-10 lg:right-10 md:right-10 sm:right-10 right-1  bg-bgLight py-2 px-2"
+                  className="grid grid-cols-1 absolute lg:top-10 xl:top-1 md:top-10 top-0 xl:right-10 lg:right-10 md:right-10 sm:right-10 right-1  bg-bgLight py-2 px-2 show_zone_journey_replay"
                   style={{
                     borderRadius: "10px",
                     borderColor: "green",
@@ -2602,7 +2621,7 @@ export default function journeyReplayComp() {
               className="grid lg:grid-cols-10  grid-cols-10"
               id="speed_meter"
             >
-              <div className="col-span-2  lg:w-52 md:w-44 sm:w-44 w-44 rounded-md ">
+              <div className="col-span-2  lg:w-52 md:w-44 sm:w-44 w-48 rounded-md ">
                 {isPlaying || isPaused ? (
                   <div>
                     {/* <ReactSpeedometer
@@ -2643,7 +2662,11 @@ export default function journeyReplayComp() {
                 ) : null}
 
                 {isPaused && (
-                  <p className="bg-bgPlatBtn text-white mt-3 w-full px-2 py-3 rounded-md">
+                  <p
+                    className="bg-bgPlatBtn text-white mt-3 w-full px-2 py-3 rounded-md
+                  trip_address
+                  "
+                  >
                     {TripAddressData}
                   </p>
                 )}
@@ -2679,10 +2702,12 @@ export default function journeyReplayComp() {
               //   right: "5%",
               //   bottom: "0%",
               // }}
-              className="absolute xl:left-56 lg:left-10 xl:right-20 lg:right-10 xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8  bottom-2  left-1 right-3"
+              className="absolute xl:left-56 lg:left-10 xl:right-20 lg:right-10 xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8  bottom-2  left-1 right-3
+              journey_replay_center_box
+              "
             >
               <div className="grid xl:grid-cols-7 lg:grid-cols-12 md:grid-12 grid-cols-12 lg:gap-5 gap-2 ">
-                <div className="xl:col-span-1 mt-5  lg:col-span-4 md:col-span-4 col-span-4  ">
+                <div className="xl:col-span-1 mt-5  lg:col-span-4 md:col-span-4 col-span-4">
                   {/* <div className="bg-bgPlatBtn rounded-md">
                     <div className="lg:text-xl text-white font-medium text-center  py-2 text-md mx-1">
                       <BlinkingTime timezone={session?.timezone} />
@@ -2698,7 +2723,7 @@ export default function journeyReplayComp() {
                           }`}
                         >
                           <svg
-                            className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6  mx-1 "
+                            className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6  mx-1"
                             // style={{
                             //   color: stopVehicle === true ? "gray" : "white",
                             // }}
@@ -2770,10 +2795,10 @@ export default function journeyReplayComp() {
                     </div>
                   </div> */}
                 </div>
-                <div className="xl:col-span-4 lg:col-span-8 col-span-12   ">
-                  <div className="grid lg:grid-cols-12 grid-cols-12 gap-1 lg:py-5 py-2 mt-8 pt-4 lg:pt-4 rounded-md  mx-2 px-5 bg-white space-x-4">
+                <div className="xl:col-span-4 lg:col-span-8 col-span-12  journey_replay_slider ">
+                  <div className="grid lg:grid-cols-12 grid-cols-12 gap-1 lg:py-5 py-2 mt-8 pt-4 lg:pt-4 rounded-md  mx-2 px-5 bg-white space-x-4 ">
                     <div
-                      className="lg:col-span-10 col-span-8"
+                      className="lg:col-span-10 md:col-span-9 col-span-8 journey_replay_slider_res"
                       // style={{ height: "4vh" }}
                     >
                       <Slider
@@ -2808,7 +2833,7 @@ export default function journeyReplayComp() {
                             {isDynamicTime.TripStartTimeLabel}
                           </div>
                           {/* <div className="col-span-3"></div> */}
-                          <div className="col-span-6">
+                          <div className="col-span-6 play_pause_icon">
                             <Tooltip content="Pause" className="bg-black">
                               <button
                                 onClick={() => pausebtn && pauseTick()}
@@ -2819,7 +2844,7 @@ export default function journeyReplayComp() {
                                 }`}
                               >
                                 <svg
-                                  className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6  mx-1 "
+                                  className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6 mx-1"
                                   // style={{
                                   //   color: stopVehicle === true ? "gray" : "white",
                                   // }}
@@ -2931,7 +2956,7 @@ export default function journeyReplayComp() {
                       </div> */}
                     </div>
 
-                    <div className="lg:col-span-2 col-span-4 mt-2">
+                    <div className="lg:col-span-2 md:col-span-3 col-span-4 mt-2 select_journey_speed">
                       {isPlaying && (
                         // <Select
                         //   className="text-black  outline-green border h-8 w-16 border-grayLight px-1"

@@ -6,7 +6,12 @@ class MyDocument extends Document {
   render() {
     return (
       <Html>
-        <Head />
+        <Head>
+          <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' https: data:; font-src 'self' https: data:; frame-src https:;"
+          />
+        </Head>
         <body>
           <Main />
           <NextScript />

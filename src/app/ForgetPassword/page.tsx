@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { forgetEmailByClientId } from "@/utils/API_CALLS";
+import { forgetEmailByClientId, expireForgotLink } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { Toaster, toast } from "react-hot-toast";
 
@@ -31,52 +31,53 @@ export default function ForgetPassword() {
       ...formData,
       clientId: session?.clientId,
     };
-
-    const response = await forgetEmailByClientId({
-      token: session?.accessToken,
-      newformdata: newformdata,
-    });
-
-    // {
-    //   loading: "Saving data...",
-    //   error: "Error saving data. Please try again.",
-    // },
-    // {
-    // style: {
-    //   border: "1px solid #00B56C",
-    //   padding: "16px",
-    //   color: "#1A202C",
-    // },
-    // success: {
-    //   duration: 2000,
-    //   iconTheme: {
-    //     primary: "#00B56C",
-    //     secondary: "",
-    //   },
-    // },
-    // error: {
-    //   duration: 2000,
-    //   iconTheme: {
-    //     primary: "#00B56C",
-    //     secondary: "#FFFAEE",
-    //   },
-    // },
-    // }
-    // );
-
-    setFormData({
-      userName: "",
-      email: "",
-    });
-    if (response.Msg == "Reset Link send successfully") {
-      setshowVerificationText(true);
-      toast.success(response.Msg, {
-        position: "top-center",
+    if (showVerificationText == false) {
+      const response = await forgetEmailByClientId({
+        token: session?.accessToken,
+        newformdata: newformdata,
       });
-    } else {
-      toast.error(response.Msg, {
-        position: "top-center",
+
+      // {
+      //   loading: "Saving data...",
+      //   error: "Error saving data. Please try again.",
+      // },
+      // {
+      // style: {
+      //   border: "1px solid #00B56C",
+      //   padding: "16px",
+      //   color: "#1A202C",
+      // },
+      // success: {
+      //   duration: 2000,
+      //   iconTheme: {
+      //     primary: "#00B56C",
+      //     secondary: "",
+      //   },
+      // },
+      // error: {
+      //   duration: 2000,
+      //   iconTheme: {
+      //     primary: "#00B56C",
+      //     secondary: "#FFFAEE",
+      //   },
+      // },
+      // }
+      // );
+
+      setFormData({
+        userName: "",
+        email: "",
       });
+      if (response.Msg == "Reset Link send successfully") {
+        setshowVerificationText(true);
+        toast.success(response.Msg, {
+          position: "top-center",
+        });
+      } else {
+        toast.error(response.Msg, {
+          position: "top-center",
+        });
+      }
     }
     // if (session) {
     //   const newformdata: any = {
@@ -119,6 +120,7 @@ export default function ForgetPassword() {
     //   );
     // }
   };
+  console.log("session", session);
 
   return (
     <div
@@ -210,15 +212,18 @@ export default function ForgetPassword() {
                 </div>
               )}
 
-              <div className="lg:mx-0 px-20">
-                <button
-                  type="submit"
-                  className="flex w-full mt-20 justify-center rounded-md bg-green px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-8"
-                  // onClick={handleClick}
-                >
-                  Reset My Password
-                </button>
-              </div>
+              {showVerificationText ? (
+                ""
+              ) : (
+                <div className="lg:mx-0 px-20">
+                  <button
+                    type="submit"
+                    className="flex w-full mt-20 justify-center rounded-md bg-green px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-8"
+                  >
+                    Reset My Password
+                  </button>
+                </div>
+              )}
               <p
                 className="text-white text-sm lg:mx-0 mx-5 cursor-pointer hover:text-red pb-0"
                 onClick={() => router.push("/signin")}

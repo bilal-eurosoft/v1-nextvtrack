@@ -17,7 +17,10 @@ import { Toaster, toast } from "react-hot-toast";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import { Button } from "@mui/material";
 import {
   getZoneListByClientId,
   modifyCollectionStatus,
@@ -459,7 +462,7 @@ export default function Zone() {
   };
   return (
     <div className=" bg-bgLight border-t border-bgLight " id="zone_main">
-      <p className="bg-green px-4 py-1 text-black text-center text-2xl text-white font-bold zone_heading">
+      <p className="bg-green px-4 py-1  text-center text-2xl text-white font-bold zone_heading">
         Zones
       </p>
       <form className=" lg:w-full w-screen bg-bgLight lg:-ms-0 -ms-1 zone_form">
@@ -708,7 +711,7 @@ export default function Zone() {
               isClearable
               isSearchable
               noOptionsMessage={() => "No options available"}
-              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              className="rounded-md w-full  outline-green border border-grayLight  hover:border-green"
               styles={{
                 control: (provided, state) => ({
                   ...provided,
@@ -772,10 +775,32 @@ export default function Zone() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 md:grid-cols-2  sm:grid-cols-2 grid-cols-2 px-5 lg:mt-0 mt-5 ">
-          <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2">
-            <div className="grid xl:grid-cols-7 -mt-2 lg:grid-cols-4  md:grid-cols-3 grid-cols-2">
-              <div className="grid  rounded-md lg:grid-cols-3 md:grid-cols-4 grid-cols-5 bg-green shadow-md    hover:shadow-gray transition duration-500 cursor-pointer">
+        <div className="grid lg:grid-cols-2  md:grid-cols-2  sm:grid-cols-2 grid-cols-2 px-5 lg:mt-0 mt-5 search_zone_btn_grid_main  ">
+          <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 search_zone_btn">
+            <div className="grid xl:grid-cols-7 lg:gap-2 md:gap-2 sm:gap-2 -mt-2 lg:grid-cols-4 gap-5 md:grid-cols-3 sm:grid-cols-2 grid-cols-2  search_zone_btn_grid">
+              <Button
+                className=" text-white font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none "
+                variant="outlined"
+                style={{
+                  fontSize: "16px",
+                  backgroundColor: "#00b56c",
+                  color: "white",
+                  border: "none",
+                }}
+                startIcon={
+                  <span style={{ fontWeight: "600" }}>
+                    <SearchIcon />
+                  </span>
+                }
+                onClick={handleSearchClick}
+              >
+                <b> s</b>{" "}
+                <span style={{ textTransform: "lowercase" }}>
+                  <b>earch</b>
+                </span>
+              </Button>
+
+              {/* <div className="grid  rounded-md lg:grid-cols-3 md:grid-cols-4 grid-cols-5  shadow-md    hover:shadow-gray transition duration-500 cursor-pointer">
                 <div className="lg:col-span-1 md:col-span-1 sm:col-span-2  col-span-2">
                   <svg
                     className="h-11 py-3 w-full text-white"
@@ -797,16 +822,36 @@ export default function Zone() {
 
                 <div className="lg:col-span-1 md:col-span-2 sm:col-span-1 col-span-1 text-center">
                   <button
-                    className="text-white font-popins font-bold text-start pt-1 h-10 bg-green text-md "
+                    className="text-white font-popins font-bold text-end pt-1 h-10 bg-green text-md "
                     type="button"
                     onClick={handleSearchClick}
                   >
                     Search
                   </button>
                 </div>
-              </div>
-
-              <div className="grid  rounded-md  xl:grid-cols-3 lg:grid-cols-5 md:ps-3 ms-4 md:grid-cols-4 grid-cols-5 bg-white shadow-md hover:shadow-gray transition duration-500 cursor-pointer">
+              </div> */}
+              <Button
+                className=" bg-white text-black font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-white border-none hover:border-none lg:w-auto md:w-auto sm:w-auto w-auto"
+                variant="outlined"
+                onClick={handleClear}
+                style={{
+                  fontSize: "16px",
+                  backgroundColor: "white",
+                  color: "black",
+                  border: "none",
+                }}
+                startIcon={
+                  <span style={{ fontWeight: "600" }}>
+                    <HighlightOffIcon />
+                  </span>
+                }
+              >
+                <b> C</b>{" "}
+                <span style={{ textTransform: "lowercase" }}>
+                  <b>lear</b>
+                </span>
+              </Button>
+              {/* <div className="grid  rounded-md  xl:grid-cols-3 lg:grid-cols-5 md:ps-3 ms-4 md:grid-cols-4 grid-cols-5 bg-white shadow-md hover:shadow-gray transition duration-500 cursor-pointer">
                 <div className="xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2  col-span-2">
                   <svg
                     className="h-11 py-3 w-full text-labelColor"
@@ -836,7 +881,7 @@ export default function Zone() {
                   </button>
                 </div>
                 <br></br>
-              </div>
+              </div> */}
 
               {/* <div className="grid rounded-md lg:grid-cols-2 lg:grid-cols-4 grid-cols-5 bg-zonebtnColor shadow-md ms-3 hover:shadow-gray transition duration-500 cursor-pointer">
         <div className="lg:col-span-2   md:col-span-2 col-span-3">
@@ -872,13 +917,13 @@ export default function Zone() {
 
           <div
             // style={{ display: "flex", justifyContent: "flex-end" }}
-            className="flex lg:justify-end justify-start"
+            className="flex lg:justify-end md:justify-end sm:justify-end"
           >
             <Link href="/AddZone">
-              <div className="rounded-md  grid grid-cols-3 bg-green mb-8 lg:-mt-2 md:-mt-1 mt-2 w-full  shadow-md   hover:shadow-gray transition duration-500 ">
-                <div className="col-span-1">
+              <div className="lg:rounded-md md:rounded-md sm:rounded-md rounded-sm  grid lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-3 grid-cols-4 bg-green mb-8 lg:-mt-2 md:-mt-1 sm:-mt-1 mt-1 w-full  shadow-md  hover:shadow-gray transition duration-500 ">
+                <div className="lg:col-span-1 -ms-1  md:col-span-1 sm:col-span-1 col-span-2 add_zone_buttons">
                   <svg
-                    className="h-11 py-3 w-full text-white "
+                    className="h-11 py-3 w-full text-white"
                     width="24"
                     viewBox="0 0 24 24"
                     strokeWidth="4"
@@ -893,12 +938,12 @@ export default function Zone() {
                     <line x1="12" y1="9" x2="12" y2="15" />
                   </svg>
                 </div>
-                <div className="col-span-2 pt-1">
+                <div className="lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-2   pt-1 flex lg:justify-center md:justify-center sm:justify-center justify-start -ms-1 lg:pe-0 md:pe-0 sm:pe-0 pe-1 add_zone_button_text">
                   <button
-                    className="text-white  font-popins font-bold -ms-2 h-10 bg-[#00B56C] px-2 text-md   "
+                    className="text-white  font-popins font-bold lg:-ms-2 md:-ms-2 h-10 bg-[#00B56C] px-2 text-md  sm:-ms-2 -ms-2  "
                     // onClick={handleClick}
                   >
-                    Add Zone
+                    Add zone
                   </button>
                 </div>
               </div>
@@ -926,7 +971,7 @@ export default function Zone() {
         </div>
       </form>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} className="table_scroll">
         {/* <p className="bg-green px-4 py-1 text-white font-bold lg:w-full w-screen ">
     ZoneTitle
   </p> */}
@@ -1163,8 +1208,8 @@ export default function Zone() {
                               onClick={() => deleteSelectedZones(item.id)}
                             >
                               <DeleteIcon
-                                className="text-white bg-red p-1 h-7 w-8 rounded-md shadow-md hover:shadow-gray transition duration-500 "
-                                style={{ marginTop: "-18%", marginLeft: "20%" }}
+                                className="text-white bg-red p-1 h-7 w-8 rounded-md shadow-md hover:shadow-gray transition duration-500 delete_zone_button"
+                          
                               />
                             </button>
 

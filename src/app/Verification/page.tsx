@@ -4,19 +4,22 @@ import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { forgetPasswordClientId } from "@/utils/API_CALLS";
+import { forgetPasswordClientId, expireForgotLink } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { Toaster, toast } from "react-hot-toast";
+import moment from "moment";
 
 import logo from "../../../public/Images/logo.png";
 import { base64encode, base64decode } from "nodejs-base64";
 
 import "./verification.css";
+import { Button } from "@mui/material";
 export default function Verification() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setshowConfirmPassword] = useState(false);
+  const [expireLink, setExpireLink] = useState<any>([]);
   const router = useRouter();
   const searchParams = useSearchParams();
   const id: any = searchParams.get("q");
@@ -29,12 +32,21 @@ export default function Verification() {
   });
 
   const [inputConfirmPassword, setinputConfirmPassword] = useState("");
-
+  const [lineExpire, setLinkExpire] = useState(false);
+  const moment = require("moment-timezone");
   // Use the decoded value in your component
   // console.log('Decoded value of "q":', decodedValue);
   const handleInputChange = (key: any, e: any) => {
     setFormData({ ...formData, [key]: e.target.value });
   };
+
+  // useEffect(() => {
+  //   const timeOut = setTimeout(() => {
+  //     setLinkExpire(true);
+  //   }, 60000);
+  //   return () => clearTimeout(timeOut);
+  // }, []);
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     const newformdata = {
@@ -96,13 +108,36 @@ export default function Verification() {
         });
       }
     }
+    router.push("/signin");
   };
+
+  useEffect(() => {
+    const func = async () => {
+      const result = await expireForgotLink({ link: base64decode(id) });
+      setExpireLink(result);
+    };
+    func();
+  }, []);
+
+  useEffect(() => {
+    const originalTimestamp: any = new Date(expireLink.timestamp);
+    const currentTimestamp: any = new Date();
+    const timeDifference = currentTimestamp - originalTimestamp;
+
+    if (timeDifference >= 5 * 60 * 1000) {
+      setLinkExpire(true);
+    } else {
+      setLinkExpire(false);
+    }
+  }, [expireLink?.timestamp]);
+
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
   const handleShowPasswordConfirm = () => {
     setshowConfirmPassword(!showConfirmPassword);
   };
+
   return (
     <div
       className="w-100 h-screen bg-no-repeat bg-cover bg-center"
@@ -143,166 +178,199 @@ export default function Verification() {
                 alt="Your Company"
               />
             </div>
-            <p className="mt-5 text-start   font-popins text-2xl  leading-9 tracking-tight text-white px-5">
-              Enter New Password
-            </p>
-            <form className="space-y-6 mx-6" onSubmit={handleSubmit}>
-              <div className="lg:mx-0 mx-5">
-                <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
-                  {/* <div className="col-span-12 ">
-                    <input
-                      required
-                      placeholder="Please Enter Your New Password"
-                      className="outline-none w-full text-black font-bold"
-                      type={showPassword ? "text" : "password"}
-                      value={formData.password}
-                      onChange={(e: any) => handleInputChange("password", e)}
-                    />
-                  </div> */}
-                  <div className="col-span-11 ">
-                    <input
-                      required
-                      placeholder="Please Enter Your New Password"
-                      className="outline-none w-full text-black font-bold"
-                      type={showPassword ? "text" : "password"}
-                      value={formData.password}
-                      onChange={(e: any) => handleInputChange("password", e)}
-                    />
-                  </div>
-                  <div className="col-span-1 cursor-pointer">
-                    {showPassword ? (
-                      <svg
-                        className="h-4 lg:w-16 w-10 text-gray mt-1"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        onClick={handleShowPassword}
-                      >
-                        {" "}
-                        <circle cx="12" cy="12" r="10" />{" "}
-                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="h-4 lg:w-16 w-10 text-gray mt-1"
-                        onClick={handleShowPassword}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                </div>
 
-                {/* <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
-                  <div className="col-span-12 ">
-                    <input
-                      required
-                      placeholder="Please Enter Your Confirm Password"
-                      className="outline-none w-full text-black font-bold"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e: any) => handleInputChange("password", e)}
-                    />
-                  </div>
-                </div> */}
-              </div>
-              <div className="lg:mx-0 mx-5">
-                <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
-                  {/* <div className="col-span-12 ">
-                    <input
-                      required
-                      placeholder="Please Enter Confirm Password"
-                      className="outline-none w-full text-black font-bold"
-                      type={showPassword ? "text" : "password"}
-                      value={inputConfirmPassword}
-                      onChange={(e: any) =>
-                        setinputConfirmPassword(e.target.value)
-                      }
-                    />
-                  </div> */}
-                  <div className="col-span-11 ">
-                    <input
-                      required
-                      placeholder="Please Enter Confirm Password"
-                      className="outline-none w-full text-black font-bold"
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={inputConfirmPassword}
-                      onChange={(e: any) =>
-                        setinputConfirmPassword(e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="col-span-1 cursor-pointer">
-                    {showConfirmPassword ? (
-                      <svg
-                        className="h-4 lg:w-16 w-10 text-gray mt-1"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        onClick={handleShowPasswordConfirm}
-                      >
-                        {" "}
-                        <circle cx="12" cy="12" r="10" />{" "}
-                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="h-4 lg:w-16 w-10 text-gray mt-1"
-                        onClick={handleShowPasswordConfirm}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-
-                {/* <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
-                  <div className="col-span-12 ">
-                    <input
-                      required
-                      placeholder="Please Enter Your Confirm Password"
-                      className="outline-none w-full text-black font-bold"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e: any) => handleInputChange("password", e)}
-                    />
-                  </div>
-                </div> */}
-              </div>
-
-              <div className="lg:mx-0 px-20">
-                <button
-                  type="submit"
-                  className="flex w-full mt-10 justify-center rounded-md bg-green px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-8"
-                  // onClick={handleClick}
+            {lineExpire ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%",
+                  flexDirection: "column",
+                }}
+              >
+                <h2 className="text-2xl font-bold text-white font-popins py-16 text-center">
+                  Link Has Been Expire Please Try Again
+                </h2>
+                <Button
+                  onClick={() => router.push("/signin")}
+                  style={{
+                    backgroundColor: "#00b56c",
+                    color: "white",
+                    width: "30%",
+                    margin: "0 auto",
+                    display: "block",
+                    marginBottom: "3%",
+                  }}
                 >
-                  Save
-                </button>
+                  Back To Sign In
+                </Button>
               </div>
-              <br></br>
-            </form>
+            ) : (
+              <div>
+                <p className="mt-5 text-start   font-popins text-2xl  leading-9 tracking-tight text-white px-5">
+                  Enter New Password
+                </p>
+                <form className="space-y-6 mx-6" onSubmit={handleSubmit}>
+                  <div className="lg:mx-0 mx-5">
+                    <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
+                      {/* <div className="col-span-12 ">
+                    <input
+                      required
+                      placeholder="Please Enter Your New Password"
+                      className="outline-none w-full text-black font-bold"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e: any) => handleInputChange("password", e)}
+                    />
+                  </div> */}
+                      <div className="col-span-11 ">
+                        <input
+                          required
+                          placeholder="Please Enter Your New Password"
+                          className="outline-none w-full text-black font-bold"
+                          type={showPassword ? "text" : "password"}
+                          value={formData.password}
+                          onChange={(e: any) =>
+                            handleInputChange("password", e)
+                          }
+                        />
+                      </div>
+                      <div className="col-span-1 cursor-pointer">
+                        {showPassword ? (
+                          <svg
+                            className="h-4 lg:w-16 w-10 text-gray mt-1"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            onClick={handleShowPassword}
+                          >
+                            {" "}
+                            <circle cx="12" cy="12" r="10" />{" "}
+                            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                          </svg>
+                        ) : (
+                          <svg
+                            className="h-4 lg:w-16 w-10 text-gray mt-1"
+                            onClick={handleShowPassword}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
+                  <div className="col-span-12 ">
+                    <input
+                      required
+                      placeholder="Please Enter Your Confirm Password"
+                      className="outline-none w-full text-black font-bold"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e: any) => handleInputChange("password", e)}
+                    />
+                  </div>
+                </div> */}
+                  </div>
+                  <div className="lg:mx-0 mx-5">
+                    <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
+                      {/* <div className="col-span-12 ">
+                    <input
+                      required
+                      placeholder="Please Enter Confirm Password"
+                      className="outline-none w-full text-black font-bold"
+                      type={showPassword ? "text" : "password"}
+                      value={inputConfirmPassword}
+                      onChange={(e: any) =>
+                        setinputConfirmPassword(e.target.value)
+                      }
+                    />
+                  </div> */}
+                      <div className="col-span-11 ">
+                        <input
+                          required
+                          placeholder="Please Enter Confirm Password"
+                          className="outline-none w-full text-black font-bold"
+                          type={showConfirmPassword ? "text" : "password"}
+                          value={inputConfirmPassword}
+                          onChange={(e: any) =>
+                            setinputConfirmPassword(e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="col-span-1 cursor-pointer">
+                        {showConfirmPassword ? (
+                          <svg
+                            className="h-4 lg:w-16 w-10 text-gray mt-1"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            onClick={handleShowPasswordConfirm}
+                          >
+                            {" "}
+                            <circle cx="12" cy="12" r="10" />{" "}
+                            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                          </svg>
+                        ) : (
+                          <svg
+                            className="h-4 lg:w-16 w-10 text-gray mt-1"
+                            onClick={handleShowPasswordConfirm}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
+                  <div className="col-span-12 ">
+                    <input
+                      required
+                      placeholder="Please Enter Your Confirm Password"
+                      className="outline-none w-full text-black font-bold"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e: any) => handleInputChange("password", e)}
+                    />
+                  </div>
+                </div> */}
+                  </div>
+
+                  <div className="lg:mx-0 px-20">
+                    <button
+                      type="submit"
+                      className="flex w-full mt-10 justify-center rounded-md bg-green px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-8"
+                      // onClick={handleClick}
+                    >
+                      Save
+                    </button>
+                  </div>
+                  <br></br>
+                </form>
+              </div>
+            )}
           </div>
         </div>
       )}

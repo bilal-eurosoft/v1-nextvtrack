@@ -84,6 +84,7 @@ export default function ForgetPassword(props: any) {
     //   }
     // );
   };
+
   useEffect(() => {
     console.log(props.searchParams.q);
     const newformdata: any = {

@@ -69,7 +69,10 @@ export default function DualCam() {
   };
   const router = useRouter();
 
-  if (session?.userRole === "Controller") {
+  if (
+    session?.userRole === "Controller" ||
+    (session?.userRole == "Admin" && session?.cameraProfile == false)
+  ) {
     router.push("/signin");
     return null;
   }

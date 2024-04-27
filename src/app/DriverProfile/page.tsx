@@ -58,7 +58,10 @@ export default function DriverProfile() {
   const [getRfid, setRfid] = useState([]);
   const [selectedRFID, setSelectedRFID] = useState("");
   const [inactiveRFIDs, setInactiveRFIDs] = useState<any>([]);
-  if (session?.userRole === "Controller") {
+  if (
+    session?.userRole === "Controller" ||
+    (session?.userRole == "Admin" && session?.driverProfile === false)
+  ) {
     router.push("/signin");
     return null;
   }
@@ -673,10 +676,10 @@ export default function DriverProfile() {
         Driver Profile
       </p>
       <div className="grid xl:grid-cols-12 lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-2  p-4  bg-bgLight drivers_add_popup">
-        <div className="xl:col-span-8 lg:col-span-5 md:col-span-5  sm:col-span-1 lg:mb-0  ">
+        <div className="xl:col-span-8 lg:col-span-5 md:col-span-5  sm:col-span-2  lg:mb-0  driver_add_new ">
           <button
             onClick={handleOpen}
-            className="bg-green px-4 py-1  text-white rounded-md font-popins font-bold"
+            className="bg-green px-4 py-1 mr-4  text-white rounded-md font-popins font-bold add_new_driver_btn"
           >
             Add New Driver
           </button>
@@ -689,18 +692,18 @@ export default function DriverProfile() {
           </button>
         </div>
         <div
-          className="xl:col-span-2 lg:col-span-3 md:col-span-3 sm:grid-col-span-1   text-center"
+          className="xl:col-span-2 lg:col-span-3 md:col-span-3 sm:col-span-1 text-center total_driver_text"
           // id="hover_bg"
         >
           <h1
             // style={{ fontSize: "19px" }}
-            className=" font-popins font-bold xl:text-xl text-green pt-2"
+            className=" font-popins font-bold xl:text-xl text-green pt-2 text_total_driver"
           >
             Total Active Drivers: {DriverData.length}
           </h1>
         </div>
         <div
-          className="xl:col-span-2  lg:col-span-3 md:col-span-3 sm:grid-col-span-1 border-b border-grayLight  text-center lg:mx-5"
+          className="xl:col-span-2  lg:col-span-3 md:col-span-3 sm:col-span-1 border-b border-grayLight mb-10  text-center lg:mx-5 search_driver"
           id="hover_bg"
         >
           <div className="grid grid-cols-12">
@@ -777,7 +780,7 @@ export default function DriverProfile() {
               className="text-black"
             >
               <div className="grid grid-cols-12 bg-green">
-                <div className="col-span-11">
+                <div className="lg:col-span-11 md:col-span-11 sm:col-span-10 col-span-10">
                   <p className="p-3 text-white w-full font-popins font-bold ">
                     Add Driver
                   </p>
@@ -955,7 +958,6 @@ export default function DriverProfile() {
                     <button
                       className="bg-green text-white font-bold font-popins  w-full  py-2  rounded-md shadow-md  hover:shadow-gray transition duration-500"
                       type="submit"
-                      // disabled={}
                       style={{
                         float: "right",
                         marginTop: "40%",

@@ -5,9 +5,12 @@ import "leaflet-draw/dist/leaflet.draw.css"; */
 import dynamic from "next/dynamic"; // Import dynamic from Next.js
 import { useSession } from "next-auth/react";
 import { ClientSettings } from "@/types/clientSettings";
+import { useMap } from "react-leaflet";
+import Select from "react-select";
 import {
   getClientSettingByClinetIdAndToken,
   postZoneDataByClientId,
+  getSearchAddress,
 } from "@/utils/API_CALLS";
 import L, { LatLngTuple } from "leaflet";
 import { Toaster, toast } from "react-hot-toast";
@@ -15,10 +18,14 @@ import { useRouter } from "next/navigation";
 import { Polygon } from "react-leaflet/Polygon";
 import { Circle } from "react-leaflet/Circle";
 import { LayerGroup } from "leaflet";
-import { Button, MenuItem, Select } from "@mui/material";
+import EditRoadIcon from "@mui/icons-material/EditRoad";
+import { Button, MenuItem } from "@mui/material";
+import SaveIcon from "@mui/icons-material/Save";
 import ClearIcon from "@mui/icons-material/Clear";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import { EditControl } from "react-leaflet-draw";
+
 import "./editZone.css";
 const MapContainer = dynamic(
   () => import("react-leaflet").then((module) => module.MapContainer),
@@ -30,10 +37,6 @@ const TileLayer = dynamic(
 );
 const FeatureGroup = dynamic(
   () => import("react-leaflet").then((module) => module.FeatureGroup),
-  { ssr: false }
-);
-const EditControl = dynamic(
-  () => import("react-leaflet-draw").then((module) => module.EditControl),
   { ssr: false }
 );
 
@@ -49,6 +52,7 @@ export default function AddZoneComp() {
   const [drawShape, setDrawShape] = useState<boolean>(true);
   const [shapeType, setShapeType] = useState<"Polygon" | "Circle">();
   const [mapcenter, setMapcenter] = useState<LatLngTuple | null>(null);
+  const [selectLatLng, setSelectLatLng] = useState<any>("");
   const [polygondata, setPolygondata] = useState<
     { latitude: number; longitude: number }[]
   >([]);
@@ -61,15 +65,15 @@ export default function AddZoneComp() {
     null
   );
   const [Form, setForm] = useState({
-    GeoFenceType: "",
     centerPoints: "",
     id: "",
     zoneName: "",
     zoneShortName: "",
     zoneType: "",
     latlngCordinates: "",
+    label: "",
   });
-
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const router = useRouter();
   if (session?.userRole === "Controller") {
     router.push("/signin");
@@ -191,11 +195,65 @@ export default function AddZoneComp() {
     }
   };
 
+  const handleSelectAddressOne = (e: any) => {
+    console.log("e", e);
+    // const selectedIndex = e.target.selectedIndex;
+    // setSelectedAddress(addresses[selectedIndex]);
+    if (!e) return;
+    const latlng = JSON.parse(e.value);
+    if ("lat" in latlng && "lon" in latlng) {
+      setSelectLatLng({ lat: latlng.lat, lon: latlng.lon });
+    } else {
+      console.error("Invalid latlng object:", latlng);
+    }
+  };
+
+  const handleInputChange = (e: any) => {
+    let query: string = e;
+    if (session) {
+      getSearchAddress({
+        query: query,
+        country: session?.country,
+      })
+        .then((response) => {
+          setAddresses(response);
+        })
+        .catch((error) => {
+          console.log("Error fetching address:", error);
+        });
+    }
+  };
+
+  // const handleAAdressSearch = async (inputValue: any) => {
+  //   console.log("e", inputValue.target.value);
+  //   let query: string = inputValue.target.value;
+  //   if (session) {
+  //     const getAddress = await getSearchAddress({
+  //       query: query,
+  //       country: session?.country,
+  //     });
+  //     setAddresses(getAddress);
+  //   }
+  // };
+
+  const SetViewfly = () => {
+    const map = useMap();
+    if (selectLatLng) {
+      map.flyTo([selectLatLng.lat, selectLatLng.lon], 18);
+    }
+
+    return null;
+  };
   const handleChange = (e: any) => {
     const { name, value } = e.target;
+    console.log("name, value ", name, value);
     setForm({ ...Form, [name]: value });
+  };
+  const handleChangeSelectValue = (e: any) => {
+    const { label, value } = e;
+    setForm({ ...Form, [label]: value });
     if (value === "Restricted-Area") {
-      setForm({ ...Form, GeoFenceType: value });
+      setForm({ ...Form, label: value });
     }
   };
 
@@ -203,12 +261,7 @@ export default function AddZoneComp() {
     e.preventDefault();
 
     // Check if any of the required fields are empty
-    if (
-      !Form.latlngCordinates ||
-      !Form.GeoFenceType ||
-      !Form.zoneName ||
-      !Form.zoneShortName
-    ) {
+    if (!Form.latlngCordinates || !Form.zoneName || !Form.zoneShortName) {
       toast.error("Please Select All Field");
       return;
     } else if (polygondataById.length == 0 && circleDataById?.radius == null) {
@@ -266,13 +319,13 @@ export default function AddZoneComp() {
       console.error("Error fetching zone data:", error);
     }
     setForm({
-      GeoFenceType: "",
       centerPoints: "",
       id: "",
       zoneName: "",
       zoneShortName: "",
       zoneType: "",
       latlngCordinates: "",
+      label: "",
     });
     router.push("/Zone");
   };
@@ -333,6 +386,26 @@ export default function AddZoneComp() {
       setDrawShape(drawShape);
     }
   };
+  const optionsSiteClickCall: any = [
+    { value: "On-Site", label: "On-Site" },
+    { value: "Off-Site", label: "Off-Site" },
+    { value: "City-Area", label: "City-Area" },
+    { value: "Restricted-Area", label: "Restricted-Area" },
+  ];
+  const optionsSite: any = [
+    { value: "On-Site", label: "On-Site" },
+    { value: "Off-Site", label: "Off-Site" },
+  ];
+  const optionsCitys: any =
+    addresses?.map((item: any) => ({
+      value: JSON.stringify(item),
+      label: item.display_name,
+    })) || [];
+  // {addresses.map((address, index) => (
+  //   <option key={address.place_id} value={JSON.stringify(address)}>
+  //     {address.display_name}
+  //   </option>
+  // ))}
 
   return (
     <div className="shadow-lg bg-bgLight h-5/6  border-t text-white edit_zone_main ">
@@ -341,7 +414,7 @@ export default function AddZoneComp() {
       </p>
 
       <div className="grid lg:grid-cols-6 sm:grid-cols-5 md:grid-cols-5 grid-cols-1 pt-8 edit_zone_map">
-        <div className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-4 col-span-4 bg-gray-200 mx-5">
+        <div className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-6 col-span-4 bg-gray-200 mx-5 edit_zone_side_bar">
           <form onSubmit={handleSave}>
             <label className="text-black text-md w-full font-popins font-medium">
               <span className="text-red">
@@ -366,50 +439,76 @@ export default function AddZoneComp() {
             </label>
             {session?.clickToCall === true ? (
               <Select
-                onChange={handleChange}
-                value={Form?.GeoFenceType}
-                className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
-                placeholder="geofence"
-                // required
-                name="GeoFenceType"
-                displayEmpty
-              >
-                <MenuItem value="" selected disabled hidden>
-                  Select Geofence Type
-                </MenuItem>
-                <MenuItem value="On-Site" className="hover_select">
-                  On-Site
-                </MenuItem>
-                <MenuItem className="hover_select" value="Off-Site">
-                  Off-Site
-                </MenuItem>
-                <MenuItem className="hover_select" value="City-Area">
-                  City-Area
-                </MenuItem>
-                <MenuItem className="hover_select" value="Restricted-Area">
-                  Restricted-Area
-                </MenuItem>
-              </Select>
+                // value={Ignitionreport?.vehicleNo}
+                // value={Form?.GeoFenceType}
+                onChange={handleChangeSelectValue}
+                options={optionsSiteClickCall}
+                placeholder="Select Report Type"
+                isSearchable
+                isClearable
+                noOptionsMessage={() => "No options available"}
+                className="   rounded-md w-full  outline-green border border-grayLight"
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    border: "none",
+                    boxShadow: state.isFocused ? null : null,
+                  }),
+                  option: (provided, state) => ({
+                    ...provided,
+                    backgroundColor: state.isSelected
+                      ? "#00B56C"
+                      : state.isFocused
+                      ? "#e1f0e3"
+                      : "transparent",
+                    color: state.isSelected
+                      ? "white"
+                      : state.isFocused
+                      ? "black"
+                      : "black",
+                    "&:hover": {
+                      backgroundColor: "#e1f0e3",
+                      color: "black",
+                    },
+                  }),
+                }}
+              />
             ) : (
               <Select
-                onChange={handleChange}
-                value={Form?.GeoFenceType}
-                className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
-                placeholder="geofence"
-                // required
-                name="GeoFenceType"
-                displayEmpty
-              >
-                <MenuItem value="" selected disabled hidden>
-                  Select Geofence Type
-                </MenuItem>
-                <MenuItem className="hover_select" value="On-Site">
-                  On-Site
-                </MenuItem>
-                <MenuItem className="hover_select" value="Off-Site">
-                  Off-Site
-                </MenuItem>
-              </Select>
+                // value={Ignitionreport?.vehicleNo}
+                // value={Form?.GeoFenceType}
+                onChange={handleChangeSelectValue}
+                options={optionsSite}
+                placeholder="Select Report Type"
+                isSearchable
+                isClearable
+                noOptionsMessage={() => "No options available"}
+                className="   rounded-md w-full  outline-green border border-grayLight"
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    border: "none",
+                    boxShadow: state.isFocused ? null : null,
+                  }),
+                  option: (provided, state) => ({
+                    ...provided,
+                    backgroundColor: state.isSelected
+                      ? "#00B56C"
+                      : state.isFocused
+                      ? "#e1f0e3"
+                      : "transparent",
+                    color: state.isSelected
+                      ? "white"
+                      : state.isFocused
+                      ? "black"
+                      : "black",
+                    "&:hover": {
+                      backgroundColor: "#e1f0e3",
+                      color: "black",
+                    },
+                  }),
+                }}
+              />
             )}
             <br></br>
             <br></br>
@@ -471,10 +570,10 @@ export default function AddZoneComp() {
                 "
               >
                 <div
-                  className="col-span-5 bg-green 
-                rounded-md shadow-md  hover:shadow-gray transition duration-500"
+                  className="lg:col-span-5 md:col-span-5 sm:col-span-2 col-span-4    
+"
                 >
-                  <div className="grid grid-cols-12 gap-2">
+                  {/* <div className="grid grid-cols-12 gap-2">
                     <div className="col-span-1"></div>
                     <div className="col-span-3 ">
                       <svg
@@ -499,14 +598,33 @@ export default function AddZoneComp() {
                         Save
                       </button>
                     </div>
-                  </div>
+                  </div> */}
+                  <Button
+                    className="  shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none h-10 "
+                    variant="outlined"
+                    type="submit"
+                    // onClick={handleClear}
+                    style={{
+                      fontSize: "16px",
+                      backgroundColor: "#00b56c",
+                      color: "white",
+                      border: "none",
+                    }}
+                    startIcon={
+                      <span style={{ fontWeight: "600" }}>
+                        <SaveIcon className="-mt-1" />
+                      </span>
+                    }
+                  >
+                    <b>S</b>{" "}
+                    <span style={{ textTransform: "lowercase" }}>
+                      <b>ave</b>
+                    </span>
+                  </Button>
                 </div>
                 <div className="col-span-1"></div>
-                <div
-                  className="col-span-5 bg-red
-                rounded-md shadow-md  hover:shadow-gray transition duration-500"
-                >
-                  <div className="grid grid-cols-12 gap-2">
+                <div className="lg:col-span-5 md:col-span-5 sm:col-span-2 col-span-4 ">
+                  {/* <div className="grid grid-cols-12 gap-2">
                     <div className="col-span-1"></div>
                     <div className="col-span-2 ">
                       <ClearIcon className="mt-2 font-bold" />
@@ -524,7 +642,28 @@ export default function AddZoneComp() {
                         <b> Cancel</b>
                       </Button>
                     </div>
-                  </div>
+                  </div> */}
+                  <Button
+                    className=" bg-red shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-red border-none hover:border-none h-10 "
+                    variant="outlined"
+                    onClick={() => router.push("/Zone")}
+                    style={{
+                      fontSize: "16px",
+                      backgroundColor: "red",
+                      color: "white",
+                      border: "none",
+                    }}
+                    startIcon={
+                      <span style={{ fontWeight: "600" }}>
+                        <ClearIcon className="-mt-1" />
+                      </span>
+                    }
+                  >
+                    <b>C</b>{" "}
+                    <span style={{ textTransform: "lowercase" }}>
+                      <b>ancel</b>
+                    </span>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -537,11 +676,48 @@ export default function AddZoneComp() {
             <label className="text-black text-md w-full font-popins font-medium ">
               <b>Please Enter Text To Search </b>
             </label>
-            <input
+            {/* <input
               type="text"
               className="  block py-2 px-0 w-full text-sm text-labelColor bg-white-10 border border-grayLight appearance-none px-3 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-green mb-5"
               placeholder="Search"
+              onChange={handleAAdressSearch}
               required
+            /> */}
+
+            <Select
+              onChange={handleSelectAddressOne}
+              onInputChange={handleInputChange}
+              options={optionsCitys}
+              placeholder="Search"
+              isClearable
+              isSearchable
+              noOptionsMessage={() => "No options available"}
+              className="rounded-md w-full outline-green border border-grayLight hover:border-green"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  border: "none",
+                  boxShadow: state.isFocused ? null : null,
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  zIndex: "9999",
+                  backgroundColor: state.isSelected
+                    ? "#00B56C"
+                    : state.isFocused
+                    ? "#e1f0e3"
+                    : "transparent",
+                  color: state.isSelected
+                    ? "white"
+                    : state.isFocused
+                    ? "black"
+                    : "black",
+                  "&:hover": {
+                    backgroundColor: "#e1f0e3",
+                    color: "black",
+                  },
+                }),
+              }}
             />
           </div>
           {/* <button
@@ -551,11 +727,36 @@ export default function AddZoneComp() {
           >
             Redraw
           </button> */}
-
-          <div className="grid lg:grid-cols-3 grid-cols-3 bg-green w-24 edit_zone_map_btn rounded-md shadow-md  hover:shadow-gray transition duration-500">
-            <div className="col-span-1">
+          <Button
+            className=" bg-green shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none h-10 "
+            variant="outlined"
+            onClick={handleredraw}
+            style={{
+              fontSize: "16px",
+              backgroundColor: "#00b56c",
+              color: "white",
+              border: "none",
+            }}
+            id="add_zone_redraw_btn"
+            startIcon={
+              <span style={{ fontWeight: "600" }}>
+                <EditRoadIcon className="-mt-1" />
+              </span>
+            }
+          >
+            <b>R</b>{" "}
+            <span style={{ textTransform: "lowercase" }}>
+              <b>edraw</b>
+            </span>
+          </Button>
+          {/* <div
+            className="grid lg:grid-cols-3 grid-cols-3  bg-green lg:w-28 md:w-28 sm:w-28
+            w-32
+              rounded-md shadow-md  hover:shadow-gray transition duration-500 h-10 redraw_btn"
+          >
+            <div className="col-span-1  ms-1">
               <svg
-                className="h-10 py-3 w-full text-white"
+                className="h-10 py-2 w-full text-white"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -568,16 +769,16 @@ export default function AddZoneComp() {
                 />
               </svg>
             </div>
-            <div className="col-span-2">
+            <div className="col-span-2 mt-1 ">
               <button
-                className="text-white  font-popins font-bold h-10    "
+                className="text-white  font-popins font-bold h-9 px-3"
                 type="submit"
                 onClick={handleredraw}
               >
                 Redraw
               </button>
             </div>
-          </div>
+          </div> */}
           <div className="flex justify-start"></div>
           <div className="lg:col-span-5  md:col-span-4  sm:col-span-5 col-span-4 mx-3">
             <div className="flex justify-start"></div>
@@ -586,12 +787,14 @@ export default function AddZoneComp() {
                 <MapContainer
                   zoom={15}
                   center={mapcenter}
-                  className="z-10 edit_zone_map_main"
+                  className="z-0 edit_zone_map_main"
                 >
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
                   />
+
+                  <SetViewfly />
                   {drawShape == false && (
                     <FeatureGroup>
                       <EditControl
