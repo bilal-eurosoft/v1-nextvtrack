@@ -923,7 +923,7 @@ export async function getSearchAddress({
   //   const data = await response.json();
   console.log("frtgfbhjn", response) */
     const response = await fetch(
-      `http://osm.vtracksolutions.com/nominatim/search.php?q=${query}+${country}&format=json`,
+      `https://backend.vtracksolutions.com/zoneaddresssearch?q=${query},${country}`,
       {
         method: "GET",
         headers: {
