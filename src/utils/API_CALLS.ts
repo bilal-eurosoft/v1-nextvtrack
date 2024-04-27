@@ -929,6 +929,7 @@ export async function getSearchAddress({
         headers: {
           accept: "application/json, text/plain, */*",
           "content-type": "application/json",
+          "Content-Security-Policy": "default-src 'self' https: http:",
         },
       }
     );
