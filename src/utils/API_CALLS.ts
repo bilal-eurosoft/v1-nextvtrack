@@ -121,7 +121,7 @@ export async function vehicleListByClientId({
 // }
 export function expireForgotLink(payload: any) {
   const ressult = axios
-    .post(`http://172.16.10.99/forgotpassword/UpdateLink`, payload)
+    .post(`${URL}/forgotpassword/UpdateLink`, payload)
     .then((response: any) => response?.data)
     .catch((error) => {
       console.log("Error Expire Update Link", error);
