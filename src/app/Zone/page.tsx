@@ -17,7 +17,10 @@ import { Toaster, toast } from "react-hot-toast";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import { Button } from "@mui/material";
 import {
   getZoneListByClientId,
   modifyCollectionStatus,
@@ -30,7 +33,8 @@ import {
 import { zonelistType } from "@/types/zoneType";
 import "./zone.css";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+// import Select from "@mui/material/Select";
+import Select from "react-select";
 import HexagonIcon from "@mui/icons-material/Hexagon";
 
 const ITEM_HEIGHT = 48;
@@ -71,16 +75,16 @@ export default function Zone() {
   });
   const [rowsPerPage, setRowsPerPage] = useState<any>(10);
   const totalPages = Math.ceil(zoneList.length / rowsPerPage);
-
   const [filterZonepage, setFilterZonePage] = useState(1);
   const [filterZonePerPage, setfilterZonePerPage] = useState(10);
   const [filteredDataIsNotAvaialable, setFilteredDataIsNotAvaialable] =
     useState<boolean>(true);
   const lastIndexFilter = filterZonePerPage * filterZonepage;
   const firstIndexFilter = lastIndexFilter - filterZonePerPage;
-  let filterZoneResult;
-  filterZoneResult = filteredZones.slice(firstIndexFilter, lastIndexFilter);
-  const totalPagesFilter = Math.ceil(filteredZones.length / filterZonePerPage);
+  // let filterZoneResult;
+  // filterZoneResult = filteredZones.slice(firstIndexFilter, lastIndexFilter);
+  // const totalPagesFilter = Math.ceil(filteredZones.length / filterZonePerPage);
+  // console.log("filteredZones", filterZoneResult);
 
   const handleClickPagination = () => {
     setCurrentPage(input);
@@ -99,14 +103,18 @@ export default function Zone() {
 
   useEffect(() => {
     allZone();
-  }, []);
+  }, [session]);
 
   // }, []);
 
   const router = useRouter();
+  if (session?.userRole === "Controller") {
+    router.push("/signin");
+    return null;
+  }
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  let displayedData;
+  let displayedData: any;
   displayedData = zoneList.slice(startIndex, endIndex);
   function handleSearchClick(e: any) {
     e.preventDefault();
@@ -115,30 +123,34 @@ export default function Zone() {
       const filteredZone = zoneList.filter((zone) => {
         return (
           (zoneName === "" ||
-            zone.zoneName.toLowerCase().includes(zoneName.toLowerCase())) &&
-          (zoneShortName === "" ||
-            (zone.zoneShortName &&
-              zone.zoneShortName
+            (typeof zone.zoneName === "string" &&
+              zone.zoneName
                 .toLowerCase()
-                .includes(zoneShortName.toLowerCase()))) &&
+                .includes(zoneName?.value?.toLowerCase()))) &&
+          (zoneShortName === "" ||
+            (zone?.zoneShortName &&
+              zone?.zoneShortName
+                ?.toLowerCase()
+                .includes(zoneShortName?.value?.toLowerCase()))) &&
           (GeoFenceType === "" ||
             (zone.GeoFenceType !== undefined &&
               zone.GeoFenceType.toLowerCase() ===
-                GeoFenceType.toLowerCase())) &&
+                GeoFenceType?.value?.toLowerCase())) &&
           (zoneType === "" ||
             (zone.zoneType !== undefined &&
-              zone.zoneType.toLowerCase() === zoneType.toLowerCase()))
+              zone.zoneType?.toLowerCase() === zoneType.toLowerCase()))
         );
       });
+      setFilteredZones(filteredZone);
 
-      if (filteredZone.length > 0) {
+      if (filteredZone.length >= 0) {
         setFilteredDataIsNotAvaialable(true);
         setFilteredZones(filteredZone);
       } else {
         displayedData = [];
         setFilteredDataIsNotAvaialable(false);
         setFilteredZones([]);
-        filterZoneResult = [];
+        // filterZoneResult = [];
       }
     }
   }
@@ -188,6 +200,28 @@ export default function Zone() {
       });
     }
   };
+  let optionZoneName: any =
+    zoneList?.map((item: any) => ({
+      value: item.zoneName,
+      label: item.zoneName,
+    })) || [];
+  const optionZoneSortName =
+    zoneList?.map((item: any) => ({
+      value: item.zoneShortName,
+      label: item.zoneShortName,
+    })) || [];
+
+  let GeofenceOption = [
+    { value: "On-Site", label: "On-Site" },
+    { value: "Off-Site", label: "Off-Site" },
+    { value: "City-Area", label: "City-Area" },
+    { value: "Restricted-Area", label: "Restricted-Area" },
+  ];
+
+  let GeofenceOptionDisable = [
+    { value: "On-Site", label: "On-Site" },
+    { value: "Off-Site", label: "Off-Site" },
+  ];
 
   const handleClear = (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -202,9 +236,9 @@ export default function Zone() {
     setselectedZoneTypePolyGone(false);
     setSelectedZones([]);
     setInput("");
-    setFilterZonePage(1);
+    // setFilterZonePage(1);
     setRowsPerPage(10);
-    setFilteredZones(initialzoneList);
+    setFilteredZones([]);
     setCurrentPage(1);
   };
 
@@ -260,7 +294,7 @@ export default function Zone() {
   async function deleteSelectedZones(zoneId: any) {
     try {
       // Show a custom confirmation toast with "OK" and "Cancel" buttons
-      const { id } = toast.custom((t) => (
+      const { id } = await toast.custom((t) => (
         <div className="bg-white p-2 rounded-md">
           <p>Are you sure you want to delete this zone?</p>
           <button
@@ -284,6 +318,7 @@ export default function Zone() {
           >
             OK
           </button>
+
           <button
             onClick={() => {
               // Dismiss the confirmation toast without deleting
@@ -301,6 +336,7 @@ export default function Zone() {
           </button>
         </div>
       ));
+      await allZone();
     } catch (error) {
       // Show an error toast
       toast.error("Failed to delete zone", {
@@ -310,7 +346,6 @@ export default function Zone() {
       console.log(error);
     }
   }
-  // allZone();
 
   // async function deleteSelectedZones(zoneId: any) {
   // try {
@@ -384,9 +419,50 @@ export default function Zone() {
     setcheckBox(!checkBox);
   };
 
+  const handleZoneName = (e: any) => {
+    if (!e) {
+      return setSearchCriteria((preData: any) => ({
+        ...preData,
+        zoneName: "",
+      }));
+    }
+    setSearchCriteria({
+      ...searchCriteria,
+      zoneName: e,
+    });
+  };
+
+  const handleZoneSortName = (e: any) => {
+    // const { value, label } = e;
+    // console.log("value", value);
+    if (!e) {
+      return setSearchCriteria((PreData: any) => ({
+        ...PreData,
+        zoneShortName: "",
+      }));
+    }
+    setSearchCriteria({
+      ...searchCriteria,
+      zoneShortName: e,
+      // ["label"]: label,
+    });
+  };
+  const handleGeoFence = (e: any) => {
+    if (!e) {
+      return setSearchCriteria((preData: any) => ({
+        ...preData,
+        GeoFenceType: "",
+      }));
+    }
+    setSearchCriteria({
+      ...searchCriteria,
+      GeoFenceType: e,
+      // ["label"]: label,
+    });
+  };
   return (
     <div className=" bg-bgLight border-t border-bgLight " id="zone_main">
-      <p className="bg-green px-4 py-1 text-black text-center text-2xl text-white font-bold zone_heading">
+      <p className="bg-green px-4 py-1  text-center text-2xl text-white font-bold zone_heading">
         Zones
       </p>
       <form className=" lg:w-full w-screen bg-bgLight lg:-ms-0 -ms-1 zone_form">
@@ -415,7 +491,7 @@ export default function Zone() {
           </option>
         ))}
     </select> */}
-            <Select
+            {/* <Select
               value={searchCriteria.zoneName}
               onChange={(e) =>
                 setSearchCriteria({
@@ -423,6 +499,7 @@ export default function Zone() {
                   zoneName: e.target.value,
                 })
               }
+              onChange={selectZoneName}
               MenuProps={MenuProps}
               name="VehicleReg"
               id="select_box_journey"
@@ -439,7 +516,41 @@ export default function Zone() {
                     {item.zoneName}
                   </MenuItem>
                 ))}
-            </Select>
+            </Select> */}
+            <Select
+              value={searchCriteria.zoneName}
+              onChange={handleZoneName}
+              options={optionZoneName}
+              placeholder="Zone Name"
+              isClearable
+              isSearchable
+              noOptionsMessage={() => "No options available"}
+              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  border: "none",
+                  boxShadow: state.isFocused ? null : null,
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  backgroundColor: state.isSelected
+                    ? "#00B56C"
+                    : state.isFocused
+                    ? "#e1f0e3"
+                    : "transparent",
+                  color: state.isSelected
+                    ? "white"
+                    : state.isFocused
+                    ? "black"
+                    : "black",
+                  "&:hover": {
+                    backgroundColor: "#e1f0e3",
+                    color: "black",
+                  },
+                }),
+              }}
+            />
           </div>
           <div className="lg:col-span-1 md:col-span-1 col-span-1">
             <label className="text-md font-popins text-black font-semibold">
@@ -458,7 +569,7 @@ export default function Zone() {
         })
       }
     /> */}
-            <Select
+            {/* <Select
               value={searchCriteria.zoneShortName}
               onChange={(e) =>
                 setSearchCriteria({
@@ -488,7 +599,41 @@ export default function Zone() {
                     {item.zoneShortName}
                   </MenuItem>
                 ))}
-            </Select>
+            </Select> */}
+            <Select
+              onChange={handleZoneSortName}
+              value={searchCriteria.zoneShortName}
+              options={optionZoneSortName}
+              placeholder="Zone Sort Name"
+              isClearable
+              isSearchable
+              noOptionsMessage={() => "No options available"}
+              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  border: "none",
+                  boxShadow: state.isFocused ? null : null,
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  backgroundColor: state.isSelected
+                    ? "#00B56C"
+                    : state.isFocused
+                    ? "#e1f0e3"
+                    : "transparent",
+                  color: state.isSelected
+                    ? "white"
+                    : state.isFocused
+                    ? "black"
+                    : "black",
+                  "&:hover": {
+                    backgroundColor: "#e1f0e3",
+                    color: "black",
+                  },
+                }),
+              }}
+            />
           </div>
         </div>
         <div className="grid lg:grid-cols-2 md:grid-cols-2 mb-3   gap-6 pt-5 px-5 bg-green-50 ">
@@ -523,7 +668,7 @@ export default function Zone() {
         Restricted-Area
       </option>
     </select> */}
-            <Select
+            {/* <Select
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
@@ -552,7 +697,46 @@ export default function Zone() {
               <MenuItem value="Restricted-Area" id="zone_hover">
                 Restricted-Area
               </MenuItem>
-            </Select>
+            </Select> */}
+
+            <Select
+              value={searchCriteria.GeoFenceType}
+              onChange={handleGeoFence}
+              options={
+                session?.clickToCall === true
+                  ? GeofenceOption
+                  : GeofenceOptionDisable
+              }
+              placeholder="GeoFence"
+              isClearable
+              isSearchable
+              noOptionsMessage={() => "No options available"}
+              className="rounded-md w-full  outline-green border border-grayLight  hover:border-green"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  border: "none",
+                  boxShadow: state.isFocused ? null : null,
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  backgroundColor: state.isSelected
+                    ? "#00B56C"
+                    : state.isFocused
+                    ? "#e1f0e3"
+                    : "transparent",
+                  color: state.isSelected
+                    ? "white"
+                    : state.isFocused
+                    ? "black"
+                    : "black",
+                  "&:hover": {
+                    backgroundColor: "#e1f0e3",
+                    color: "black",
+                  },
+                }),
+              }}
+            />
           </div>
 
           <div
@@ -573,7 +757,7 @@ export default function Zone() {
             >
               <RadioButtonUncheckedIcon
                 className="mr-2"
-                style={{ color: "black !important" }}
+                // style={{ color: "black !important" }}
               />{" "}
               Circle
             </span>
@@ -591,10 +775,32 @@ export default function Zone() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 md:grid-cols-2  sm:grid-cols-2 grid-cols-2 px-5 lg:mt-0 mt-5">
-          <div className="lg:col-span-1 md:col-span-1 sm:col-span-1   col-span-2">
-            <div className="grid xl:grid-cols-7 lg:grid-cols-4  md:grid-cols-3 grid-cols-2">
-              <div className="grid  rounded-md lg:grid-cols-3 md:grid-cols-4 grid-cols-5 bg-green shadow-md  hover:shadow-gray transition duration-500 cursor-pointer">
+        <div className="grid lg:grid-cols-2  md:grid-cols-2  sm:grid-cols-2 grid-cols-2 px-5 lg:mt-0 mt-5 search_zone_btn_grid_main  ">
+          <div className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-2 search_zone_btn">
+            <div className="grid xl:grid-cols-7 lg:gap-2 md:gap-2 sm:gap-2 -mt-2 lg:grid-cols-4 gap-5 md:grid-cols-3 sm:grid-cols-2 grid-cols-2  search_zone_btn_grid">
+              <Button
+                className=" text-white font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none "
+                variant="outlined"
+                style={{
+                  fontSize: "16px",
+                  backgroundColor: "#00b56c",
+                  color: "white",
+                  border: "none",
+                }}
+                startIcon={
+                  <span style={{ fontWeight: "600" }}>
+                    <SearchIcon />
+                  </span>
+                }
+                onClick={handleSearchClick}
+              >
+                <b> s</b>{" "}
+                <span style={{ textTransform: "lowercase" }}>
+                  <b>earch</b>
+                </span>
+              </Button>
+
+              {/* <div className="grid  rounded-md lg:grid-cols-3 md:grid-cols-4 grid-cols-5  shadow-md    hover:shadow-gray transition duration-500 cursor-pointer">
                 <div className="lg:col-span-1 md:col-span-1 sm:col-span-2  col-span-2">
                   <svg
                     className="h-11 py-3 w-full text-white"
@@ -616,16 +822,36 @@ export default function Zone() {
 
                 <div className="lg:col-span-1 md:col-span-2 sm:col-span-1 col-span-1 text-center">
                   <button
-                    className="text-white font-popins font-bold text-start pt-1 h-10 bg-green text-md "
+                    className="text-white font-popins font-bold text-end pt-1 h-10 bg-green text-md "
                     type="button"
                     onClick={handleSearchClick}
                   >
                     Search
                   </button>
                 </div>
-              </div>
-
-              <div className="grid  rounded-md  xl:grid-cols-3 lg:grid-cols-5 md:ps-3 ms-4 md:grid-cols-4 grid-cols-5 bg-white shadow-md hover:shadow-gray transition duration-500 cursor-pointer">
+              </div> */}
+              <Button
+                className=" bg-white text-black font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-white border-none hover:border-none lg:w-auto md:w-auto sm:w-auto w-auto"
+                variant="outlined"
+                onClick={handleClear}
+                style={{
+                  fontSize: "16px",
+                  backgroundColor: "white",
+                  color: "black",
+                  border: "none",
+                }}
+                startIcon={
+                  <span style={{ fontWeight: "600" }}>
+                    <HighlightOffIcon />
+                  </span>
+                }
+              >
+                <b> C</b>{" "}
+                <span style={{ textTransform: "lowercase" }}>
+                  <b>lear</b>
+                </span>
+              </Button>
+              {/* <div className="grid  rounded-md  xl:grid-cols-3 lg:grid-cols-5 md:ps-3 ms-4 md:grid-cols-4 grid-cols-5 bg-white shadow-md hover:shadow-gray transition duration-500 cursor-pointer">
                 <div className="xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2  col-span-2">
                   <svg
                     className="h-11 py-3 w-full text-labelColor"
@@ -654,7 +880,8 @@ export default function Zone() {
                     Clear
                   </button>
                 </div>
-              </div>
+                <br></br>
+              </div> */}
 
               {/* <div className="grid rounded-md lg:grid-cols-2 lg:grid-cols-4 grid-cols-5 bg-zonebtnColor shadow-md ms-3 hover:shadow-gray transition duration-500 cursor-pointer">
         <div className="lg:col-span-2   md:col-span-2 col-span-3">
@@ -690,13 +917,13 @@ export default function Zone() {
 
           <div
             // style={{ display: "flex", justifyContent: "flex-end" }}
-            className="flex lg:justify-end justify-start"
+            className="flex lg:justify-end md:justify-end sm:justify-end"
           >
             <Link href="/AddZone">
-              <div className="rounded-md  grid grid-cols-3 bg-green mb-8 lg:-mt-2 md:-mt-1 mt-2 w-full  shadow-md   hover:shadow-gray transition duration-500 ">
-                <div className="col-span-1">
+              <div className="lg:rounded-md md:rounded-md sm:rounded-md rounded-sm  grid lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-3 grid-cols-4 bg-green mb-8 lg:-mt-2 md:-mt-1 sm:-mt-1 mt-1 w-full  shadow-md  hover:shadow-gray transition duration-500 ">
+                <div className="lg:col-span-1 -ms-1  md:col-span-1 sm:col-span-1 col-span-2 add_zone_buttons">
                   <svg
-                    className="h-11 py-3 w-full text-white "
+                    className="h-11 py-3 w-full text-white"
                     width="24"
                     viewBox="0 0 24 24"
                     strokeWidth="4"
@@ -711,12 +938,12 @@ export default function Zone() {
                     <line x1="12" y1="9" x2="12" y2="15" />
                   </svg>
                 </div>
-                <div className="col-span-2 pt-1">
+                <div className="lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-2   pt-1 flex lg:justify-center md:justify-center sm:justify-center justify-start -ms-1 lg:pe-0 md:pe-0 sm:pe-0 pe-1 add_zone_button_text">
                   <button
-                    className="text-white  font-popins font-bold -ms-2 h-10 bg-[#00B56C] px-2 text-md   "
+                    className="text-white  font-popins font-bold lg:-ms-2 md:-ms-2 h-10 bg-[#00B56C] px-2 text-md  sm:-ms-2 -ms-2  "
                     // onClick={handleClick}
                   >
-                    Add Zone
+                    Add zone
                   </button>
                 </div>
               </div>
@@ -732,7 +959,7 @@ export default function Zone() {
           <AddBoxIcon className="mx-3" />
         </div>
         <div className="col-span-1">
-          <button className="text-white font-popins font-bold  h-10 bg-[#00B56C] -ms-6 text-md ">
+          <button className="text-white font-popins font-bold  h-10 bg-[#00B56C] -ms-6 text-md">
             AddZone
           </button>
         </div>
@@ -744,7 +971,7 @@ export default function Zone() {
         </div>
       </form>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} className="table_scroll">
         {/* <p className="bg-green px-4 py-1 text-white font-bold lg:w-full w-screen ">
     ZoneTitle
   </p> */}
@@ -763,8 +990,8 @@ export default function Zone() {
           </TableCell> */}
                 <TableCell
                   align="left"
-                  className="border-r border-green text-white font-popins font-medium "
-                  style={{ fontSize: "20px" }}
+                  className="border-r border-green font-popins font-medium "
+                  style={{ fontSize: "20px", color: "white" }}
                 >
                   Zone Name
                 </TableCell>
@@ -784,18 +1011,22 @@ export default function Zone() {
                 </TableCell>
                 <TableCell
                   align="left"
-                  className="border-r border-green text-center font-popins font-medium "
-                  style={{ fontSize: "20px", color: "white" }}
+                  className="border-r border-green font-popins font-medium "
+                  style={{
+                    fontSize: "20px",
+                    color: "white",
+                    textAlign: "center",
+                  }}
                 >
                   Action
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filterZoneResult.length > 0 ? (
+              {filteredZones.length > 0 ? (
                 <>
                   {" "}
-                  {filterZoneResult.map((item: zonelistType, index) => (
+                  {filteredZones.map((item: zonelistType, index) => (
                     <TableRow
                       key={index}
                       className="cursor-pointer hover:bg-[#e2f6f0]"
@@ -822,28 +1053,41 @@ export default function Zone() {
                 </TableCell> */}
                       <TableCell
                         align="left"
-                        className="border-r border-green  font-popins text-black font-normal"
-                        style={{ fontSize: "16px" }}
+                        className="border-r   font-popins text-black font-normal"
+                        style={{
+                          fontSize: "16px",
+                          border: "1px solid #00b56c",
+                        }}
                       >
                         {item.zoneName}
                       </TableCell>
                       <TableCell
                         align="left"
-                        className="border-r border-green  font-popins text-black font-normal"
-                        style={{ fontSize: "16px" }}
+                        className="border-r   font-popins text-black font-normal"
+                        style={{
+                          fontSize: "16px",
+                          border: "1px solid #00b56c",
+                        }}
                       >
                         {item.zoneShortName}
                       </TableCell>
                       <TableCell
                         align="left"
-                        className="border-r border-green  font-popins text-black font-normal"
-                        style={{ fontSize: "16px" }}
+                        className="border-r   font-popins text-black font-normal"
+                        style={{
+                          fontSize: "16px",
+                          border: "1px solid #00b56c",
+                        }}
                       >
                         {item.zoneType}
                       </TableCell>
                       <TableCell
                         align="center" // Set align to center
-                        className="border-r border-green font-popins text-black font-normal"
+                        className="border-r 
+                         font-popins text-black font-normal"
+                        style={{
+                          border: "1px solid #00b56c",
+                        }}
                       >
                         <Link href={`/EditZone?id=${item.id}`}>
                           <BorderColorIcon
@@ -872,18 +1116,33 @@ export default function Zone() {
                 </>
               ) : filteredDataIsNotAvaialable === false ? (
                 <>
-                  <p className="flex items-center justify-center mt-52">
-                    No data found
-                  </p>
+                  <h2
+                    style={{
+                      height: "45vh",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      textAlign: "center",
+                      position: "absolute",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                    }}
+                    className="font-popins text-3xl"
+                  >
+                    No Data Found
+                  </h2>
                 </>
               ) : (
                 <>
-                  {displayedData.map((item: any, index) => (
-                    <TableRow
-                      key={index}
-                      className="cursor-pointer hover:bg-[#e2f6f0]"
-                    >
-                      {/* <TableCell
+                  {displayedData.length > 0 ? (
+                    <>
+                      {" "}
+                      {displayedData.map((item: any, index) => (
+                        <TableRow
+                          key={index}
+                          className="cursor-pointer hover:bg-[#e2f6f0]"
+                        >
+                          {/* <TableCell
                   align="left"
                   className="w-4 h-4 border-r border-green"
                 >
@@ -900,55 +1159,85 @@ export default function Zone() {
                     onChange={() => handleCheckboxChange(item)}
                   />
                 </TableCell> */}
-                      <TableCell
-                        align="left"
-                        className="border-r border-green  font-popins text-black font-normal"
-                        style={{ fontSize: "16px" }}
-                      >
-                        {item.zoneName}
-                      </TableCell>
-                      <TableCell
-                        align="left"
-                        className="border-r border-green  font-popins text-black font-normal"
-                        style={{ fontSize: "16px" }}
-                      >
-                        {item.zoneShortName}
-                      </TableCell>
-                      <TableCell
-                        align="left"
-                        className="border-r border-green  font-popins text-black font-normal"
-                        style={{ fontSize: "16px" }}
-                      >
-                        {item.zoneType}
-                      </TableCell>
-                      <TableCell
-                        align="center" // Set align to center
-                        className="border-r border-green font-popins text-black font-normal"
-                      >
-                        <Link href={`/EditZone?id=${item.id}`}>
-                          <BorderColorIcon
-                            style={{ marginTop: "-2%" }}
-                            className="text-white bg-green  p-1 h-7 w-8  rounded-md shadow-md hover:shadow-gray transition duration-500 "
-                          />
-                        </Link>
-                        <button
-                          // style={{ marginLeft: "73%" }}
-                          className="icon_delete_edit"
-                          onClick={() => deleteSelectedZones(item.id)}
-                        >
-                          <DeleteIcon
-                            className="text-white bg-red p-1 h-7 w-8 rounded-md shadow-md hover:shadow-gray transition duration-500 "
-                            style={{ marginTop: "-18%", marginLeft: "20%" }}
-                          />
-                        </button>
+                          <TableCell
+                            align="left"
+                            className="border-r   font-popins text-black font-normal"
+                            style={{
+                              fontSize: "16px",
+                              border: "1px solid #00b56c",
+                            }}
+                          >
+                            {item.zoneName}
+                          </TableCell>
+                          <TableCell
+                            align="left"
+                            className="border-r  font-popins text-black font-normal"
+                            style={{
+                              fontSize: "16px",
+                              border: "1px solid #00b56c",
+                            }}
+                          >
+                            {item.zoneShortName}
+                          </TableCell>
+                          <TableCell
+                            align="left"
+                            className="border-r   font-popins text-black font-normal"
+                            style={{
+                              fontSize: "16px",
+                              border: "1px solid #00b56c",
+                            }}
+                          >
+                            {item.zoneType}
+                          </TableCell>
+                          <TableCell
+                            align="center" // Set align to center
+                            className="border-r font-popins text-black font-normal"
+                            style={{
+                              border: "1px solid #00b56c",
+                            }}
+                          >
+                            <Link href={`/EditZone?id=${item.id}`}>
+                              <BorderColorIcon
+                                style={{ marginTop: "-2%" }}
+                                className="text-white bg-green  p-1 h-7 w-8  rounded-md shadow-md hover:shadow-gray transition duration-500 "
+                              />
+                            </Link>
+                            <button
+                              // style={{ marginLeft: "73%" }}
+                              className="icon_delete_edit"
+                              onClick={() => deleteSelectedZones(item.id)}
+                            >
+                              <DeleteIcon
+                                className="text-white bg-red p-1 h-7 w-8 rounded-md shadow-md hover:shadow-gray transition duration-500 delete_zone_button"
+                          
+                              />
+                            </button>
 
-                        {/* <BorderColorIcon
+                            {/* <BorderColorIcon
                     onClick={deleteSelectedZones}
                 
                   /> */}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </>
+                  ) : (
+                    <h2
+                      style={{
+                        height: "40vh",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        textAlign: "center",
+                        position: "absolute",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                      }}
+                      className="font-popins text-3xl"
+                    >
+                      No Data Found
+                    </h2>
+                  )}
                 </>
               )}
             </TableBody>
@@ -957,7 +1246,7 @@ export default function Zone() {
       </TableContainer>
 
       <div className="table_pagination">
-        {filterZoneResult.length > 0 ? (
+        {filteredZones.length > 0 ? (
           <div className="flex  justify-end lg:w-full w-screen bg-bgLight">
             <div className="grid lg:grid-cols-4 grid-cols-4   ">
               <div className="lg:col-span-1 col-span-1">
@@ -969,7 +1258,7 @@ export default function Zone() {
               <div className="lg:col-span-2 md:col-span-2 m:col-span-2 col-span-12 table_pagination">
                 <Stack spacing={2}>
                   <Pagination
-                    count={totalPagesFilter}
+                    // count={totalPagesFilter}
                     page={filterZonepage}
                     onChange={handlePageChangeFiter}
                     sx={{ color: "green" }}
@@ -998,7 +1287,7 @@ export default function Zone() {
               <TablePagination
                 component="div"
                 rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
-                count={filterZoneResult.length} // or zoneList.length depending on the context
+                count={filteredZones.length} // or zoneList.length depending on the context
                 rowsPerPage={filterZonePerPage} // or rowsPerPage depending on the context
                 page={filterZonepage} // or currentPage depending on the context
                 onRowsPerPageChange={handleChangeRowsPerPageFilter} // or handleChangeRowsPerPage depending on the context
@@ -1044,7 +1333,7 @@ export default function Zone() {
             <div className="-mt-3">
               <TablePagination
                 component="div"
-                // rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
+                rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
                 count={zoneList.length}
                 rowsPerPage={rowsPerPage}
                 page={currentPage}

@@ -9,8 +9,8 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Button from "@mui/material/Button";
-import { toast } from "react-hot-toast";
-
+import { toast, Toaster } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -29,6 +29,8 @@ import { vehicleListByClientId } from "@/utils/API_CALLS";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import "./assign.css";
+import { el } from "date-fns/locale";
+import { InputLabel } from "@mui/material";
 interface Column {
   id: "name" | "code" | "population" | "size" | "density";
   label: string;
@@ -158,6 +160,7 @@ const style = {
 };
 
 export default function DriverProfile() {
+  const router = useRouter();
   const { data: session } = useSession();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -165,6 +168,13 @@ export default function DriverProfile() {
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
+  if (
+    session?.userRole === "Controller" ||
+    (session?.userRole == "Admin" && session?.driverProfile === false)
+  ) {
+    router.push("/signin");
+    return null;
+  }
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -181,30 +191,32 @@ export default function DriverProfile() {
   const [getAllAsignData, setgetAllAsignData] = useState<any>([]);
   const [selectedDriver, setSelectedDriver] = useState<any>({});
   const [selectVehicleNum, setSelectVehicleNum] = useState<any>({});
-  useEffect(() => {
-    const vehicleName = async () => {
-      try {
-        // setLaoding(true);
-        if (session) {
-          const response = await GetDriverDataByClientId({
-            token: session?.accessToken,
-            clientId: session?.clientId,
-          });
-          setDriverList(
-            response.filter(
-              (item: any) =>
-                item.isAvailable == true && item.isDeleted === false
-            )
-          );
-        }
-        // setLaoding(false);
-      } catch (error) {
-        console.error("Error fetching zone data:", error);
+
+  const vehicleName = async () => {
+    // console.log("selected", selectedDriver);
+    try {
+      // setLaoding(true);
+      if (session) {
+        const response = await GetDriverDataByClientId({
+          token: session?.accessToken,
+          clientId: session?.clientId,
+        });
+        setDriverList(
+          response.filter(
+            (item: any) => item.isAvailable == true && item.isDeleted === false
+          )
+        );
       }
-    };
+      // setLaoding(false);
+    } catch (error) {
+      console.error("Error fetching zone data:", error);
+    }
+  };
+
+  useEffect(() => {
     vehicleName();
   }, [session]);
-
+  // console.log("getallAssign", getAllAsignData);
   const AllAsignData = async () => {
     try {
       // setLaoding(true);
@@ -258,12 +270,11 @@ export default function DriverProfile() {
   // }, [session]);
   useEffect(() => {
     vehicleNum();
-  });
+  }, [session]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
-    const payload: any = {
+    let payload: any = {
       DriverDetails: {
         id: selectedDriver._id,
         driverfirstName: selectedDriver.driverfirstName,
@@ -287,58 +298,72 @@ export default function DriverProfile() {
       // dateDeassign: null,
     };
 
-    try {
-      if (session) {
-        const newformdata: any = {
-          ...payload,
-          clientId: session?.clientId,
-        };
-        const response = await toast.promise(
-          postDriverDataAssignByClientId({
-            token: session?.accessToken,
-            newformdata: newformdata,
-          }),
-          {
-            loading: "Saving data...",
-            success: "Data saved successfully!",
-            error: "Error saving data. Please try again.",
-          },
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
+    if (
+      !payload.vehicleDetails.vehicleNo ||
+      !payload.DriverDetails.driverfirstName ||
+      !payload.DriverDetails.driverLastName
+    ) {
+      toast.error("Please Fill the field");
+    } else {
+      try {
+        if (session) {
+          const newformdata: any = {
+            ...payload,
+            clientId: session?.clientId,
+          };
+
+          const response = await toast.promise(
+            postDriverDataAssignByClientId({
+              token: session?.accessToken,
+              newformdata: newformdata,
+            }),
+            {
+              loading: "Saving data...",
+              success: "Data saved successfully!",
+              error: "Error saving data. Please try again.",
             },
-            success: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
+            {
+              style: {
+                border: "1px solid #00B56C",
+                padding: "16px",
+                color: "#1A202C",
               },
-            },
-            error: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
+              success: {
+                duration: 2000,
+                iconTheme: {
+                  primary: "#00B56C",
+                  secondary: "#FFFAEE",
+                },
               },
-            },
-          }
-        );
-        // vehicleListData();
-        AllAsignData();
+              error: {
+                duration: 2000,
+                iconTheme: {
+                  primary: "#00B56C",
+                  secondary: "#FFFAEE",
+                },
+              },
+            }
+          );
+          // vehicleListData();
+          AllAsignData();
+          setSelectedDriver("");
+        }
+      } catch (error) {
+        console.error("Error fetching zone data:", error);
       }
-    } catch (error) {
-      console.error("Error fetching zone data:", error);
+      vehicleName();
+      vehicleNum();
+      vehicleNum();
+      setSelectedDriver("");
+      setOpen(false);
     }
-    vehicleNum();
+    setSelectVehicleNum({});
   };
 
   const handleDeasign = async (item: any) => {
     const selectedDriverObject: any = await getAllAsignData?.data?.find(
       (driver: any) => driver._id === item
     );
-    console.log("item", selectedDriverObject.id);
     const payload: any = {
       DriverDetails: {
         driverfirstName: selectedDriverObject?.DriverDetails?.driverfirstName,
@@ -367,45 +392,107 @@ export default function DriverProfile() {
     };
     try {
       if (session) {
-        const newformdata: any = {
-          ...payload,
-          clientId: session?.clientId,
-        };
-        console.log("deAssign", newformdata);
-        const response = await toast.promise(
-          postDriverDeDataAssignByClientId({
-            token: session?.accessToken,
-            newformdata: newformdata,
-          }),
-          {
-            loading: "Saving data...",
-            success: "Data saved successfully!",
-            error: "Error saving data. Please try again.",
-          },
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
-            },
-            success: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-            error: {
-              duration: 2000,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-          }
-        );
-        // vehicleListData();
-        AllAsignData();
+        const { id } = toast.custom((t) => (
+          <div className="bg-white p-2 rounded-md">
+            <p>Are you sure you want to Deasign This Driver ?</p>
+            <button
+              onClick={async () => {
+                // Check if the user is authenticated
+                if (session) {
+                  const newformdata: any = {
+                    ...payload,
+                    clientId: session?.clientId,
+                  };
+                  const response = await toast.promise(
+                    postDriverDeDataAssignByClientId({
+                      token: session?.accessToken,
+                      newformdata: newformdata,
+                    }),
+                    {
+                      loading: "Saving data...",
+                      success: "User successfully Active!",
+                      error: "Error saving data. Please try again.",
+                    },
+                    {
+                      style: {
+                        border: "1px solid #00B56C",
+                        padding: "16px",
+                        color: "#1A202C",
+                      },
+                      success: {
+                        duration: 2000,
+                        iconTheme: {
+                          primary: "#00B56C",
+                          secondary: "#FFFAEE",
+                        },
+                      },
+                      error: {
+                        duration: 2000,
+                        iconTheme: {
+                          primary: "#00B56C",
+                          secondary: "#FFFAEE",
+                        },
+                      },
+                    }
+                  );
+                  AllAsignData();
+                }
+              }}
+              className="text-green pr-5 font-popins font-bold"
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => {
+                // Dismiss the confirmation toast without deleting
+                toast.dismiss(id);
+
+                // Optionally, you can show a cancellation message
+                toast("Deletion canceled", {
+                  duration: 3000,
+                  position: "top-center",
+                });
+              }}
+              className="text-red font-popins font-bold"
+            >
+              No
+            </button>
+          </div>
+        ));
+
+        // console.log("deAssign", newformdata);
+        // const response = await toast.promise(
+        //   postDriverDeDataAssignByClientId({
+        //     token: session?.accessToken,
+        //     newformdata: newformdata,
+        //   }),
+        //   {
+        //     loading: "Saving data...",
+        //     success: "Data saved successfully!",
+        //     error: "Error saving data. Please try again.",
+        //   },
+        //   {
+        //     style: {
+        //       border: "1px solid #00B56C",
+        //       padding: "16px",
+        //       color: "#1A202C",
+        //     },
+        //     success: {
+        //       duration: 2000,
+        //       iconTheme: {
+        //         primary: "#00B56C",
+        //         secondary: "#FFFAEE",
+        //       },
+        //     },
+        //     error: {
+        //       duration: 2000,
+        //       iconTheme: {
+        //         primary: "#00B56C",
+        //         secondary: "#FFFAEE",
+        //       },
+        //     },
+        //   }
+        // );
       }
     } catch (error) {
       console.error("Error fetching zone data:", error);
@@ -481,7 +568,7 @@ export default function DriverProfile() {
                   <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 m-6 mt-8 gap-5">
                     <div className="lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-12  ">
                       <label className="text-gray-700 ">
-                        <i className="text-black font-popins font-medium mt-5">
+                        <i className=" font-popins font-extrabold mt-5 text-red">
                           *
                         </i>{" "}
                         Drives:
@@ -493,14 +580,17 @@ export default function DriverProfile() {
                         className="h-8 w-full  border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-outoutline-none color-gray"
                         displayEmpty
                       >
-                        <MenuItem value="" disabled>
+                        {/* <MenuItem value="" disabled selected>
                           Drives
-                        </MenuItem>
+                        </MenuItem> */}
+                        <InputLabel disabled hidden className="text-gray">
+                          Select Driver{" "}
+                        </InputLabel>
                         {DriverList &&
                           DriverList.map((item: any, i: any) => {
                             return (
                               <MenuItem
-                                className="hover:bg-green hover:text-white"
+                                className="assign_driver_hover"
                                 key={item._id}
                                 value={item._id}
                               >
@@ -515,7 +605,7 @@ export default function DriverProfile() {
                     <div className="lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-12 lg:mt-0 md:mt-0 sm:mt-0  mt-4 ">
                       <label>
                         {" "}
-                        <i className="text-black font-popins font-medium  mt-5">
+                        <i className="text-red font-popins font-extrabold  mt-5">
                           *
                         </i>{" "}
                         Vehicles:
@@ -525,14 +615,15 @@ export default function DriverProfile() {
                           displayEmpty
                           className="h-8  border w-full border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out"
                         >
-                          <MenuItem value="" disabled selected hidden>
-                            Vehicles
-                          </MenuItem>
+                          <InputLabel disabled hidden className="text-gray">
+                            Select Vehicle{" "}
+                          </InputLabel>
                           {vehicleNums &&
                             vehicleNums?.map((item: any) => {
                               return (
                                 <MenuItem
-                                  className="hover:bg-green hover:text-white"
+                                  className="assign_driver_hover"
+                                  // className="hover:bg-green hover:text-white"
                                   key={item._id}
                                   value={item._id}
                                 >
@@ -546,7 +637,7 @@ export default function DriverProfile() {
                       <div className="flex justify-end">
                         <button
                           type="submit"
-                          className="bg-[#00B56C]  px-4 py-1 mt-10  text-end text-white rounded-md "
+                          className="bg-[#00B56C]  px-6 py-2 mt-10  text-end text-white rounded-md "
                         >
                           Submit
                         </button>
@@ -561,7 +652,7 @@ export default function DriverProfile() {
         <TableContainer>
           <div className="table_driver_profile">
             <Table stickyHeader aria-label="sticky table">
-              <TableHead className="sticky top-0 bg-white z-10">
+              <TableHead className="sticky top-0 bg-white ">
                 <TableRow>
                   <TableCell
                     align="center"
@@ -569,7 +660,7 @@ export default function DriverProfile() {
                     id="table_head"
                     className="font-popins  font-bold text-black"
                   >
-                    Driver Number
+                    S.No
                   </TableCell>
                   <TableCell
                     align="center"
@@ -604,7 +695,7 @@ export default function DriverProfile() {
                     id="table_head"
                     className="font-popins  font-bold text-black"
                   >
-                    Driver Contact.NO
+                    Driver Number
                   </TableCell>
                   <TableCell
                     align="center"
@@ -636,8 +727,11 @@ export default function DriverProfile() {
                 </TableRow>
               </TableHead>
               <TableBody className="bg-bgLight cursor-pointer  ">
-                {getAllAsignData?.data?.map((row: any) => (
+                {getAllAsignData?.data?.map((row: any, index: any) => (
                   <TableRow className="hover:bg-bgHoverTabel w-full">
+                    <TableCell align="center" colSpan={2}>
+                      {page * rowsPerPage + index + 1}
+                    </TableCell>
                     <TableCell align="center" colSpan={2}>
                       {row?.DriverDetails?.driverNo}
                     </TableCell>
@@ -654,9 +748,9 @@ export default function DriverProfile() {
                     </TableCell>
                     <TableCell align="center" colSpan={2}>
                       {row?.DriverDetails?.driverIdNo}
-                    </TableCell>
-                    <TableCell>{row?.DriverDetails?.driverIdNo}</TableCell>
-                    <TableCell align="center">
+                      {/* </TableCell> */}
+                      {/* <TableCell>{row?.DriverDetails?.driverIdNo}</TableCell> */}
+                      {/* <TableCell align="center"> */}
                       {row?.DriverDetails?.driverContact}
                     </TableCell>
                     <TableCell align="center" colSpan={2}>
@@ -670,7 +764,8 @@ export default function DriverProfile() {
                       align="center"
                       colSpan={2}
                       onClick={() => handleDeasign(row.id)}
-                      className="text-green"
+                      className=" font-bold"
+                      style={{ color: "#00B56C" }}
                     >
                       Deasign
                       {/* {row.DriverDetails.driverAddress2} */}
@@ -692,6 +787,7 @@ export default function DriverProfile() {
           className="bg-bgLight table_pagination"
         />
       </Paper>
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }

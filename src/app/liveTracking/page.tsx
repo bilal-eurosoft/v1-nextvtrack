@@ -53,7 +53,10 @@ const LiveMap = dynamic(() => import("@/components/LiveTracking/LiveMap"), {
 });
 
 const LiveTracking = () => {
-  const { data: session } = useSession();
+  let { data: session } = useSession();
+  if (!session) {
+    session = JSON.parse(localStorage.getItem("user"));
+  }
   const carData = useRef<VehicleData[]>([]);
   const [clientSettings, setClientSettings] = useState<ClientSettings[]>([]);
   const [zoneList, setZoneList] = useState<zonelistType[]>([]);
@@ -236,7 +239,7 @@ const LiveTracking = () => {
 
   return (
     <>
-      <div className="grid lg:grid-cols-5 sm:grid-cols-5 md:grid-cols-5 grid-cols-1 ">
+      <div className="grid lg:grid-cols-5 sm:grid-cols-5 md:grid-cols-5 grid-cols-1">
         <LiveSidebar
           carData={carData.current}
           countMoving={countMoving}

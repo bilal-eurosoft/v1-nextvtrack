@@ -27,6 +27,11 @@
 .yellowCarBG {
   background-image: url(../../public//yellowcar.png);
 }
+@media (max-width: 1023px) {
+  div[data-floating-ui-portal] div {
+    z-index: 9999;
+  }
+}
 
 .car {
   width: 40px;
@@ -36,4 +41,21 @@
   background-repeat: no-repeat;
   background-position: center;
   margin: -15px 0 0 37px;
+}
+/* . style={{ height: "7vh", width: "12%", marginTop: "-3%" }}{ */
+
+/* } */
+.loading_all_page {
+  height: 7vh;
+  width: 12%;
+  margin-top: -3%;
+}
+
+@media (max-width: 600px) {
+  .loading_all_page {
+    width: 25%;
+    height: 5vh !important;
+    /* margin-top: -3%; */
+    margin-bottom: 12% !important;
+  }
 }

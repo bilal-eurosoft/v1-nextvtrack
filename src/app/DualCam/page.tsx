@@ -3,6 +3,7 @@ import React from "react";
 import { Dialog } from "@material-tailwind/react";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { videoList } from "@/utils/API_CALLS";
@@ -66,6 +67,15 @@ export default function DualCam() {
     setOpen(!open);
     setSingleImage(item.path);
   };
+  const router = useRouter();
+
+  if (
+    session?.userRole === "Controller" ||
+    (session?.userRole == "Admin" && session?.cameraProfile == false)
+  ) {
+    router.push("/signin");
+    return null;
+  }
 
   const handleOpenSecond = (item: any) => {
     setOpenSecond(!openSecond);

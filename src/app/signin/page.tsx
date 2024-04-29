@@ -1,32 +1,48 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import logo from "../../../public/Images/logo.png";
 import loadings from "../../../public/Images/loadinglogo.png";
-
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
+import { setLoginTime } from "../../utils/time";
+import { GetUsersByClientId, GetLicenseById } from "@/utils/API_CALLS";
 import "./login.css";
+import https from "https";
+import { useSession } from "next-auth/react";
 
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 export default function LoginPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const clientIdparams = searchParams.get("clientId");
+  const pageparams = searchParams.get("page");
+  const agent = new https.Agent({
+    rejectUnauthorized: false,
+  });
 
   const [formData, setFormData] = useState({
     userName: "",
     password: "",
   });
-
+  const { data: session } = useSession();
   const handleInputChange = (e: any) => {
     const value = e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
   };
+  console.log("session", session);
 
+  if (session?.failed == false) {
+    router.push("/signin");
+  }
+  /* 
   const handleClick = async () => {
     setLoading(true);
     const { userName, password } = formData;
@@ -40,12 +56,103 @@ export default function LoginPage() {
       router.push("/liveTracking");
     }
     if (data?.status === 401) {
-      toast.error("Invalid Credential", {
+      toast.error("Invalid User Or Password", {
         position: "top-center",
       });
     }
+
+    // else {
+    //   toast.error("License  is Expire", {
+    //     position: "top-center",
+    //   });
+    // }
+    setLoading(false);
+  }; */
+
+  const handleClick = async () => {
+    setLoading(true);
+    const { userName, password } = formData;
+    const data = await signIn("credentials", {
+      userName,
+      password,
+      redirect: false,
+    });
+    if (data?.error) {
+      if (data.error) {
+        toast.error(data.error, {
+          position: "top-center",
+        });
+      }
+    } else {
+      router.push("/liveTracking");
+    }
     setLoading(false);
   };
+
+  // const handleClick = async () => {
+  //   setLoading(true);
+  //   const { userName, password } = formData;
+  //   const data = await signIn("credentials", {
+  //     userName,
+  //     password,
+  //     redirect: false,
+  //   });
+  //   if (data?.status === 200) {
+  //     setLoginTime();
+  //     router.push("/liveTracking");
+  //   }
+  //   setLoading(false);
+  // };
+  const fetchData = async () => {
+    if (
+      clientIdparams !== undefined &&
+      clientIdparams !== null &&
+      pageparams !== undefined &&
+      pageparams !== null
+    ) {
+      try {
+        const users = await GetUsersByClientId({
+          // token: session.accessToken,
+          clientId: clientIdparams,
+        });
+
+        const licenseInfo = await GetLicenseById({
+          // token: session.accessToken,
+          id: clientIdparams,
+        });
+
+        let config = {
+          method: "post",
+          maxBodyLength: Infinity,
+          url: "https://backend.vtracksolutions.com/Portallogin",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          httpsAgent: agent,
+          data: {
+            userName: licenseInfo[0].accountCode + "@" + users[0].userName,
+            password: users[0].password,
+          },
+        };
+        const response = await axios.request(config);
+        if (response?.data?.accessToken) {
+          // localStorage.setItem(
+          //   "user_id",
+          //   JSON.stringify(response?.data?.Email)
+          // );
+
+          localStorage.setItem("user", JSON.stringify(response?.data));
+          router.push("/liveTracking?screen=full");
+        }
+      } catch (error) {
+        // Handle errors
+        console.error("Error fetching data:", error);
+      }
+    }
+  };
+
+  fetchData();
+
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -77,12 +184,7 @@ export default function LoginPage() {
               alignItems: "center",
             }}
           >
-            <Image
-              src={loadings}
-              alt=""
-              style={{ height: "7vh", width: "12%", marginTop: "-3%" }}
-            />
-            <br></br>
+            <Image src={loadings} alt="" className="loading_all_page" />
           </div>
           <div role="status">
             <svg
@@ -164,7 +266,7 @@ export default function LoginPage() {
                 </div>
               </div>
               <div className="lg:mx-0 mx-5">
-                <div className="grid lg:grid-cols-12 grid-cols-12   rounded-md  py-1.5 text-labelColor shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-green  px-3 bg-white">
+                <div className="grid lg:grid-cols-12 grid-cols-12  rounded-md  py-1.5 text-labelColor shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-green  px-3 bg-white">
                   <div className="col-span-11 ">
                     <input
                       id="password"

@@ -1,19 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { forgetEmailByClientId } from "@/utils/API_CALLS";
+import { forgetEmailByClientId, expireForgotLink } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
-import { toast } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
+
 import logo from "../../../public/Images/logo.png";
 import "./forget.css";
 export default function ForgetPassword() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState<boolean>(false);
+  const [showVerificationText, setshowVerificationText] = useState<any>(false);
   const router = useRouter();
+
   const [formData, setFormData] = useState({
     email: "",
+    userName: "",
   });
 
   const handleInputChange = (key: any, e: any) => {
@@ -27,40 +31,54 @@ export default function ForgetPassword() {
       ...formData,
       clientId: session?.clientId,
     };
-
-    const response = await toast.promise(
-      forgetEmailByClientId({
+    if (showVerificationText == false) {
+      const response = await forgetEmailByClientId({
         token: session?.accessToken,
         newformdata: newformdata,
-      }),
-      {
-        loading: "Saving data...",
-        success: "Data saved successfully!",
-        error: "Error saving data. Please try again.",
-      },
-      {
-        style: {
-          border: "1px solid #00B56C",
-          padding: "16px",
-          color: "#1A202C",
-        },
-        success: {
-          duration: 2000,
-          iconTheme: {
-            primary: "#00B56C",
-            secondary: "#FFFAEE",
-          },
-        },
-        error: {
-          duration: 2000,
-          iconTheme: {
-            primary: "#00B56C",
-            secondary: "#FFFAEE",
-          },
-        },
-      }
-    );
+      });
 
+      // {
+      //   loading: "Saving data...",
+      //   error: "Error saving data. Please try again.",
+      // },
+      // {
+      // style: {
+      //   border: "1px solid #00B56C",
+      //   padding: "16px",
+      //   color: "#1A202C",
+      // },
+      // success: {
+      //   duration: 2000,
+      //   iconTheme: {
+      //     primary: "#00B56C",
+      //     secondary: "",
+      //   },
+      // },
+      // error: {
+      //   duration: 2000,
+      //   iconTheme: {
+      //     primary: "#00B56C",
+      //     secondary: "#FFFAEE",
+      //   },
+      // },
+      // }
+      // );
+
+      setFormData({
+        userName: "",
+        email: "",
+      });
+      if (response.Msg == "Reset Link send successfully") {
+        setshowVerificationText(true);
+        toast.success(response.Msg, {
+          position: "top-center",
+        });
+      } else {
+        toast.error(response.Msg, {
+          position: "top-center",
+        });
+      }
+    }
     // if (session) {
     //   const newformdata: any = {
     //     ...formData,
@@ -102,6 +120,7 @@ export default function ForgetPassword() {
     //   );
     // }
   };
+  console.log("session", session);
 
   return (
     <div
@@ -145,7 +164,7 @@ export default function ForgetPassword() {
               Forgot Your Password?
             </p>
 
-            <p className="mt-3 text-start   font-popins text-1xl  leading-9 tracking-tight text-white px-5">
+            <p className="mt-3 text-start   font-popins text-xl  leading-9 tracking-tight text-white px-5">
               Not to worry, we got you! let's get you a new password
             </p>
 
@@ -154,33 +173,60 @@ export default function ForgetPassword() {
             </label> */}
 
             <form className="space-y-6 mx-6" onSubmit={handleSubmit}>
-              <div className="lg:mx-0 mx-5">
-                <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
-                  <div className="col-span-12 ">
-                    <input
-                      required
-                      placeholder="Please Input Your Email Address"
-                      className="outline-none w-full text-black font-bold"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e: any) => handleInputChange("email", e)}
-                    />
+              {showVerificationText ? (
+                <p className="text-white text-xl pt-2">
+                  {" "}
+                  We have sent an email with a confirmation link to your email
+                  address. In order to complete the reset process, please click
+                  the confirmation link. If you do not receive a confirmation
+                  email, please check your spam folder. Also, please verify that
+                  you entered a valid email address.
+                </p>
+              ) : (
+                <div className="lg:mx-0 mx-5">
+                  <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
+                    <div className="col-span-12 ">
+                      <input
+                        required
+                        placeholder="Please Input Your Name"
+                        className="outline-none w-full text-black font-bold"
+                        type="text"
+                        value={formData.userName}
+                        onChange={(e: any) => handleInputChange("userName", e)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-12 block mt-5 w-full rounded-md  py-1.5 text-gray shadow-sm border border-grayLight border hover:border-green  placeholder:text-gray-400 bg-white sm:text-sm sm:leading-6 outline-green  px-3">
+                    <div className="col-span-12 ">
+                      <input
+                        required
+                        placeholder="Please Input Your Email Address"
+                        className="outline-none w-full text-black font-bold"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e: any) => handleInputChange("email", e)}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
-              <div className="lg:mx-0 px-20">
-                <button
-                  type="submit"
-                  className="flex w-full mt-20 justify-center rounded-md bg-green px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-8"
-                  // onClick={handleClick}
-                >
-                  Reset My Password
-                </button>
-              </div>
+              {showVerificationText ? (
+                ""
+              ) : (
+                <div className="lg:mx-0 px-20">
+                  <button
+                    type="submit"
+                    className="flex w-full mt-20 justify-center rounded-md bg-green px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-8"
+                  >
+                    Reset My Password
+                  </button>
+                </div>
+              )}
               <p
                 className="text-white text-sm lg:mx-0 mx-5 cursor-pointer hover:text-red pb-0"
-                onClick={() => router.push("/login")}
+                onClick={() => router.push("/signin")}
               >
                 <b> Back To Sign In</b>
               </p>
@@ -189,6 +235,7 @@ export default function ForgetPassword() {
           </div>
         </div>
       )}
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }

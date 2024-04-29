@@ -2,17 +2,17 @@
 const nextConfig = {
   experimental: {},
   images: {
-    domains: ["vtracksolutions.s3.eu-west-2.amazonaws.com"],
+    domains: ["vtracksolutions.s3.eu-west-2.amazonaws.com"]
   },
   compiler: {
-    styledComponents: true,
+    styledComponents: true
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: true
   },
   eslint: {
-    ignoreDuringBuilds: true,
-  },
+    ignoreDuringBuilds: true
+  }
 };
 
 module.exports = nextConfig;

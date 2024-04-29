@@ -33,6 +33,8 @@ type TripsByBucket = {
   StartingPoint: StartingPoint;
   StartingPointComplete: Location;
   Status: string;
+  DriverName: string;
+
   TotalDistance: string;
   TripDurationHr: TripDurationHr;
   TripDurationMins: TripDurationMins;
@@ -60,4 +62,6 @@ export type TravelHistoryData = {
   vehicle: string;
   vehicleEvents: any[]; // You can specify the type of vehicleEvents as needed
   _id: string;
+  address: string;
+  display_name: string;
 };

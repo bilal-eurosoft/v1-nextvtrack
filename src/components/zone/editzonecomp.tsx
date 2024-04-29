@@ -10,7 +10,10 @@ import { ZoneFindById, postZoneDataByClientId } from "@/utils/API_CALLS";
 import L, { LatLngTuple } from "leaflet";
 import { Toaster, toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { MenuItem, Select } from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
+import SaveIcon from "@mui/icons-material/Save";
+import { Button, MenuItem, Select } from "@mui/material";
+import EditRoadIcon from "@mui/icons-material/EditRoad";
 import "./editZone.css";
 
 const MapContainer = dynamic(
@@ -71,6 +74,10 @@ export default function EditZoneComp() {
   });
 
   const router = useRouter();
+  if (session?.userRole === "Controller") {
+    router.push("/signin");
+    return null;
+  }
   const [zoom, setZoom] = useState(10);
 
   useEffect(() => {
@@ -122,10 +129,8 @@ export default function EditZoneComp() {
           const maxLat = Math.max(...lats);
           const minLng = Math.min(...lngs);
           const maxLng = Math.max(...lngs);
-
           const latDistance = maxLat - minLat;
           const lngDistance = maxLng - minLng;
-
           const latZoom = Math.floor(Math.log2(360 / (0.5 * latDistance)));
           const lngZoom = Math.floor(Math.log2(360 / (0.5 * lngDistance)));
 
@@ -137,7 +142,7 @@ export default function EditZoneComp() {
           ]);
         }
       }
-    } else {
+    } else if (zoneDataById?.zoneType === "Circle") {
       let circledata = Number(zoneDataById?.latlngCordinates);
       const newcenterPoints = zoneDataById?.centerPoints;
       const latlng = newcenterPoints?.split(",").map(Number);
@@ -223,28 +228,30 @@ export default function EditZoneComp() {
     };
 
     let circlePoint = formatCenterPoints(latlng.lat, latlng.lng);
+
     const newlatlng = circlePoint?.split(",").map(Number);
-    if (drawShape == true) {
+    console.log("newlatlng", newlatlng, drawShape);
+
+    if (drawShape == true || drawShape == false) {
       setCircleDataById({ radius: radius });
       const updateCircleData = (newLatlng: string, newRadius: string): void => {
+        console.log("updateCircleData", newLatlng, newRadius);
         setCircleData({
           latlng: newLatlng,
           radius: newRadius,
         });
       };
       updateCircleData(circlePoint, radius);
-
       setMapcenter([newlatlng[0], newlatlng[1]]);
-
-      setDrawShape(!drawShape);
     }
   };
-
+  console.log("circledata", circleData);
   const handleChange = (e: any) => {
     const { name, value } = e.target;
+    console.log("e", name, value);
     setForm({ ...Form, [name]: value });
   };
-
+  // console.log(drawShape);
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -255,7 +262,7 @@ export default function EditZoneComp() {
       toast.error("Please Draw a Zone");
       return;
     }
-
+    console.log("[pqwoepiwqouwiy", Form);
     try {
       if (session) {
         const newformdata = {
@@ -322,12 +329,15 @@ export default function EditZoneComp() {
       } else if (layer instanceof L.Circle) {
         const latlng: L.LatLng = layer.getLatLng();
         const radius: number = layer.getRadius();
+        console.log("vsdfvfd", latlng, radius);
         handleCircleSave(latlng, radius.toString());
+        setDrawShape(true);
       }
     });
   };
 
   const handleredraw = (e: any) => {
+    setDrawShape(true);
     if (polygondataById.length > 0) {
       setDrawShape(true);
       setPolygondataById([]);
@@ -336,14 +346,13 @@ export default function EditZoneComp() {
     } else if (circleDataById !== null) {
       setCircleDataById(null);
       setCircleData({ radius: "", latlng: "" });
-
       setForm({ ...Form, zoneType: "" });
       setDrawShape(true);
     } else {
-      setDrawShape(drawShape);
+      setDrawShape(true);
     }
   };
-
+  console.log("form", Form, drawShape);
   const handleCreated = (e: any) => {
     const createdLayer = e.layer;
     const type = e.layerType;
@@ -373,10 +382,11 @@ export default function EditZoneComp() {
           Edit Zone
         </p>
         <div className="grid lg:grid-cols-6 sm:grid-cols-5 md:grid-cols-6 grid-cols-1  pt-8">
-          <div className=" xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-4 col-span-4 bg-gray-200 mx-5">
+          <div className=" xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-6 col-span-4 bg-gray-200 mx-5 edit_zone_side_bar">
             <form onSubmit={handleSave}>
-              <label className="text-black text-md w-full font-popins font-medium">
-                <span className="text-red">*</span> Please Enter Zone Name:{" "}
+              <label className="text-md font-popins text-black font-semibold">
+                <span className="text-red  font-extraboldbold">*</span> Please
+                Enter Zone Name:{" "}
               </label>
               <input
                 onChange={handleChange}
@@ -387,46 +397,53 @@ export default function EditZoneComp() {
                 placeholder="Enter Zone Name"
                 required
               />
-              <label className="text-black text-md font-popins font-medium">
-                <span className="text-red">*</span> Geofence:{" "}
+              <label className="text-md font-popins text-black font-semibold">
+                <span className="text-red font-extraboldbold">*</span> Geofence:{" "}
               </label>
-              <Select
-                onChange={handleChange}
-                value={Form?.GeoFenceType}
-                id="select_box_journey"
-                className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
-                required
-                name="GeoFenceType"
-              >
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="On-Site"
+              {session?.clickToCall === true ? (
+                <Select
+                  onChange={handleChange}
+                  value={Form?.GeoFenceType}
+                  id="select_box_journey"
+                  className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
+                  required
+                  name="GeoFenceType"
                 >
-                  On-Site
-                </MenuItem>
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="Off-Site"
+                  <MenuItem className="hover_select" value="On-Site">
+                    On-Site
+                  </MenuItem>
+                  <MenuItem className="hover_select" value="Off-Site">
+                    Off-Site
+                  </MenuItem>
+                  <MenuItem className="hover_select" value="City-Area">
+                    City-Area
+                  </MenuItem>
+                  <MenuItem className="hover_select" value="Restricted-Area">
+                    Restricted-Area
+                  </MenuItem>
+                </Select>
+              ) : (
+                <Select
+                  onChange={handleChange}
+                  value={Form?.GeoFenceType}
+                  id="select_box_journey"
+                  className="h-8 text-sm text-gray  w-full  outline-green hover:border-green"
+                  required
+                  name="GeoFenceType"
                 >
-                  Off-Site
-                </MenuItem>
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="City-Area"
-                >
-                  City-Area
-                </MenuItem>
-                <MenuItem
-                  className="hover:bg-green hover:text-white"
-                  value="Restricted-Area"
-                >
-                  Restricted-Area
-                </MenuItem>
-              </Select>
+                  <MenuItem className="hover_select" value="On-Site">
+                    On-Site
+                  </MenuItem>
+                  <MenuItem className="hover_select" value="Off-Site">
+                    Off-Site
+                  </MenuItem>
+                </Select>
+              )}
               <br></br>
               <br></br>
-              <label className="text-black text-md font-popins font-medium">
-                <span className="text-red">*</span> Zone Short Name:{" "}
+              <label className="text-md font-popins text-black font-semibold">
+                <span className="text-red font-extraboldbold">*</span> Zone
+                Short Name:{" "}
               </label>
               <input
                 aria-required
@@ -440,32 +457,100 @@ export default function EditZoneComp() {
               />
               <div className="flex justify-center">
                 <div
-                  className="grid lg:grid-cols-2 grid-cols-2 bg-green w-24
-                rounded-md shadow-md  hover:shadow-gray transition duration-50
+                  className="grid grid-cols-12  
                 "
                 >
-                  <div className="col-span-1">
-                    <svg
-                      className="h-10 py-3 w-full text-white"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                      <polyline points="17 21 17 13 7 13 7 21" />
-                      <polyline points="7 3 7 8 15 8" />
-                    </svg>
-                  </div>
-                  <div className="col-span-1">
-                    <button
-                      className="text-white font-popins font-bold h-10 bg-[#00B56C] -ms-2"
+                  <div className="lg:col-span-5 md:col-span-5 sm:col-span-2 col-span-4 ">
+                    {/* <div className="grid grid-cols-12 gap-2">
+                      <div className="col-span-1"></div>
+                      <div className="col-span-3 ">
+                        <svg
+                          className="h-10 py-2  w-full text-white"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                          <polyline points="17 21 17 13 7 13 7 21" />
+                          <polyline points="7 3 7 8 15 8" />
+                        </svg>
+                      </div>
+                      <div className="col-span-8">
+                        <button
+                          className="text-white font-popins font-bold h-10 bg-[#00B56C] "
+                          type="submit"
+                        >
+                          Update
+                        </button>
+                      </div>
+                    </div> */}
+                    <Button
+                      className=" bg-green shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none h-10 "
+                      variant="outlined"
                       type="submit"
+                      // onClick={handleClear}
+                      style={{
+                        fontSize: "16px",
+                        backgroundColor: "#00b56c",
+                        color: "white",
+                        border: "none",
+                      }}
+                      startIcon={
+                        <span style={{ fontWeight: "600" }}>
+                          <SaveIcon className="-mt-1" />
+                        </span>
+                      }
                     >
-                      Save
-                    </button>
+                      <b>U</b>{" "}
+                      <span style={{ textTransform: "lowercase" }}>
+                        <b>pdate</b>
+                      </span>
+                    </Button>
+                  </div>
+                  <div className="col-span-1"></div>
+                  <div className="lg:col-span-5 md:col-span-5 sm:col-span-2 col-span-4 ">
+                    {/* <div className="grid grid-cols-12 gap-2">
+                      <div className="col-span-1"></div>
+                      <div className="col-span-2 ">
+                        <ClearIcon className="mt-2 font-bold" />
+                      </div>
+                      <div className="col-span-8 bg-red  rounded-md">
+                        <Button
+                          className="text-white font-popins font-bold h-10"
+                          onClick={() => router.push("/Zone")}
+                          style={{
+                            color: "white",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          <b> Cancel</b>
+                        </Button>
+                      </div>
+                    </div> */}
+                    <Button
+                      className=" bg-red shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-red border-none hover:border-none h-10 "
+                      variant="outlined"
+                      onClick={() => router.push("/Zone")}
+                      style={{
+                        fontSize: "16px",
+                        backgroundColor: "red",
+                        color: "white",
+                        border: "none",
+                      }}
+                      startIcon={
+                        <span style={{ fontWeight: "600" }}>
+                          <ClearIcon className="-mt-1" />
+                        </span>
+                      }
+                    >
+                      <b>C</b>{" "}
+                      <span style={{ textTransform: "lowercase" }}>
+                        <b>ancel</b>
+                      </span>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -475,21 +560,46 @@ export default function EditZoneComp() {
 
           <div className="xl:col-span-5 lg:col-span-4 md:col-span-4 sm:col-span-5 col-span-4 mx-3 edit-zone_map_child">
             <div className="edit_zone_map_text">
-              <label className="text-black text-md font-popins font-medium">
+              <label className="text-md font-popins text-black font-semibold">
                 please enter text to search{" "}
               </label>
               <input
                 type="text"
-                className="  block py-2 px-0 w-11/12 text-sm text-labelColor bg-white-10 border border-grayLight appearance-none px-3 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-green mb-5"
+                className="   block py-2 px-0 w-full text-sm text-labelColor bg-white-10 border border-grayLight appearance-none px-3 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-green mb-5"
                 placeholder="Search"
                 required
               />
             </div>
-
-            <div className="grid lg:grid-cols-3 grid-cols-3 bg-green w-24 edit_zone_map_btn rounded-md shadow-md  hover:shadow-gray transition duration-500">
+            <Button
+              className=" bg-green shadow-md text-white hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none h-10 "
+              variant="outlined"
+              onClick={handleredraw}
+              style={{
+                fontSize: "16px",
+                backgroundColor: "#00b56c",
+                color: "white",
+                border: "none",
+              }}
+              startIcon={
+                <span style={{ fontWeight: "600" }}>
+                  <EditRoadIcon className="-mt-1" />
+                </span>
+              }
+            >
+              <b>R</b>{" "}
+              <span style={{ textTransform: "lowercase" }}>
+                <b>edraw</b>
+              </span>
+            </Button>
+            {/* <div
+              className="grid lg:grid-cols-3 grid-cols-3  bg-green lg:w-28 md:w-28 sm:w-28
+            w-32
+              rounded-md shadow-md  hover:shadow-gray transition duration-500 h-10 redraw_btn"
+     
+            >
               <div className="col-span-1">
                 <svg
-                  className="h-10 py-3 w-full text-white"
+                  className="h-10 py-2 w-full text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -504,14 +614,14 @@ export default function EditZoneComp() {
               </div>
               <div className="col-span-2">
                 <button
-                  className="text-white font-popins font-bold pt-2      "
+                  className="text-white font-popins font-bold pt-2    px-2  "
                   type="submit"
                   onClick={handleredraw}
                 >
                   Redraw
                 </button>
               </div>
-            </div>
+            </div> */}
 
             <div className="flex justify-start"></div>
             <div className="lg:col-span-5  md:col-span-4  sm:col-span-5 col-span-4 mx-3">
@@ -544,21 +654,59 @@ export default function EditZoneComp() {
                         />
                         {shapeType === "Polygon" &&
                         polygondataById.length > 0 ? (
-                          <Polygon
-                            positions={polygondataById}
-                            color="#97009c"
-                          />
+                          <>
+                            {zoneDataById?.GeoFenceType ===
+                              "Restricted-Area" && (
+                              <Polygon
+                                positions={polygondataById}
+                                color="red"
+                              />
+                            )}
+                            {zoneDataById?.GeoFenceType !==
+                              "Restricted-Area" && (
+                              <Polygon
+                                positions={polygondataById}
+                                color="#97009c"
+                              />
+                            )}
+                            {zoneDataById?.GeoFenceType === "City-Area" && (
+                              <Polygon
+                                positions={polygondataById}
+                                color="green"
+                              />
+                            )}
+                          </>
                         ) : null}
 
                         {shapeType === "Circle" &&
                         !isNaN(mapcenter[0]) &&
                         !isNaN(mapcenter[1]) &&
                         !isNaN(Number(circleDataById?.radius)) ? (
-                          <Circle
-                            radius={Number(circleDataById?.radius)}
-                            center={mapcenter}
-                            color="#97009c"
-                          />
+                          <>
+                            {zoneDataById?.GeoFenceType ===
+                              "Restricted-Area" && (
+                              <Circle
+                                radius={Number(circleDataById?.radius)}
+                                center={mapcenter}
+                                color="red"
+                              />
+                            )}
+                            {zoneDataById?.GeoFenceType !==
+                              "Restricted-Area" && (
+                              <Circle
+                                radius={Number(circleDataById?.radius)}
+                                center={mapcenter}
+                                color="#97009c"
+                              />
+                            )}
+                            {zoneDataById?.GeoFenceType === "City-Area" && (
+                              <Circle
+                                radius={Number(circleDataById?.radius)}
+                                center={mapcenter}
+                                color="green"
+                              />
+                            )}
+                          </>
                         ) : null}
                       </FeatureGroup>
                     )}
