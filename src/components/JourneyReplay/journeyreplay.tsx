@@ -1711,7 +1711,7 @@ export default function journeyReplayComp() {
             </p>
             <div
               id="trips_handle"
-              className="overflow-y-scroll overflow-x-hidden bg-bgLight "
+              className="overflow-y-scroll overflow-x-hidden bg-bgLight"
             >
               {weekDataGrouped == true
                 ? Object.entries(groupedData).map(

@@ -1,4 +1,6 @@
 import { IgnitionReport, replayreport } from "@/types/IgnitionReport";
+import { Events , Notifications } from "@/types/events" 
+import { commandrequest } from "@/types/commandrequest";
 import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
 import { error } from "console";
@@ -129,6 +131,37 @@ export function expireForgotLink(payload: any) {
   return ressult;
 }
 
+// here 
+export async function portalGprsCommand({
+  token,
+  payload,
+}: {
+  token: string;
+  payload: commandrequest;
+}) {
+  try {
+    const response = await fetch(`${URL}/portal/GprsCommand`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log("Error fetching data");
+    return [];
+  }
+}
+
+
+
 export async function getAllVehicleByUserId({
   token,
   userId,
@@ -159,6 +192,174 @@ export async function getAllVehicleByUserId({
     return [];
   }
 }
+
+// here events permission 
+export async function updateEventPermissionByClientId({
+  token,
+  clientId,
+  payload,
+}: {
+  token: string;
+  clientId: string;
+  payload: Events;
+}) {
+  try {
+    const payloadWithClientId = { clientId, ...payload }; // Construct payload object
+    const response = await fetch(`${URL}/updateEventPermissionByClientId`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payloadWithClientId), // Stringify payload with clientId
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+
+// here get client 
+export async function clientbyClientid({
+  token,
+  clientId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(`${URL}/GetClientById`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"id\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    console.log("data", data);
+    return data;
+  } catch (error) {
+    console.log("Error fetching data");
+    return [];
+  }
+}
+
+  
+// here save client
+export async function clientsave({
+  token,
+  clientId,
+  payload,
+}: {
+  token: string;
+  clientId: string;
+  payload: Notifications;
+}) {
+  try {
+    const payloadWithClientId = {  id: clientId, ...payload }; // Construct payload object
+    const response = await fetch(`${URL}/clients`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      // add here client id in this form]
+      body: JSON.stringify(payloadWithClientId), // Stringify payload with clientId
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+
+  export async function getEventPermissionByClientId({
+    token,
+    clientId,
+  }: {
+    token: string;
+    clientId: string;
+  }) {
+    try {
+      const response = await fetch(
+        `${URL}/getEventPermissionByClientId?clientId=${clientId}`,
+        {
+          headers: {
+            accept: "application/json, text/plain, */*",
+            authorization: `Bearer ${token}`,
+            "content-type": "application/json",
+          },
+          method: "GET", // Use lowercase 'get' for method
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch data from the API");
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching data", error);
+      return [];
+    }
+  }
+  
+
+// here suraksha
+export async function vehiclebyClientid({
+  token,
+  clientId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(`http://hammadserver/getDualCamVehicleByclientId`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"clientId\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    console.log("data", data);
+    return data;
+  } catch (error) {
+    console.log("Error fetching data");
+    return [];
+  }
+}
+
+
+
+
+
 
 export async function IgnitionReportByTrip({
   token,
