@@ -174,7 +174,7 @@ export default function ForgetPassword() {
 
             <form className="space-y-6 mx-6" onSubmit={handleSubmit}>
               {showVerificationText ? (
-                <p className="text-white text-xl pt-2">
+                <p className="text-white text-xl pt-2 text-justify">
                   {" "}
                   We have sent an email with a confirmation link to your email
                   address. In order to complete the reset process, please click

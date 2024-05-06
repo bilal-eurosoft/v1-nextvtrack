@@ -79,15 +79,17 @@ export default function Zone() {
   const [filterZonePerPage, setfilterZonePerPage] = useState(10);
   const [filteredDataIsNotAvaialable, setFilteredDataIsNotAvaialable] =
     useState<boolean>(true);
+  const [noDataFound, setNoDataFound] = useState(false);
+  const [inputPagination, setInputPagination] = useState(false);
   const lastIndexFilter = filterZonePerPage * filterZonepage;
   const firstIndexFilter = lastIndexFilter - filterZonePerPage;
   // let filterZoneResult;
   // filterZoneResult = filteredZones.slice(firstIndexFilter, lastIndexFilter);
   // const totalPagesFilter = Math.ceil(filteredZones.length / filterZonePerPage);
   // console.log("filteredZones", filterZoneResult);
-
   const handleClickPagination = () => {
     setCurrentPage(input);
+    setInputPagination(true);
   };
 
   const allZone = async () => {
@@ -153,6 +155,9 @@ export default function Zone() {
         // filterZoneResult = [];
       }
     }
+    if (filteredZones.length >= 0) {
+      setNoDataFound(true);
+    }
   }
 
   const handlePageChangeFiter = (event: any, newPage: any) => {
@@ -210,7 +215,6 @@ export default function Zone() {
       value: item.zoneShortName,
       label: item.zoneShortName,
     })) || [];
-
   let GeofenceOption = [
     { value: "On-Site", label: "On-Site" },
     { value: "Off-Site", label: "Off-Site" },
@@ -240,6 +244,7 @@ export default function Zone() {
     setRowsPerPage(10);
     setFilteredZones([]);
     setCurrentPage(1);
+    setNoDataFound(false);
   };
 
   function handleCheckboxChange(zone: zonelistType) {
@@ -298,8 +303,7 @@ export default function Zone() {
         <div className="bg-white p-2 rounded-md">
           <p>Are you sure you want to delete this zone?</p>
           <button
-            onClick={() => {
-              // Perform the actual delete action
+            onClick={async () => {
               zoneDelete({
                 token: session?.accessToken,
                 id: zoneId,
@@ -310,15 +314,15 @@ export default function Zone() {
 
               // Show a success toast
               toast.success("Zone deleted successfully!", {
-                duration: 3000,
                 position: "top-center",
               });
+              await allZone();
             }}
             className="text-green pr-5 font-popins font-bold"
           >
             OK
           </button>
-
+          {/* {allZone()} */}
           <button
             onClick={() => {
               // Dismiss the confirmation toast without deleting
@@ -336,7 +340,6 @@ export default function Zone() {
           </button>
         </div>
       ));
-      await allZone();
     } catch (error) {
       // Show an error toast
       toast.error("Failed to delete zone", {
@@ -460,6 +463,7 @@ export default function Zone() {
       // ["label"]: label,
     });
   };
+  console.log("currentPage", currentPage);
   return (
     <div className=" bg-bgLight border-t border-bgLight " id="zone_main">
       <p className="bg-green px-4 py-1  text-center text-2xl text-white font-bold zone_heading">
@@ -792,7 +796,13 @@ export default function Zone() {
                     <SearchIcon />
                   </span>
                 }
-                onClick={handleSearchClick}
+                onClick={(e: any) =>
+                  (searchCriteria.zoneName ||
+                    searchCriteria.zoneType ||
+                    searchCriteria.zoneShortName ||
+                    searchCriteria.GeoFenceType) &&
+                  handleSearchClick(e)
+                }
               >
                 <b> s</b>{" "}
                 <span style={{ textTransform: "lowercase" }}>
@@ -1114,7 +1124,8 @@ export default function Zone() {
                     </TableRow>
                   ))}
                 </>
-              ) : filteredDataIsNotAvaialable === false ? (
+              ) : filteredDataIsNotAvaialable === false ||
+                noDataFound == true ? (
                 <>
                   <h2
                     style={{
@@ -1207,10 +1218,7 @@ export default function Zone() {
                               className="icon_delete_edit"
                               onClick={() => deleteSelectedZones(item.id)}
                             >
-                              <DeleteIcon
-                                className="text-white bg-red p-1 h-7 w-8 rounded-md shadow-md hover:shadow-gray transition duration-500 delete_zone_button"
-                          
-                              />
+                              <DeleteIcon className="text-white bg-red p-1 h-7 w-8 rounded-md shadow-md hover:shadow-gray transition duration-500 delete_zone_button" />
                             </button>
 
                             {/* <BorderColorIcon
@@ -1305,14 +1313,15 @@ export default function Zone() {
               </div>
 
               <div className="lg:col-span-2 col-span-2 ">
-                <Stack spacing={2}>
-                  <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={handlePageChange}
-                    sx={{ color: "green" }}
-                  />
-                </Stack>
+                {/* <Stack spacing={2}> */}
+                <Pagination
+                  count={totalPages}
+                  page={
+                    inputPagination ? parseInt(input) : parseInt(currentPage)
+                  }
+                  onChange={handlePageChange}
+                />
+                {/* </Stack> */}
               </div>
               <div className="lg:col-lg-1 col-lg-1   ">
                 <span className="lg:inline-block hidden">Go To</span>
@@ -1320,7 +1329,15 @@ export default function Zone() {
                   type="text"
                   value={input}
                   className="lg:w-10 w-5  border border-grayLight outline-green mx-2 px-2"
-                  onChange={(e: any) => setInput(e.target.value)}
+                  onChange={(e: any) => {
+                    const value = e.target.value;
+                    if (value > 0 && value <= totalPages) {
+                      setInput(e.target.value);
+                    } else {
+                      setInputPagination(false);
+                      setInput("");
+                    }
+                  }}
                 />
                 <span
                   className="text-labelColor cursor-pointer "
@@ -1336,7 +1353,7 @@ export default function Zone() {
                 rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
                 count={zoneList.length}
                 rowsPerPage={rowsPerPage}
-                page={currentPage}
+                // page={currentPage}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />

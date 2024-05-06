@@ -549,7 +549,7 @@ export default function RootLayout({
                     {/* <Link href="/DriverProfile"> */}
                     {/* <Link href={pathname ? "/DriverProfile" : "/DriverAssign"}> */}
                     <Tooltip
-                      className={`bg-[#00B56C] text-white shadow-lg rounded border-none`}
+                      className={`bg-[#00B56C] z-50 text-white shadow-lg rounded border-none`}
                       placement="right"
                       content="Driver"
                     >
@@ -594,7 +594,7 @@ export default function RootLayout({
                         </svg>
                       </PopoverHandler>
                     </Tooltip>
-                    <PopoverContent className="border-none cursor-pointer bg-green">
+                    <PopoverContent className="border-none cursor-pointer bg-green z-50">
                       {/* <Link className="w-full text-white" href="/DriverProfile">
                   Driver Profile
                 </Link> */}

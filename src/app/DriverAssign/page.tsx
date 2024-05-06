@@ -504,7 +504,7 @@ export default function DriverProfile() {
       <p className="bg-green px-4 py-1   text-center text-2xl text-white font-bold font-popins drivers_text">
         Assign Driver
       </p>
-      <Paper sx={{ width: "98%" }} className="bg-green-50 ms-3 mr-3">
+      <Paper sx={{ width: "100%" }} className="bg-green-50 ">
         {/* <Button>Add New Driver</Button> */}
         <div className="flex lg: justify-center items-center sm:justify-start drivers_add_popup">
           <button
@@ -544,7 +544,7 @@ export default function DriverProfile() {
                   </div>
                   <div className="col-span-1" onClick={handleClose}>
                     <svg
-                      className="h-6 w-6 text-labelColor mt-3 cursor-pointer"
+                      className="h-6 w-6 text-white mt-3 cursor-pointer"
                       width="24"
                       height="24"
                       viewBox="0 0 24 24"

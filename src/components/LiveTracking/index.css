@@ -77,6 +77,12 @@ input[type="checkbox"]:hover {
     grid-column: 2 span;
     width: 68%;
   }
+  .show_vehicle_left {
+    grid-column: 7 span !important;
+  }
+  .search_vehicle_live_tracking {
+    grid-column: 5 span;
+  }
   .main_map {
     grid-column: 3 span;
     margin-left: -21%;

@@ -189,21 +189,14 @@ export default function Verification() {
                 }}
               >
                 <h2 className="text-2xl font-bold text-white font-popins py-16 text-center">
-                  Link Has Been Expire Please Try Again
+                  Link Has Been Expired Please Try Again
                 </h2>
-                <Button
+                <button
                   onClick={() => router.push("/signin")}
-                  style={{
-                    backgroundColor: "#00b56c",
-                    color: "white",
-                    width: "30%",
-                    margin: "0 auto",
-                    display: "block",
-                    marginBottom: "3%",
-                  }}
+                  className="flex w-full mt-20 justify-center rounded-md bg-green px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-8"
                 >
                   Back To Sign In
-                </Button>
+                </button>
               </div>
             ) : (
               <div>

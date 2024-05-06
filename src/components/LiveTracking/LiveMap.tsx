@@ -98,7 +98,6 @@ const DynamicCarMap = ({
     setIsActiveColor("");
     // setSelectedVehicle(null);
   };
-
   return (
     <>
       <div className="xl:col-span-4 lg:col-span-3  md:col-span-3  sm:col-span-3 col-span-4 main_map">

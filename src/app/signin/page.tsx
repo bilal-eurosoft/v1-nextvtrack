@@ -86,7 +86,13 @@ export default function LoginPage() {
     } else {
       router.push("/liveTracking");
     }
-    setLoading(false);
+
+    // if (session?.failed == false) {
+    //   return toast.success("Account Code Generate", {
+    //     position: "top-center",
+    //   });
+    // }
+    // setLoading(false);
   };
 
   // const handleClick = async () => {

@@ -5,7 +5,7 @@ import { DatePicker } from "@material-ui/pickers";
 import BlinkingTime from "@/components/General/BlinkingTime";
 import axios from "axios";
 import PlaceIcon from "@mui/icons-material/Place";
-
+import EventIcon from "@material-ui/icons/Event";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -201,11 +201,23 @@ export default function journeyReplayComp() {
   const [expanded, setExpanded] = useState(null);
   const [searchJourney, setsearchJourney] = useState(true);
   const [seacrhLoading, setSearchLoading] = useState(true);
-
+  const [fromDateInput, setFromDateInput] = useState(false);
+  const [harshPopUp, setHarshPopUp] = useState(true);
+  const [harshAccPopUp, setAccHarshPopUp] = useState(true);
+  const [addressTravelHistory, setAddressTravelHistory] = useState([]);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isPickerOpenFromDate, setIsPickerOpenFromDate] = useState(false);
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
     setExpanded(isExpanded ? panel : null);
   };
+
   const moment = require("moment-timezone");
+  const togglePicker = () => {
+    setIsPickerOpen(!isPickerOpen);
+  };
+  const togglePickerFromDate = () => {
+    setIsPickerOpenFromDate(!isPickerOpenFromDate);
+  };
   const SetViewOnClick = ({ coords }: { coords: any }) => {
     if (isPaused) {
       setMapcenterToFly(null);
@@ -239,6 +251,7 @@ export default function journeyReplayComp() {
 
     return null;
   };
+
   const tick = () => {
     setIsPlaying(true);
     setIsPaused(false);
@@ -248,6 +261,8 @@ export default function journeyReplayComp() {
     setPauseBtn(true);
     setstopVehicle(false);
     setIsPauseColor(false);
+    setHarshPopUp(false);
+    setAccHarshPopUp(false);
 
     if (!carMovementInterval) {
       if (currentPositionIndex >= polylinedata.length) {
@@ -263,6 +278,8 @@ export default function journeyReplayComp() {
     setstopVehicle(false);
     setIsPauseColor(true);
     setIsPaused(true);
+    setHarshPopUp(true);
+    setAccHarshPopUp(true);
 
     if (carMovementInterval) {
       clearInterval(carMovementInterval);
@@ -285,6 +302,8 @@ export default function journeyReplayComp() {
     setIsPauseColor(false);
     setStopBtn(false);
     setstopVehicle(true);
+    setHarshPopUp(true);
+    setAccHarshPopUp(true);
     setProgressWidth(0);
     if (polylinedata.length > 0) {
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
@@ -299,10 +318,14 @@ export default function journeyReplayComp() {
 
       const currentData = TravelHistoryresponse[step];
       const nextData = TravelHistoryresponse[step + 1];
+      const addRessOne: any = TravelHistoryresponse[step];
+      const addressSplit = addRessOne?.address?.display_name?.split(",");
+      setAddressTravelHistory(addressSplit);
 
       if (currentData && nextData) {
         const currentLatLng = new L.LatLng(currentData.lat, currentData.lng);
         const nextLatLng = new L.LatLng(nextData.lat, nextData.lng);
+        // const address=new L.latLng()
 
         const totalObjects = TravelHistoryresponse.length;
         let numSteps;
@@ -382,7 +405,7 @@ export default function journeyReplayComp() {
     speedFactor,
     stopVehicle,
   ]);
-
+  // console.log("TravelHistoryresponse", TravelHistoryresponse);
   useEffect(() => {
     if (polylinedata.length > 0) {
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
@@ -431,12 +454,16 @@ export default function journeyReplayComp() {
           token: session?.accessToken,
           clientId: session?.clientId,
         });
-
         if (clientSettingData) {
-          const centervalue = await clientSettingData?.[0].PropertyValue;
+          const centervalue = await clientSettingData.filter(
+            (item: any) => item.PropertDesc == "Map"
+          );
+          const centerMapValue = centervalue.map((item) => item.PropertyValue);
 
-          if (centervalue) {
-            const match = centervalue.match(/\{lat:([^,]+),lng:([^}]+)\}/);
+          if (centerMapValue) {
+            const match = centerMapValue?.[0]?.match(
+              /\{lat:([^,]+),lng:([^}]+)\}/
+            );
             if (match) {
               const lat = parseFloat(match[1]);
               const lng = parseFloat(match[2]);
@@ -488,6 +515,20 @@ export default function journeyReplayComp() {
     setCurrentDate(formattedDate);
   }, []);
 
+  const handleCloseDateTime = () => {
+    setShowRadioButton(false);
+    setFromDateInput(true);
+    setIgnitionreport((preData: any) => ({
+      ...preData,
+      fromDateTime: "",
+      toDateTime: "",
+    }));
+
+    // setIgnitionreport({
+    //   fromDateTime: "",
+    //   toDateTime: "",
+    // });
+  };
   const formattedTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
   const parsedDateTime = new Date(currentTime);
   const formattedDateTime = `${parsedDateTime}
@@ -978,6 +1019,7 @@ export default function journeyReplayComp() {
     //   }));
 
     // }
+    setFromDateInput(false);
     setCurrentDateDefaul(true);
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
@@ -1032,6 +1074,7 @@ export default function journeyReplayComp() {
       ["VehicleReg"]: value,
       ["label"]: label,
     }));
+    setFromDateInput(true);
   };
 
   const handleInputChange: any = (e: any) => {
@@ -1339,12 +1382,20 @@ export default function journeyReplayComp() {
           <div className="xl:col-span-3 lg:col-span-4 md:col-span-6 col-span-12 days_select">
             {getShowRadioButton ? (
               <div className="grid lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-12  -mt-2  grid-cols-12  xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2 flex justify-center ">
-                <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0  ">
+                <div
+                  className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0  "
+                  // onClick={togglePickerFromDate}
+                >
                   <label className="text-green">From</label>
                   <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
-                    <KeyboardDatePicker
+                    <DatePicker
+                      // open={isPickerOpenFromDate}
                       format="MM/DD/yyyy"
-                      value={Ignitionreport.fromDateTime}
+                      value={
+                        fromDateInput
+                          ? "start date"
+                          : Ignitionreport.fromDateTime
+                      }
                       onChange={(newDate: any) =>
                         handleDateChange("fromDateTime", newDate)
                       }
@@ -1354,16 +1405,30 @@ export default function journeyReplayComp() {
                       maxDate={currenTDates}
                       autoOk
                       inputProps={{ readOnly: true }}
+                      InputProps={{
+                        endAdornment: (
+                          <EventIcon
+                            style={{ width: "20", height: "20" }}
+                            className="text-gray"
+                          />
+                        ),
+                      }}
                     />
                   </MuiPickersUtilsProvider>
                 </div>
-                <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 ">
+                <div
+                  className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 "
+                  onClick={togglePicker}
+                >
                   <label className="text-green">To</label>
                   <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
-                    <KeyboardDatePicker
+                    <DatePicker
+                      // open={isPickerOpen}
                       style={{ marginTop: "-3%" }}
                       format="MM/DD/yyyy"
-                      value={Ignitionreport.toDateTime}
+                      value={
+                        fromDateInput ? "End Date" : Ignitionreport.toDateTime
+                      }
                       onChange={(newDate: any) =>
                         handleDateChange("toDateTime", newDate)
                       }
@@ -1373,6 +1438,14 @@ export default function journeyReplayComp() {
                       inputProps={{ readOnly: true }}
                       maxDate={currenTDates}
                       // shouldDisableDate={(date) => !isCurrentDate(date)}
+                      InputProps={{
+                        endAdornment: (
+                          <EventIcon
+                            style={{ width: "20", height: "20" }}
+                            className="text-gray"
+                          />
+                        ),
+                      }}
                       autoOk
                     />
                   </MuiPickersUtilsProvider>
@@ -1380,7 +1453,7 @@ export default function journeyReplayComp() {
                 <div className="lg:col-span-1 col-span-1   ">
                   <button
                     className="text-green ms-5  text-2xl font-bold"
-                    onClick={() => setShowRadioButton(false)}
+                    onClick={handleCloseDateTime}
                   >
                     x
                   </button>
@@ -2380,10 +2453,7 @@ export default function journeyReplayComp() {
                                 })
                               }
                             >
-                              <Popup>
-                                {/* Add your popup content here */}
-                                Harsh Break
-                              </Popup>
+                              {harshPopUp && <Popup>Harsh Break</Popup>}
                             </Marker>
                           ) : (
                             ""
@@ -2402,10 +2472,9 @@ export default function journeyReplayComp() {
                                 })
                               }
                             >
-                              <Popup>
-                                {/* Add your popup content here */}
-                                Harsh Acceleration
-                              </Popup>
+                              {harshAccPopUp && (
+                                <Popup>Harsh Acceleration</Popup>
+                              )}
                             </Marker>
                           ) : (
                             ""
@@ -2661,14 +2730,18 @@ export default function journeyReplayComp() {
                   </div>
                 ) : null}
 
-                {isPaused && (
+                {isPlaying || isPaused ? (
                   <p
                     className="bg-bgPlatBtn text-white mt-3 w-full px-2 py-3 rounded-md
                   trip_address
                   "
                   >
-                    {TripAddressData}
+                    {addressTravelHistory?.slice(0, 3).map((item, index) => (
+                      <div key={index}>{<p>{item}</p>}</div>
+                    ))}
                   </p>
+                ) : (
+                  ""
                 )}
                 {isPlaying && (
                   <div>

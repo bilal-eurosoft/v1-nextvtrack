@@ -17,6 +17,7 @@ const LiveSidebar = ({
   setshowAllVehicles,
   setunselectVehicles,
   unselectVehicles,
+  setZoom,
 }: {
   carData: VehicleData[];
   countPause: Number;
@@ -28,6 +29,7 @@ const LiveSidebar = ({
   setshowAllVehicles: any;
   setunselectVehicles: any;
   unselectVehicles: any;
+  setZoom: any;
 }) => {
   const { data: session } = useSession();
   const [searchData, setSearchData] = useState({
@@ -41,7 +43,6 @@ const LiveSidebar = ({
   };
   const searchParams = useSearchParams();
   const fullparams = searchParams.get("screen");
-
   useEffect(() => {
     (async function () {
       if (session) {
@@ -71,6 +72,12 @@ const LiveSidebar = ({
     const t = ((p[0] - p1[0]) * dy - (p[1] - p1[1]) * dx) / (dx * dy);
     return t >= 0 && t <= 1;
   }
+  const toggleLiveCars = () => {
+    setSelectedVehicle(null);
+    setshowAllVehicles(true);
+    setunselectVehicles(false);
+    setIsActiveColor(0);
+  };
   useEffect(() => {
     const zoneLatlog = zoneList.map((item: any) => {
       if (item.zoneType == "Polygon") {
@@ -119,12 +126,7 @@ const LiveSidebar = ({
       });
     setFilteredData(filtered);
   }, [searchData.search, carData]);
-  const toggleLiveCars = () => {
-    setSelectedVehicle(null);
-    setshowAllVehicles(true);
-    setunselectVehicles(false);
-    setIsActiveColor(0);
-  };
+
   const handleClickVehicle = (item: any) => {
     setSelectedVehicle(item);
     setshowAllVehicles(false);
@@ -134,7 +136,7 @@ const LiveSidebar = ({
   return (
     <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-2  col-span-5 main_sider_bar">
       <div className="grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3 search_live_tracking">
-        <div className="lg:col-span-7 w-full  md:col-span-5 sm:col-span-5 col-span-6 sticky top-0">
+        <div className="lg:col-span-7 w-full  md:col-span-5 sm:col-span-5 col-span-6 sticky top-0 search_vehicle_live_tracking">
           <div className="grid grid-cols-12 vehicle_search_left">
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1">
               <svg

@@ -6,6 +6,8 @@ import uniqueDataByIMEIAndLatestTimestamp from "@/utils/uniqueDataByIMEIAndLates
 import { zonelistType } from "@/types/zoneType";
 import { VehicleData } from "@/types/vehicle";
 import { ClientSettings } from "@/types/clientSettings";
+import L, { LatLng } from "leaflet";
+
 import {
   getClientSettingByClinetIdAndToken,
   getVehicleDataByClientId,
@@ -252,7 +254,6 @@ const LiveTracking = () => {
           setunselectVehicles={setunselectVehicles}
           unselectVehicles={unselectVehicles}
         />
-
         {carData?.current?.length !== 0 && (
           <LiveMap
             carData={carData?.current}
