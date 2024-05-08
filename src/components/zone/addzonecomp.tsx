@@ -8,7 +8,7 @@ import { ClientSettings } from "@/types/clientSettings";
 import { useMap } from "react-leaflet";
 import Select from "react-select";
 import {
-  getClientSettingByClinetIdAndToken,
+  // getClientSettingByClinetIdAndToken,
   postZoneDataByClientId,
   getSearchAddress,
 } from "@/utils/API_CALLS";
@@ -83,14 +83,14 @@ export default function AddZoneComp() {
     if (typeof window !== "undefined") {
       (async function () {
         if (session) {
-          const clientSettingData = await getClientSettingByClinetIdAndToken({
-            token: session?.accessToken,
-            clientId: session?.clientId,
-          });
+          // const clientSettingData = await getClientSettingByClinetIdAndToken({
+          //   token: session?.accessToken,
+          //   clientId: session?.clientId,
+          // });
 
-          if (clientSettingData) {
+          if (session) {
             //   const centervalue = await clientSettingData?.[0].PropertyValue;
-            const mapObject = clientSettingData.find(
+            const mapObject = session?.clientSetting.find(
               (obj: { PropertDesc: string }) => obj.PropertDesc === "Map"
             );
 
@@ -107,7 +107,7 @@ export default function AddZoneComp() {
                 }
               }
             }
-            setClientsetting(clientSettingData);
+            setClientsetting(session?.clientSetting);
           }
         }
       })();

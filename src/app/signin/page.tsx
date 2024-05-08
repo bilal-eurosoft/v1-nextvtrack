@@ -12,9 +12,9 @@ import { GetUsersByClientId, GetLicenseById } from "@/utils/API_CALLS";
 import "./login.css";
 import https from "https";
 import { useSession } from "next-auth/react";
-
+import { fetchZone, vehicleClientById } from "@/lib/slices/zoneSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
-
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 export default function LoginPage() {
@@ -23,6 +23,7 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const clientIdparams = searchParams.get("clientId");
+
   const pageparams = searchParams.get("page");
   const agent = new https.Agent({
     rejectUnauthorized: false,
@@ -32,16 +33,18 @@ export default function LoginPage() {
     userName: "",
     password: "",
   });
+
   const { data: session } = useSession();
   const handleInputChange = (e: any) => {
     const value = e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
   };
-  console.log("session", session);
 
-  if (session?.failed == false) {
-    router.push("/signin");
-  }
+  console.log("sessionss", session);
+
+  // if (session?.failed == false) {
+  //   router.push("/signin");
+  // }
   /* 
   const handleClick = async () => {
     setLoading(true);
@@ -68,7 +71,7 @@ export default function LoginPage() {
     // }
     setLoading(false);
   }; */
-
+  const dispatch = useDispatch();
   const handleClick = async () => {
     setLoading(true);
     const { userName, password } = formData;
@@ -77,6 +80,7 @@ export default function LoginPage() {
       password,
       redirect: false,
     });
+    console.log("data", data);
     if (data?.error) {
       if (data.error) {
         toast.error(data.error, {
@@ -95,6 +99,21 @@ export default function LoginPage() {
     // setLoading(false);
   };
 
+  if (session) {
+    dispatch(
+      fetchZone({
+        clientId: session?.clientId,
+        token: session?.accessToken,
+      })
+    );
+    dispatch(
+      vehicleClientById({
+        clientId: session?.clientId,
+        token: session?.accessToken,
+      })
+    );
+  }
+
   // const handleClick = async () => {
   //   setLoading(true);
   //   const { userName, password } = formData;
@@ -107,7 +126,7 @@ export default function LoginPage() {
   //     setLoginTime();
   //     router.push("/liveTracking");
   //   }
-  //   setLoading(false);
+  // setLoading(false);
   // };
   const fetchData = async () => {
     if (
@@ -140,7 +159,9 @@ export default function LoginPage() {
             password: users[0].password,
           },
         };
+
         const response = await axios.request(config);
+
         if (response?.data?.accessToken) {
           // localStorage.setItem(
           //   "user_id",

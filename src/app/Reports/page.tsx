@@ -12,6 +12,7 @@ import MenuItem from "@mui/material/MenuItem";
 import DateFnsMomemtUtils from "@date-io/moment";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "react-select";
+import { useSelector } from "react-redux";
 import "./report.css";
 
 import {
@@ -149,6 +150,8 @@ export default function Reports() {
       | "Type"
     )[]
   >([]);
+  const allData = useSelector((state) => state?.zone);
+
   const firstIndex = currentPage * rowsPerPages;
   const lastIndex = Math.min(firstIndex + rowsPerPages, trisdata.length); // Ensure lastIndex does not exceed trisdata.length
 
@@ -178,11 +181,11 @@ export default function Reports() {
     const vehicleListData = async () => {
       try {
         if (session?.userRole == "Admin" || session?.userRole == "SuperAmin") {
-          const Data = await vehicleListByClientId({
-            token: session.accessToken,
-            clientId: session?.clientId,
-          });
-          setVehicleList(Data);
+          // const Data = await vehicleListByClientId({
+          //   token: session.accessToken,
+          //   clientId: session?.clientId,
+          // });
+          setVehicleList(allData?.vehicle);
         } else {
           if (session) {
             const data = await getAllVehicleByUserId({

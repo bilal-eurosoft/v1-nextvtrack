@@ -8,7 +8,9 @@ import { zonelistType } from "@/types/zoneType";
 import dynamic from "next/dynamic";
 import { ClientSettings } from "@/types/clientSettings";
 import { useSession } from "next-auth/react";
-import { getZoneListByClientId } from "@/utils/API_CALLS";
+// import { getZoneListByClientId } from "@/utils/API_CALLS";
+import { fetchZone } from "@/lib/slices/zoneSlice";
+import { useSelector } from "react-redux";
 import { Marker, Popup } from "react-leaflet";
 import L, { LatLng } from "leaflet";
 import { useSearchParams } from "next/navigation";
@@ -67,17 +69,19 @@ const DynamicCarMap = ({
   const [showZones, setShowZones] = useState(false);
   const [mapCoordinates, setMapCoordinates] = useState<LatLng | null>(null);
   const [zoom, setZoom] = useState(10);
-  useEffect(() => {
-    (async function () {
-      if (session) {
-        const allzoneList = await getZoneListByClientId({
-          token: session?.accessToken,
-          clientId: session?.clientId,
-        });
-        setZoneList(allzoneList);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async function () {
+  //     if (session) {
+
+  //       await dispatch(
+  //         fetchZone({
+  //           token: session?.accessToken,
+  //           clientId: session?.clientId,
+  //         })
+  //       );
+  //     }
+  //   })();
+  // }, []);
 
   useEffect(() => {
     const regex = /lat:([^,]+),lng:([^}]+)/;
@@ -98,6 +102,11 @@ const DynamicCarMap = ({
     setIsActiveColor("");
     // setSelectedVehicle(null);
   };
+  const allZones = useSelector((state) => state.zone);
+
+  useEffect(() => {
+    setZoneList(allZones?.zone);
+  }, [allZones]);
   return (
     <>
       <div className="xl:col-span-4 lg:col-span-3  md:col-span-3  sm:col-span-3 col-span-4 main_map">

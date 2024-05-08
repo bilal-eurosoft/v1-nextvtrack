@@ -9,9 +9,7 @@ import { ClientSettings } from "@/types/clientSettings";
 import L, { LatLng } from "leaflet";
 
 import {
-  getClientSettingByClinetIdAndToken,
   getVehicleDataByClientId,
-  getZoneListByClientId,
   getAllVehicleByUserId,
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
@@ -142,14 +140,12 @@ const LiveTracking = () => {
 
           setIsFirstTimeFetchedFromGraphQL(true);
         }
+        // const clientSettingData = await getClientSettingByClinetIdAndToken({
+        //   token: session?.accessToken,
+        //   clientId: session?.clientId,
+        // });
 
-        const clientSettingData = await getClientSettingByClinetIdAndToken({
-          token: session?.accessToken,
-          clientId: session?.clientId,
-        });
-        if (clientSettingData) {
-          setClientSettings(clientSettingData);
-        }
+        setClientSettings(session?.clientSetting);
       }
     })();
   }, [session, userVehicle]);

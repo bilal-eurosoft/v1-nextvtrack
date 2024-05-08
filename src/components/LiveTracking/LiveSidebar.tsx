@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { ActiveStatus } from "../General/ActiveStatus";
 import { useSession } from "next-auth/react";
 import { zonelistType } from "../../types/zoneType";
-import { getZoneListByClientId } from "../../utils/API_CALLS";
+// import { getZoneListByClientId } from "../../utils/API_CALLS";
 import { useSearchParams } from "next/navigation";
+import { fetchZone } from "@/lib/slices/zoneSlice";
+import { useSelector } from "react-redux";
 import "./index.css";
 const LiveSidebar = ({
   carData,
@@ -43,16 +45,27 @@ const LiveSidebar = ({
   };
   const searchParams = useSearchParams();
   const fullparams = searchParams.get("screen");
+  const allZones = useSelector((state) => state.zone);
+
   useEffect(() => {
-    (async function () {
-      if (session) {
-        const allzoneList = await getZoneListByClientId({
-          token: session?.accessToken,
-          clientId: session?.clientId,
-        });
-        setZoneList(allzoneList);
-      }
-    })();
+    setZoneList(allZones?.zone);
+  }, [allZones]);
+  useEffect(() => {
+    // (async function () {
+    //   if (session) {
+    //     // const allzoneList = await getZoneListByClientId({
+    //     //   token: session?.accessToken,
+    //     //   clientId: session?.clientId,
+    //     // });
+    //     // setZoneList(allzoneList);
+    //     await dispatch(
+    //       fetchZone({
+    //         token: session?.accessToken,
+    //         clientId: session?.clientId,
+    //       })
+    //     );
+    //   }
+    // })();
   }, [session]);
   function isPointInPolygon(point: any, polygon: any) {
     let intersections = 0;

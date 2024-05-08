@@ -104,26 +104,16 @@ export const authOptions: AuthOptions = {
           let config = {
             method: "post",
             maxBodyLength: Infinity,
-            url: "https://backend.vtracksolutions.com/Portallogin",
+            url: "http://172.16.10.99:80/Portallogin",
             headers: {
               "Content-Type": "application/json",
             },
             httpsAgent: agent,
             data: data,
           };
+          console.log("config", config);
           try {
             const user: any = await axios.request(config);
-            // const response = await fetch(
-            //   "https://backend.vtracksolutions.com/portallogin",
-            //   {
-            //     method: "POST",
-            //     body: JSON.stringify(credentials),
-            //     headers: { "Content-Type": "application/json" },
-
-            //   }
-            // );
-            // const user = await response.json();
-
             if (user.data.success == false) {
               throw new Error(user.data.message);
               // return {message:user.message}

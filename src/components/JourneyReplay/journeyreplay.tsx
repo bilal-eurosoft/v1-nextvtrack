@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import DateFnsMomemtUtils from "@date-io/moment";
 import { DatePicker } from "@material-ui/pickers";
 import BlinkingTime from "@/components/General/BlinkingTime";
-import axios from "axios";
+import axios, { all } from "axios";
 import PlaceIcon from "@mui/icons-material/Place";
 import EventIcon from "@material-ui/icons/Event";
 import Radio from "@mui/material/Radio";
@@ -28,6 +28,7 @@ import HarshAccelerationIcon from "../../../public/Images/HarshAccelerationIcon.
 import markerA from "../../../public/Images/marker-a.png";
 import markerB from "../../../public/Images/marker-b.png";
 import harshAcceleration from "../../../public/Images/brake-discs.png";
+import { useSelector } from "react-redux";
 import Speedometer, {
   Background,
   Arc,
@@ -40,9 +41,9 @@ import {
   TravelHistoryByBucketV2,
   TripsByBucketAndVehicle,
   getAllVehicleByUserId,
-  getClientSettingByClinetIdAndToken,
+  // getClientSettingByClinetIdAndToken,
   getCurrentAddress,
-  getZoneListByClientId,
+  // getZoneListByClientId,
   vehicleListByClientId,
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
@@ -210,6 +211,10 @@ export default function journeyReplayComp() {
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
     setExpanded(isExpanded ? panel : null);
   };
+  const allData = useSelector((state) => state?.zone);
+  // useEffect(() => {
+  //   setZoneList(allZones?.zone);
+  // }, [allZones]);
 
   const moment = require("moment-timezone");
   const togglePicker = () => {
@@ -418,11 +423,11 @@ export default function journeyReplayComp() {
       try {
         if (session?.userRole == "Admin" || session?.userRole == "SuperAmin") {
           if (session) {
-            const Data = await vehicleListByClientId({
-              token: session.accessToken,
-              clientId: session?.clientId,
-            });
-            setVehicleList(Data);
+            // const Data = await vehicleListByClientId({
+            //   token: session.accessToken,
+            //   clientId: session?.clientId,
+            // });
+            setVehicleList(allData?.vehicle);
           }
         } else {
           if (session) {
@@ -438,24 +443,27 @@ export default function journeyReplayComp() {
       }
     };
     vehicleListData();
-    (async function () {
-      if (session) {
-        const allzoneList = await getZoneListByClientId({
-          token: session?.accessToken,
-          clientId: session?.clientId,
-        });
-        setZoneList(allzoneList);
-      }
-    })();
+    // (async function () {
+    //   if (session) {
+
+    //     await dispatch(
+    //       fetchZone({
+    //         token: session?.accessToken,
+    //         clientId: session?.clientId,
+    //       })
+    //     );
+    //   }
+    // })();
 
     (async function () {
       if (session) {
-        const clientSettingData = await getClientSettingByClinetIdAndToken({
-          token: session?.accessToken,
-          clientId: session?.clientId,
-        });
-        if (clientSettingData) {
-          const centervalue = await clientSettingData.filter(
+        // const clientSettingData = await getClientSettingByClinetIdAndToken({
+        //   token: session?.accessToken,
+        //   clientId: session?.clientId,
+        // });
+        if (session) {
+          const centervalue = await session?.clientSetting
+          .filter(
             (item: any) => item.PropertDesc == "Map"
           );
           const centerMapValue = centervalue.map((item) => item.PropertyValue);
@@ -473,7 +481,8 @@ export default function journeyReplayComp() {
               }
             }
           }
-          setClientsetting(clientSettingData);
+          setClientsetting(session?.clientSetting
+          );
           const clientZoomSettings = clientsetting?.filter(
             (el) => el?.PropertDesc === "Zoom"
           )[0]?.PropertyValue;

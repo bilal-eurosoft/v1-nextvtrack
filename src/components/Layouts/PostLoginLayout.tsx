@@ -3,7 +3,7 @@
 import logo from "@/../public/Images/logo.png";
 import Image from "next/image";
 import Link from "next/link";
-import { signOut, useSession } from "next-auth/react";
+import { signOut, useSession, SessionProvider } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Loading from "@/app/loading";
@@ -22,7 +22,9 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import TimeCounter from "@/app/context/timer";
 import { usePathname, useSearchParams } from "next/navigation";
-import { getZoneListByClientId } from "@/utils/API_CALLS";
+import { fetchZone } from "@/lib/slices/zoneSlice";
+import { useSelector } from "react-redux";
+// import { getZoneListByClientId } from "@/utils/API_CALLS";
 
 import {
   Popover,
@@ -83,11 +85,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-end",
 }));
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function RootLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [openPopover, setOpenPopover] = useState(false);
   const [selectedColor, setSelectedColor] = useState(null);
@@ -118,6 +116,12 @@ export default function RootLayout({
   const [loginTime, setLoginTime] = useState(new Date());
   const [elapsedTime, setElapsedTime] = useState(0);
   const fullparams = searchParams?.get("screen");
+  // const dispatch = useDispatch();
+  const allZones = useSelector((state) => state.zone);
+
+  useEffect(() => {
+    setZoneList(allZones?.zone);
+  }, [allZones]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -128,23 +132,24 @@ export default function RootLayout({
     return () => clearInterval(interval);
   }, []); // Run effect when loginTime changes
 
-  useEffect(() => {
-    const fetchZoneList = async () => {
-      if (session) {
-        try {
-          const allzoneList = await getZoneListByClientId({
-            token: session.accessToken,
-            clientId: session.clientId,
-          });
-          setZoneList(allzoneList);
-        } catch (error) {
-          console.log("Error fetching zone list:", error);
-        }
-      }
-    };
+  // useEffect(() => {
+  //   const fetchZoneList = async () => {
+  //     if (session) {
+  //       try {
+  //         await dispatch(
+  //           fetchZone({
+  //             token: session?.accessToken,
+  //             clientId: session?.clientId,
+  //           })
+  //         );
+  //       } catch (error) {
+  //         console.log("Error fetching zone list:", error);
+  //       }
+  //     }
+  //   };
 
-    fetchZoneList();
-  }, [session]);
+  //   fetchZoneList();
+  // }, [session]);
 
   // const allzoneList = zoneList?.map((item) => {
   //   return item?.id;
@@ -161,7 +166,7 @@ export default function RootLayout({
     if (!session && fullparams != "full") {
       router.push("/signin");
     }
-  }, [session, router]);
+  }, [session]);
 
   const handleClick = (item: any) => {
     setSelectedColor(item);
@@ -1272,3 +1277,14 @@ export default function RootLayout({
     </div>
   );
 }
+// const WithSessionProvider = ({chi}) => {
+//   return (
+//     <SessionProvider>
+//    <RootLayout>{children}</RootLayout>
+//     </SessionProvider>
+//   );
+// };
+
+// export default WithSessionProvider;
+
+export default RootLayout;

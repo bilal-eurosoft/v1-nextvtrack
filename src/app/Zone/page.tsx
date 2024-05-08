@@ -21,8 +21,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { Button } from "@mui/material";
+import { fetchZone } from "@/lib/slices/zoneSlice";
+import { useDispatch, useSelector } from "react-redux";
 import {
-  getZoneListByClientId,
+  // getZoneListByClientId,
   modifyCollectionStatus,
   zonevehicleByZoneId,
   zoneRuleDeleteByZoneId,
@@ -91,16 +93,29 @@ export default function Zone() {
     setCurrentPage(input);
     setInputPagination(true);
   };
-
+  const allZones = useSelector((state) => state.zone);
+  const dispatch = useDispatch();
+  console.log(allZones?.zone);
+  useEffect(() => {
+    setZoneList(allZones?.zone);
+  }, [allZones]);
+  console.log("zonelist", zoneList);
   const allZone = async () => {
     if (session) {
-      const allzoneList = await getZoneListByClientId({
-        token: session?.accessToken,
-        clientId: session?.clientId,
-      });
-      setZoneList(allzoneList);
-      setInitialZoneList(allzoneList);
+      // const allzoneList =  await getZoneListByClientId({
+      //   token: session?.accessToken,
+      //   clientId: session?.clientId,
+      // });
+      // setZoneList(allzoneList);
+      // setInitialZoneList(allzoneList);
+
+      setZoneList(allZones?.zone);
     }
+    // if (zoneList?.length >-0) {
+    //   await dispatch(
+    //     fetchZone({ token: session?.accessToken, clientId: session?.clientId })
+    //   );
+    // }
   };
 
   useEffect(() => {
