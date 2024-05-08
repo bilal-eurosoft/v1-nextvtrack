@@ -39,6 +39,8 @@ import Speedometer, {
 } from "react-speedometer";
 import {
   TravelHistoryByBucketV2,
+  TravelHistoryByBucketV3,
+  TripsByBucketAndVehicleV3,
   TripsByBucketAndVehicle,
   getAllVehicleByUserId,
   // getClientSettingByClinetIdAndToken,
@@ -208,6 +210,10 @@ export default function journeyReplayComp() {
   const [addressTravelHistory, setAddressTravelHistory] = useState([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isPickerOpenFromDate, setIsPickerOpenFromDate] = useState(false);
+
+  const [travelV2, setTravelV2] = useState(false);
+  const [travelV3, setTravelV3] = useState(false);
+
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
     setExpanded(isExpanded ? panel : null);
   };
@@ -462,8 +468,7 @@ export default function journeyReplayComp() {
         //   clientId: session?.clientId,
         // });
         if (session) {
-          const centervalue = await session?.clientSetting
-          .filter(
+          const centervalue = await session?.clientSetting.filter(
             (item: any) => item.PropertDesc == "Map"
           );
           const centerMapValue = centervalue.map((item) => item.PropertyValue);
@@ -481,8 +486,7 @@ export default function journeyReplayComp() {
               }
             }
           }
-          setClientsetting(session?.clientSetting
-          );
+          setClientsetting(session?.clientSetting);
           const clientZoomSettings = clientsetting?.filter(
             (el) => el?.PropertDesc === "Zoom"
           )[0]?.PropertyValue;
@@ -545,6 +549,8 @@ export default function journeyReplayComp() {
     .slice(0, 10)}TO${timeOnly}`;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setTravelV3(false);
+    setTravelV2(true);
     setIsDynamicTime("");
     setstops([]);
     setIsPaused(false);
@@ -732,6 +738,197 @@ export default function journeyReplayComp() {
     setLoading(false);
   };
 
+  const handleSubmitTwo = async (e: React.FormEvent) => {
+    setTravelV3(true);
+    setTravelV2(false);
+    e.preventDefault();
+    setIsDynamicTime("");
+    setstops([]);
+    setIsPaused(false);
+    setPlayBtn(false);
+    setStopBtn(false);
+    setPauseBtn(false);
+    setLaodingMap(false);
+    setIsPlaying(false);
+    setCarPosition(null);
+    setactiveTripColor("");
+    setTravelHistoryresponse([]);
+    setClearMapData(false);
+    setProgressWidth(0);
+    setLoading(true);
+    // setSearchLoading(true);
+    setDataResponse(null);
+    setExpanded(null);
+    setSearchLoading(false);
+    if (polylinedata.length > 0) {
+      setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
+    }
+    setCurrentPositionIndex(0);
+    setClearMapData(true);
+    if (
+      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "today") ||
+      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "yesterday") ||
+      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "week") ||
+      (Ignitionreport?.VehicleReg &&
+        Ignitionreport?.VehicleReg &&
+        Ignitionreport?.toDateTime &&
+        Ignitionreport?.fromDateTime)
+    ) {
+      if (session) {
+        const { VehicleReg, period } = await Ignitionreport;
+        if (period == "week") {
+          setWeekData(true);
+        }
+        if (period == "today") {
+          setWeekData(false);
+        }
+        if (VehicleReg && period) {
+          let newdata = {
+            ...Ignitionreport,
+          };
+          const timestart: string = "00:00:00";
+          const timeend: string = "23:59:59";
+          const currentDayOfWeek = new Date().getDay();
+          const currentDay = new Date().getDay();
+          const daysUntilMonday =
+            currentDayOfWeek === currentDay ? 7 : currentDayOfWeek - 1;
+          const fromDateTime = new Date();
+          fromDateTime.setDate(fromDateTime.getDate() - daysUntilMonday);
+          const toDateTime = new Date(fromDateTime);
+          toDateTime.setDate(toDateTime.getDate() + 6);
+          const formattedFromDateTime = formatDate(fromDateTime);
+          const formattedToDateTime = formatDate(toDateTime);
+          if (isCustomPeriod) {
+            newdata = {
+              ...newdata,
+              fromDateTime: `${
+                weekData ? formattedFromDateTime : Ignitionreport.fromDateTime
+              }T${timestart}Z`,
+              toDateTime: `${
+                weekData ? formattedToDateTime : Ignitionreport.toDateTime
+              }T${timeend}Z`,
+            };
+          } else {
+            newdata = {
+              ...newdata,
+              fromDateTime: `${
+                weekData ? formattedFromDateTime : currentDate
+              }T${timestart}Z`,
+              toDateTime: `${
+                weekData ? formattedToDateTime : currentDate
+              }T${timeend}Z`,
+            };
+          }
+          const fromDate: any = new Date(Ignitionreport?.fromDateTime);
+          const toDate: any = new Date(Ignitionreport?.toDateTime);
+
+          const differenceMs = toDate - fromDate;
+
+          const differenceDays = differenceMs / (1000 * 60 * 60 * 24);
+
+          // setIgnitionreport(newdata);
+          // if (
+          //   Ignitionreport.period == "today" ||
+          //   Ignitionreport.period == "yesterday"
+          // ) {
+          //   setTimeout(() => setweekDataGrouped(false), 1000);
+          // }
+          // if (
+          //   Ignitionreport.period == "week" ||
+          //   Ignitionreport.period == "custom"
+          // ) {
+          //   setTimeout(() => setweekDataGrouped(true), 3000);
+          // }
+          if (differenceDays > 5 || differenceDays < 0) {
+            toast.error("please Select 0nly Five Days");
+          } else {
+            try {
+              const response = await toast.promise(
+                TripsByBucketAndVehicleV3({
+                  token: session.accessToken,
+                  payload: newdata,
+                }),
+
+                {
+                  loading: "Loading...",
+                  success: "",
+                  error: "",
+                },
+                {
+                  style: {
+                    border: "1px solid #00B56C",
+                    padding: "16px",
+                    color: "#1A202C",
+                  },
+                  success: {
+                    duration: 10,
+                    iconTheme: {
+                      primary: "#00B56C",
+                      secondary: "#FFFAEE",
+                    },
+                  },
+                  error: {
+                    duration: 10,
+                    iconTheme: {
+                      primary: "#00B56C",
+                      secondary: "#FFFAEE",
+                    },
+                  },
+                }
+              );
+              if (
+                Ignitionreport.period == "today" ||
+                Ignitionreport.period == "yesterday"
+              ) {
+                // setTimeout(() => setweekDataGrouped(false), 1000);
+                setweekDataGrouped(false);
+              }
+              if (
+                Ignitionreport.period == "week" ||
+                Ignitionreport.period == "custom"
+              ) {
+                // setTimeout(() => setweekDataGrouped(true), 3000);
+                setweekDataGrouped(true);
+              }
+              setDataResponse(response?.data);
+
+              if (response.success === true) {
+                toast.success(`${response.message}`, {
+                  style: {
+                    border: "1px solid #00B56C",
+                    padding: "16px",
+                    color: "#1A202C",
+                  },
+                  duration: 4000,
+                  iconTheme: {
+                    primary: "#00B56C",
+                    secondary: "#FFFAEE",
+                  },
+                });
+              } else {
+                toast.error(`${response.message}`, {
+                  style: {
+                    border: "1px solid red",
+                    padding: "16px",
+                    color: "red",
+                  },
+                  iconTheme: {
+                    primary: "red",
+                    secondary: "white",
+                  },
+                });
+              }
+            } catch (error) {
+              console.error(`Error calling API for ${newdata}:`, error);
+            }
+          }
+        }
+      }
+    }
+    setSearchLoading(true);
+    setLoading(false);
+  };
+
   function formatDate(date: Date): string {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -778,6 +975,7 @@ export default function journeyReplayComp() {
   function getFormattedDate(date: any) {
     return date.toISOString().slice(0, 10);
   }
+
   let displayName: any;
   const handleDivClick = async (
     TripStart: TripsByBucket["TripStart"],
@@ -808,6 +1006,130 @@ export default function journeyReplayComp() {
         setLaodingMap(false);
         const TravelHistoryresponseapi = await toast.promise(
           TravelHistoryByBucketV2({
+            token: session.accessToken,
+            payload: newresponsedata,
+          }),
+          {
+            loading: "Loading...",
+            success: "",
+            error: "",
+          },
+          {
+            style: {
+              border: "1px solid #00B56C",
+              padding: "16px",
+              color: "#1A202C",
+            },
+            success: {
+              duration: 10,
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            },
+            error: {
+              duration: 10,
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            },
+          }
+        );
+        // if (session?.unit == "Mile") {
+        //   unit = "Mph";
+        // } else {
+        //   unit = "Kph";
+        // }
+        var stopPoints = [];
+        if (session?.unit == "KM") {
+          stopPoints = TravelHistoryresponseapi.data
+            .filter((x: any) => x.speed == "0 Kph")
+            .sort((x: any) => x.date);
+        } else {
+          stopPoints = TravelHistoryresponseapi.data
+            .filter((x: any) => x.speed == "0 Mph")
+            .sort((x: any) => x.date);
+        }
+        // displayName = TravelHistoryresponse.map((item) => {
+        //   return item?.address?.display_name;
+        // });
+        var addresses: any = [];
+        if (TravelHistoryresponse)
+          stopPoints.map(async function (singlePoint: any) {
+            let completeAddress;
+            if (!singlePoint.address?.display_name) {
+              completeAddress = await axios
+                .get(
+                  `http://osm.vtracksolutions.com/nominatim/reverse.php?lat=${singlePoint.lat}&lon=${singlePoint.lng}&zoom=19&format=jsonv2`
+                )
+                .then(async (response: any) => {
+                  return response.data;
+                });
+            } else {
+              completeAddress = singlePoint.address;
+            }
+
+            var record: any = {};
+            record["_id"] = singlePoint._id;
+            record["lat"] = singlePoint.lat;
+            record["lng"] = singlePoint.lng;
+            record["date"] = singlePoint.date;
+            record["speed"] = singlePoint.speed;
+            record["TimeStamp"] = singlePoint.TimeStamp;
+            record["address"] = completeAddress.display_name;
+            if (
+              addresses.filter(
+                (x: any) => x.lat == record.lat && x.lng == record.lng
+              ).length == 0
+            ) {
+              addresses.push(record);
+            }
+          });
+        setstops(
+          addresses.sort((a: any, b: any) => {
+            return moment(a.date).diff(b.date);
+          })
+        );
+        // }
+
+        setTravelHistoryresponse(TravelHistoryresponseapi.data);
+      }
+    } catch (error) {
+      console.error(`Error calling API for:`, error);
+    }
+    setLaodingMap(true);
+  };
+  const handleDivClickv3 = async (
+    TripStart: TripsByBucket["TripStart"],
+    TripEnd: TripsByBucket["TripEnd"]
+  ) => {
+    setlat(null);
+    setlng(null);
+    setPlayBtn(true);
+    setStopBtn(false);
+    setStopDetailsOpen(true);
+    setIsPlaying(false);
+    setIsPaused(false);
+    setstopVehicle(false);
+
+    try {
+      setTravelHistoryresponse([]);
+      setIsPauseColor(false);
+      setProgressWidth(0);
+      // if (polylinedata.length > 0) {
+      //   setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
+      // }
+      setCurrentPositionIndex(0);
+      if (session) {
+        let newresponsedata = {
+          ...Ignitionreport,
+          fromDateTime: `${TripStart}`,
+          toDateTime: `${TripEnd}`,
+        };
+        setLaodingMap(false);
+        const TravelHistoryresponseapi = await toast.promise(
+          TravelHistoryByBucketV3({
             token: session.accessToken,
             payload: newresponsedata,
           }),
@@ -1678,6 +2000,47 @@ export default function journeyReplayComp() {
                 <button>Search</button>
               </div>
             </div>
+            <div
+              onClick={handleSubmitTwo}
+              className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    search_btn_journey
+                    ${
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "today") ||
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "yesterday") ||
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "week") ||
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "custom" &&
+                        Ignitionreport?.toDateTime &&
+                        Ignitionreport?.fromDateTime)
+                        ? ""
+                        : "opacity-50 cursor-not-allowed"
+                    }`}
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <div className="col-span-3">
+                <svg
+                  className="lg:h-18 lg:w-10 md:h-12 md:w-12 sm:h-10 sm:w-10 h-12 w-12 py-3 px-2  text-white"
+                  // width="24"
+                  // height="24"
+                  viewBox="0 0 24 24"
+                  strokeWidth="4"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  {" "}
+                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                  <circle cx="10" cy="10" r="7" />{" "}
+                  <line x1="21" y1="21" x2="15" y2="15" />
+                </svg>
+              </div>
+              <div className="lg:col-span-8 md:col-span-8">
+                <button>SearchS</button>
+              </div>
+            </div>
             {/* <button
               onClick={handleSubmit}
               className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
@@ -2062,9 +2425,15 @@ export default function journeyReplayComp() {
                     <button
                       key={index}
                       // className=" my-2 "
-                      onClick={() =>
-                        handleDivClick(item.fromDateTime, item.toDateTime)
-                      }
+                      // onClick={() =>
+                      //   handleDivClickv3(item.fromDateTime, item.toDateTime)
+                      // }
+                      onClick={() => {
+                        travelV2 &&
+                          handleDivClick(item.fromDateTime, item.toDateTime);
+                        travelV3 &&
+                          handleDivClickv3(item.fromDateTime, item.toDateTime);
+                      }}
                     >
                       <div
                         className="py-5 hover:bg-[#e1f0e3] px-5 cursor-pointer border-b"

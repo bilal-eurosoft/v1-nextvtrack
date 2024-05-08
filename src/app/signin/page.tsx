@@ -80,7 +80,7 @@ export default function LoginPage() {
       password,
       redirect: false,
     });
-    console.log("data", data);
+    console.log("datasss", data);
     if (data?.error) {
       if (data.error) {
         toast.error(data.error, {
@@ -89,6 +89,13 @@ export default function LoginPage() {
       }
     } else {
       router.push("/liveTracking");
+    }
+    if (
+      data?.error == "User is deleted" ||
+      data?.error == "License Expired" ||
+      data?.error == "License Not Available"
+    ) {
+      setLoading(false);
     }
 
     // if (session?.failed == false) {

@@ -104,14 +104,13 @@ export const authOptions: AuthOptions = {
           let config = {
             method: "post",
             maxBodyLength: Infinity,
-            url: "http://172.16.10.99:80/Portallogin",
+            url: "https://backend.vtracksolutions.com/Portallogin",
             headers: {
               "Content-Type": "application/json",
             },
             httpsAgent: agent,
             data: data,
           };
-          console.log("config", config);
           try {
             const user: any = await axios.request(config);
             if (user.data.success == false) {

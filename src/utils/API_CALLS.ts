@@ -1060,6 +1060,35 @@ export async function TripsByBucketAndVehicle({
   }
 }
 
+export async function TripsByBucketAndVehicleV3({
+  token,
+  payload,
+}: {
+  token: string;
+  payload: replayreport;
+}) {
+  try {
+    const response = await fetch(`${URL}/v3/TripsByBucketAndVehicleV2`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return [];
+  }
+}
+
 export async function TravelHistoryByBucketV2({
   token,
   payload,
@@ -1069,6 +1098,36 @@ export async function TravelHistoryByBucketV2({
 }) {
   try {
     const response = await fetch(`${URL}/v2/TravelHistoryByBucketV2`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+export async function TravelHistoryByBucketV3({
+  token,
+  payload,
+}: {
+  token: string;
+  payload: replayreport;
+}) {
+  try {
+    const response = await fetch(`${URL}/v3/TravelHistoryByBucketV2`, {
       method: "POST",
       headers: {
         accept: "application/json, text/plain, */*",
