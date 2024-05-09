@@ -49,19 +49,19 @@ const LiveSidebar = ({
 
   useEffect(() => {
     if (session) {
-      if (allZones?.zone.length <= 0) {
-        const func = async () => {
-          const Data = await getZoneListByClientId({
-            token: session.accessToken,
-            clientId: session?.clientId,
-          });
-          setZoneList(Data);
-        };
-        func();
-      }
       setZoneList(allZones?.zone);
     }
   }, [allZones]);
+  if (allZones?.zone?.length <= 0) {
+    const func = async () => {
+      const Data = await getZoneListByClientId({
+        token: session?.accessToken,
+        clientId: session?.clientId,
+      });
+      setZoneList(Data);
+    };
+    func();
+  }
   // useEffect(() => {
   //   // (async function () {
   //   //   if (session) {

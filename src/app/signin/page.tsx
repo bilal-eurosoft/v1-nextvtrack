@@ -93,7 +93,9 @@ export default function LoginPage() {
     if (
       data?.error == "User is deleted" ||
       data?.error == "License Expired" ||
-      data?.error == "License Not Available"
+      data?.error == "License Not Available" ||
+      data?.error == "Invalid Password" ||
+      data?.error == "Invalid UserName"
     ) {
       setLoading(false);
     }

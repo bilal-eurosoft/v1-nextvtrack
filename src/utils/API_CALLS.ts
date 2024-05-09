@@ -360,8 +360,8 @@ export async function getZoneListByClientId({
   token,
   clientId,
 }: {
-  token: string;
-  clientId: string;
+  token: any;
+  clientId: any;
 }) {
   try {
     const response = await fetch(`${URL}/zonelist`, {

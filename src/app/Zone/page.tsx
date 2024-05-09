@@ -1347,11 +1347,11 @@ export default function Zone() {
               <div className="lg:col-lg-1 col-lg-1   ">
                 <span className="lg:inline-block hidden">Go To</span>
                 <input
-                  type="number"
+                  type="text"
                   value={input}
                   className="lg:w-10 w-5  border border-grayLight outline-green mx-2 px-2"
                   onChange={(e: any) => {
-                    const value = e.target.value.replace(/[^0-9]/g, "");
+                    const value = e.target.value.match(/\d+/g);
                     if (value > 0 && value <= totalPages) {
                       setInput(e.target.value);
                     } else {
