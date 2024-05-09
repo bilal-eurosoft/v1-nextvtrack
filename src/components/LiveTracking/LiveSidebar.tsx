@@ -202,7 +202,7 @@ const LiveSidebar = ({
       <div className="grid grid-cols-2  md:pb-8 text-center border-y-2  border-green bg-zoneTabelBg py-4 text-white vehicle_summary">
         <div className="lg:col-span-1 w-full">
           <p className="text-md mt-1 text-black font-popins font-semibold">
-            Vehicle Summary:
+            Vehicle Summary:sdfsd
           </p>
         </div>
         <div className="lg:col-span-1">
