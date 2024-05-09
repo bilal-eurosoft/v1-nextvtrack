@@ -42,6 +42,8 @@ const DynamicCarMap = ({
   showAllVehicles,
   setunselectVehicles,
   unselectVehicles,
+  mapCoordinates,
+  zoom,
 }: {
   carData: VehicleData[];
   clientSettings: ClientSettings[];
@@ -51,6 +53,8 @@ const DynamicCarMap = ({
   showAllVehicles: any;
   setunselectVehicles: any;
   unselectVehicles: any;
+  mapCoordinates: any;
+  zoom: any;
 }) => {
   const clientMapSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Map"
@@ -67,8 +71,8 @@ const DynamicCarMap = ({
 
   const [zoneList, setZoneList] = useState<zonelistType[]>([]);
   const [showZones, setShowZones] = useState(false);
-  const [mapCoordinates, setMapCoordinates] = useState<LatLng | null>(null);
-  const [zoom, setZoom] = useState(10);
+  // const [mapCoordinates, setMapCoordinates] = useState<LatLng | null>(null);
+  // const [zoom, setZoom] = useState(10);
   // useEffect(() => {
   //   (async function () {
   //     if (session) {
@@ -83,20 +87,20 @@ const DynamicCarMap = ({
   //   })();
   // }, []);
 
-  useEffect(() => {
-    const regex = /lat:([^,]+),lng:([^}]+)/;
-    if (clientMapSettings) {
-      const match = clientMapSettings.match(regex);
+  // useEffect(() => {
+  //   const regex = /lat:([^,]+),lng:([^}]+)/;
+  //   if (clientMapSettings) {
+  //     const match = clientMapSettings.match(regex);
 
-      if (match) {
-        const lat = parseFloat(match[1]);
-        const lng = parseFloat(match[2]);
-        setMapCoordinates(new LatLng(lat, lng));
-      }
-    }
-    let zoomLevel = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
-    setZoom(zoomLevel);
-  }, [clientMapSettings]);
+  //     if (match) {
+  //       const lat = parseFloat(match[1]);
+  //       const lng = parseFloat(match[2]);
+  //       setMapCoordinates(new LatLng(lat, lng));
+  //     }
+  //   }
+  //   let zoomLevel = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
+  //   setZoom(zoomLevel);
+  // }, [clientMapSettings]);
 
   const handleClear = () => {
     setIsActiveColor("");
@@ -114,6 +118,7 @@ const DynamicCarMap = ({
           {mapCoordinates !== null && zoom !== null && (
             <MapContainer
               id="maps"
+              key={`map-${zoom}`}
               style={{ height: fullparams == "full" ? "100vh" : "" }}
               center={mapCoordinates}
               className=" z-0"

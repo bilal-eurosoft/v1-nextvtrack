@@ -356,33 +356,33 @@ export async function videoList({
   }
 }
 
-// export async function getZoneListByClientId({
-//   token,
-//   clientId,
-// }: {
-//   token: string;
-//   clientId: string;
-// }) {
-//   try {
-//     const response = await fetch(`${URL}/zonelist`, {
-//       headers: {
-//         accept: "application/json, text/plain, */*",
-//         authorization: `Bearer ${token}`,
-//         "content-type": "application/json",
-//       },
-//       body: `{\"clientId\":\"${clientId}\"}`,
-//       method: "POST",
-//     });
-//     if (!response.ok) {
-//       throw new Error("Failed to fetch data from the API");
-//     }
-//     const data = await response.json();
-//     return data;
-//   } catch (error) {
-//     console.log("Error fetching data");
-//     return [];
-//   }
-// }
+export async function getZoneListByClientId({
+  token,
+  clientId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(`${URL}/zonelist`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"clientId\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log("Error fetching data");
+    return [];
+  }
+}
 
 export async function forgetEmailByClientId({
   token,

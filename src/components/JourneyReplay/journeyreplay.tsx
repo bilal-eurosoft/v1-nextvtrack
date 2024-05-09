@@ -429,10 +429,13 @@ export default function journeyReplayComp() {
       try {
         if (session?.userRole == "Admin" || session?.userRole == "SuperAmin") {
           if (session) {
-            // const Data = await vehicleListByClientId({
-            //   token: session.accessToken,
-            //   clientId: session?.clientId,
-            // });
+            if (allData?.vehicle.length <= 0) {
+              const Data = await vehicleListByClientId({
+                token: session.accessToken,
+                clientId: session?.clientId,
+              });
+              setVehicleList(Data);
+            }
             setVehicleList(allData?.vehicle);
           }
         } else {
@@ -1102,7 +1105,8 @@ export default function journeyReplayComp() {
   };
   const handleDivClickv3 = async (
     TripStart: TripsByBucket["TripStart"],
-    TripEnd: TripsByBucket["TripEnd"]
+    TripEnd: TripsByBucket["TripEnd"],
+    id: any
   ) => {
     setlat(null);
     setlng(null);
@@ -1126,6 +1130,7 @@ export default function journeyReplayComp() {
           ...Ignitionreport,
           fromDateTime: `${TripStart}`,
           toDateTime: `${TripEnd}`,
+          id: id,
         };
         setLaodingMap(false);
         const TravelHistoryresponseapi = await toast.promise(
@@ -2432,7 +2437,11 @@ export default function journeyReplayComp() {
                         travelV2 &&
                           handleDivClick(item.fromDateTime, item.toDateTime);
                         travelV3 &&
-                          handleDivClickv3(item.fromDateTime, item.toDateTime);
+                          handleDivClickv3(
+                            item.fromDateTime,
+                            item.toDateTime,
+                            item.id
+                          );
                       }}
                     >
                       <div

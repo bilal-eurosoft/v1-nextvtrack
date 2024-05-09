@@ -181,10 +181,13 @@ export default function Reports() {
     const vehicleListData = async () => {
       try {
         if (session?.userRole == "Admin" || session?.userRole == "SuperAmin") {
-          // const Data = await vehicleListByClientId({
-          //   token: session.accessToken,
-          //   clientId: session?.clientId,
-          // });
+          if (allData?.vehicle.length <= 0) {
+            const Data = await vehicleListByClientId({
+              token: session.accessToken,
+              clientId: session?.clientId,
+            });
+            setVehicleList(Data);
+          }
           setVehicleList(allData?.vehicle);
         } else {
           if (session) {

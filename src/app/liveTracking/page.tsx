@@ -73,6 +73,28 @@ const LiveTracking = () => {
   );
   const [userVehicle, setuserVehicle] = useState([]);
   const [unselectVehicles, setunselectVehicles] = useState(false);
+  const [zoom, setZoom] = useState(10);
+  const [mapCoordinates, setMapCoordinates] = useState<LatLng | null>(null);
+  const clientMapSettings = clientSettings?.filter(
+    (el) => el?.PropertDesc === "Map"
+  )[0]?.PropertyValue;
+  const clientZoomSettings = clientSettings?.filter(
+    (el) => el?.PropertDesc === "Zoom"
+  )[0]?.PropertyValue;
+  useEffect(() => {
+    const regex = /lat:([^,]+),lng:([^}]+)/;
+    if (clientMapSettings) {
+      const match = clientMapSettings.match(regex);
+
+      if (match) {
+        const lat = parseFloat(match[1]);
+        const lng = parseFloat(match[2]);
+        setMapCoordinates(new LatLng(lat, lng));
+      }
+    }
+    let zoomLevel = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
+    setZoom(zoomLevel);
+  }, [clientMapSettings]);
   // This useEffect is responsible for checking internet connection in the browser.
   useEffect(() => {
     setIsOnline(navigator.onLine);
@@ -249,6 +271,7 @@ const LiveTracking = () => {
           setshowAllVehicles={setshowAllVehicles}
           setunselectVehicles={setunselectVehicles}
           unselectVehicles={unselectVehicles}
+          setZoom={setZoom}
         />
         {carData?.current?.length !== 0 && (
           <LiveMap
@@ -260,6 +283,8 @@ const LiveTracking = () => {
             showAllVehicles={showAllVehicles}
             setunselectVehicles={setunselectVehicles}
             unselectVehicles={unselectVehicles}
+            mapCoordinates={mapCoordinates}
+            zoom={zoom}
           />
         )}
       </div>

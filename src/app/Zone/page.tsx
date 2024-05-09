@@ -24,7 +24,7 @@ import { Button } from "@mui/material";
 import { fetchZone } from "@/lib/slices/zoneSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  // getZoneListByClientId,
+  getZoneListByClientId,
   modifyCollectionStatus,
   zonevehicleByZoneId,
   zoneRuleDeleteByZoneId,
@@ -99,7 +99,7 @@ export default function Zone() {
   useEffect(() => {
     setZoneList(allZones?.zone);
   }, [allZones]);
-  console.log("zonelist", zoneList);
+  console.log("zonelist", allZones);
   const allZone = async () => {
     if (session) {
       // const allzoneList =  await getZoneListByClientId({
@@ -108,7 +108,13 @@ export default function Zone() {
       // });
       // setZoneList(allzoneList);
       // setInitialZoneList(allzoneList);
-
+      if (allZones?.zone.length <= 0) {
+        const Data = await getZoneListByClientId({
+          token: session.accessToken,
+          clientId: session?.clientId,
+        });
+        setZoneList(Data);
+      }
       setZoneList(allZones?.zone);
     }
     // if (zoneList?.length >-0) {
@@ -1341,11 +1347,11 @@ export default function Zone() {
               <div className="lg:col-lg-1 col-lg-1   ">
                 <span className="lg:inline-block hidden">Go To</span>
                 <input
-                  type="text"
+                  type="number"
                   value={input}
                   className="lg:w-10 w-5  border border-grayLight outline-green mx-2 px-2"
                   onChange={(e: any) => {
-                    const value = e.target.value;
+                    const value = e.target.value.replace(/[^0-9]/g, "");
                     if (value > 0 && value <= totalPages) {
                       setInput(e.target.value);
                     } else {
@@ -1356,7 +1362,7 @@ export default function Zone() {
                 />
                 <span
                   className="text-labelColor cursor-pointer "
-                  onClick={handleClickPagination}
+                  onClick={input && handleClickPagination}
                 >
                   page &nbsp;&nbsp;
                 </span>

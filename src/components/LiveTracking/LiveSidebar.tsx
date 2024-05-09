@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ActiveStatus } from "../General/ActiveStatus";
 import { useSession } from "next-auth/react";
 import { zonelistType } from "../../types/zoneType";
-// import { getZoneListByClientId } from "../../utils/API_CALLS";
+import { getZoneListByClientId } from "../../utils/API_CALLS";
 import { useSearchParams } from "next/navigation";
 import { fetchZone } from "@/lib/slices/zoneSlice";
 import { useSelector } from "react-redux";
@@ -48,25 +48,37 @@ const LiveSidebar = ({
   const allZones = useSelector((state) => state.zone);
 
   useEffect(() => {
-    setZoneList(allZones?.zone);
+    if (session) {
+      if (allZones?.zone.length <= 0) {
+        const func = async () => {
+          const Data = await getZoneListByClientId({
+            token: session.accessToken,
+            clientId: session?.clientId,
+          });
+          setZoneList(Data);
+        };
+        func();
+      }
+      setZoneList(allZones?.zone);
+    }
   }, [allZones]);
-  useEffect(() => {
-    // (async function () {
-    //   if (session) {
-    //     // const allzoneList = await getZoneListByClientId({
-    //     //   token: session?.accessToken,
-    //     //   clientId: session?.clientId,
-    //     // });
-    //     // setZoneList(allzoneList);
-    //     await dispatch(
-    //       fetchZone({
-    //         token: session?.accessToken,
-    //         clientId: session?.clientId,
-    //       })
-    //     );
-    //   }
-    // })();
-  }, [session]);
+  // useEffect(() => {
+  //   // (async function () {
+  //   //   if (session) {
+  //   //     // const allzoneList = await getZoneListByClientId({
+  //   //     //   token: session?.accessToken,
+  //   //     //   clientId: session?.clientId,
+  //   //     // });
+  //   //     // setZoneList(allzoneList);
+  //   //     await dispatch(
+  //   //       fetchZone({
+  //   //         token: session?.accessToken,
+  //   //         clientId: session?.clientId,
+  //   //       })
+  //   //     );
+  //   //   }
+  //   // })();
+  // }, [session]);
   function isPointInPolygon(point: any, polygon: any) {
     let intersections = 0;
     for (let i = 0; i < polygon.length; i++) {
@@ -90,6 +102,7 @@ const LiveSidebar = ({
     setshowAllVehicles(true);
     setunselectVehicles(false);
     setIsActiveColor(0);
+    setZoom(10);
   };
   useEffect(() => {
     const zoneLatlog = zoneList.map((item: any) => {
