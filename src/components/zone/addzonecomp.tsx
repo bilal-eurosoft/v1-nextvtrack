@@ -80,38 +80,38 @@ export default function AddZoneComp() {
     return null;
   }
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      (async function () {
+    // if (typeof window !== "undefined") {
+    // }
+    (async function () {
+      if (session) {
+        // const clientSettingData = await getClientSettingByClinetIdAndToken({
+        //   token: session?.accessToken,
+        //   clientId: session?.clientId,
+        // });
+
         if (session) {
-          // const clientSettingData = await getClientSettingByClinetIdAndToken({
-          //   token: session?.accessToken,
-          //   clientId: session?.clientId,
-          // });
+          //   const centervalue = await clientSettingData?.[0].PropertyValue;
+          const mapObject = session?.clientSetting.find(
+            (obj: { PropertDesc: string }) => obj.PropertDesc === "Map"
+          );
 
-          if (session) {
-            //   const centervalue = await clientSettingData?.[0].PropertyValue;
-            const mapObject = session?.clientSetting.find(
-              (obj: { PropertDesc: string }) => obj.PropertDesc === "Map"
-            );
+          // Get the PropertyValue from the found object
+          const centervalue = mapObject ? mapObject.PropertyValue : null;
+          if (centervalue) {
+            const match = centervalue.match(/\{lat:([^,]+),lng:([^}]+)\}/);
+            if (match) {
+              const lat = parseFloat(match[1]);
+              const lng = parseFloat(match[2]);
 
-            // Get the PropertyValue from the found object
-            const centervalue = mapObject ? mapObject.PropertyValue : null;
-            if (centervalue) {
-              const match = centervalue.match(/\{lat:([^,]+),lng:([^}]+)\}/);
-              if (match) {
-                const lat = parseFloat(match[1]);
-                const lng = parseFloat(match[2]);
-
-                if (!isNaN(lat) && !isNaN(lng)) {
-                  setMapcenter([lat, lng]);
-                }
+              if (!isNaN(lat) && !isNaN(lng)) {
+                setMapcenter([lat, lng]);
               }
             }
-            setClientsetting(session?.clientSetting);
           }
+          setClientsetting(session?.clientSetting);
         }
-      })();
-    }
+      }
+    })();
   }, []);
   const clientZoomSettings = clientsetting?.filter(
     (el) => el?.PropertDesc === "Zoom"
