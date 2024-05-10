@@ -74,7 +74,9 @@ const LiveTracking = () => {
   const [userVehicle, setuserVehicle] = useState([]);
   const [unselectVehicles, setunselectVehicles] = useState(false);
   const [zoom, setZoom] = useState(10);
-  const [mapCoordinates, setMapCoordinates] = useState<LatLng | null>(null);
+  const [mapCoordinates, setMapCoordinates] = useState<LatLng | null | []>(
+    null
+  );
   const clientMapSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Map"
   )[0]?.PropertyValue;
@@ -89,7 +91,7 @@ const LiveTracking = () => {
       if (match) {
         const lat = parseFloat(match[1]);
         const lng = parseFloat(match[2]);
-        setMapCoordinates(new LatLng(lat, lng));
+        setMapCoordinates([lat, lng]);
       }
     }
     let zoomLevel = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
