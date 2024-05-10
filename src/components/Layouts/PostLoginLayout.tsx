@@ -31,7 +31,7 @@ import {
   PopoverHandler,
   PopoverContent,
   Typography,
-  Tooltip,
+  Tooltip
 } from "@material-tailwind/react";
 import "./layout.css";
 import BlinkingTime from "../General/BlinkingTime";
@@ -41,39 +41,39 @@ import { stringify } from "querystring";
 const drawerWidth = 58;
 
 const Main = styled("main", {
-  shouldForwardProp: (prop) => prop !== "open",
+  shouldForwardProp: (prop) => prop !== "open"
 })(({ theme, open }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
+    duration: theme.transitions.duration.leavingScreen
   }),
   marginLeft: `-${drawerWidth}px`,
   ...(open && {
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
+      duration: theme.transitions.duration.enteringScreen
     }),
-    marginLeft: 0,
-  }),
+    marginLeft: 0
+  })
 }));
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
+  shouldForwardProp: (prop) => prop !== "open"
 })(({ theme, open }) => ({
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
+    duration: theme.transitions.duration.leavingScreen
   }),
   ...(open && {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: `${drawerWidth}px`,
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
+      duration: theme.transitions.duration.enteringScreen
+    })
+  })
 }));
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -82,7 +82,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
-  justifyContent: "flex-end",
+  justifyContent: "flex-end"
 }));
 
 function RootLayout({ children }: { children: React.ReactNode }) {
@@ -106,7 +106,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
   };
 
   const triggers = {
-    onClick: handleOpenPopUp,
+    onClick: handleOpenPopUp
   };
   type MySessionData = {
     // Define the properties you expect in your session object
@@ -245,7 +245,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                   stroke="currentColor"
                   style={{
                     color: pathname == "/liveTracking" ? "green" : "white",
-                    backgroundColor: pathname == "/liveTracking" ? "white" : "",
+                    backgroundColor: pathname == "/liveTracking" ? "white" : ""
                   }}
                 >
                   <path
@@ -287,8 +287,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                   strokeLinejoin="round"
                   style={{
                     color: pathname == "/journeyReplay" ? "green" : "white",
-                    backgroundColor:
-                      pathname == "/journeyReplay" ? "white" : "",
+                    backgroundColor: pathname == "/journeyReplay" ? "white" : ""
                   }}
                 >
                   {" "}
@@ -332,7 +331,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                         pathname == "/AddZone" ||
                         `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
                           ? "white"
-                          : "",
+                          : ""
                     }}
                   >
                     {" "}
@@ -433,7 +432,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                             backgroundColor:
                               pathname == "/DualCam" || pathname == "/DualCam"
                                 ? "white"
-                                : "",
+                                : ""
                           }}
                         >
                           {" "}
@@ -456,8 +455,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                         href="/DualCam"
                         style={{
                           color: pathname == "/DualCam" ? "black" : "white",
-                          backgroundColor:
-                            pathname == "/DualCam" ? "white" : "",
+                          backgroundColor: pathname == "/DualCam" ? "white" : ""
                         }}
                       >
                         Get Image And Video
@@ -537,11 +535,48 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                   strokeLinejoin="round"
                   style={{
                     color: pathname == "/Reports" ? "green" : "white",
-                    backgroundColor: pathname == "/Reports" ? "white" : "",
+                    backgroundColor: pathname == "/Reports" ? "white" : ""
                   }}
                 >
                   <path d="M9 7V2.13a2.98 2.98 0 0 0-1.293.749L4.879 5.707A2.98 2.98 0 0 0 4.13 7H9Z" />
                   <path d="M18.066 2H11v5a2 2 0 0 1-2 2H4v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 20 20V4a1.97 1.97 0 0 0-1.934-2ZM10 18a1 1 0 1 1-2 0v-2a1 1 0 1 1 2 0v2Zm3 0a1 1 0 0 1-2 0v-6a1 1 0 1 1 2 0v6Zm3 0a1 1 0 0 1-2 0v-4a1 1 0 1 1 2 0v4Z" />
+                </svg>
+              </Tooltip>
+            </Link>
+            <Link href="/Notifications">
+              <Tooltip
+                className="bg-[#00B56C] text-white shadow-lg rounded"
+                placement="right"
+                content="Events and Notifications"
+              >
+                <svg
+                  className={`w-20 h-14 py-3 
+  text-white-10  dark:text-white  ${
+    pathname === "/Notifications"
+      ? "border-r-2 border-#29303b -my-1"
+      : "border-y-1 border-b-2"
+  }`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    color: pathname === "/Notifications" ? "green" : "white",
+                    backgroundColor:
+                      pathname === "/Notifications" ? "white" : ""
+                  }}
+                >
+                  <path
+                    d="M9.5 19C8.89555 19 7.01237 19 5.61714 19C4.87375 19 4.39116 18.2177 4.72361 17.5528L5.57771 15.8446C5.85542 15.2892 6 14.6774 6 14.0564C6 13.2867 6 12.1434 6 11C6 9 7 5 12 5C17 5 18 9 18 11C18 12.1434 18 13.2867 18 14.0564C18 14.6774 18.1446 15.2892 18.4223 15.8446L19.2764 17.5528C19.6088 18.2177 19.1253 19 18.382 19H14.5M9.5 19C9.5 21 10.5 22 12 22C13.5 22 14.5 21 14.5 19M9.5 19C11.0621 19 14.5 19 14.5 19"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M12 5V3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </Tooltip>
             </Link>
@@ -588,7 +623,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                               pathname == "/DriverProfile" ||
                               pathname == "/ActiveDriver"
                                 ? "white"
-                                : "",
+                                : ""
                           }}
                         >
                           {" "}
@@ -610,7 +645,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                           color:
                             pathname == "/DriverProfile" ? "black" : "white",
                           backgroundColor:
-                            pathname == "/DriverProfile" ? "white" : "",
+                            pathname == "/DriverProfile" ? "white" : ""
                         }}
                       >
                         Driver Profile
@@ -625,7 +660,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                           color:
                             pathname == "/DriverAssign" ? "black" : "white",
                           backgroundColor:
-                            pathname == "/DriverAssign" ? "white" : "",
+                            pathname == "/DriverAssign" ? "white" : ""
                         }}
                       >
                         Assign Driver
@@ -716,7 +751,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                                 className="grid grid-cols-12 w-full"
                                 style={{
                                   display: "flex",
-                                  justifyContent: "center",
+                                  justifyContent: "center"
                                 }}
                               >
                                 <div className="col-span-9 ms-2 text-lg font-popins text-center text-black">
@@ -730,7 +765,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                               <div
                                 style={{
                                   display: "flex",
-                                  justifyContent: "center",
+                                  justifyContent: "center"
                                 }}
                                 className="py-2 font-popins font-semibold"
                               >
@@ -763,8 +798,8 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                       flexShrink: 0,
                       "& .MuiDrawer-paper": {
                         width: drawerWidth,
-                        boxSizing: "border-box",
-                      },
+                        boxSizing: "border-box"
+                      }
                     }}
                     anchor="left"
                     open={open}
@@ -796,7 +831,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                                 pathname == "/liveTracking" ? "green" : "white",
                               backgroundColor:
                                 pathname == "/liveTracking" ? "white" : "",
-                              border: pathname == "/liveTracking" ? "none" : "",
+                              border: pathname == "/liveTracking" ? "none" : ""
                             }}
                           >
                             <path
@@ -838,7 +873,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                                   ? "green"
                                   : "white",
                               backgroundColor:
-                                pathname == "/journeyReplay" ? "white" : "",
+                                pathname == "/journeyReplay" ? "white" : ""
                             }}
                           >
                             {" "}
@@ -885,7 +920,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                                   `EditZone?id=${filterId}` ==
                                     `EditZone?id=${pathName}`
                                     ? "none"
-                                    : "",
+                                    : ""
                               }}
                             >
                               {" "}
@@ -989,7 +1024,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                                         pathname == "/DualCam" ||
                                         pathname == "/DualCam"
                                           ? "none"
-                                          : "",
+                                          : ""
                                     }}
                                   >
                                     {" "}
@@ -1019,7 +1054,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                                         ? "black"
                                         : "white",
                                     backgroundColor:
-                                      pathname == "/DualCam" ? "white" : "",
+                                      pathname == "/DualCam" ? "white" : ""
                                   }}
                                 >
                                   Get Image And Video
@@ -1068,11 +1103,51 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                               color: pathname == "/Reports" ? "green" : "white",
                               backgroundColor:
                                 pathname == "/Reports" ? "white" : "",
-                              border: pathname == "/Reports" ? "none" : "",
+                              border: pathname == "/Reports" ? "none" : ""
                             }}
                           >
                             <path d="M9 7V2.13a2.98 2.98 0 0 0-1.293.749L4.879 5.707A2.98 2.98 0 0 0 4.13 7H9Z" />
                             <path d="M18.066 2H11v5a2 2 0 0 1-2 2H4v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 20 20V4a1.97 1.97 0 0 0-1.934-2ZM10 18a1 1 0 1 1-2 0v-2a1 1 0 1 1 2 0v2Zm3 0a1 1 0 0 1-2 0v-6a1 1 0 1 1 2 0v6Zm3 0a1 1 0 0 1-2 0v-4a1 1 0 1 1 2 0v4Z" />
+                          </svg>
+                        </Tooltip>
+                      </Link>
+                      <Link href="/Notifications">
+                        <Tooltip
+                          className="bg-[#00B56C] text-white shadow-lg rounded"
+                          placement="right"
+                          content="Events and Notifications"
+                        >
+                          <svg
+                            className={`w-20 h-14 py-3 
+  text-white-10  dark:text-white  ${
+    pathname === "/Notifications"
+      ? "border-r-2 border-#29303b -my-1"
+      : "border-y-1 border-b-2"
+  }`}
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{
+                              color:
+                                pathname === "/Notifications"
+                                  ? "green"
+                                  : "white",
+                              backgroundColor:
+                                pathname === "/Notifications" ? "white" : ""
+                            }}
+                          >
+                            <path
+                              d="M9.5 19C8.89555 19 7.01237 19 5.61714 19C4.87375 19 4.39116 18.2177 4.72361 17.5528L5.57771 15.8446C5.85542 15.2892 6 14.6774 6 14.0564C6 13.2867 6 12.1434 6 11C6 9 7 5 12 5C17 5 18 9 18 11C18 12.1434 18 13.2867 18 14.0564C18 14.6774 18.1446 15.2892 18.4223 15.8446L19.2764 17.5528C19.6088 18.2177 19.1253 19 18.382 19H14.5M9.5 19C9.5 21 10.5 22 12 22C13.5 22 14.5 21 14.5 19M9.5 19C11.0621 19 14.5 19 14.5 19"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M12 5V3"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
                           </svg>
                         </Tooltip>
                       </Link>
@@ -1119,7 +1194,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                                         pathname == "/DriverProfile" ||
                                         pathname == "/ActiveDriver"
                                           ? "none"
-                                          : "",
+                                          : ""
                                     }}
                                   >
                                     {" "}
@@ -1148,7 +1223,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                                     backgroundColor:
                                       pathname == "/DriverProfile"
                                         ? "white"
-                                        : "",
+                                        : ""
                                   }}
                                 >
                                   Driver Profile
@@ -1165,9 +1240,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                                         ? "black"
                                         : "white",
                                     backgroundColor:
-                                      pathname == "/DriverAssign"
-                                        ? "white"
-                                        : "",
+                                      pathname == "/DriverAssign" ? "white" : ""
                                   }}
                                 >
                                   Assign Driver

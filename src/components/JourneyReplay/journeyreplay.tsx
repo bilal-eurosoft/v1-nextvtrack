@@ -35,7 +35,7 @@ import Speedometer, {
   Needle,
   Progress,
   Marks,
-  Indicator,
+  Indicator
 } from "react-speedometer";
 import {
   TravelHistoryByBucketV2,
@@ -46,7 +46,7 @@ import {
   // getClientSettingByClinetIdAndToken,
   getCurrentAddress,
   // getZoneListByClientId,
-  vehicleListByClientId,
+  vehicleListByClientId
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { DeviceAttach } from "@/types/vehiclelistreports";
@@ -61,7 +61,7 @@ import { useMap } from "react-leaflet";
 import {
   Tripaddressresponse,
   calculateZoomCenter,
-  createMarkerIcon,
+  createMarkerIcon
 } from "@/utils/JourneyReplayFunctions";
 import { StopAddressData } from "@/types/StopDetails";
 import Box from "@mui/material/Box";
@@ -71,7 +71,7 @@ import { Tooltip, Button } from "@material-tailwind/react";
 import DateFnsUtils from "@date-io/date-fns";
 import {
   MuiPickersUtilsProvider,
-  KeyboardDatePicker,
+  KeyboardDatePicker
 } from "@material-ui/pickers";
 
 import MenuItem from "@mui/material/MenuItem";
@@ -86,9 +86,9 @@ const MenuProps = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 50,
-    },
-  },
+      width: 50
+    }
+  }
 };
 
 import "./index.css";
@@ -129,12 +129,12 @@ import Slider from "@mui/material/Slider";
 const useStyles = makeStyles((theme) => ({
   select: {
     "&:before": {
-      borderColor: "green", // Change this to the desired border color
+      borderColor: "green" // Change this to the desired border color
     },
     "&:after": {
-      borderColor: "green", // Change this to the desired border color
-    },
-  },
+      borderColor: "green" // Change this to the desired border color
+    }
+  }
 }));
 export default function journeyReplayComp() {
   const { data: session } = useSession();
@@ -165,7 +165,7 @@ export default function journeyReplayComp() {
     period: "",
     // toDateTime: new Date(),
     toDateTime: "",
-    unit: session?.unit || "",
+    unit: session?.unit || ""
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -414,7 +414,7 @@ export default function journeyReplayComp() {
     isPaused,
     TravelHistoryresponse,
     speedFactor,
-    stopVehicle,
+    stopVehicle
   ]);
   // console.log("TravelHistoryresponse", TravelHistoryresponse);
   useEffect(() => {
@@ -432,7 +432,7 @@ export default function journeyReplayComp() {
             if (allData?.vehicle.length <= 0) {
               const Data = await vehicleListByClientId({
                 token: session.accessToken,
-                clientId: session?.clientId,
+                clientId: session?.clientId
               });
               setVehicleList(Data);
             }
@@ -442,7 +442,7 @@ export default function journeyReplayComp() {
           if (session) {
             const data = await getAllVehicleByUserId({
               token: session.accessToken,
-              userId: session.userId,
+              userId: session.userId
             });
             setVehicleList(data);
           }
@@ -511,7 +511,7 @@ export default function journeyReplayComp() {
   }, [clientsetting]);
 
   let currentTime = new Date().toLocaleString("en-US", {
-    timeZone: session?.timezone,
+    timeZone: session?.timezone
   });
 
   let timeOnly = currentTime.split(",")[1].trim();
@@ -537,7 +537,7 @@ export default function journeyReplayComp() {
     setIgnitionreport((preData: any) => ({
       ...preData,
       fromDateTime: "",
-      toDateTime: "",
+      toDateTime: ""
     }));
 
     // setIgnitionreport({
@@ -596,7 +596,7 @@ export default function journeyReplayComp() {
         }
         if (VehicleReg && period) {
           let newdata = {
-            ...Ignitionreport,
+            ...Ignitionreport
           };
           const timestart: string = "00:00:00";
           const timeend: string = "23:59:59";
@@ -618,7 +618,7 @@ export default function journeyReplayComp() {
               }T${timestart}Z`,
               toDateTime: `${
                 weekData ? formattedToDateTime : Ignitionreport.toDateTime
-              }T${timeend}Z`,
+              }T${timeend}Z`
             };
           } else {
             newdata = {
@@ -628,7 +628,7 @@ export default function journeyReplayComp() {
               }T${timestart}Z`,
               toDateTime: `${
                 weekData ? formattedToDateTime : currentDate
-              }T${timeend}Z`,
+              }T${timeend}Z`
             };
           }
           const fromDate: any = new Date(Ignitionreport?.fromDateTime);
@@ -658,34 +658,34 @@ export default function journeyReplayComp() {
               const response = await toast.promise(
                 TripsByBucketAndVehicle({
                   token: session.accessToken,
-                  payload: newdata,
+                  payload: newdata
                 }),
 
                 {
                   loading: "Loading...",
                   success: "",
-                  error: "",
+                  error: ""
                 },
                 {
                   style: {
                     border: "1px solid #00B56C",
                     padding: "16px",
-                    color: "#1A202C",
+                    color: "#1A202C"
                   },
                   success: {
                     duration: 10,
                     iconTheme: {
                       primary: "#00B56C",
-                      secondary: "#FFFAEE",
-                    },
+                      secondary: "#FFFAEE"
+                    }
                   },
                   error: {
                     duration: 10,
                     iconTheme: {
                       primary: "#00B56C",
-                      secondary: "#FFFAEE",
-                    },
-                  },
+                      secondary: "#FFFAEE"
+                    }
+                  }
                 }
               );
               if (
@@ -709,25 +709,25 @@ export default function journeyReplayComp() {
                   style: {
                     border: "1px solid #00B56C",
                     padding: "16px",
-                    color: "#1A202C",
+                    color: "#1A202C"
                   },
                   duration: 4000,
                   iconTheme: {
                     primary: "#00B56C",
-                    secondary: "#FFFAEE",
-                  },
+                    secondary: "#FFFAEE"
+                  }
                 });
               } else {
                 toast.error(`${response.message}`, {
                   style: {
                     border: "1px solid red",
                     padding: "16px",
-                    color: "red",
+                    color: "red"
                   },
                   iconTheme: {
                     primary: "red",
-                    secondary: "white",
-                  },
+                    secondary: "white"
+                  }
                 });
               }
             } catch (error) {
@@ -743,6 +743,7 @@ export default function journeyReplayComp() {
 
   const handleSubmitTwo = async (e: React.FormEvent) => {
     setTravelV3(true);
+
     setTravelV2(false);
     e.preventDefault();
     setIsDynamicTime("");
@@ -787,7 +788,7 @@ export default function journeyReplayComp() {
         }
         if (VehicleReg && period) {
           let newdata = {
-            ...Ignitionreport,
+            ...Ignitionreport
           };
           const timestart: string = "00:00:00";
           const timeend: string = "23:59:59";
@@ -809,7 +810,7 @@ export default function journeyReplayComp() {
               }T${timestart}Z`,
               toDateTime: `${
                 weekData ? formattedToDateTime : Ignitionreport.toDateTime
-              }T${timeend}Z`,
+              }T${timeend}Z`
             };
           } else {
             newdata = {
@@ -819,7 +820,7 @@ export default function journeyReplayComp() {
               }T${timestart}Z`,
               toDateTime: `${
                 weekData ? formattedToDateTime : currentDate
-              }T${timeend}Z`,
+              }T${timeend}Z`
             };
           }
           const fromDate: any = new Date(Ignitionreport?.fromDateTime);
@@ -849,34 +850,34 @@ export default function journeyReplayComp() {
               const response = await toast.promise(
                 TripsByBucketAndVehicleV3({
                   token: session.accessToken,
-                  payload: newdata,
+                  payload: newdata
                 }),
 
                 {
                   loading: "Loading...",
                   success: "",
-                  error: "",
+                  error: ""
                 },
                 {
                   style: {
                     border: "1px solid #00B56C",
                     padding: "16px",
-                    color: "#1A202C",
+                    color: "#1A202C"
                   },
                   success: {
                     duration: 10,
                     iconTheme: {
                       primary: "#00B56C",
-                      secondary: "#FFFAEE",
-                    },
+                      secondary: "#FFFAEE"
+                    }
                   },
                   error: {
                     duration: 10,
                     iconTheme: {
                       primary: "#00B56C",
-                      secondary: "#FFFAEE",
-                    },
-                  },
+                      secondary: "#FFFAEE"
+                    }
+                  }
                 }
               );
               if (
@@ -900,25 +901,25 @@ export default function journeyReplayComp() {
                   style: {
                     border: "1px solid #00B56C",
                     padding: "16px",
-                    color: "#1A202C",
+                    color: "#1A202C"
                   },
                   duration: 4000,
                   iconTheme: {
                     primary: "#00B56C",
-                    secondary: "#FFFAEE",
-                  },
+                    secondary: "#FFFAEE"
+                  }
                 });
               } else {
                 toast.error(`${response.message}`, {
                   style: {
                     border: "1px solid red",
                     padding: "16px",
-                    color: "red",
+                    color: "red"
                   },
                   iconTheme: {
                     primary: "red",
-                    secondary: "white",
-                  },
+                    secondary: "white"
+                  }
                 });
               }
             } catch (error) {
@@ -1004,39 +1005,39 @@ export default function journeyReplayComp() {
         let newresponsedata = {
           ...Ignitionreport,
           fromDateTime: `${TripStart}`,
-          toDateTime: `${TripEnd}`,
+          toDateTime: `${TripEnd}`
         };
         setLaodingMap(false);
         const TravelHistoryresponseapi = await toast.promise(
           TravelHistoryByBucketV2({
             token: session.accessToken,
-            payload: newresponsedata,
+            payload: newresponsedata
           }),
           {
             loading: "Loading...",
             success: "",
-            error: "",
+            error: ""
           },
           {
             style: {
               border: "1px solid #00B56C",
               padding: "16px",
-              color: "#1A202C",
+              color: "#1A202C"
             },
             success: {
               duration: 10,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
+                secondary: "#FFFAEE"
+              }
             },
             error: {
               duration: 10,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
+                secondary: "#FFFAEE"
+              }
+            }
           }
         );
         // if (session?.unit == "Mile") {
@@ -1130,39 +1131,39 @@ export default function journeyReplayComp() {
           ...Ignitionreport,
           fromDateTime: `${TripStart}`,
           toDateTime: `${TripEnd}`,
-          id: id,
+          id: id
         };
         setLaodingMap(false);
         const TravelHistoryresponseapi = await toast.promise(
           TravelHistoryByBucketV3({
             token: session.accessToken,
-            payload: newresponsedata,
+            payload: newresponsedata
           }),
           {
             loading: "Loading...",
             success: "",
-            error: "",
+            error: ""
           },
           {
             style: {
               border: "1px solid #00B56C",
               padding: "16px",
-              color: "#1A202C",
+              color: "#1A202C"
             },
             success: {
               duration: 10,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
+                secondary: "#FFFAEE"
+              }
             },
             error: {
               duration: 10,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
+                secondary: "#FFFAEE"
+              }
+            }
           }
         );
         // if (session?.unit == "Mile") {
@@ -1235,7 +1236,7 @@ export default function journeyReplayComp() {
       setPolylinedata(
         TravelHistoryresponse.map((item: TravelHistoryData) => [
           item.lat,
-          item.lng,
+          item.lng
         ])
       );
 
@@ -1269,7 +1270,7 @@ export default function journeyReplayComp() {
               const Data = await getCurrentAddress({
                 token: session.accessToken,
                 lat: lat,
-                lon: lng,
+                lon: lng
               });
 
               stopDetailsArray.push(Data);
@@ -1305,7 +1306,7 @@ export default function journeyReplayComp() {
       const item = TravelHistoryresponse[currentPositionIndex];
       return {
         speed: item.speed,
-        distanceCovered: item.distanceCovered,
+        distanceCovered: item.distanceCovered
       };
     }
     return null;
@@ -1359,7 +1360,7 @@ export default function journeyReplayComp() {
     setCurrentDateDefaul(true);
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
-      [fieldName]: newDate?.toISOString(),
+      [fieldName]: newDate?.toISOString()
     }));
   };
 
@@ -1401,14 +1402,14 @@ export default function journeyReplayComp() {
     if (!e) {
       return setIgnitionreport((prevReport: any) => ({
         ...prevReport,
-        period: "",
+        period: ""
       }));
     }
     const { value, label } = e;
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
       ["VehicleReg"]: value,
-      ["label"]: label,
+      ["label"]: label
     }));
     setFromDateInput(true);
   };
@@ -1425,7 +1426,7 @@ export default function journeyReplayComp() {
     const { name, value } = e.target;
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
-      [name]: value,
+      [name]: value
     }));
 
     if (value == "week") {
@@ -1501,7 +1502,7 @@ export default function journeyReplayComp() {
       "Wednesday",
       "Thursday",
       "Friday",
-      "Saturday",
+      "Saturday"
     ];
     return days[date.getDay()];
   }
@@ -1515,7 +1516,7 @@ export default function journeyReplayComp() {
       groupedData[item.TripStartDateLabel] = {
         trips: [item],
         count: 1,
-        day: dayName,
+        day: dayName
       };
     } else {
       // If the date group already exists, push the trip and increment the count
@@ -1526,14 +1527,14 @@ export default function journeyReplayComp() {
   const options =
     vehicleList?.data?.map((item: any) => ({
       value: item.vehicleReg,
-      label: item.vehicleReg,
+      label: item.vehicleReg
     })) || [];
 
   const SpeedOption = [
     { value: "1", label: "1X" },
     { value: "2", label: "2X" },
     { value: "4", label: "4X" },
-    { value: "6", label: "6X" },
+    { value: "6", label: "6X" }
   ];
   return (
     <>
@@ -1588,7 +1589,7 @@ export default function journeyReplayComp() {
                 control: (provided, state) => ({
                   ...provided,
                   border: "none",
-                  boxShadow: state.isFocused ? null : null,
+                  boxShadow: state.isFocused ? null : null
                 }),
                 option: (provided, state) => ({
                   ...provided,
@@ -1604,9 +1605,9 @@ export default function journeyReplayComp() {
                     : "black",
                   "&:hover": {
                     backgroundColor: "#e1f0e3",
-                    color: "black",
-                  },
-                }),
+                    color: "black"
+                  }
+                })
               }}
             />
 
@@ -1747,7 +1748,7 @@ export default function journeyReplayComp() {
                             style={{ width: "20", height: "20" }}
                             className="text-gray"
                           />
-                        ),
+                        )
                       }}
                     />
                   </MuiPickersUtilsProvider>
@@ -1780,7 +1781,7 @@ export default function journeyReplayComp() {
                             style={{ width: "20", height: "20" }}
                             className="text-gray"
                           />
-                        ),
+                        )
                       }}
                       autoOk
                     />
@@ -2186,7 +2187,7 @@ export default function journeyReplayComp() {
                                   borderBottom: "1px solid gray",
                                   width: "100%",
                                   paddingTop: "2%",
-                                  paddingBottom: "2%",
+                                  paddingBottom: "2%"
                                 }}
                               >
                                 {/* <b>
@@ -2220,7 +2221,7 @@ export default function journeyReplayComp() {
                                     backgroundColor:
                                       activeTripColor.id === item.id
                                         ? "#e1f0e3"
-                                        : "",
+                                        : ""
                                   }}
                                 >
                                   <Typography>
@@ -2264,7 +2265,7 @@ export default function journeyReplayComp() {
                                             style={{
                                               filter:
                                                 "drop-shadow(1px 2px 2px #000000)",
-                                              marginTop: "-0.8rem",
+                                              marginTop: "-0.8rem"
                                             }}
                                             xmlSpace="preserve"
                                             transform="matrix(1, 0, 0, 1, 0, 0)"
@@ -2309,7 +2310,7 @@ export default function journeyReplayComp() {
                                                     style={{
                                                       filter:
                                                         "drop-shadow(1px 2px 2px #000000)",
-                                                      marginRight: "0.5%",
+                                                      marginRight: "0.5%"
                                                     }}
                                                     viewBox="0 0 24 24"
                                                   >
@@ -2334,7 +2335,7 @@ export default function journeyReplayComp() {
                                             viewBox="0 0 512 512"
                                             style={{
                                               filter:
-                                                "drop-shadow(1px 2px 2px #000000)",
+                                                "drop-shadow(1px 2px 2px #000000)"
                                             }}
                                           >
                                             <circle
@@ -2377,7 +2378,7 @@ export default function journeyReplayComp() {
                                             viewBox="0 0 512 512"
                                             style={{
                                               filter:
-                                                "drop-shadow(1px 2px 2px #000000)",
+                                                "drop-shadow(1px 2px 2px #000000)"
                                             }}
                                           >
                                             <circle
@@ -2449,7 +2450,7 @@ export default function journeyReplayComp() {
                         onClick={() => handleGetItem(item, index)}
                         style={{
                           backgroundColor:
-                            activeTripColor.id === item.id ? "#e1f0e3" : "",
+                            activeTripColor.id === item.id ? "#e1f0e3" : ""
                         }}
                       >
                         <div className="grid grid-cols-12 space-x-3">
@@ -2500,7 +2501,7 @@ export default function journeyReplayComp() {
                               xmlnsXlink="http://www.w3.org/1999/xlink"
                               style={{
                                 filter: "drop-shadow(1px 2px 2px #000000)",
-                                marginTop: "-0.8rem",
+                                marginTop: "-0.8rem"
                               }}
                               xmlSpace="preserve"
                               transform="matrix(1, 0, 0, 1, 0, 0)"
@@ -2542,7 +2543,7 @@ export default function journeyReplayComp() {
                                       style={{
                                         filter:
                                           "drop-shadow(1px 2px 2px #000000)",
-                                        marginRight: "0.5%",
+                                        marginRight: "0.5%"
                                       }}
                                       viewBox="0 0 24 24"
                                     >
@@ -2585,7 +2586,7 @@ export default function journeyReplayComp() {
                               className="h-8 w-8 text-green"
                               viewBox="0 0 512 512"
                               style={{
-                                filter: "drop-shadow(1px 2px 2px #000000)",
+                                filter: "drop-shadow(1px 2px 2px #000000)"
                               }}
                             >
                               <circle
@@ -2643,7 +2644,7 @@ export default function journeyReplayComp() {
                               className="h-8 w-8 text-green"
                               viewBox="0 0 512 512"
                               style={{
-                                filter: "drop-shadow(1px 2px 2px #000000)",
+                                filter: "drop-shadow(1px 2px 2px #000000)"
                               }}
                             >
                               <circle
@@ -2722,7 +2723,7 @@ export default function journeyReplayComp() {
                           <Circle
                             center={[
                               Number(singleRecord.centerPoints.split(",")[0]),
-                              Number(singleRecord.centerPoints.split(",")[1]),
+                              Number(singleRecord.centerPoints.split(",")[1])
                             ]}
                             radius={Number(singleRecord.latlngCordinates)}
                             color={
@@ -2773,7 +2774,7 @@ export default function journeyReplayComp() {
                           iconUrl:
                             "https://img.icons8.com/fluency/48/000000/stop-sign.png",
                           iconAnchor: [22, 47],
-                          popupAnchor: [1, -34],
+                          popupAnchor: [1, -34]
                         })
                       }
                     ></Marker>
@@ -2784,14 +2785,14 @@ export default function journeyReplayComp() {
                         <Marker
                           position={[
                             TravelHistoryresponse[0].lat,
-                            TravelHistoryresponse[0].lng,
+                            TravelHistoryresponse[0].lng
                           ]}
                           icon={
                             new L.Icon({
                               iconUrl:
                                 "https://img.icons8.com/fluent/48/000000/marker-a.png",
                               iconAnchor: [22, 47],
-                              popupAnchor: [1, -34],
+                              popupAnchor: [1, -34]
                             })
                           }
                         ></Marker>
@@ -2807,14 +2808,14 @@ export default function journeyReplayComp() {
                             ].lat,
                             TravelHistoryresponse[
                               TravelHistoryresponse.length - 1
-                            ].lng,
+                            ].lng
                           ]}
                           icon={
                             new L.Icon({
                               iconUrl:
                                 "https://img.icons8.com/fluent/48/000000/marker-b.png",
                               iconAnchor: [22, 47],
-                              popupAnchor: [1, -34],
+                              popupAnchor: [1, -34]
                             })
                           }
                         ></Marker>
@@ -2836,7 +2837,7 @@ export default function journeyReplayComp() {
                                   iconUrl:
                                     "https://img.icons8.com/color/48/000000/brake-discs.png",
                                   iconSize: [40, 40],
-                                  iconAnchor: [16, 37],
+                                  iconAnchor: [16, 37]
                                 })
                               }
                             >
@@ -2855,7 +2856,7 @@ export default function journeyReplayComp() {
                                   iconUrl:
                                     " https://img.icons8.com/nolan/64/speed-up.png",
                                   iconSize: [30, 30],
-                                  iconAnchor: [16, 37],
+                                  iconAnchor: [16, 37]
                                 })
                               }
                             >
@@ -2997,7 +2998,7 @@ export default function journeyReplayComp() {
                     borderRadius: "10px",
                     borderColor: "green",
                     borderWidth: "3px",
-                    borderStyle: "solid",
+                    borderStyle: "solid"
                   }}
                 >
                   <div className="col-span-1" style={{ color: "green" }}>
@@ -3270,7 +3271,7 @@ export default function journeyReplayComp() {
                         color="secondary"
                         style={{
                           color: "#00B56C",
-                          cursor: isPlaying ? "pointer" : "not-allowed",
+                          cursor: isPlaying ? "pointer" : "not-allowed"
                         }}
                         max={polylinedata.length}
                         disabled={isPlaying ? false : true}
@@ -3309,7 +3310,7 @@ export default function journeyReplayComp() {
                                   //   color: stopVehicle === true ? "gray" : "white",
                                   // }}
                                   style={{
-                                    color: isPauseColor ? "green" : "black",
+                                    color: isPauseColor ? "green" : "black"
                                   }}
                                   fill={isPauseColor ? "none" : "none"}
                                   width="24"
@@ -3347,7 +3348,7 @@ export default function journeyReplayComp() {
                                   className="h-5 w-5  lg:mx-2  md:mx-3 sm:mx-3 mx-1"
                                   viewBox="0 0 24 24"
                                   style={{
-                                    color: isPlaying ? "green" : "black",
+                                    color: isPlaying ? "green" : "black"
                                   }}
                                   fill={isPlaying ? "green" : "black"}
                                   stroke="currentColor"
@@ -3373,7 +3374,7 @@ export default function journeyReplayComp() {
                                   className="h-4 w-4 lg:mx-2 md:mx-3 sm:mx-3 mx-1"
                                   width="24"
                                   style={{
-                                    color: stopVehicle ? "green" : "black",
+                                    color: stopVehicle ? "green" : "black"
                                   }}
                                   fill={stopVehicle ? "green" : "black    "}
                                   height="24"
@@ -3469,14 +3470,14 @@ export default function journeyReplayComp() {
                             control: (provided, state) => ({
                               ...provided,
                               border: "none",
-                              boxShadow: state.isFocused ? null : null,
+                              boxShadow: state.isFocused ? null : null
                             }),
                             menu: (provided, state) => ({
                               ...provided,
                               zIndex: 9999, // Ensure the menu appears above other elements
                               position: "absolute",
                               top: "auto",
-                              bottom: "100%", // Position the menu above the select input
+                              bottom: "100%" // Position the menu above the select input
                             }),
                             option: (provided, state) => ({
                               ...provided,
@@ -3492,9 +3493,9 @@ export default function journeyReplayComp() {
                                 : "black",
                               "&:hover": {
                                 backgroundColor: "#00B56C",
-                                color: "white",
-                              },
-                            }),
+                                color: "white"
+                              }
+                            })
                           }}
                         />
                       )}
