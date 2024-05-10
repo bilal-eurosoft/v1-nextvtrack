@@ -44,33 +44,6 @@ export const fetchZone = createAsyncThunk(
     }
   }
 );
-// export const vehicleClientById = createAsyncThunk(
-//   "vehicleClientById",
-//   async ({ token, clientId }) => {
-//     try {
-//       const response = await fetch(
-//         "https://backend.vtracksolutions.com/vehicleListByClientId",
-//         {
-//           headers: {
-//             accept: "application/json, text/plain, */*",
-//             authorization: `Bearer ${token}`,
-//             "content-type": "application/json",
-//           },
-//           body: `{\"clientId\":\"${clientId}\"}`,
-//           method: "POST",
-//         }
-//       );
-//       if (!response.ok) {
-//         throw new Error("Failed to fetch data from the API");
-//       }
-//       const data = await response.json();
-//       return data;
-//     } catch (error) {
-//       console.log("Error fetching data");
-//       throw error;
-//     }
-//   }
-// );
 
 const fetchvehicleApi = async ({ token, clientId }) => {
   try {
@@ -133,10 +106,6 @@ const zoneSlice = createSlice({
     builder.addCase(fetchZone.fulfilled, (state, action) => {
       state.status = "succeeded";
       state.zone = action.payload.length === 0 ? null : action.payload;
-      // if (action?.payload?.length === 0) {
-      //   state.zone = undefined;
-      //   console.log("state.zone", state.zone);
-      // }
     });
     builder.addCase(fetchZone.rejected, (state, action) => {
       state.status = "failed";

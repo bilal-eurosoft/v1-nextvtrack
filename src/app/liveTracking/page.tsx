@@ -105,14 +105,14 @@ const LiveTracking = () => {
     function offlineHandler() {
       setIsOnline(false);
     }
-    if (typeof window !== "undefined") {
-      window.addEventListener("online", onlineHandler);
-      window.addEventListener("offline", offlineHandler);
-      return () => {
-        window.removeEventListener("online", onlineHandler);
-        window.removeEventListener("offline", offlineHandler);
-      };
-    }
+    // if (typeof window !== "undefined") {
+    //   window.addEventListener("online", onlineHandler);
+    //   window.addEventListener("offline", offlineHandler);
+    //   return () => {
+    //     window.removeEventListener("online", onlineHandler);
+    //     window.removeEventListener("offline", offlineHandler);
+    //   };
+    // }
   }, []);
 
   useEffect(() => {
