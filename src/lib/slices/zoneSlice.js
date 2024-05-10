@@ -132,7 +132,11 @@ const zoneSlice = createSlice({
     });
     builder.addCase(fetchZone.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.zone = action.payload;
+      state.zone = action.payload.length === 0 ? null : action.payload;
+      // if (action?.payload?.length === 0) {
+      //   state.zone = undefined;
+      //   console.log("state.zone", state.zone);
+      // }
     });
     builder.addCase(fetchZone.rejected, (state, action) => {
       state.status = "failed";

@@ -76,7 +76,7 @@ export default function Zone() {
     zoneType: "",
   });
   const [rowsPerPage, setRowsPerPage] = useState<any>(10);
-  const totalPages = Math.ceil(zoneList.length / rowsPerPage);
+  const totalPages = Math.ceil(zoneList?.length / rowsPerPage);
   const [filterZonepage, setFilterZonePage] = useState(1);
   const [filterZonePerPage, setfilterZonePerPage] = useState(10);
   const [filteredDataIsNotAvaialable, setFilteredDataIsNotAvaialable] =
@@ -108,7 +108,7 @@ export default function Zone() {
       // });
       // setZoneList(allzoneList);
       // setInitialZoneList(allzoneList);
-      if (allZones?.zone.length <= 0) {
+      if (allZones?.zone?.length <= 0) {
         const Data = await getZoneListByClientId({
           token: session.accessToken,
           clientId: session?.clientId,
@@ -138,7 +138,7 @@ export default function Zone() {
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   let displayedData: any;
-  displayedData = zoneList.slice(startIndex, endIndex);
+  displayedData = zoneList?.slice(startIndex, endIndex);
   function handleSearchClick(e: any) {
     e.preventDefault();
     const { zoneName, zoneShortName, GeoFenceType, zoneType } = searchCriteria;
@@ -1166,7 +1166,7 @@ export default function Zone() {
                 </>
               ) : (
                 <>
-                  {displayedData.length > 0 ? (
+                  {displayedData? .length > 0 ? (
                     <>
                       {" "}
                       {displayedData.map((item: any, index) => (
@@ -1275,12 +1275,12 @@ export default function Zone() {
       </TableContainer>
 
       <div className="table_pagination">
-        {filteredZones.length > 0 ? (
+        {filteredZones?.length > 0 ? (
           <div className="flex  justify-end lg:w-full w-screen bg-bgLight">
             <div className="grid lg:grid-cols-4 grid-cols-4   ">
               <div className="lg:col-span-1 col-span-1">
                 <p className="mt-1 text-black font-medium font-popins text-end">
-                  Total {filteredZones.length} items
+                  Total {filteredZones?.length} items
                 </p>
               </div>
 
@@ -1316,7 +1316,7 @@ export default function Zone() {
               <TablePagination
                 component="div"
                 rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
-                count={filteredZones.length} // or zoneList.length depending on the context
+                count={filteredZones?.length} // or zoneList.length depending on the context
                 rowsPerPage={filterZonePerPage} // or rowsPerPage depending on the context
                 page={filterZonepage} // or currentPage depending on the context
                 onRowsPerPageChange={handleChangeRowsPerPageFilter} // or handleChangeRowsPerPage depending on the context
@@ -1329,7 +1329,7 @@ export default function Zone() {
             <div className="grid lg:grid-cols-4 grid-cols-4   ">
               <div className="lg:col-span-1 col-span-1">
                 <p className=" text-labelColor text-end">
-                  Total {zoneList.length} items
+                  Total {zoneList?.length} items
                 </p>
               </div>
 
@@ -1372,7 +1372,7 @@ export default function Zone() {
               <TablePagination
                 component="div"
                 rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
-                count={zoneList.length}
+                count={zoneList?.length}
                 rowsPerPage={rowsPerPage}
                 // page={currentPage}
                 onPageChange={handlePageChange}

@@ -52,16 +52,16 @@ const LiveSidebar = ({
       setZoneList(allZones?.zone);
     }
   }, [allZones]);
-  if (allZones?.zone?.length <= 0) {
-    const func = async () => {
-      const Data = await getZoneListByClientId({
-        token: session?.accessToken,
-        clientId: session?.clientId,
-      });
-      setZoneList(Data);
-    };
-    func();
-  }
+  // if (allZones?.zone?.length <= 0) {
+  //   const func = async () => {
+  //     const Data = await getZoneListByClientId({
+  //       token: session?.accessToken,
+  //       clientId: session?.clientId,
+  //     });
+  //     setZoneList(Data);
+  //   };
+  //   func();
+  // }
   // useEffect(() => {
   //   // (async function () {
   //   //   if (session) {
@@ -105,7 +105,7 @@ const LiveSidebar = ({
     setZoom(10);
   };
   useEffect(() => {
-    const zoneLatlog = zoneList.map((item: any) => {
+    const zoneLatlog = zoneList?.map((item: any) => {
       if (item.zoneType == "Polygon") {
         return [...JSON.parse(item.latlngCordinates)]?.map((item2: any) => {
           return [item2.lat, item2.lng];
@@ -137,7 +137,7 @@ const LiveSidebar = ({
         }
       })
       .map((item: any) => {
-        const i = zoneLatlog.findIndex((zone: any) => {
+        const i = zoneLatlog?.findIndex((zone: any) => {
           if (zone != undefined) {
             return isPointInPolygon(
               [item.gps.latitude, item.gps.longitude],
@@ -145,8 +145,8 @@ const LiveSidebar = ({
             );
           }
         });
-        if (i != -1) {
-          item.zone = zoneList[i].zoneName;
+        if (i && i != -1) {
+          item.zone = zoneList[i]?.zoneName;
         }
         return item;
       });
@@ -202,7 +202,7 @@ const LiveSidebar = ({
       <div className="grid grid-cols-2  md:pb-8 text-center border-y-2  border-green bg-zoneTabelBg py-4 text-white vehicle_summary">
         <div className="lg:col-span-1 w-full">
           <p className="text-md mt-1 text-black font-popins font-semibold">
-            Vehicle Summary:sdfsd
+            Vehicle Summary:
           </p>
         </div>
         <div className="lg:col-span-1">

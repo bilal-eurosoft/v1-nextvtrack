@@ -118,7 +118,7 @@ const DynamicCarMap = ({
           {mapCoordinates !== null && zoom !== null && (
             <MapContainer
               id="maps"
-              key={`map-${zoom}`}
+              key={zoom}
               style={{ height: fullparams == "full" ? "100vh" : "" }}
               center={mapCoordinates}
               className=" z-0"
