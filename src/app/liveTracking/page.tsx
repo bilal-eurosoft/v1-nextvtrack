@@ -124,7 +124,6 @@ const LiveTracking = () => {
           token: session.accessToken,
           userId: session.userId,
         });
-        console.log("data", data.data);
         setuserVehicle(data.data);
       }
     }
@@ -147,15 +146,12 @@ const LiveTracking = () => {
           // carData.current = uniqueData;
           let matchingVehicles;
           if (role === "Controller") {
-            console.log("in ", userVehicle);
             let vehicleIds = userVehicle.map((item: any) => item._id);
-            console.log("VehicleIds", vehicleIds);
             // Filter carData.current based on vehicleIds
             matchingVehicles = uniqueData.filter((vehicle) =>
               vehicleIds.includes(vehicle.vehicleId)
             );
 
-            console.log("matchingVehicles", matchingVehicles);
             carData.current = matchingVehicles;
           } else {
             carData.current = uniqueData;
@@ -224,15 +220,12 @@ const LiveTracking = () => {
 
             let matchingVehicles;
             if (role === "Controller") {
-              console.log("in  2", userVehicle);
               let vehicleIds = userVehicle.map((item: any) => item._id);
-              console.log("VehicleIds 2", vehicleIds);
               // Filter carData.current based on vehicleIds
               matchingVehicles = uniqueData.filter((vehicle) =>
                 vehicleIds.includes(vehicle.vehicleId)
               );
 
-              console.log("matchingVehicles 2", matchingVehicles);
               carData.current = matchingVehicles;
             } else {
               carData.current = uniqueData;

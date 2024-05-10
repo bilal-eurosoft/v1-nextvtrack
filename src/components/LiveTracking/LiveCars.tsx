@@ -60,7 +60,6 @@ const LiveCars = ({
             if (match) {
               const lat = parseFloat(match[1]);
               const lng = parseFloat(match[2]);
-              console.log("dfv", lat, lng);
               map.flyTo([lat, lng], Number(clientZoomSettings));
             }
           }
