@@ -80,6 +80,7 @@ export default function LoginPage() {
       password,
       redirect: false,
     });
+
     console.log("datasss", data);
     if (data?.error) {
       if (data.error) {
