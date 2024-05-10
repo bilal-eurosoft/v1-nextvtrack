@@ -635,9 +635,7 @@ export default function journeyReplayComp() {
           const toDate: any = new Date(Ignitionreport?.toDateTime);
 
           const differenceMs = toDate - fromDate;
-
           const differenceDays = differenceMs / (1000 * 60 * 60 * 24);
-
           // setIgnitionreport(newdata);
           // if (
           //   Ignitionreport.period == "today" ||

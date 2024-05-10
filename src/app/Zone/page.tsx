@@ -94,12 +94,9 @@ export default function Zone() {
     setInputPagination(true);
   };
   const allZones = useSelector((state) => state.zone);
-  const dispatch = useDispatch();
-  console.log(allZones?.zone);
   useEffect(() => {
     setZoneList(allZones?.zone);
   }, [allZones]);
-  console.log("zonelist", allZones);
   const allZone = async () => {
     if (session) {
       // const allzoneList =  await getZoneListByClientId({
@@ -484,7 +481,6 @@ export default function Zone() {
       // ["label"]: label,
     });
   };
-  console.log("currentPage", currentPage);
   return (
     <div className=" bg-bgLight border-t border-bgLight " id="zone_main">
       <p className="bg-green px-4 py-1  text-center text-2xl text-white font-bold zone_heading">

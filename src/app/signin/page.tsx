@@ -40,8 +40,6 @@ export default function LoginPage() {
     setFormData({ ...formData, [e.target.name]: value });
   };
 
-  console.log("sessionss", session);
-
   // if (session?.failed == false) {
   //   router.push("/signin");
   // }
@@ -81,7 +79,6 @@ export default function LoginPage() {
       redirect: false,
     });
 
-    console.log("datasss", data);
     if (data?.error) {
       if (data.error) {
         toast.error(data.error, {
