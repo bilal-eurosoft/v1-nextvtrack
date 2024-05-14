@@ -682,7 +682,6 @@ export default function Reports() {
             today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
             today.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          // Handle other periods if needed
         }
         if (period === "yesterday") {
           const yesterday = moment().subtract(1, "day");
@@ -693,16 +692,11 @@ export default function Reports() {
             yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
         }
         if (period === "week") {
-          //console.log("week is starting");
           const startOfWeek = moment().subtract(7, "days").startOf("day");
-          //console.log("start of week", startOfWeek);
           const oneday = moment().subtract(1, "day");
-
           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          //console.log("start date time ", startDateTime);
           endDateTime =
             oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          //console.log("end date time", endDateTime);
         }
         if (period === "custom") {
           startDateTime =
