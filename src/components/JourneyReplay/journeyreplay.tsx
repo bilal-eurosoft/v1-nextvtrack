@@ -54,7 +54,7 @@ import { zonelistType } from "@/types/zoneType";
 import { ClientSettings } from "@/types/clientSettings";
 import { replayreport } from "@/types/IgnitionReport";
 import TripsByBucket, { TravelHistoryData } from "@/types/TripsByBucket";
-import L, { LatLng, LatLngTuple } from "leaflet";
+import L, { LatLng, LatLngTuple, point } from "leaflet";
 import { Marker } from "react-leaflet/Marker";
 import { Toaster, toast } from "react-hot-toast";
 import { useMap } from "react-leaflet";
@@ -213,6 +213,9 @@ export default function journeyReplayComp() {
 
   const [travelV2, setTravelV2] = useState(false);
   const [travelV3, setTravelV3] = useState(false);
+  const [stopWithSecond, setStopWithSecond] = useState([]);
+
+  console.log("stopWithSecond", stopWithSecond);
   const startdate = new Date();
   const enddate = new Date();
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
@@ -227,9 +230,9 @@ export default function journeyReplayComp() {
   const togglePicker = () => {
     setIsPickerOpen(!isPickerOpen);
   };
-  const togglePickerFromDate = () => {
-    setIsPickerOpenFromDate(!isPickerOpenFromDate);
-  };
+  // const togglePickerFromDate = () => {
+  //   setIsPickerOpenFromDate(!isPickerOpenFromDate);
+  // };
   const SetViewOnClick = ({ coords }: { coords: any }) => {
     if (isPaused) {
       setMapcenterToFly(null);
@@ -260,7 +263,6 @@ export default function journeyReplayComp() {
     if (coords && !Number.isNaN(coords[0]) && coords[0] != null) {
       map.flyTo(coords, zoom);
     }
-
     return null;
   };
 
@@ -355,7 +357,6 @@ export default function journeyReplayComp() {
           numSteps = 100;
           stepSize = (1 / numSteps) * speedFactor * 0.9;
         }
-
         let progress: number = 0;
         let animationId: number;
 
@@ -567,6 +568,7 @@ export default function journeyReplayComp() {
     setactiveTripColor("");
     setTravelHistoryresponse([]);
     setClearMapData(false);
+    setShowDetails(false);
     setProgressWidth(0);
     setLoading(true);
     // setSearchLoading(true);
@@ -1076,10 +1078,12 @@ export default function journeyReplayComp() {
           stopPoints = TravelHistoryresponseapi.data
             .filter((x: any) => x.speed == "0 Kph")
             .sort((x: any) => x.date);
+          console.log("points", stopPoints);
         } else {
           stopPoints = TravelHistoryresponseapi.data
             .filter((x: any) => x.speed == "0 Mph")
             .sort((x: any) => x.date);
+          console.log("points", stopPoints);
         }
         // displayName = TravelHistoryresponse.map((item) => {
         //   return item?.address?.display_name;
@@ -1121,8 +1125,46 @@ export default function journeyReplayComp() {
             return moment(a.date).diff(b.date);
           })
         );
-        // }
+        let stopTimesArray = [];
 
+        // Iterate over data array
+        for (let i = 0; i < TravelHistoryresponseapi?.data?.length - 1; i++) {
+          const currentData = TravelHistoryresponseapi?.data[i];
+          const nextData = TravelHistoryresponseapi?.data[i + 1];
+          console.log("currentAddress", currentData);
+          // Check if current car's speed is 0 Mph and next car's speed is non-zero
+          if (
+            currentData.speed === "0 Mph" &&
+            (currentData.speed === "0 Mph" || nextData.speed !== "0 Mph")
+          ) {
+            const currentTime: any = new Date(currentData.date);
+            const nextTime: any = new Date(nextData.date);
+            const timeDiffInSeconds = Math.floor(
+              (nextTime - currentTime) / 1000
+            );
+
+            const minutes = Math.floor(timeDiffInSeconds / 60);
+            const seconds = timeDiffInSeconds % 60;
+
+            // Construct the formatted string
+            const formattedTime = `${
+              minutes > 0 ? minutes + " min" : ""
+            } ${seconds} sec`;
+
+            // Display the time difference
+            // setStopWithSecond(currentData.date,minuteSecond:formattedTime})
+            stopTimesArray.push({
+              date: currentData.date,
+              time: formattedTime,
+              address: currentData.address,
+            });
+            console.log(
+              `Time difference from ${currentData.date}  ${formattedTime}`
+            );
+          }
+        }
+        console.log("stopTimesArray", stopTimesArray);
+        setStopWithSecond(stopTimesArray);
         setTravelHistoryresponse(TravelHistoryresponseapi.data);
       }
     } catch (error) {
@@ -2957,11 +2999,10 @@ export default function journeyReplayComp() {
 
                 {getShowdetails ? (
                   <div className="bg-white lg:h-60 md:h-60 sm:h-60 h-24 overflow-y-scroll resposive_stop_details">
-                    {stops?.map((item: any) => {
+                    {stopWithSecond?.map((item: any) => {
                       const getHour = item?.date?.slice(11, 13);
                       const period = getHour >= 12 ? "PM" : "AM";
                       const getHourPm = getHour >= 12 ? getHour - 12 : getHour;
-                      console.log("getHourPm", getHourPm);
 
                       return loadingMap ? (
                         <div
@@ -2969,7 +3010,7 @@ export default function journeyReplayComp() {
                           className="cursor-pointer"
                         >
                           <p className="text-black font-popins px-3 py-3 text-sm">
-                            <b>{item?.address?.substring(0, 50)}</b>
+                            {/* <b>{item?.address?.address?.substring(0, 50)}</b> */}
                           </p>
 
                           <div className="grid grid-cols-12">
@@ -2977,6 +3018,7 @@ export default function journeyReplayComp() {
                             <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
                               {/* {getHour > 12 ? getHourPm : getHour} */}
                               {item?.date?.slice(11, 19)}
+                              {item?.time}
                               {/* {period} */}
 
                               {/* {moment(item?.date)
