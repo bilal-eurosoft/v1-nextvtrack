@@ -215,7 +215,7 @@ export default function journeyReplayComp() {
   const [travelV3, setTravelV3] = useState(false);
   const [stopWithSecond, setStopWithSecond] = useState([]);
 
-  console.log("stopWithSecond", stopWithSecond);
+  
   const startdate = new Date();
   const enddate = new Date();
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
@@ -418,7 +418,7 @@ export default function journeyReplayComp() {
     speedFactor,
     stopVehicle,
   ]);
-  // console.log("TravelHistoryresponse", TravelHistoryresponse);
+  
   useEffect(() => {
     if (polylinedata.length > 0) {
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
@@ -596,7 +596,14 @@ export default function journeyReplayComp() {
 
         if (period == "today") {
           setWeekData(false);
-          const today = moment();
+          const today = moment().tz(
+            session?.timezone === "Australia/Sydney" ||
+              session?.timezone === "America/Winnipeg" ||
+              session?.timezone === "Europe/London" ||
+              session?.timezone === "Asia/Karachi"
+              ? session?.timezone
+              : ""
+          );
           startDateTime =
             today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
@@ -612,16 +619,13 @@ export default function journeyReplayComp() {
         }
         if (period == "week") {
           setWeekData(true);
-          //console.log("week is starting");
+          
           const startOfWeek = moment().subtract(7, "days").startOf("day");
-          //console.log("start of week", startOfWeek);
           const oneday = moment().subtract(1, "day");
 
           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          //console.log("start date time ", startDateTime);
           endDateTime =
             oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          //console.log("end date time", endDateTime);
         }
         if (period === "custom") {
           startDateTime =
@@ -646,6 +650,28 @@ export default function journeyReplayComp() {
           // toDateTime.setDate(toDateTime.getDate() + 6);
           // const formattedFromDateTime = formatDate(fromDateTime);
           // const formattedToDateTime = formatDate(toDateTime);
+          // if (isCustomPeriod) {
+          //   newdata = {
+          //     ...newdata,
+          //     fromDateTime: `${
+          //       weekData ? formattedFromDateTime : Ignitionreport.fromDateTime
+          //     }T${timestart}Z`,
+          //     toDateTime: `${
+          //       weekData ? formattedToDateTime : Ignitionreport.toDateTime
+          //     }T${timeend}Z`,
+          //   };
+          // } else {
+          //   newdata = {
+          //     ...newdata,
+          //     fromDateTime: `${
+          //       weekData ? formattedFromDateTime : currentDate
+          //     }T${timestart}Z`,
+          //     toDateTime: `${
+          //       weekData ? formattedToDateTime : currentDate
+          //     }T${timeend}Z`,
+          //   };
+          // }
+
           if (isCustomPeriod) {
             newdata = {
               ...newdata,
@@ -654,9 +680,16 @@ export default function journeyReplayComp() {
             };
           } else {
             newdata = {
-              ...newdata,
+              ...newdata, 
+              unit: session?.unit,
+                period: period,
+              VehicleReg: VehicleReg,
+              TimeZone: session?.timezone,
+              clientId: session?.clientId,
               fromDateTime: startDateTime,
               toDateTime: endDateTime,
+              // fromDateTime: "2024-02-01T00:00:00Z",
+              // toDateTime: "2024-02-01T23:59:59Z",
             };
           }
           const fromDate: any = new Date(Ignitionreport?.fromDateTime);
@@ -970,7 +1003,7 @@ export default function journeyReplayComp() {
   // const result = TravelHistoryresponse.map((item) => {
   //   if (item.speed === "0 Kph") return item;
   // });
-  // console.log(result);
+  
   // if (TravelHistoryresponse.speed == "KM") {
   //   stopPoints = res.data
   //     .filter((x: any) => x.speed == "0 Kph")
@@ -981,7 +1014,7 @@ export default function journeyReplayComp() {
   //     .sort((x) => x.date);
   // }
 
-  console.log("stops", stops);
+  
   const handleClickClear = () => {
     setPolylinedata([]);
     setCarPosition(null);
@@ -1078,12 +1111,12 @@ export default function journeyReplayComp() {
           stopPoints = TravelHistoryresponseapi.data
             .filter((x: any) => x.speed == "0 Kph")
             .sort((x: any) => x.date);
-          console.log("points", stopPoints);
+          
         } else {
           stopPoints = TravelHistoryresponseapi.data
             .filter((x: any) => x.speed == "0 Mph")
             .sort((x: any) => x.date);
-          console.log("points", stopPoints);
+          
         }
         // displayName = TravelHistoryresponse.map((item) => {
         //   return item?.address?.display_name;
@@ -1128,42 +1161,63 @@ export default function journeyReplayComp() {
         let stopTimesArray = [];
 
         // Iterate over data array
-        for (let i = 0; i < TravelHistoryresponseapi?.data?.length - 1; i++) {
-          const currentData = TravelHistoryresponseapi?.data[i];
-          const nextData = TravelHistoryresponseapi?.data[i + 1];
-          console.log("currentAddress", currentData);
-          // Check if current car's speed is 0 Mph and next car's speed is non-zero
-          if (
-            currentData.speed === "0 Mph" &&
-            (currentData.speed === "0 Mph" || nextData.speed !== "0 Mph")
-          ) {
-            const currentTime: any = new Date(currentData.date);
-            const nextTime: any = new Date(nextData.date);
-            const timeDiffInSeconds = Math.floor(
-              (nextTime - currentTime) / 1000
-            );
+        for (let i = 0; i < TravelHistoryresponseapi?.data?.length; i++) {
+          var currentData = TravelHistoryresponseapi?.data[i];
+
+          // Check if current car's speed is 0 Mph
+          if (currentData.speed === "0 Mph" || currentData.speed === "0 Kph") {
+            let timeDiffInSeconds = 0;
+            let nextIndex = i + 1;
+
+            // Include the time difference with consecutive 0 Mph speed data points
+            while (
+              nextIndex < TravelHistoryresponseapi?.data?.length &&
+              (TravelHistoryresponseapi?.data[nextIndex]?.speed === "0 Mph" ||
+                TravelHistoryresponseapi?.data[nextIndex]?.speed === "0 Kph")
+            ) {
+              
+              const currentTime: any = new Date(currentData.date);
+              const nextTime: any = new Date(
+                TravelHistoryresponseapi?.data[nextIndex].date
+              );
+
+              timeDiffInSeconds += Math.floor((nextTime - currentTime) / 1000);
+              currentData=
+              TravelHistoryresponseapi?.data[nextIndex]
+              nextIndex++; 
+            }
+
+            if(timeDiffInSeconds!=0){i=nextIndex-1}
+            if(timeDiffInSeconds==0&& (TravelHistoryresponseapi?.data[nextIndex]?.speed !== "0 Mph" ||
+            TravelHistoryresponseapi?.data[nextIndex]?.speed!== "0 Kph")&&nextIndex<TravelHistoryresponseapi?.data?.length){
+              const currentTime: any = new Date(currentData.date);
+              const nextTime: any = new Date(
+                TravelHistoryresponseapi?.data[nextIndex].date
+              );
+               timeDiffInSeconds += Math.floor((nextTime - currentTime) / 1000);       
+            }
+
 
             const minutes = Math.floor(timeDiffInSeconds / 60);
             const seconds = timeDiffInSeconds % 60;
 
             // Construct the formatted string
-            const formattedTime = `${
+            const formattedTime = ` ${
               minutes > 0 ? minutes + " min" : ""
             } ${seconds} sec`;
 
             // Display the time difference
-            // setStopWithSecond(currentData.date,minuteSecond:formattedTime})
             stopTimesArray.push({
               date: currentData.date,
               time: formattedTime,
               address: currentData.address,
             });
-            console.log(
-              `Time difference from ${currentData.date}  ${formattedTime}`
-            );
+
+           
           }
         }
-        console.log("stopTimesArray", stopTimesArray);
+
+       
         setStopWithSecond(stopTimesArray);
         setTravelHistoryresponse(TravelHistoryresponseapi.data);
       }
@@ -1431,8 +1485,10 @@ export default function journeyReplayComp() {
       [fieldName]: newDate?.toISOString(),
     }));
   };
-
+  // const timeZone =  "Australia/Sydney" 
+  //     const currenTDates = moment.tz(timeZone).toDate();
   const currenTDates = new Date();
+  
   const isCurrentDate = (date: any) => {
     if (date instanceof Date) {
       const currentDate = new Date();
@@ -3010,12 +3066,14 @@ export default function journeyReplayComp() {
                           className="cursor-pointer"
                         >
                           <p className="text-black font-popins px-3 py-3 text-sm">
-                            {/* <b>{item?.address?.address?.substring(0, 50)}</b> */}
+                            <b>
+                              {item?.address?.display_name?.substring(0, 50)}
+                            </b>
                           </p>
 
                           <div className="grid grid-cols-12">
                             <div className="lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-2"></div>
-                            <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
+                            <div className="lg:col-span-10 md:col-span-5 sm:col-span-5 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
                               {/* {getHour > 12 ? getHourPm : getHour} */}
                               {item?.date?.slice(11, 19)}
                               {item?.time}

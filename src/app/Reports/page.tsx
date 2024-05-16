@@ -224,7 +224,7 @@ export default function Reports() {
 
   const parsedDateTime = new Date(currentTime);
   const currenTDates = new Date();
-  var moment = require("moment");
+  var moment = require("moment-timezone");
   const formattedDateTime = `${parsedDateTime
     .toISOString()
     .slice(0, 10)}TO${timeOnly}`;
@@ -284,7 +284,14 @@ export default function Reports() {
       if (session) {
         const { reportType, VehicleReg, period } = Ignitionreport;
         if (period === "today") {
-          const today = moment();
+          const today = moment().tz(
+            session?.timezone === "Australia/Sydney" ||
+              session?.timezone === "America/Winnipeg" ||
+              session?.timezone === "Europe/London" ||
+              session?.timezone === "Asia/Karachi"
+              ? session?.timezone
+              : ""
+          );
           startDateTime =
             today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
@@ -547,7 +554,9 @@ export default function Reports() {
                   const filteredData = response.data.tableData.filter(
                     (eventitem: { event: string }) =>
                       eventitem.event !== "ignitionOn" &&
-                      eventitem.event !== "ignitionOff"
+                      eventitem.event !== "ignitionOff" &&
+                      eventitem.event !== "ignition On" &&
+                      eventitem.event !== "ignition Off"
                   );
                   setTrisdata(filteredData);
                   newColumnHeaders = ["event", "date", "Address"];
