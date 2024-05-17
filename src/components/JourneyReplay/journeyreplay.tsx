@@ -2060,7 +2060,6 @@ export default function journeyReplayComp() {
               // </div>
             )}
           </div>
-
           <div className="xl:col-span-1 lg:col-span-1 md:col-span-1 col-span-12 text-white font-bold flex justify-center items-center mt-2 journey_replay_search">
             {/* {clearMapData ? (
               <button
@@ -2081,8 +2080,7 @@ export default function journeyReplayComp() {
               >
                 Search
               </button>
-            ) : (
-           
+            ) : (           
             )} */}
             <div
               onClick={(e) => seacrhLoading && handleSubmit(e)}
