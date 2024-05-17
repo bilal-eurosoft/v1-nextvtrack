@@ -1202,8 +1202,8 @@ export default function journeyReplayComp() {
 
             // Construct the formatted string
             const formattedTime = ` ${
-              minutes > 0 ? minutes + " min" : ""
-            } ${seconds} sec`;
+              minutes > 0 ? minutes + "m" : ""
+            } ${seconds}s`;
 
             // Display the time difference
             stopTimesArray.push({
@@ -2125,7 +2125,7 @@ export default function journeyReplayComp() {
                 <button>Search</button>
               </div>
             </div>
-            <div
+            {/* <div
               onClick={handleSubmitTwo}
               className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    search_btn_journey
                     ${
@@ -2165,7 +2165,7 @@ export default function journeyReplayComp() {
               <div className="lg:col-span-8 md:col-span-8">
                 <button>SearchS</button>
               </div>
-            </div>
+            </div> */}
             {/* <button
               onClick={handleSubmit}
               className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
@@ -3051,9 +3051,6 @@ export default function journeyReplayComp() {
                   <div className="bg-white lg:h-60 md:h-60 sm:h-60 h-24 overflow-y-scroll resposive_stop_details">
                     {stopWithSecond?.map((item: any) => {
                       const getHour = item?.date?.slice(11, 13);
-                      const period = getHour >= 12 ? "PM" : "AM";
-                      const getHourPm = getHour >= 12 ? getHour - 12 : getHour;
-
                       return loadingMap ? (
                         <div
                           onClick={() => handleClickStopCar(item)}
@@ -3066,27 +3063,21 @@ export default function journeyReplayComp() {
                           </p>
 
                           <div className="grid grid-cols-12 ">
-                            <div className="lg:col-span-3 md:col-span-2 sm:col-span-6 col-span-2"></div>
-                            <div className="lg:col-span-8 md:col-span-8 sm:col-span-8 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
-                              {/* {getHour > 12 ? getHourPm : getHour} */}
-                              Time: {item?.date?.slice(11, 19)}
-                              {/* {period} */}
-                              {/* {moment(item?.date)
+                            <div className="lg:col-span-2 md:col-span-2 sm:col-span-6 col-span-2"></div>
+                            {/* <div className="lg:col-span-9 md:col-span-8 sm:col-span-8 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time"> */}
+                            {/* {getHour > 12 ? getHourPm : getHour} */}
+                            {/* {item?.date?.slice(11, 19)}, {item?.time} */}
+                            {/* {period} */}
+                            {/* {moment(item?.date)
                               date.format("hh:mm A");
                             
                                 .format("HH:mm:ss A")} */}
-                            </div>
-                            <br></br>
+                            {/* </div> */}
+                            {/* <br></br>
                             <div className="lg:col-span-2 md:col-span-2 sm:col-span-6 col-span-2"></div>
                             <div className="lg:col-span-9 md:col-span-8 sm:col-span-8 col-span-11  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time mt-3">
-                              {/* {getHour > 12 ? getHourPm : getHour} */}
                               Duration: {item?.time}
-                              {/* {period} */}
-                              {/* {moment(item?.date)
-                              date.format("hh:mm A");
-                            
-                                .format("HH:mm:ss A")} */}
-                            </div>
+                            </div> */}
                           </div>
                           <br></br>
                           <hr className="text-gray"></hr>
