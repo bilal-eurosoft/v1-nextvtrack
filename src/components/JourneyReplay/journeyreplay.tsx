@@ -1447,12 +1447,10 @@ export default function journeyReplayComp() {
       setShowZones(false);
     }
   };
-
   const handleShowDetails = () => {
     setShowDetails(!getShowdetails);
     setShowIcon(!getShowICon);
   };
-
   const handleChangeChecked = () => {
     setCheckedInput(!getCheckedInput);
   };
