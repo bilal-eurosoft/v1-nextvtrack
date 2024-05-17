@@ -20,6 +20,7 @@ const LiveSidebar = ({
   setunselectVehicles,
   unselectVehicles,
   setZoom,
+  setShowZonePopUp,
 }: {
   carData: VehicleData[];
   countPause: Number;
@@ -32,6 +33,7 @@ const LiveSidebar = ({
   setunselectVehicles: any;
   unselectVehicles: any;
   setZoom: any;
+  setShowZonePopUp: any;
 }) => {
   const { data: session } = useSession();
   const [searchData, setSearchData] = useState({
@@ -115,7 +117,7 @@ const LiveSidebar = ({
       }
     });
     const filtered = carData
-      .filter((data) =>
+      ?.filter((data) =>
         data.vehicleReg.toLowerCase().includes(searchData.search.toLowerCase())
       )
       .sort((a: any, b: any) => {
@@ -157,6 +159,7 @@ const LiveSidebar = ({
     setSelectedVehicle(item);
     setshowAllVehicles(false);
     setIsActiveColor(item.vehicleId);
+    setShowZonePopUp(false);
   };
 
   return (

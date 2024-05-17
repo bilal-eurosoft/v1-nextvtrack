@@ -1167,7 +1167,7 @@ export default function Reports() {
                       <DatePicker
                         // open={isPickerOpenFromDate}/
                         format="MM/DD/yyyy"
-                        value={Ignitionreport.fromDateTime}
+                        value={Ignitionreport.fromDateTime || null}
                         onChange={(e) =>
                           handleCustomDateChange("fromDateTime", e)
                         }
@@ -1209,7 +1209,7 @@ export default function Reports() {
                         <DatePicker
                           // open={isPickerOpen}
                           format="MM/DD/yyyy"
-                          value={Ignitionreport.toDateTime}
+                          value={Ignitionreport.toDateTime || null}
                           onChange={(newDate: any) =>
                             handleCustomDateChange("toDateTime", newDate)
                           }

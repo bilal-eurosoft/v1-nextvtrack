@@ -209,13 +209,12 @@ export default function journeyReplayComp() {
   const [harshAccPopUp, setAccHarshPopUp] = useState(true);
   const [addressTravelHistory, setAddressTravelHistory] = useState([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [isPickerOpenFromDate, setIsPickerOpenFromDate] = useState(false);
+  const [isPickerOpenFromDate, setIsPickerOpenFromDate] = useState(true);
 
   const [travelV2, setTravelV2] = useState(false);
   const [travelV3, setTravelV3] = useState(false);
   const [stopWithSecond, setStopWithSecond] = useState([]);
 
-  
   const startdate = new Date();
   const enddate = new Date();
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
@@ -418,7 +417,7 @@ export default function journeyReplayComp() {
     speedFactor,
     stopVehicle,
   ]);
-  
+
   useEffect(() => {
     if (polylinedata.length > 0) {
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
@@ -619,7 +618,7 @@ export default function journeyReplayComp() {
         }
         if (period == "week") {
           setWeekData(true);
-          
+
           const startOfWeek = moment().subtract(7, "days").startOf("day");
           const oneday = moment().subtract(1, "day");
 
@@ -680,9 +679,9 @@ export default function journeyReplayComp() {
             };
           } else {
             newdata = {
-              ...newdata, 
+              ...newdata,
               unit: session?.unit,
-                period: period,
+              period: period,
               VehicleReg: VehicleReg,
               TimeZone: session?.timezone,
               clientId: session?.clientId,
@@ -1003,7 +1002,7 @@ export default function journeyReplayComp() {
   // const result = TravelHistoryresponse.map((item) => {
   //   if (item.speed === "0 Kph") return item;
   // });
-  
+
   // if (TravelHistoryresponse.speed == "KM") {
   //   stopPoints = res.data
   //     .filter((x: any) => x.speed == "0 Kph")
@@ -1014,7 +1013,6 @@ export default function journeyReplayComp() {
   //     .sort((x) => x.date);
   // }
 
-  
   const handleClickClear = () => {
     setPolylinedata([]);
     setCarPosition(null);
@@ -1111,12 +1109,10 @@ export default function journeyReplayComp() {
           stopPoints = TravelHistoryresponseapi.data
             .filter((x: any) => x.speed == "0 Kph")
             .sort((x: any) => x.date);
-          
         } else {
           stopPoints = TravelHistoryresponseapi.data
             .filter((x: any) => x.speed == "0 Mph")
             .sort((x: any) => x.date);
-          
         }
         // displayName = TravelHistoryresponse.map((item) => {
         //   return item?.address?.display_name;
@@ -1175,28 +1171,31 @@ export default function journeyReplayComp() {
               (TravelHistoryresponseapi?.data[nextIndex]?.speed === "0 Mph" ||
                 TravelHistoryresponseapi?.data[nextIndex]?.speed === "0 Kph")
             ) {
-              
               const currentTime: any = new Date(currentData.date);
               const nextTime: any = new Date(
                 TravelHistoryresponseapi?.data[nextIndex].date
               );
 
               timeDiffInSeconds += Math.floor((nextTime - currentTime) / 1000);
-              currentData=
-              TravelHistoryresponseapi?.data[nextIndex]
-              nextIndex++; 
+              currentData = TravelHistoryresponseapi?.data[nextIndex];
+              nextIndex++;
             }
 
-            if(timeDiffInSeconds!=0){i=nextIndex-1}
-            if(timeDiffInSeconds==0&& (TravelHistoryresponseapi?.data[nextIndex]?.speed !== "0 Mph" ||
-            TravelHistoryresponseapi?.data[nextIndex]?.speed!== "0 Kph")&&nextIndex<TravelHistoryresponseapi?.data?.length){
+            if (timeDiffInSeconds != 0) {
+              i = nextIndex - 1;
+            }
+            if (
+              timeDiffInSeconds == 0 &&
+              (TravelHistoryresponseapi?.data[nextIndex]?.speed !== "0 Mph" ||
+                TravelHistoryresponseapi?.data[nextIndex]?.speed !== "0 Kph") &&
+              nextIndex < TravelHistoryresponseapi?.data?.length
+            ) {
               const currentTime: any = new Date(currentData.date);
               const nextTime: any = new Date(
                 TravelHistoryresponseapi?.data[nextIndex].date
               );
-               timeDiffInSeconds += Math.floor((nextTime - currentTime) / 1000);       
+              timeDiffInSeconds += Math.floor((nextTime - currentTime) / 1000);
             }
-
 
             const minutes = Math.floor(timeDiffInSeconds / 60);
             const seconds = timeDiffInSeconds % 60;
@@ -1212,12 +1211,9 @@ export default function journeyReplayComp() {
               time: formattedTime,
               address: currentData.address,
             });
-
-           
           }
         }
 
-       
         setStopWithSecond(stopTimesArray);
         setTravelHistoryresponse(TravelHistoryresponseapi.data);
       }
@@ -1485,10 +1481,10 @@ export default function journeyReplayComp() {
       [fieldName]: newDate?.toISOString(),
     }));
   };
-  // const timeZone =  "Australia/Sydney" 
+  // const timeZone =  "Australia/Sydney"
   //     const currenTDates = moment.tz(timeZone).toDate();
   const currenTDates = new Date();
-  
+
   const isCurrentDate = (date: any) => {
     if (date instanceof Date) {
       const currentDate = new Date();
@@ -1578,18 +1574,19 @@ export default function journeyReplayComp() {
 
   const [lat, setlat] = useState<any>("");
   const [lng, setlng] = useState<any>("");
-
+  console.log(lat, lng);
   const handleClickStopCar = (item: any) => {
-    if (item?.lat === lat) {
+    console.log("item", item);
+    if (item?.address?.lat === lat) {
       setlat(null);
     } else {
-      setlat(item?.lat);
+      setlat(item?.address?.lat);
     }
 
-    if (item?.lng === lat) {
+    if (item?.address?.lon === lng) {
       setlng(null);
     } else {
-      setlng(item?.lng);
+      setlng(item?.address?.lon);
     }
   };
   const handleChangeValueSlider = (value: any) => {
@@ -1853,11 +1850,7 @@ export default function journeyReplayComp() {
                     <DatePicker
                       // open={isPickerOpenFromDate}
                       format="MM/DD/yyyy"
-                      value={
-                        fromDateInput
-                          ? "start date"
-                          : Ignitionreport.fromDateTime
-                      }
+                      value={Ignitionreport.fromDateTime || null}
                       onChange={(newDate: any) =>
                         handleDateChange("fromDateTime", newDate)
                       }
@@ -1883,34 +1876,35 @@ export default function journeyReplayComp() {
                   onClick={togglePicker}
                 >
                   <label className="text-green">To</label>
-                  <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
-                    <DatePicker
-                      // open={isPickerOpen}
-                      style={{ marginTop: "-3%" }}
-                      format="MM/DD/yyyy"
-                      value={
-                        fromDateInput ? "End Date" : Ignitionreport.toDateTime
-                      }
-                      onChange={(newDate: any) =>
-                        handleDateChange("toDateTime", newDate)
-                      }
-                      variant="inline"
-                      // maxDate={currenTDates}
-                      placeholder="End Date"
-                      inputProps={{ readOnly: true }}
-                      maxDate={currenTDates}
-                      // shouldDisableDate={(date) => !isCurrentDate(date)}
-                      InputProps={{
-                        endAdornment: (
-                          <EventIcon
-                            style={{ width: "20", height: "20" }}
-                            className="text-gray"
-                          />
-                        ),
-                      }}
-                      autoOk
-                    />
-                  </MuiPickersUtilsProvider>
+                  <div>
+                    {/* <h1>test</h1> */}
+                    <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
+                      <DatePicker
+                        style={{ marginTop: "-3%" }}
+                        className="text-red"
+                        format="MM/DD/yyyy"
+                        value={Ignitionreport.toDateTime || null}
+                        onChange={(newDate: any) =>
+                          handleDateChange("toDateTime", newDate)
+                        }
+                        variant="inline"
+                        // maxDate={currenTDates}
+                        placeholder="End Date"
+                        inputProps={{ readOnly: true }}
+                        maxDate={currenTDates}
+                        // shouldDisableDate={(date) => !isCurrentDate(date)}
+                        InputProps={{
+                          endAdornment: (
+                            <EventIcon
+                              style={{ width: "20", height: "20" }}
+                              className="text-gray"
+                            />
+                          ),
+                        }}
+                        autoOk
+                      />
+                    </MuiPickersUtilsProvider>
+                  </div>
                 </div>
                 <div className="lg:col-span-1 col-span-1   ">
                   <button
@@ -3071,14 +3065,23 @@ export default function journeyReplayComp() {
                             </b>
                           </p>
 
-                          <div className="grid grid-cols-12">
-                            <div className="lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-2"></div>
-                            <div className="lg:col-span-10 md:col-span-5 sm:col-span-5 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
+                          <div className="grid grid-cols-12 ">
+                            <div className="lg:col-span-3 md:col-span-2 sm:col-span-6 col-span-2"></div>
+                            <div className="lg:col-span-8 md:col-span-8 sm:col-span-8 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
                               {/* {getHour > 12 ? getHourPm : getHour} */}
-                              {item?.date?.slice(11, 19)}
-                              {item?.time}
+                              Time: {item?.date?.slice(11, 19)}
                               {/* {period} */}
-
+                              {/* {moment(item?.date)
+                              date.format("hh:mm A");
+                            
+                                .format("HH:mm:ss A")} */}
+                            </div>
+                            <br></br>
+                            <div className="lg:col-span-2 md:col-span-2 sm:col-span-6 col-span-2"></div>
+                            <div className="lg:col-span-9 md:col-span-8 sm:col-span-8 col-span-11  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time mt-3">
+                              {/* {getHour > 12 ? getHourPm : getHour} */}
+                              Duration: {item?.time}
+                              {/* {period} */}
                               {/* {moment(item?.date)
                               date.format("hh:mm A");
                             

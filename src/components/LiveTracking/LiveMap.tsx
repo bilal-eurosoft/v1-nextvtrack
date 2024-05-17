@@ -44,6 +44,8 @@ const DynamicCarMap = ({
   unselectVehicles,
   mapCoordinates,
   zoom,
+  setShowZonePopUp,
+  showZonePopUp,
 }: {
   carData: VehicleData[];
   clientSettings: ClientSettings[];
@@ -55,6 +57,8 @@ const DynamicCarMap = ({
   unselectVehicles: any;
   mapCoordinates: any;
   zoom: any;
+  setShowZonePopUp: any;
+  showZonePopUp: any;
 }) => {
   const clientMapSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Map"
@@ -101,9 +105,11 @@ const DynamicCarMap = ({
   //   let zoomLevel = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
   //   setZoom(zoomLevel);
   // }, [clientMapSettings]);
-
+  console.log("showPop", showZonePopUp);
   const handleClear = () => {
     setIsActiveColor("");
+    // setShowZonePopUp(true);
+    // console.log("test123");
     // setSelectedVehicle(null);
   };
   const allZones = useSelector((state) => state.zone);
@@ -111,6 +117,10 @@ const DynamicCarMap = ({
   useEffect(() => {
     setZoneList(allZones?.zone);
   }, [allZones]);
+  const handleShowZone = () => {
+    setShowZones(!showZones);
+  };
+
   return (
     <>
       <div className="xl:col-span-4 lg:col-span-3  md:col-span-3  sm:col-span-3 col-span-4 main_map">
@@ -121,7 +131,7 @@ const DynamicCarMap = ({
               key={zoom}
               style={{ height: fullparams == "full" ? "100vh" : "" }}
               center={mapCoordinates}
-              className=" z-0"
+              className="z-0"
               zoom={zoom}
             >
               <TileLayer
@@ -165,9 +175,7 @@ const DynamicCarMap = ({
                 })}
               <button
                 className="bg-[#00B56C] text-white"
-                onClick={() => {
-                  setShowZones(!showZones);
-                }}
+                onClick={handleShowZone}
               ></button>
               <LiveCars
                 carData={carData}

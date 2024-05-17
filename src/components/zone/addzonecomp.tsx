@@ -25,7 +25,8 @@ import ClearIcon from "@mui/icons-material/Clear";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import { EditControl } from "react-leaflet-draw";
-
+import { fetchZone } from "@/lib/slices/zoneSlice";
+import { UseDispatch, useDispatch } from "react-redux";
 import "./editZone.css";
 const MapContainer = dynamic(
   () => import("react-leaflet").then((module) => module.MapContainer),
@@ -79,6 +80,7 @@ export default function AddZoneComp() {
     router.push("/signin");
     return null;
   }
+  const dispatch = useDispatch();
   useEffect(() => {
     // if (typeof window !== "undefined") {
     // }
@@ -314,6 +316,12 @@ export default function AddZoneComp() {
         //     router.push("/Zone");
         //   }, 2000);
         // }
+        dispatch(
+          fetchZone({
+            clientId: session?.clientId,
+            token: session?.accessToken,
+          })
+        );
       }
     } catch (error) {
       console.error("Error fetching zone data:", error);

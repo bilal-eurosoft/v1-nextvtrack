@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-export default function LoginPage() {
+const SignIn = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -385,4 +385,6 @@ export default function LoginPage() {
       )}
     </div>
   );
-}
+};
+
+export default SignIn;

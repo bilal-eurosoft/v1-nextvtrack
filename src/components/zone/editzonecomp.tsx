@@ -14,6 +14,8 @@ import ClearIcon from "@mui/icons-material/Clear";
 import SaveIcon from "@mui/icons-material/Save";
 import { Button, MenuItem, Select } from "@mui/material";
 import EditRoadIcon from "@mui/icons-material/EditRoad";
+import { fetchZone } from "@/lib/slices/zoneSlice";
+import { UseSelector, useDispatch } from "react-redux";
 import "./editZone.css";
 
 const MapContainer = dynamic(
@@ -74,6 +76,7 @@ export default function EditZoneComp() {
   });
 
   const router = useRouter();
+  const dispatch = useDispatch();
   if (session?.userRole === "Controller") {
     router.push("/signin");
     return null;
@@ -308,6 +311,12 @@ export default function EditZoneComp() {
             router.push("/Zone");
           }, 2000);
         }
+        dispatch(
+          fetchZone({
+            clientId: session?.clientId,
+            token: session?.accessToken,
+          })
+        );
       }
     } catch (error) {
       console.error("Error fetching zone data:", error);

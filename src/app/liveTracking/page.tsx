@@ -63,6 +63,7 @@ const LiveTracking = () => {
   const [activeColor, setIsActiveColor] = useState<any>("");
   const [showAllVehicles, setshowAllVehicles] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
+  const [showZonePopUp, setShowZonePopUp] = useState(true);
   const [isFirstTimeFetchedFromGraphQL, setIsFirstTimeFetchedFromGraphQL] =
     useState(false);
   const [lastDataReceivedTimestamp, setLastDataReceivedTimestamp] = useState(
@@ -266,6 +267,7 @@ const LiveTracking = () => {
           setunselectVehicles={setunselectVehicles}
           unselectVehicles={unselectVehicles}
           setZoom={setZoom}
+          setShowZonePopUp={setShowZonePopUp}
         />
         {carData?.current?.length !== 0 && (
           <LiveMap
@@ -279,6 +281,8 @@ const LiveTracking = () => {
             unselectVehicles={unselectVehicles}
             mapCoordinates={mapCoordinates}
             zoom={zoom}
+            setShowZonePopUp={setShowZonePopUp}
+            showZonePopUp={showZonePopUp}
           />
         )}
       </div>

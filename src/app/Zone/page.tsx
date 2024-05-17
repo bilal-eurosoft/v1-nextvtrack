@@ -97,6 +97,7 @@ export default function Zone() {
   useEffect(() => {
     setZoneList(allZones?.zone);
   }, [allZones]);
+  const dispatch=useDispatch()
   const allZone = async () => {
     if (session) {
       // const allzoneList =  await getZoneListByClientId({
@@ -105,7 +106,7 @@ export default function Zone() {
       // });
       // setZoneList(allzoneList);
       // setInitialZoneList(allzoneList);
-      if (allZones?.zone?.length <= 0) {
+      if (allZones?.zone?.length <= 0 ) {
         const Data = await getZoneListByClientId({
           token: session.accessToken,
           clientId: session?.clientId,
@@ -114,6 +115,7 @@ export default function Zone() {
       }
       setZoneList(allZones?.zone);
     }
+    console.log("zoneList",zoneList)
     // if (zoneList?.length >-0) {
     //   await dispatch(
     //     fetchZone({ token: session?.accessToken, clientId: session?.clientId })
@@ -334,6 +336,12 @@ export default function Zone() {
               toast.success("Zone deleted successfully!", {
                 position: "top-center",
               });
+              dispatch(
+                fetchZone({
+                  clientId: session?.clientId,
+                  token: session?.accessToken,
+                })
+              );
               await allZone();
             }}
             className="text-green pr-5 font-popins font-bold"
