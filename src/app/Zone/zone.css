@@ -9,6 +9,9 @@
   flex-shrink: 0;
   display: none;
 }
+.css-yuzg60-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected {
+  background-color: rgb(190, 190, 190) !important;
+}
 
 .css-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar
   .MuiTablePagination-actions {

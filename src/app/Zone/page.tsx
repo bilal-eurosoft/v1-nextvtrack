@@ -21,6 +21,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { Button } from "@mui/material";
+import { fetchZone } from "@/lib/slices/zoneSlice";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getZoneListByClientId,
   modifyCollectionStatus,
@@ -74,31 +76,51 @@ export default function Zone() {
     zoneType: "",
   });
   const [rowsPerPage, setRowsPerPage] = useState<any>(10);
-  const totalPages = Math.ceil(zoneList.length / rowsPerPage);
+  const totalPages = Math.ceil(zoneList?.length / rowsPerPage);
   const [filterZonepage, setFilterZonePage] = useState(1);
   const [filterZonePerPage, setfilterZonePerPage] = useState(10);
   const [filteredDataIsNotAvaialable, setFilteredDataIsNotAvaialable] =
     useState<boolean>(true);
+  const [noDataFound, setNoDataFound] = useState(false);
+  const [inputPagination, setInputPagination] = useState(false);
   const lastIndexFilter = filterZonePerPage * filterZonepage;
   const firstIndexFilter = lastIndexFilter - filterZonePerPage;
   // let filterZoneResult;
   // filterZoneResult = filteredZones.slice(firstIndexFilter, lastIndexFilter);
   // const totalPagesFilter = Math.ceil(filteredZones.length / filterZonePerPage);
   // console.log("filteredZones", filterZoneResult);
-
   const handleClickPagination = () => {
     setCurrentPage(input);
+    setInputPagination(true);
   };
-
+  const allZones = useSelector((state) => state.zone);
+  useEffect(() => {
+    setZoneList(allZones?.zone);
+  }, [allZones]);
+  const dispatch=useDispatch()
   const allZone = async () => {
     if (session) {
-      const allzoneList = await getZoneListByClientId({
-        token: session?.accessToken,
-        clientId: session?.clientId,
-      });
-      setZoneList(allzoneList);
-      setInitialZoneList(allzoneList);
+      // const allzoneList =  await getZoneListByClientId({
+      //   token: session?.accessToken,
+      //   clientId: session?.clientId,
+      // });
+      // setZoneList(allzoneList);
+      // setInitialZoneList(allzoneList);
+      if (allZones?.zone?.length <= 0 ) {
+        const Data = await getZoneListByClientId({
+          token: session.accessToken,
+          clientId: session?.clientId,
+        });
+        setZoneList(Data);
+      }
+      setZoneList(allZones?.zone);
     }
+    console.log("zoneList",zoneList)
+    // if (zoneList?.length >-0) {
+    //   await dispatch(
+    //     fetchZone({ token: session?.accessToken, clientId: session?.clientId })
+    //   );
+    // }
   };
 
   useEffect(() => {
@@ -115,7 +137,7 @@ export default function Zone() {
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   let displayedData: any;
-  displayedData = zoneList.slice(startIndex, endIndex);
+  displayedData = zoneList?.slice(startIndex, endIndex);
   function handleSearchClick(e: any) {
     e.preventDefault();
     const { zoneName, zoneShortName, GeoFenceType, zoneType } = searchCriteria;
@@ -152,6 +174,9 @@ export default function Zone() {
         setFilteredZones([]);
         // filterZoneResult = [];
       }
+    }
+    if (filteredZones.length >= 0) {
+      setNoDataFound(true);
     }
   }
 
@@ -210,7 +235,6 @@ export default function Zone() {
       value: item.zoneShortName,
       label: item.zoneShortName,
     })) || [];
-
   let GeofenceOption = [
     { value: "On-Site", label: "On-Site" },
     { value: "Off-Site", label: "Off-Site" },
@@ -240,6 +264,7 @@ export default function Zone() {
     setRowsPerPage(10);
     setFilteredZones([]);
     setCurrentPage(1);
+    setNoDataFound(false);
   };
 
   function handleCheckboxChange(zone: zonelistType) {
@@ -298,8 +323,7 @@ export default function Zone() {
         <div className="bg-white p-2 rounded-md">
           <p>Are you sure you want to delete this zone?</p>
           <button
-            onClick={() => {
-              // Perform the actual delete action
+            onClick={async () => {
               zoneDelete({
                 token: session?.accessToken,
                 id: zoneId,
@@ -310,15 +334,21 @@ export default function Zone() {
 
               // Show a success toast
               toast.success("Zone deleted successfully!", {
-                duration: 3000,
                 position: "top-center",
               });
+              dispatch(
+                fetchZone({
+                  clientId: session?.clientId,
+                  token: session?.accessToken,
+                })
+              );
+              await allZone();
             }}
             className="text-green pr-5 font-popins font-bold"
           >
             OK
           </button>
-
+          {/* {allZone()} */}
           <button
             onClick={() => {
               // Dismiss the confirmation toast without deleting
@@ -336,7 +366,6 @@ export default function Zone() {
           </button>
         </div>
       ));
-      await allZone();
     } catch (error) {
       // Show an error toast
       toast.error("Failed to delete zone", {
@@ -792,7 +821,13 @@ export default function Zone() {
                     <SearchIcon />
                   </span>
                 }
-                onClick={handleSearchClick}
+                onClick={(e: any) =>
+                  (searchCriteria.zoneName ||
+                    searchCriteria.zoneType ||
+                    searchCriteria.zoneShortName ||
+                    searchCriteria.GeoFenceType) &&
+                  handleSearchClick(e)
+                }
               >
                 <b> s</b>{" "}
                 <span style={{ textTransform: "lowercase" }}>
@@ -1114,7 +1149,8 @@ export default function Zone() {
                     </TableRow>
                   ))}
                 </>
-              ) : filteredDataIsNotAvaialable === false ? (
+              ) : filteredDataIsNotAvaialable === false ||
+                noDataFound == true ? (
                 <>
                   <h2
                     style={{
@@ -1134,7 +1170,7 @@ export default function Zone() {
                 </>
               ) : (
                 <>
-                  {displayedData.length > 0 ? (
+                  {displayedData? .length > 0 ? (
                     <>
                       {" "}
                       {displayedData.map((item: any, index) => (
@@ -1207,10 +1243,7 @@ export default function Zone() {
                               className="icon_delete_edit"
                               onClick={() => deleteSelectedZones(item.id)}
                             >
-                              <DeleteIcon
-                                className="text-white bg-red p-1 h-7 w-8 rounded-md shadow-md hover:shadow-gray transition duration-500 delete_zone_button"
-                          
-                              />
+                              <DeleteIcon className="text-white bg-red p-1 h-7 w-8 rounded-md shadow-md hover:shadow-gray transition duration-500 delete_zone_button" />
                             </button>
 
                             {/* <BorderColorIcon
@@ -1246,12 +1279,12 @@ export default function Zone() {
       </TableContainer>
 
       <div className="table_pagination">
-        {filteredZones.length > 0 ? (
+        {filteredZones?.length > 0 ? (
           <div className="flex  justify-end lg:w-full w-screen bg-bgLight">
             <div className="grid lg:grid-cols-4 grid-cols-4   ">
               <div className="lg:col-span-1 col-span-1">
                 <p className="mt-1 text-black font-medium font-popins text-end">
-                  Total {filteredZones.length} items
+                  Total {filteredZones?.length} items
                 </p>
               </div>
 
@@ -1287,7 +1320,7 @@ export default function Zone() {
               <TablePagination
                 component="div"
                 rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
-                count={filteredZones.length} // or zoneList.length depending on the context
+                count={filteredZones?.length} // or zoneList.length depending on the context
                 rowsPerPage={filterZonePerPage} // or rowsPerPage depending on the context
                 page={filterZonepage} // or currentPage depending on the context
                 onRowsPerPageChange={handleChangeRowsPerPageFilter} // or handleChangeRowsPerPage depending on the context
@@ -1300,19 +1333,20 @@ export default function Zone() {
             <div className="grid lg:grid-cols-4 grid-cols-4   ">
               <div className="lg:col-span-1 col-span-1">
                 <p className=" text-labelColor text-end">
-                  Total {zoneList.length} items
+                  Total {zoneList?.length} items
                 </p>
               </div>
 
               <div className="lg:col-span-2 col-span-2 ">
-                <Stack spacing={2}>
-                  <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={handlePageChange}
-                    sx={{ color: "green" }}
-                  />
-                </Stack>
+                {/* <Stack spacing={2}> */}
+                <Pagination
+                  count={totalPages}
+                  page={
+                    inputPagination ? parseInt(input) : parseInt(currentPage)
+                  }
+                  onChange={handlePageChange}
+                />
+                {/* </Stack> */}
               </div>
               <div className="lg:col-lg-1 col-lg-1   ">
                 <span className="lg:inline-block hidden">Go To</span>
@@ -1320,11 +1354,19 @@ export default function Zone() {
                   type="text"
                   value={input}
                   className="lg:w-10 w-5  border border-grayLight outline-green mx-2 px-2"
-                  onChange={(e: any) => setInput(e.target.value)}
+                  onChange={(e: any) => {
+                    const value = e.target.value.match(/\d+/g);
+                    if (value > 0 && value <= totalPages) {
+                      setInput(e.target.value);
+                    } else {
+                      setInputPagination(false);
+                      setInput("");
+                    }
+                  }}
                 />
                 <span
                   className="text-labelColor cursor-pointer "
-                  onClick={handleClickPagination}
+                  onClick={input && handleClickPagination}
                 >
                   page &nbsp;&nbsp;
                 </span>
@@ -1334,9 +1376,9 @@ export default function Zone() {
               <TablePagination
                 component="div"
                 rowsPerPageOptions={[10, 20, 30, 40, 50, 100]}
-                count={zoneList.length}
+                count={zoneList?.length}
                 rowsPerPage={rowsPerPage}
-                page={currentPage}
+                // page={currentPage}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />

@@ -68,7 +68,7 @@ export default function DualCam() {
     setSingleImage(item.path);
   };
   const router = useRouter();
-
+ 
   if (
     session?.userRole === "Controller" ||
     (session?.userRole == "Admin" && session?.cameraProfile == false)

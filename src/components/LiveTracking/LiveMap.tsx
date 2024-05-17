@@ -8,7 +8,9 @@ import { zonelistType } from "@/types/zoneType";
 import dynamic from "next/dynamic";
 import { ClientSettings } from "@/types/clientSettings";
 import { useSession } from "next-auth/react";
-import { getZoneListByClientId } from "@/utils/API_CALLS";
+// import { getZoneListByClientId } from "@/utils/API_CALLS";
+import { fetchZone } from "@/lib/slices/zoneSlice";
+import { useSelector } from "react-redux";
 import { Marker, Popup } from "react-leaflet";
 import L, { LatLng } from "leaflet";
 import { useSearchParams } from "next/navigation";
@@ -40,6 +42,10 @@ const DynamicCarMap = ({
   showAllVehicles,
   setunselectVehicles,
   unselectVehicles,
+  mapCoordinates,
+  zoom,
+  setShowZonePopUp,
+  showZonePopUp,
 }: {
   carData: VehicleData[];
   clientSettings: ClientSettings[];
@@ -49,6 +55,10 @@ const DynamicCarMap = ({
   showAllVehicles: any;
   setunselectVehicles: any;
   unselectVehicles: any;
+  mapCoordinates: any;
+  zoom: any;
+  setShowZonePopUp: any;
+  showZonePopUp: any;
 }) => {
   const clientMapSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Map"
@@ -65,38 +75,50 @@ const DynamicCarMap = ({
 
   const [zoneList, setZoneList] = useState<zonelistType[]>([]);
   const [showZones, setShowZones] = useState(false);
-  const [mapCoordinates, setMapCoordinates] = useState<LatLng | null>(null);
-  const [zoom, setZoom] = useState(10);
-  useEffect(() => {
-    (async function () {
-      if (session) {
-        const allzoneList = await getZoneListByClientId({
-          token: session?.accessToken,
-          clientId: session?.clientId,
-        });
-        setZoneList(allzoneList);
-      }
-    })();
-  }, []);
+  // const [mapCoordinates, setMapCoordinates] = useState<LatLng | null>(null);
+  // const [zoom, setZoom] = useState(10);
+  // useEffect(() => {
+  //   (async function () {
+  //     if (session) {
 
-  useEffect(() => {
-    const regex = /lat:([^,]+),lng:([^}]+)/;
-    if (clientMapSettings) {
-      const match = clientMapSettings.match(regex);
+  //       await dispatch(
+  //         fetchZone({
+  //           token: session?.accessToken,
+  //           clientId: session?.clientId,
+  //         })
+  //       );
+  //     }
+  //   })();
+  // }, []);
 
-      if (match) {
-        const lat = parseFloat(match[1]);
-        const lng = parseFloat(match[2]);
-        setMapCoordinates(new LatLng(lat, lng));
-      }
-    }
-    let zoomLevel = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
-    setZoom(zoomLevel);
-  }, [clientMapSettings]);
+  // useEffect(() => {
+  //   const regex = /lat:([^,]+),lng:([^}]+)/;
+  //   if (clientMapSettings) {
+  //     const match = clientMapSettings.match(regex);
 
+  //     if (match) {
+  //       const lat = parseFloat(match[1]);
+  //       const lng = parseFloat(match[2]);
+  //       setMapCoordinates(new LatLng(lat, lng));
+  //     }
+  //   }
+  //   let zoomLevel = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
+  //   setZoom(zoomLevel);
+  // }, [clientMapSettings]);
+  console.log("showPop", showZonePopUp);
   const handleClear = () => {
     setIsActiveColor("");
+    // setShowZonePopUp(true);
+    // console.log("test123");
     // setSelectedVehicle(null);
+  };
+  const allZones = useSelector((state) => state.zone);
+
+  useEffect(() => {
+    setZoneList(allZones?.zone);
+  }, [allZones]);
+  const handleShowZone = () => {
+    setShowZones(!showZones);
   };
 
   return (
@@ -106,9 +128,10 @@ const DynamicCarMap = ({
           {mapCoordinates !== null && zoom !== null && (
             <MapContainer
               id="maps"
+              key={zoom}
               style={{ height: fullparams == "full" ? "100vh" : "" }}
               center={mapCoordinates}
-              className=" z-0"
+              className="z-0"
               zoom={zoom}
             >
               <TileLayer
@@ -152,9 +175,7 @@ const DynamicCarMap = ({
                 })}
               <button
                 className="bg-[#00B56C] text-white"
-                onClick={() => {
-                  setShowZones(!showZones);
-                }}
+                onClick={handleShowZone}
               ></button>
               <LiveCars
                 carData={carData}

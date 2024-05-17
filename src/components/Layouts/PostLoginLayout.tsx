@@ -3,7 +3,7 @@
 import logo from "@/../public/Images/logo.png";
 import Image from "next/image";
 import Link from "next/link";
-import { signOut, useSession } from "next-auth/react";
+import { signOut, useSession, SessionProvider } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Loading from "@/app/loading";
@@ -22,7 +22,9 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import TimeCounter from "@/app/context/timer";
 import { usePathname, useSearchParams } from "next/navigation";
-import { getZoneListByClientId } from "@/utils/API_CALLS";
+import { fetchZone } from "@/lib/slices/zoneSlice";
+import { useSelector } from "react-redux";
+// import { getZoneListByClientId } from "@/utils/API_CALLS";
 
 import {
   Popover,
@@ -83,11 +85,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-end",
 }));
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function RootLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [openPopover, setOpenPopover] = useState(false);
   const [selectedColor, setSelectedColor] = useState(null);
@@ -118,6 +116,12 @@ export default function RootLayout({
   const [loginTime, setLoginTime] = useState(new Date());
   const [elapsedTime, setElapsedTime] = useState(0);
   const fullparams = searchParams?.get("screen");
+  // const dispatch = useDispatch();
+  const allZones = useSelector((state) => state.zone);
+
+  useEffect(() => {
+    setZoneList(allZones?.zone);
+  }, [allZones]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -128,23 +132,24 @@ export default function RootLayout({
     return () => clearInterval(interval);
   }, []); // Run effect when loginTime changes
 
-  useEffect(() => {
-    const fetchZoneList = async () => {
-      if (session) {
-        try {
-          const allzoneList = await getZoneListByClientId({
-            token: session.accessToken,
-            clientId: session.clientId,
-          });
-          setZoneList(allzoneList);
-        } catch (error) {
-          console.log("Error fetching zone list:", error);
-        }
-      }
-    };
+  // useEffect(() => {
+  //   const fetchZoneList = async () => {
+  //     if (session) {
+  //       try {
+  //         await dispatch(
+  //           fetchZone({
+  //             token: session?.accessToken,
+  //             clientId: session?.clientId,
+  //           })
+  //         );
+  //       } catch (error) {
+  //         console.log("Error fetching zone list:", error);
+  //       }
+  //     }
+  //   };
 
-    fetchZoneList();
-  }, [session]);
+  //   fetchZoneList();
+  // }, [session]);
 
   // const allzoneList = zoneList?.map((item) => {
   //   return item?.id;
@@ -161,7 +166,7 @@ export default function RootLayout({
     if (!session && fullparams != "full") {
       router.push("/signin");
     }
-  }, [session, router]);
+  }, [session]);
 
   const handleClick = (item: any) => {
     setSelectedColor(item);
@@ -540,6 +545,43 @@ export default function RootLayout({
                 </svg>
               </Tooltip>
             </Link>
+            <Link href="/Notifications">
+              <Tooltip
+                className="bg-[#00B56C] text-white shadow-lg rounded"
+                placement="right"
+                content="Events and Notifications"
+              >
+                <svg
+                  className={`w-20 h-14 py-3 
+  text-white-10  dark:text-white  ${
+    pathname === "/Notifications"
+      ? "border-r-2 border-#29303b -my-1"
+      : "border-y-1 border-b-2"
+  }`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    color: pathname === "/Notifications" ? "green" : "white",
+                    backgroundColor:
+                      pathname === "/Notifications" ? "white" : "",
+                  }}
+                >
+                  <path
+                    d="M9.5 19C8.89555 19 7.01237 19 5.61714 19C4.87375 19 4.39116 18.2177 4.72361 17.5528L5.57771 15.8446C5.85542 15.2892 6 14.6774 6 14.0564C6 13.2867 6 12.1434 6 11C6 9 7 5 12 5C17 5 18 9 18 11C18 12.1434 18 13.2867 18 14.0564C18 14.6774 18.1446 15.2892 18.4223 15.8446L19.2764 17.5528C19.6088 18.2177 19.1253 19 18.382 19H14.5M9.5 19C9.5 21 10.5 22 12 22C13.5 22 14.5 21 14.5 19M9.5 19C11.0621 19 14.5 19 14.5 19"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M12 5V3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </Tooltip>
+            </Link>
 
             {(session?.userRole == "SuperAdmin" ||
               session?.userRole == "Admin") && (
@@ -549,7 +591,7 @@ export default function RootLayout({
                     {/* <Link href="/DriverProfile"> */}
                     {/* <Link href={pathname ? "/DriverProfile" : "/DriverAssign"}> */}
                     <Tooltip
-                      className={`bg-[#00B56C] text-white shadow-lg rounded border-none`}
+                      className={`bg-[#00B56C] z-50 text-white shadow-lg rounded border-none`}
                       placement="right"
                       content="Driver"
                     >
@@ -594,7 +636,7 @@ export default function RootLayout({
                         </svg>
                       </PopoverHandler>
                     </Tooltip>
-                    <PopoverContent className="border-none cursor-pointer bg-green">
+                    <PopoverContent className="border-none cursor-pointer bg-green z-50">
                       {/* <Link className="w-full text-white" href="/DriverProfile">
                   Driver Profile
                 </Link> */}
@@ -1071,6 +1113,46 @@ export default function RootLayout({
                           </svg>
                         </Tooltip>
                       </Link>
+                      <Link href="/Notifications">
+                        <Tooltip
+                          className="bg-[#00B56C] text-white shadow-lg rounded"
+                          placement="right"
+                          content="Events and Notifications"
+                        >
+                          <svg
+                            className={`w-20 h-14 py-3 
+  text-white-10  dark:text-white  ${
+    pathname === "/Notifications"
+      ? "border-r-2 border-#29303b -my-1"
+      : "border-y-1 border-b-2"
+  }`}
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{
+                              color:
+                                pathname === "/Notifications"
+                                  ? "green"
+                                  : "white",
+                              backgroundColor:
+                                pathname === "/Notifications" ? "white" : "",
+                            }}
+                          >
+                            <path
+                              d="M9.5 19C8.89555 19 7.01237 19 5.61714 19C4.87375 19 4.39116 18.2177 4.72361 17.5528L5.57771 15.8446C5.85542 15.2892 6 14.6774 6 14.0564C6 13.2867 6 12.1434 6 11C6 9 7 5 12 5C17 5 18 9 18 11C18 12.1434 18 13.2867 18 14.0564C18 14.6774 18.1446 15.2892 18.4223 15.8446L19.2764 17.5528C19.6088 18.2177 19.1253 19 18.382 19H14.5M9.5 19C9.5 21 10.5 22 12 22C13.5 22 14.5 21 14.5 19M9.5 19C11.0621 19 14.5 19 14.5 19"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M12 5V3"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        </Tooltip>
+                      </Link>
 
                       {(session?.userRole == "SuperAdmin" ||
                         session?.userRole == "Admin") && (
@@ -1272,3 +1354,14 @@ export default function RootLayout({
     </div>
   );
 }
+// const WithSessionProvider = ({chi}) => {
+//   return (
+//     <SessionProvider>
+//    <RootLayout>{children}</RootLayout>
+//     </SessionProvider>
+//   );
+// };
+
+// export default WithSessionProvider;
+
+export default RootLayout;

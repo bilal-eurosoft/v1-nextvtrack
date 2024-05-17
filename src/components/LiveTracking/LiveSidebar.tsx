@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import { zonelistType } from "../../types/zoneType";
 import { getZoneListByClientId } from "../../utils/API_CALLS";
 import { useSearchParams } from "next/navigation";
+import { fetchZone } from "@/lib/slices/zoneSlice";
+import { useSelector } from "react-redux";
 import "./index.css";
 const LiveSidebar = ({
   carData,
@@ -17,6 +19,8 @@ const LiveSidebar = ({
   setshowAllVehicles,
   setunselectVehicles,
   unselectVehicles,
+  setZoom,
+  setShowZonePopUp,
 }: {
   carData: VehicleData[];
   countPause: Number;
@@ -28,6 +32,8 @@ const LiveSidebar = ({
   setshowAllVehicles: any;
   setunselectVehicles: any;
   unselectVehicles: any;
+  setZoom: any;
+  setShowZonePopUp: any;
 }) => {
   const { data: session } = useSession();
   const [searchData, setSearchData] = useState({
@@ -41,18 +47,40 @@ const LiveSidebar = ({
   };
   const searchParams = useSearchParams();
   const fullparams = searchParams.get("screen");
+  const allZones = useSelector((state) => state.zone);
 
   useEffect(() => {
-    (async function () {
-      if (session) {
-        const allzoneList = await getZoneListByClientId({
-          token: session?.accessToken,
-          clientId: session?.clientId,
-        });
-        setZoneList(allzoneList);
-      }
-    })();
-  }, [session]);
+    if (session) {
+      setZoneList(allZones?.zone);
+    }
+  }, [allZones]);
+  // if (allZones?.zone?.length <= 0) {
+  //   const func = async () => {
+  //     const Data = await getZoneListByClientId({
+  //       token: session?.accessToken,
+  //       clientId: session?.clientId,
+  //     });
+  //     setZoneList(Data);
+  //   };
+  //   func();
+  // }
+  // useEffect(() => {
+  //   // (async function () {
+  //   //   if (session) {
+  //   //     // const allzoneList = await getZoneListByClientId({
+  //   //     //   token: session?.accessToken,
+  //   //     //   clientId: session?.clientId,
+  //   //     // });
+  //   //     // setZoneList(allzoneList);
+  //   //     await dispatch(
+  //   //       fetchZone({
+  //   //         token: session?.accessToken,
+  //   //         clientId: session?.clientId,
+  //   //       })
+  //   //     );
+  //   //   }
+  //   // })();
+  // }, [session]);
   function isPointInPolygon(point: any, polygon: any) {
     let intersections = 0;
     for (let i = 0; i < polygon.length; i++) {
@@ -71,8 +99,15 @@ const LiveSidebar = ({
     const t = ((p[0] - p1[0]) * dy - (p[1] - p1[1]) * dx) / (dx * dy);
     return t >= 0 && t <= 1;
   }
+  const toggleLiveCars = () => {
+    setSelectedVehicle(null);
+    setshowAllVehicles(true);
+    setunselectVehicles(false);
+    setIsActiveColor(0);
+    setZoom(10);
+  };
   useEffect(() => {
-    const zoneLatlog = zoneList.map((item: any) => {
+    const zoneLatlog = zoneList?.map((item: any) => {
       if (item.zoneType == "Polygon") {
         return [...JSON.parse(item.latlngCordinates)]?.map((item2: any) => {
           return [item2.lat, item2.lng];
@@ -82,7 +117,7 @@ const LiveSidebar = ({
       }
     });
     const filtered = carData
-      .filter((data) =>
+      ?.filter((data) =>
         data.vehicleReg.toLowerCase().includes(searchData.search.toLowerCase())
       )
       .sort((a: any, b: any) => {
@@ -104,7 +139,7 @@ const LiveSidebar = ({
         }
       })
       .map((item: any) => {
-        const i = zoneLatlog.findIndex((zone: any) => {
+        const i = zoneLatlog?.findIndex((zone: any) => {
           if (zone != undefined) {
             return isPointInPolygon(
               [item.gps.latitude, item.gps.longitude],
@@ -112,29 +147,25 @@ const LiveSidebar = ({
             );
           }
         });
-        if (i != -1) {
-          item.zone = zoneList[i].zoneName;
+        if (i && i != -1) {
+          item.zone = zoneList[i]?.zoneName;
         }
         return item;
       });
     setFilteredData(filtered);
   }, [searchData.search, carData]);
-  const toggleLiveCars = () => {
-    setSelectedVehicle(null);
-    setshowAllVehicles(true);
-    setunselectVehicles(false);
-    setIsActiveColor(0);
-  };
+
   const handleClickVehicle = (item: any) => {
     setSelectedVehicle(item);
     setshowAllVehicles(false);
     setIsActiveColor(item.vehicleId);
+    setShowZonePopUp(false);
   };
 
   return (
     <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-2  col-span-5 main_sider_bar">
       <div className="grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3 search_live_tracking">
-        <div className="lg:col-span-7 w-full  md:col-span-5 sm:col-span-5 col-span-6 sticky top-0">
+        <div className="lg:col-span-7 w-full  md:col-span-5 sm:col-span-5 col-span-6 sticky top-0 search_vehicle_live_tracking">
           <div className="grid grid-cols-12 vehicle_search_left">
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1">
               <svg

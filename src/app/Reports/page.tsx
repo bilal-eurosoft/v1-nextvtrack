@@ -5,17 +5,20 @@ import { DeviceAttach } from "@/types/vehiclelistreports";
 import { TripsByBucket } from "@/types/TripsByBucket";
 import { IgnitionReport } from "@/types/IgnitionReport";
 import React, { useEffect, useState } from "react";
+import EventIcon from "@material-ui/icons/Event";
 import { Toaster, toast } from "react-hot-toast";
 // import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import DateFnsMomemtUtils from "@date-io/moment";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "react-select";
+import { useSelector } from "react-redux";
 import "./report.css";
 
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
+  DatePicker,
 } from "@material-ui/pickers";
 
 import {
@@ -51,6 +54,8 @@ export default function Reports() {
   const [trisdata, setTrisdata] = useState<TripsByBucket[]>([]);
   const [rowsPerPages, setRowsPerPage] = useState(20);
   const [currentPage, setCurrentPage] = useState(0);
+
+  const [tableShow, setTableShow] = useState(true);
   const [columnHeaders, setColumnHeaders] = useState<
     (
       | "duration"
@@ -145,10 +150,13 @@ export default function Reports() {
       | "Type"
     )[]
   >([]);
+  const allData = useSelector((state) => state?.zone);
+
   const firstIndex = currentPage * rowsPerPages;
   const lastIndex = Math.min(firstIndex + rowsPerPages, trisdata.length); // Ensure lastIndex does not exceed trisdata.length
 
   // Slice the data array to get the data for the current page
+
   const filterData = trisdata.slice(firstIndex, lastIndex);
   const handleChangeRowsPerPage = (e: any) => {
     setCurrentPage(0);
@@ -158,7 +166,6 @@ export default function Reports() {
     setCurrentPage(newPage);
   };
 
-  // console.log("fileter", filterData);
   const [Ignitionreport, setIgnitionreport] = useState<IgnitionReport>({
     TimeZone: session?.timezone || "",
     VehicleReg: "",
@@ -174,11 +181,14 @@ export default function Reports() {
     const vehicleListData = async () => {
       try {
         if (session?.userRole == "Admin" || session?.userRole == "SuperAmin") {
-          const Data = await vehicleListByClientId({
-            token: session.accessToken,
-            clientId: session?.clientId,
-          });
-          setVehicleList(Data);
+          if (allData?.vehicle.length <= 0) {
+            const Data = await vehicleListByClientId({
+              token: session.accessToken,
+              clientId: session?.clientId,
+            });
+            setVehicleList(Data);
+          }
+          setVehicleList(allData?.vehicle);
         } else {
           if (session) {
             const data = await getAllVehicleByUserId({
@@ -214,7 +224,7 @@ export default function Reports() {
 
   const parsedDateTime = new Date(currentTime);
   const currenTDates = new Date();
-  var moment = require("moment");
+  var moment = require("moment-timezone");
   const formattedDateTime = `${parsedDateTime
     .toISOString()
     .slice(0, 10)}TO${timeOnly}`;
@@ -243,12 +253,18 @@ export default function Reports() {
     setenddate(value);
   };
   const handleCustomDateChange = (fieldName: string, e: any) => {
+    console.log("e", e);
+    // setIgnitionreport((prevReport: any) => ({
+    //   ...prevReport,
+    //   [fieldName]: e.toISOString().split("T")[0],
+    // }));
+    // setstartdate(e);
+    // setenddate(e);
+
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
-      [fieldName]: e.toISOString().split("T")[0],
+      [fieldName]: e?.toISOString(),
     }));
-    setstartdate(e);
-    setenddate(e);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -268,7 +284,14 @@ export default function Reports() {
       if (session) {
         const { reportType, VehicleReg, period } = Ignitionreport;
         if (period === "today") {
-          const today = moment();
+          const today = moment().tz(
+            session?.timezone === "Australia/Sydney" ||
+              session?.timezone === "America/Winnipeg" ||
+              session?.timezone === "Europe/London" ||
+              session?.timezone === "Asia/Karachi"
+              ? session?.timezone
+              : ""
+          );
           startDateTime =
             today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
@@ -378,8 +401,10 @@ export default function Reports() {
                   },
                 }
               );
+
               // suraksha code
               if (response.success === true) {
+                setTableShow(true);
                 // console.log("Trips Data isssssssss:", response);
                 //  setIsFormSubmitted(true);
                 setTrisdata(response.data.tableData);
@@ -529,7 +554,9 @@ export default function Reports() {
                   const filteredData = response.data.tableData.filter(
                     (eventitem: { event: string }) =>
                       eventitem.event !== "ignitionOn" &&
-                      eventitem.event !== "ignitionOff"
+                      eventitem.event !== "ignitionOff" &&
+                      eventitem.event !== "ignition On" &&
+                      eventitem.event !== "ignition Off"
                   );
                   setTrisdata(filteredData);
                   newColumnHeaders = ["event", "date", "Address"];
@@ -562,8 +589,10 @@ export default function Reports() {
                 }
 
                 setColumnHeaders(newColumnHeaders);
-              } else {
-                toast.error(`${response.message}`, {
+              } else if (response.success === false) {
+                // setTrisdata(response.success);
+                setTableShow(false);
+                toast.error("No Data Found", {
                   style: {
                     border: "1px solid red",
                     padding: "16px",
@@ -619,7 +648,6 @@ export default function Reports() {
     }));
   };
   const handleInputChangeTrip = (e: any) => {
-    console.log("tt", e);
     // const { value, label } = e;
     if (!e) return;
     setIgnitionreport((prevReport: any) => ({
@@ -634,7 +662,7 @@ export default function Reports() {
     { value: "Ignition", label: "Ignition" },
     { value: "Events", label: "Events" },
     { value: "DetailReportByStreet", label: "Detail Report By Street" },
-    { value: "IdlingActivity", label: "Id ling Activity" },
+    { value: "IdlingActivity", label: "Idling Activity" },
   ];
   const options: { value: string; label: string; data: any }[] =
     vehicleList?.data?.map((item: VehicleData) => ({
@@ -663,7 +691,6 @@ export default function Reports() {
             today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
             today.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          // Handle other periods if needed
         }
         if (period === "yesterday") {
           const yesterday = moment().subtract(1, "day");
@@ -674,16 +701,11 @@ export default function Reports() {
             yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
         }
         if (period === "week") {
-          //console.log("week is starting");
           const startOfWeek = moment().subtract(7, "days").startOf("day");
-          //console.log("start of week", startOfWeek);
           const oneday = moment().subtract(1, "day");
-
           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          //console.log("start date time ", startDateTime);
           endDateTime =
             oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          //console.log("end date time", endDateTime);
         }
         if (period === "custom") {
           startDateTime =
@@ -836,6 +858,7 @@ export default function Reports() {
       }
     }
   };
+
   // suraksha code
   function calculateTotalDurationAndDistance(data: TripsByBucket[]): {
     duration: string;
@@ -961,7 +984,7 @@ export default function Reports() {
                     isSearchable
                     isClearable
                     noOptionsMessage={() => "No options available"}
-                    className="   rounded-md w-full  outline-green border border-grayLight"
+                    className="   rounded-md w-full  outline-green border border-grayLight z-50"
                     styles={{
                       control: (provided, state) => ({
                         ...provided,
@@ -1031,7 +1054,7 @@ export default function Reports() {
                     isClearable
                     isSearchable
                     noOptionsMessage={() => "No options available"}
-                    className="   rounded-md w-full outline-green border border-grayLight  hover:border-green"
+                    className="   rounded-md w-full outline-green border border-grayLight  hover:border-green z-50"
                     styles={{
                       control: (provided, state) => ({
                         ...provided,
@@ -1064,7 +1087,7 @@ export default function Reports() {
               <>
                 <div
                   className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-3  mt-2 report_periods_today
-                  flex lg:justify-center md:justify-center sm:justify-center justify-start
+                  flex lg:justify-center  md:justify-center sm:justify-center justify-start
                   "
                 >
                   <label>
@@ -1141,9 +1164,10 @@ export default function Reports() {
                     <label className="text-green"> From Date:</label>{" "}
                     &nbsp;&nbsp;&nbsp;
                     <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
-                      <KeyboardDatePicker
+                      <DatePicker
+                        // open={isPickerOpenFromDate}/
                         format="MM/DD/yyyy"
-                        value={Ignitionreport.fromDateTime}
+                        value={Ignitionreport.fromDateTime || null}
                         onChange={(e) =>
                           handleCustomDateChange("fromDateTime", e)
                         }
@@ -1151,6 +1175,14 @@ export default function Reports() {
                         maxDate={currenTDates}
                         autoOk
                         inputProps={{ readOnly: true }}
+                        InputProps={{
+                          endAdornment: (
+                            <EventIcon
+                              style={{ width: "20", height: "20" }}
+                              className="text-gray"
+                            />
+                          ),
+                        }}
                         placeholder="Start Date"
                         // className="xl:w-80  lg:w-80 w-auto"
                       />
@@ -1174,9 +1206,10 @@ export default function Reports() {
                     <div className="col-span-10">
                       <label className="text-green"> To Date:</label>
                       <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
-                        <KeyboardDatePicker
+                        <DatePicker
+                          // open={isPickerOpen}
                           format="MM/DD/yyyy"
-                          value={Ignitionreport.toDateTime}
+                          value={Ignitionreport.toDateTime || null}
                           onChange={(newDate: any) =>
                             handleCustomDateChange("toDateTime", newDate)
                           }
@@ -1185,8 +1218,14 @@ export default function Reports() {
                           autoOk
                           inputProps={{ readOnly: true }}
                           placeholder="End Date"
-                          // className="xl:w-80  lg:w-80 w-auto"
-                          // style={{ width: "70%" }}
+                          InputProps={{
+                            endAdornment: (
+                              <EventIcon
+                                style={{ width: "20", height: "20" }}
+                                className="text-gray"
+                              />
+                            ),
+                          }}
                         />
                       </MuiPickersUtilsProvider>
                     </div>
@@ -1405,7 +1444,7 @@ export default function Reports() {
 
       {/* Render your table below the form */}
 
-      {trisdata && trisdata.length > 0 && (
+      {trisdata && trisdata.length > 0 && tableShow && (
         <div>
           <div className="mt-8 mx-auto height_table">
             <div style={{ width: "100%", borderRadius: "2px" }}>
@@ -1515,7 +1554,7 @@ export default function Reports() {
                               calculateTotalDurationAndDistance(trisdata)
                                 .distance
                             }{" "}
-                            miles
+                            {session?.unit}
                           </span>
                         )}
                     </td>

@@ -252,6 +252,7 @@ export default function DriverProfile() {
   const handleChangeDriver = (key: any, e: any) => {
     setFormData({ ...formData, [key]: e?.target?.value?.trim() });
     setSelectedRFID(e.target.value);
+    setShowCardNumber(false);
   };
 
   const handleEditDriver = (key: any, e: any) => {
@@ -787,7 +788,7 @@ export default function DriverProfile() {
                 </div>
                 <div className="col-span-1 ms-5" onClick={handleClose}>
                   <svg
-                    className="h-6 w-6 text-labelColor mt-3 cursor-pointer"
+                    className="h-6 w-6 text-white mt-3 cursor-pointer"
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"
@@ -964,14 +965,16 @@ export default function DriverProfile() {
                         cursor:
                           formData.driverfirstName.trim() === "" ||
                           formData.driverLastName.trim() === "" ||
-                          formData.driverNo.trim() === ""
+                          formData.driverNo.trim() === "" ||
+                          showCardNumber == true
                             ? "not-allowed"
                             : "",
                       }}
                       disabled={
                         formData.driverfirstName.trim() === "" ||
                         formData.driverLastName.trim() === "" ||
-                        formData.driverNo.trim() === ""
+                        formData.driverNo.trim() === "" ||
+                        showCardNumber == true
                           ? true
                           : false
                       }
@@ -1018,7 +1021,7 @@ export default function DriverProfile() {
                   onClick={handleCloseEdit}
                 >
                   <svg
-                    className="h-6 w-6 text-labelColor mt-3"
+                    className="h-6 w-6 text-white mt-3"
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"

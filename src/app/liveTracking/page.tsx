@@ -6,10 +6,10 @@ import uniqueDataByIMEIAndLatestTimestamp from "@/utils/uniqueDataByIMEIAndLates
 import { zonelistType } from "@/types/zoneType";
 import { VehicleData } from "@/types/vehicle";
 import { ClientSettings } from "@/types/clientSettings";
+import L, { LatLng } from "leaflet";
+
 import {
-  getClientSettingByClinetIdAndToken,
   getVehicleDataByClientId,
-  getZoneListByClientId,
   getAllVehicleByUserId,
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
@@ -55,7 +55,7 @@ const LiveMap = dynamic(() => import("@/components/LiveTracking/LiveMap"), {
 const LiveTracking = () => {
   let { data: session } = useSession();
   if (!session) {
-    session = JSON.parse(localStorage.getItem("user"));
+    session = JSON.parse(localStorage?.getItem("user"));
   }
   const carData = useRef<VehicleData[]>([]);
   const [clientSettings, setClientSettings] = useState<ClientSettings[]>([]);
@@ -63,6 +63,7 @@ const LiveTracking = () => {
   const [activeColor, setIsActiveColor] = useState<any>("");
   const [showAllVehicles, setshowAllVehicles] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
+  const [showZonePopUp, setShowZonePopUp] = useState(true);
   const [isFirstTimeFetchedFromGraphQL, setIsFirstTimeFetchedFromGraphQL] =
     useState(false);
   const [lastDataReceivedTimestamp, setLastDataReceivedTimestamp] = useState(
@@ -73,6 +74,30 @@ const LiveTracking = () => {
   );
   const [userVehicle, setuserVehicle] = useState([]);
   const [unselectVehicles, setunselectVehicles] = useState(false);
+  const [zoom, setZoom] = useState(10);
+  const [mapCoordinates, setMapCoordinates] = useState<LatLng | null | []>(
+    null
+  );
+  const clientMapSettings = clientSettings?.filter(
+    (el) => el?.PropertDesc === "Map"
+  )[0]?.PropertyValue;
+  const clientZoomSettings = clientSettings?.filter(
+    (el) => el?.PropertDesc === "Zoom"
+  )[0]?.PropertyValue;
+  useEffect(() => {
+    const regex = /lat:([^,]+),lng:([^}]+)/;
+    if (clientMapSettings) {
+      const match = clientMapSettings.match(regex);
+
+      if (match) {
+        const lat = parseFloat(match[1]);
+        const lng = parseFloat(match[2]);
+        setMapCoordinates([lat, lng]);
+      }
+    }
+    let zoomLevel = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
+    setZoom(zoomLevel);
+  }, [clientMapSettings]);
   // This useEffect is responsible for checking internet connection in the browser.
   useEffect(() => {
     setIsOnline(navigator.onLine);
@@ -83,15 +108,14 @@ const LiveTracking = () => {
     function offlineHandler() {
       setIsOnline(false);
     }
-    if (typeof window !== "undefined") {
-      window.addEventListener("online", onlineHandler);
-      window.addEventListener("offline", offlineHandler);
-
-      return () => {
-        window.removeEventListener("online", onlineHandler);
-        window.removeEventListener("offline", offlineHandler);
-      };
-    }
+    // if (typeof window !== "undefined") {
+    //   window.addEventListener("online", onlineHandler);
+    //   window.addEventListener("offline", offlineHandler);
+    //   return () => {
+    //     window.removeEventListener("online", onlineHandler);
+    //     window.removeEventListener("offline", offlineHandler);
+    //   };
+    // }
   }, []);
 
   useEffect(() => {
@@ -101,7 +125,6 @@ const LiveTracking = () => {
           token: session.accessToken,
           userId: session.userId,
         });
-        console.log("data", data.data);
         setuserVehicle(data.data);
       }
     }
@@ -124,15 +147,12 @@ const LiveTracking = () => {
           // carData.current = uniqueData;
           let matchingVehicles;
           if (role === "Controller") {
-            console.log("in ", userVehicle);
             let vehicleIds = userVehicle.map((item: any) => item._id);
-            console.log("VehicleIds", vehicleIds);
             // Filter carData.current based on vehicleIds
             matchingVehicles = uniqueData.filter((vehicle) =>
               vehicleIds.includes(vehicle.vehicleId)
             );
 
-            console.log("matchingVehicles", matchingVehicles);
             carData.current = matchingVehicles;
           } else {
             carData.current = uniqueData;
@@ -140,14 +160,12 @@ const LiveTracking = () => {
 
           setIsFirstTimeFetchedFromGraphQL(true);
         }
+        // const clientSettingData = await getClientSettingByClinetIdAndToken({
+        //   token: session?.accessToken,
+        //   clientId: session?.clientId,
+        // });
 
-        const clientSettingData = await getClientSettingByClinetIdAndToken({
-          token: session?.accessToken,
-          clientId: session?.clientId,
-        });
-        if (clientSettingData) {
-          setClientSettings(clientSettingData);
-        }
+        setClientSettings(session?.clientSetting);
       }
     })();
   }, [session, userVehicle]);
@@ -203,15 +221,12 @@ const LiveTracking = () => {
 
             let matchingVehicles;
             if (role === "Controller") {
-              console.log("in  2", userVehicle);
               let vehicleIds = userVehicle.map((item: any) => item._id);
-              console.log("VehicleIds 2", vehicleIds);
               // Filter carData.current based on vehicleIds
               matchingVehicles = uniqueData.filter((vehicle) =>
                 vehicleIds.includes(vehicle.vehicleId)
               );
 
-              console.log("matchingVehicles 2", matchingVehicles);
               carData.current = matchingVehicles;
             } else {
               carData.current = uniqueData;
@@ -251,8 +266,9 @@ const LiveTracking = () => {
           setshowAllVehicles={setshowAllVehicles}
           setunselectVehicles={setunselectVehicles}
           unselectVehicles={unselectVehicles}
+          setZoom={setZoom}
+          setShowZonePopUp={setShowZonePopUp}
         />
-
         {carData?.current?.length !== 0 && (
           <LiveMap
             carData={carData?.current}
@@ -263,6 +279,10 @@ const LiveTracking = () => {
             showAllVehicles={showAllVehicles}
             setunselectVehicles={setunselectVehicles}
             unselectVehicles={unselectVehicles}
+            mapCoordinates={mapCoordinates}
+            zoom={zoom}
+            setShowZonePopUp={setShowZonePopUp}
+            showZonePopUp={showZonePopUp}
           />
         )}
       </div>

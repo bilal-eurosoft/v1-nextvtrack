@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import DateFnsMomemtUtils from "@date-io/moment";
 import { DatePicker } from "@material-ui/pickers";
 import BlinkingTime from "@/components/General/BlinkingTime";
-import axios from "axios";
+import axios, { all } from "axios";
 import PlaceIcon from "@mui/icons-material/Place";
-
+import EventIcon from "@material-ui/icons/Event";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -28,6 +28,7 @@ import HarshAccelerationIcon from "../../../public/Images/HarshAccelerationIcon.
 import markerA from "../../../public/Images/marker-a.png";
 import markerB from "../../../public/Images/marker-b.png";
 import harshAcceleration from "../../../public/Images/brake-discs.png";
+import { useSelector } from "react-redux";
 import Speedometer, {
   Background,
   Arc,
@@ -38,11 +39,13 @@ import Speedometer, {
 } from "react-speedometer";
 import {
   TravelHistoryByBucketV2,
+  TravelHistoryByBucketV3,
+  TripsByBucketAndVehicleV3,
   TripsByBucketAndVehicle,
   getAllVehicleByUserId,
-  getClientSettingByClinetIdAndToken,
+  // getClientSettingByClinetIdAndToken,
   getCurrentAddress,
-  getZoneListByClientId,
+  // getZoneListByClientId,
   vehicleListByClientId,
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
@@ -51,7 +54,7 @@ import { zonelistType } from "@/types/zoneType";
 import { ClientSettings } from "@/types/clientSettings";
 import { replayreport } from "@/types/IgnitionReport";
 import TripsByBucket, { TravelHistoryData } from "@/types/TripsByBucket";
-import L, { LatLng, LatLngTuple } from "leaflet";
+import L, { LatLng, LatLngTuple, point } from "leaflet";
 import { Marker } from "react-leaflet/Marker";
 import { Toaster, toast } from "react-hot-toast";
 import { useMap } from "react-leaflet";
@@ -201,11 +204,34 @@ export default function journeyReplayComp() {
   const [expanded, setExpanded] = useState(null);
   const [searchJourney, setsearchJourney] = useState(true);
   const [seacrhLoading, setSearchLoading] = useState(true);
+  const [fromDateInput, setFromDateInput] = useState(false);
+  const [harshPopUp, setHarshPopUp] = useState(true);
+  const [harshAccPopUp, setAccHarshPopUp] = useState(true);
+  const [addressTravelHistory, setAddressTravelHistory] = useState([]);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isPickerOpenFromDate, setIsPickerOpenFromDate] = useState(true);
 
+  const [travelV2, setTravelV2] = useState(false);
+  const [travelV3, setTravelV3] = useState(false);
+  const [stopWithSecond, setStopWithSecond] = useState([]);
+
+  const startdate = new Date();
+  const enddate = new Date();
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
     setExpanded(isExpanded ? panel : null);
   };
+  const allData = useSelector((state) => state?.zone);
+  // useEffect(() => {
+  //   setZoneList(allZones?.zone);
+  // }, [allZones]);
+
   const moment = require("moment-timezone");
+  const togglePicker = () => {
+    setIsPickerOpen(!isPickerOpen);
+  };
+  // const togglePickerFromDate = () => {
+  //   setIsPickerOpenFromDate(!isPickerOpenFromDate);
+  // };
   const SetViewOnClick = ({ coords }: { coords: any }) => {
     if (isPaused) {
       setMapcenterToFly(null);
@@ -236,9 +262,9 @@ export default function journeyReplayComp() {
     if (coords && !Number.isNaN(coords[0]) && coords[0] != null) {
       map.flyTo(coords, zoom);
     }
-
     return null;
   };
+
   const tick = () => {
     setIsPlaying(true);
     setIsPaused(false);
@@ -248,6 +274,8 @@ export default function journeyReplayComp() {
     setPauseBtn(true);
     setstopVehicle(false);
     setIsPauseColor(false);
+    setHarshPopUp(false);
+    setAccHarshPopUp(false);
 
     if (!carMovementInterval) {
       if (currentPositionIndex >= polylinedata.length) {
@@ -263,6 +291,8 @@ export default function journeyReplayComp() {
     setstopVehicle(false);
     setIsPauseColor(true);
     setIsPaused(true);
+    setHarshPopUp(true);
+    setAccHarshPopUp(true);
 
     if (carMovementInterval) {
       clearInterval(carMovementInterval);
@@ -285,6 +315,8 @@ export default function journeyReplayComp() {
     setIsPauseColor(false);
     setStopBtn(false);
     setstopVehicle(true);
+    setHarshPopUp(true);
+    setAccHarshPopUp(true);
     setProgressWidth(0);
     if (polylinedata.length > 0) {
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
@@ -299,10 +331,14 @@ export default function journeyReplayComp() {
 
       const currentData = TravelHistoryresponse[step];
       const nextData = TravelHistoryresponse[step + 1];
+      const addRessOne: any = TravelHistoryresponse[step];
+      const addressSplit = addRessOne?.address?.display_name?.split(",");
+      setAddressTravelHistory(addressSplit);
 
       if (currentData && nextData) {
         const currentLatLng = new L.LatLng(currentData.lat, currentData.lng);
         const nextLatLng = new L.LatLng(nextData.lat, nextData.lng);
+        // const address=new L.latLng()
 
         const totalObjects = TravelHistoryresponse.length;
         let numSteps;
@@ -320,7 +356,6 @@ export default function journeyReplayComp() {
           numSteps = 100;
           stepSize = (1 / numSteps) * speedFactor * 0.9;
         }
-
         let progress: number = 0;
         let animationId: number;
 
@@ -395,11 +430,14 @@ export default function journeyReplayComp() {
       try {
         if (session?.userRole == "Admin" || session?.userRole == "SuperAmin") {
           if (session) {
-            const Data = await vehicleListByClientId({
-              token: session.accessToken,
-              clientId: session?.clientId,
-            });
-            setVehicleList(Data);
+            if (allData?.vehicle.length <= 0) {
+              const Data = await vehicleListByClientId({
+                token: session.accessToken,
+                clientId: session?.clientId,
+              });
+              setVehicleList(Data);
+            }
+            setVehicleList(allData?.vehicle);
           }
         } else {
           if (session) {
@@ -415,28 +453,34 @@ export default function journeyReplayComp() {
       }
     };
     vehicleListData();
-    (async function () {
-      if (session) {
-        const allzoneList = await getZoneListByClientId({
-          token: session?.accessToken,
-          clientId: session?.clientId,
-        });
-        setZoneList(allzoneList);
-      }
-    })();
+    // (async function () {
+    //   if (session) {
+
+    //     await dispatch(
+    //       fetchZone({
+    //         token: session?.accessToken,
+    //         clientId: session?.clientId,
+    //       })
+    //     );
+    //   }
+    // })();
 
     (async function () {
       if (session) {
-        const clientSettingData = await getClientSettingByClinetIdAndToken({
-          token: session?.accessToken,
-          clientId: session?.clientId,
-        });
+        // const clientSettingData = await getClientSettingByClinetIdAndToken({
+        //   token: session?.accessToken,
+        //   clientId: session?.clientId,
+        // });
+        if (session) {
+          const centervalue = await session?.clientSetting.filter(
+            (item: any) => item.PropertDesc == "Map"
+          );
+          const centerMapValue = centervalue.map((item) => item.PropertyValue);
 
-        if (clientSettingData) {
-          const centervalue = await clientSettingData?.[0].PropertyValue;
-
-          if (centervalue) {
-            const match = centervalue.match(/\{lat:([^,]+),lng:([^}]+)\}/);
+          if (centerMapValue) {
+            const match = centerMapValue?.[0]?.match(
+              /\{lat:([^,]+),lng:([^}]+)\}/
+            );
             if (match) {
               const lat = parseFloat(match[1]);
               const lng = parseFloat(match[2]);
@@ -446,7 +490,7 @@ export default function journeyReplayComp() {
               }
             }
           }
-          setClientsetting(clientSettingData);
+          setClientsetting(session?.clientSetting);
           const clientZoomSettings = clientsetting?.filter(
             (el) => el?.PropertDesc === "Zoom"
           )[0]?.PropertyValue;
@@ -488,6 +532,20 @@ export default function journeyReplayComp() {
     setCurrentDate(formattedDate);
   }, []);
 
+  const handleCloseDateTime = () => {
+    setShowRadioButton(false);
+    setFromDateInput(true);
+    setIgnitionreport((preData: any) => ({
+      ...preData,
+      fromDateTime: "",
+      toDateTime: "",
+    }));
+
+    // setIgnitionreport({
+    //   fromDateTime: "",
+    //   toDateTime: "",
+    // });
+  };
   const formattedTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
   const parsedDateTime = new Date(currentTime);
   const formattedDateTime = `${parsedDateTime}
@@ -495,6 +553,8 @@ export default function journeyReplayComp() {
     .slice(0, 10)}TO${timeOnly}`;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setTravelV3(false);
+    setTravelV2(true);
     setIsDynamicTime("");
     setstops([]);
     setIsPaused(false);
@@ -507,6 +567,7 @@ export default function journeyReplayComp() {
     setactiveTripColor("");
     setTravelHistoryresponse([]);
     setClearMapData(false);
+    setShowDetails(false);
     setProgressWidth(0);
     setLoading(true);
     // setSearchLoading(true);
@@ -527,58 +588,114 @@ export default function journeyReplayComp() {
         Ignitionreport?.toDateTime &&
         Ignitionreport?.fromDateTime)
     ) {
+      let startDateTime: any;
+      let endDateTime: any;
       if (session) {
         const { VehicleReg, period } = await Ignitionreport;
-        if (period == "week") {
-          setWeekData(true);
-        }
+
         if (period == "today") {
           setWeekData(false);
+          const today = moment().tz(
+            session?.timezone === "Australia/Sydney" ||
+              session?.timezone === "America/Winnipeg" ||
+              session?.timezone === "Europe/London" ||
+              session?.timezone === "Asia/Karachi"
+              ? session?.timezone
+              : ""
+          );
+          startDateTime =
+            today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+          endDateTime =
+            today.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+        }
+        if (period === "yesterday") {
+          const yesterday = moment().subtract(1, "day");
+          startDateTime =
+            yesterday.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
+            "Z";
+          endDateTime =
+            yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+        }
+        if (period == "week") {
+          setWeekData(true);
+
+          const startOfWeek = moment().subtract(7, "days").startOf("day");
+          const oneday = moment().subtract(1, "day");
+
+          startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
+          endDateTime =
+            oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+        }
+        if (period === "custom") {
+          startDateTime =
+            moment(startdate).startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
+            "Z";
+          endDateTime;
+          moment(enddate).endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
         }
         if (VehicleReg && period) {
           let newdata = {
             ...Ignitionreport,
           };
-          const timestart: string = "00:00:00";
-          const timeend: string = "23:59:59";
-          const currentDayOfWeek = new Date().getDay();
-          const currentDay = new Date().getDay();
-          const daysUntilMonday =
-            currentDayOfWeek === currentDay ? 7 : currentDayOfWeek - 1;
-          const fromDateTime = new Date();
-          fromDateTime.setDate(fromDateTime.getDate() - daysUntilMonday);
-          const toDateTime = new Date(fromDateTime);
-          toDateTime.setDate(toDateTime.getDate() + 6);
-          const formattedFromDateTime = formatDate(fromDateTime);
-          const formattedToDateTime = formatDate(toDateTime);
+          // const timestart: string = "00:00:00";
+          // const timeend: string = "23:59:59";
+          // const currentDayOfWeek = new Date().getDay();
+          // const currentDay = new Date().getDay();
+          // const daysUntilMonday =
+          //   currentDayOfWeek === currentDay ? 7 : currentDayOfWeek - 1;
+          // const fromDateTime = new Date();
+          // fromDateTime.setDate(fromDateTime.getDate() - daysUntilMonday);
+          // const toDateTime = new Date(fromDateTime);
+          // toDateTime.setDate(toDateTime.getDate() + 6);
+          // const formattedFromDateTime = formatDate(fromDateTime);
+          // const formattedToDateTime = formatDate(toDateTime);
+          // if (isCustomPeriod) {
+          //   newdata = {
+          //     ...newdata,
+          //     fromDateTime: `${
+          //       weekData ? formattedFromDateTime : Ignitionreport.fromDateTime
+          //     }T${timestart}Z`,
+          //     toDateTime: `${
+          //       weekData ? formattedToDateTime : Ignitionreport.toDateTime
+          //     }T${timeend}Z`,
+          //   };
+          // } else {
+          //   newdata = {
+          //     ...newdata,
+          //     fromDateTime: `${
+          //       weekData ? formattedFromDateTime : currentDate
+          //     }T${timestart}Z`,
+          //     toDateTime: `${
+          //       weekData ? formattedToDateTime : currentDate
+          //     }T${timeend}Z`,
+          //   };
+          // }
+
           if (isCustomPeriod) {
             newdata = {
               ...newdata,
-              fromDateTime: `${
-                weekData ? formattedFromDateTime : Ignitionreport.fromDateTime
-              }T${timestart}Z`,
-              toDateTime: `${
-                weekData ? formattedToDateTime : Ignitionreport.toDateTime
-              }T${timeend}Z`,
+              fromDateTime: `${Ignitionreport.fromDateTime}T00:00:00Z`,
+              toDateTime: `${Ignitionreport.toDateTime}T23:59:59Z`,
             };
           } else {
             newdata = {
               ...newdata,
-              fromDateTime: `${
-                weekData ? formattedFromDateTime : currentDate
-              }T${timestart}Z`,
-              toDateTime: `${
-                weekData ? formattedToDateTime : currentDate
-              }T${timeend}Z`,
+              unit: session?.unit,
+              period: period,
+              VehicleReg: VehicleReg,
+              TimeZone: session?.timezone,
+              clientId: session?.clientId,
+              fromDateTime: startDateTime,
+              toDateTime: endDateTime,
+              // fromDateTime: "2024-02-01T00:00:00Z",
+              // toDateTime: "2024-02-01T23:59:59Z",
             };
           }
           const fromDate: any = new Date(Ignitionreport?.fromDateTime);
           const toDate: any = new Date(Ignitionreport?.toDateTime);
 
           const differenceMs = toDate - fromDate;
-
           const differenceDays = differenceMs / (1000 * 60 * 60 * 24);
-
           // setIgnitionreport(newdata);
           // if (
           //   Ignitionreport.period == "today" ||
@@ -682,6 +799,198 @@ export default function journeyReplayComp() {
     setLoading(false);
   };
 
+  const handleSubmitTwo = async (e: React.FormEvent) => {
+    setTravelV3(true);
+
+    setTravelV2(false);
+    e.preventDefault();
+    setIsDynamicTime("");
+    setstops([]);
+    setIsPaused(false);
+    setPlayBtn(false);
+    setStopBtn(false);
+    setPauseBtn(false);
+    setLaodingMap(false);
+    setIsPlaying(false);
+    setCarPosition(null);
+    setactiveTripColor("");
+    setTravelHistoryresponse([]);
+    setClearMapData(false);
+    setProgressWidth(0);
+    setLoading(true);
+    // setSearchLoading(true);
+    setDataResponse(null);
+    setExpanded(null);
+    setSearchLoading(false);
+    if (polylinedata.length > 0) {
+      setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
+    }
+    setCurrentPositionIndex(0);
+    setClearMapData(true);
+    if (
+      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "today") ||
+      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "yesterday") ||
+      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "week") ||
+      (Ignitionreport?.VehicleReg &&
+        Ignitionreport?.VehicleReg &&
+        Ignitionreport?.toDateTime &&
+        Ignitionreport?.fromDateTime)
+    ) {
+      if (session) {
+        const { VehicleReg, period } = await Ignitionreport;
+        if (period == "week") {
+          setWeekData(true);
+        }
+        if (period == "today") {
+          setWeekData(false);
+        }
+        if (VehicleReg && period) {
+          let newdata = {
+            ...Ignitionreport,
+          };
+          const timestart: string = "00:00:00";
+          const timeend: string = "23:59:59";
+          const currentDayOfWeek = new Date().getDay();
+          const currentDay = new Date().getDay();
+          const daysUntilMonday =
+            currentDayOfWeek === currentDay ? 7 : currentDayOfWeek - 1;
+          const fromDateTime = new Date();
+          fromDateTime.setDate(fromDateTime.getDate() - daysUntilMonday);
+          const toDateTime = new Date(fromDateTime);
+          toDateTime.setDate(toDateTime.getDate() + 6);
+          const formattedFromDateTime = formatDate(fromDateTime);
+          const formattedToDateTime = formatDate(toDateTime);
+          if (isCustomPeriod) {
+            newdata = {
+              ...newdata,
+              fromDateTime: `${
+                weekData ? formattedFromDateTime : Ignitionreport.fromDateTime
+              }T${timestart}Z`,
+              toDateTime: `${
+                weekData ? formattedToDateTime : Ignitionreport.toDateTime
+              }T${timeend}Z`,
+            };
+          } else {
+            newdata = {
+              ...newdata,
+              fromDateTime: `${
+                weekData ? formattedFromDateTime : currentDate
+              }T${timestart}Z`,
+              toDateTime: `${
+                weekData ? formattedToDateTime : currentDate
+              }T${timeend}Z`,
+            };
+          }
+          const fromDate: any = new Date(Ignitionreport?.fromDateTime);
+          const toDate: any = new Date(Ignitionreport?.toDateTime);
+
+          const differenceMs = toDate - fromDate;
+
+          const differenceDays = differenceMs / (1000 * 60 * 60 * 24);
+
+          // setIgnitionreport(newdata);
+          // if (
+          //   Ignitionreport.period == "today" ||
+          //   Ignitionreport.period == "yesterday"
+          // ) {
+          //   setTimeout(() => setweekDataGrouped(false), 1000);
+          // }
+          // if (
+          //   Ignitionreport.period == "week" ||
+          //   Ignitionreport.period == "custom"
+          // ) {
+          //   setTimeout(() => setweekDataGrouped(true), 3000);
+          // }
+          if (differenceDays > 5 || differenceDays < 0) {
+            toast.error("please Select 0nly Five Days");
+          } else {
+            try {
+              const response = await toast.promise(
+                TripsByBucketAndVehicleV3({
+                  token: session.accessToken,
+                  payload: newdata,
+                }),
+
+                {
+                  loading: "Loading...",
+                  success: "",
+                  error: "",
+                },
+                {
+                  style: {
+                    border: "1px solid #00B56C",
+                    padding: "16px",
+                    color: "#1A202C",
+                  },
+                  success: {
+                    duration: 10,
+                    iconTheme: {
+                      primary: "#00B56C",
+                      secondary: "#FFFAEE",
+                    },
+                  },
+                  error: {
+                    duration: 10,
+                    iconTheme: {
+                      primary: "#00B56C",
+                      secondary: "#FFFAEE",
+                    },
+                  },
+                }
+              );
+              if (
+                Ignitionreport.period == "today" ||
+                Ignitionreport.period == "yesterday"
+              ) {
+                // setTimeout(() => setweekDataGrouped(false), 1000);
+                setweekDataGrouped(false);
+              }
+              if (
+                Ignitionreport.period == "week" ||
+                Ignitionreport.period == "custom"
+              ) {
+                // setTimeout(() => setweekDataGrouped(true), 3000);
+                setweekDataGrouped(true);
+              }
+              setDataResponse(response?.data);
+
+              if (response.success === true) {
+                toast.success(`${response.message}`, {
+                  style: {
+                    border: "1px solid #00B56C",
+                    padding: "16px",
+                    color: "#1A202C",
+                  },
+                  duration: 4000,
+                  iconTheme: {
+                    primary: "#00B56C",
+                    secondary: "#FFFAEE",
+                  },
+                });
+              } else {
+                toast.error(`${response.message}`, {
+                  style: {
+                    border: "1px solid red",
+                    padding: "16px",
+                    color: "red",
+                  },
+                  iconTheme: {
+                    primary: "red",
+                    secondary: "white",
+                  },
+                });
+              }
+            } catch (error) {
+              console.error(`Error calling API for ${newdata}:`, error);
+            }
+          }
+        }
+      }
+    }
+    setSearchLoading(true);
+    setLoading(false);
+  };
+
   function formatDate(date: Date): string {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -693,7 +1002,7 @@ export default function journeyReplayComp() {
   // const result = TravelHistoryresponse.map((item) => {
   //   if (item.speed === "0 Kph") return item;
   // });
-  // console.log(result);
+
   // if (TravelHistoryresponse.speed == "KM") {
   //   stopPoints = res.data
   //     .filter((x: any) => x.speed == "0 Kph")
@@ -703,6 +1012,7 @@ export default function journeyReplayComp() {
   //     .filter((x: any) => x.speed == "0 Mph")
   //     .sort((x) => x.date);
   // }
+
   const handleClickClear = () => {
     setPolylinedata([]);
     setCarPosition(null);
@@ -728,6 +1038,7 @@ export default function journeyReplayComp() {
   function getFormattedDate(date: any) {
     return date.toISOString().slice(0, 10);
   }
+
   let displayName: any;
   const handleDivClick = async (
     TripStart: TripsByBucket["TripStart"],
@@ -758,6 +1069,191 @@ export default function journeyReplayComp() {
         setLaodingMap(false);
         const TravelHistoryresponseapi = await toast.promise(
           TravelHistoryByBucketV2({
+            token: session.accessToken,
+            payload: newresponsedata,
+          }),
+          {
+            loading: "Loading...",
+            success: "",
+            error: "",
+          },
+          {
+            style: {
+              border: "1px solid #00B56C",
+              padding: "16px",
+              color: "#1A202C",
+            },
+            success: {
+              duration: 10,
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            },
+            error: {
+              duration: 10,
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            },
+          }
+        );
+        // if (session?.unit == "Mile") {
+        //   unit = "Mph";
+        // } else {
+        //   unit = "Kph";
+        // }
+        var stopPoints = [];
+        if (session?.unit == "KM") {
+          stopPoints = TravelHistoryresponseapi.data
+            .filter((x: any) => x.speed == "0 Kph")
+            .sort((x: any) => x.date);
+        } else {
+          stopPoints = TravelHistoryresponseapi.data
+            .filter((x: any) => x.speed == "0 Mph")
+            .sort((x: any) => x.date);
+        }
+        // displayName = TravelHistoryresponse.map((item) => {
+        //   return item?.address?.display_name;
+        // });
+        var addresses: any = [];
+        if (TravelHistoryresponse)
+          stopPoints.map(async function (singlePoint: any) {
+            let completeAddress;
+            if (!singlePoint.address?.display_name) {
+              completeAddress = await axios
+                .get(
+                  `http://osm.vtracksolutions.com/nominatim/reverse.php?lat=${singlePoint.lat}&lon=${singlePoint.lng}&zoom=19&format=jsonv2`
+                )
+                .then(async (response: any) => {
+                  return response.data;
+                });
+            } else {
+              completeAddress = singlePoint.address;
+            }
+
+            var record: any = {};
+            record["_id"] = singlePoint._id;
+            record["lat"] = singlePoint.lat;
+            record["lng"] = singlePoint.lng;
+            record["date"] = singlePoint.date;
+            record["speed"] = singlePoint.speed;
+            record["TimeStamp"] = singlePoint.TimeStamp;
+            record["address"] = completeAddress.display_name;
+            if (
+              addresses.filter(
+                (x: any) => x.lat == record.lat && x.lng == record.lng
+              ).length == 0
+            ) {
+              addresses.push(record);
+            }
+          });
+        setstops(
+          addresses.sort((a: any, b: any) => {
+            return moment(a.date).diff(b.date);
+          })
+        );
+        let stopTimesArray = [];
+
+        // Iterate over data array
+        for (let i = 0; i < TravelHistoryresponseapi?.data?.length; i++) {
+          var currentData = TravelHistoryresponseapi?.data[i];
+
+          // Check if current car's speed is 0 Mph
+          if (currentData.speed === "0 Mph" || currentData.speed === "0 Kph") {
+            let timeDiffInSeconds = 0;
+            let nextIndex = i + 1;
+
+            // Include the time difference with consecutive 0 Mph speed data points
+            while (
+              nextIndex < TravelHistoryresponseapi?.data?.length &&
+              (TravelHistoryresponseapi?.data[nextIndex]?.speed === "0 Mph" ||
+                TravelHistoryresponseapi?.data[nextIndex]?.speed === "0 Kph")
+            ) {
+              const currentTime: any = new Date(currentData.date);
+              const nextTime: any = new Date(
+                TravelHistoryresponseapi?.data[nextIndex].date
+              );
+
+              timeDiffInSeconds += Math.floor((nextTime - currentTime) / 1000);
+              currentData = TravelHistoryresponseapi?.data[nextIndex];
+              nextIndex++;
+            }
+
+            if (timeDiffInSeconds != 0) {
+              i = nextIndex - 1;
+            }
+            if (
+              timeDiffInSeconds == 0 &&
+              (TravelHistoryresponseapi?.data[nextIndex]?.speed !== "0 Mph" ||
+                TravelHistoryresponseapi?.data[nextIndex]?.speed !== "0 Kph") &&
+              nextIndex < TravelHistoryresponseapi?.data?.length
+            ) {
+              const currentTime: any = new Date(currentData.date);
+              const nextTime: any = new Date(
+                TravelHistoryresponseapi?.data[nextIndex].date
+              );
+              timeDiffInSeconds += Math.floor((nextTime - currentTime) / 1000);
+            }
+
+            const minutes = Math.floor(timeDiffInSeconds / 60);
+            const seconds = timeDiffInSeconds % 60;
+
+            // Construct the formatted string
+            const formattedTime = ` ${
+              minutes > 0 ? minutes + "m" : ""
+            } ${seconds}s`;
+
+            // Display the time difference
+            stopTimesArray.push({
+              date: currentData.date,
+              time: formattedTime,
+              address: currentData.address,
+            });
+          }
+        }
+
+        setStopWithSecond(stopTimesArray);
+        setTravelHistoryresponse(TravelHistoryresponseapi.data);
+      }
+    } catch (error) {
+      console.error(`Error calling API for:`, error);
+    }
+    setLaodingMap(true);
+  };
+  const handleDivClickv3 = async (
+    TripStart: TripsByBucket["TripStart"],
+    TripEnd: TripsByBucket["TripEnd"],
+    id: any
+  ) => {
+    setlat(null);
+    setlng(null);
+    setPlayBtn(true);
+    setStopBtn(false);
+    setStopDetailsOpen(true);
+    setIsPlaying(false);
+    setIsPaused(false);
+    setstopVehicle(false);
+
+    try {
+      setTravelHistoryresponse([]);
+      setIsPauseColor(false);
+      setProgressWidth(0);
+      // if (polylinedata.length > 0) {
+      //   setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
+      // }
+      setCurrentPositionIndex(0);
+      if (session) {
+        let newresponsedata = {
+          ...Ignitionreport,
+          fromDateTime: `${TripStart}`,
+          toDateTime: `${TripEnd}`,
+          id: id,
+        };
+        setLaodingMap(false);
+        const TravelHistoryresponseapi = await toast.promise(
+          TravelHistoryByBucketV3({
             token: session.accessToken,
             payload: newresponsedata,
           }),
@@ -978,14 +1474,17 @@ export default function journeyReplayComp() {
     //   }));
 
     // }
+    setFromDateInput(false);
     setCurrentDateDefaul(true);
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
       [fieldName]: newDate?.toISOString(),
     }));
   };
-
+  // const timeZone =  "Australia/Sydney"
+  //     const currenTDates = moment.tz(timeZone).toDate();
   const currenTDates = new Date();
+
   const isCurrentDate = (date: any) => {
     if (date instanceof Date) {
       const currentDate = new Date();
@@ -1032,6 +1531,7 @@ export default function journeyReplayComp() {
       ["VehicleReg"]: value,
       ["label"]: label,
     }));
+    setFromDateInput(true);
   };
 
   const handleInputChange: any = (e: any) => {
@@ -1074,18 +1574,19 @@ export default function journeyReplayComp() {
 
   const [lat, setlat] = useState<any>("");
   const [lng, setlng] = useState<any>("");
-
+  console.log(lat, lng);
   const handleClickStopCar = (item: any) => {
-    if (item?.lat === lat) {
+    console.log("item", item);
+    if (item?.address?.lat === lat) {
       setlat(null);
     } else {
-      setlat(item?.lat);
+      setlat(item?.address?.lat);
     }
 
-    if (item?.lng === lat) {
+    if (item?.address?.lon === lng) {
       setlng(null);
     } else {
-      setlng(item?.lng);
+      setlng(item?.address?.lon);
     }
   };
   const handleChangeValueSlider = (value: any) => {
@@ -1156,6 +1657,7 @@ export default function journeyReplayComp() {
     { value: "4", label: "4X" },
     { value: "6", label: "6X" },
   ];
+
   return (
     <>
       <div className="main_journey">
@@ -1339,12 +1841,16 @@ export default function journeyReplayComp() {
           <div className="xl:col-span-3 lg:col-span-4 md:col-span-6 col-span-12 days_select">
             {getShowRadioButton ? (
               <div className="grid lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-12  -mt-2  grid-cols-12  xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2 flex justify-center ">
-                <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0  ">
+                <div
+                  className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0  "
+                  // onClick={togglePickerFromDate}
+                >
                   <label className="text-green">From</label>
                   <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
-                    <KeyboardDatePicker
+                    <DatePicker
+                      // open={isPickerOpenFromDate}
                       format="MM/DD/yyyy"
-                      value={Ignitionreport.fromDateTime}
+                      value={Ignitionreport.fromDateTime || null}
                       onChange={(newDate: any) =>
                         handleDateChange("fromDateTime", newDate)
                       }
@@ -1354,33 +1860,56 @@ export default function journeyReplayComp() {
                       maxDate={currenTDates}
                       autoOk
                       inputProps={{ readOnly: true }}
+                      InputProps={{
+                        endAdornment: (
+                          <EventIcon
+                            style={{ width: "20", height: "20" }}
+                            className="text-gray"
+                          />
+                        ),
+                      }}
                     />
                   </MuiPickersUtilsProvider>
                 </div>
-                <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 ">
+                <div
+                  className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 "
+                  onClick={togglePicker}
+                >
                   <label className="text-green">To</label>
-                  <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
-                    <KeyboardDatePicker
-                      style={{ marginTop: "-3%" }}
-                      format="MM/DD/yyyy"
-                      value={Ignitionreport.toDateTime}
-                      onChange={(newDate: any) =>
-                        handleDateChange("toDateTime", newDate)
-                      }
-                      variant="inline"
-                      // maxDate={currenTDates}
-                      placeholder="End Date"
-                      inputProps={{ readOnly: true }}
-                      maxDate={currenTDates}
-                      // shouldDisableDate={(date) => !isCurrentDate(date)}
-                      autoOk
-                    />
-                  </MuiPickersUtilsProvider>
+                  <div>
+                    {/* <h1>test</h1> */}
+                    <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
+                      <DatePicker
+                        style={{ marginTop: "-3%" }}
+                        className="text-red"
+                        format="MM/DD/yyyy"
+                        value={Ignitionreport.toDateTime || null}
+                        onChange={(newDate: any) =>
+                          handleDateChange("toDateTime", newDate)
+                        }
+                        variant="inline"
+                        // maxDate={currenTDates}
+                        placeholder="End Date"
+                        inputProps={{ readOnly: true }}
+                        maxDate={currenTDates}
+                        // shouldDisableDate={(date) => !isCurrentDate(date)}
+                        InputProps={{
+                          endAdornment: (
+                            <EventIcon
+                              style={{ width: "20", height: "20" }}
+                              className="text-gray"
+                            />
+                          ),
+                        }}
+                        autoOk
+                      />
+                    </MuiPickersUtilsProvider>
+                  </div>
                 </div>
                 <div className="lg:col-span-1 col-span-1   ">
                   <button
                     className="text-green ms-5  text-2xl font-bold"
-                    onClick={() => setShowRadioButton(false)}
+                    onClick={handleCloseDateTime}
                   >
                     x
                   </button>
@@ -1596,6 +2125,47 @@ export default function journeyReplayComp() {
                 <button>Search</button>
               </div>
             </div>
+            {/* <div
+              onClick={handleSubmitTwo}
+              className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    search_btn_journey
+                    ${
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "today") ||
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "yesterday") ||
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "week") ||
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "custom" &&
+                        Ignitionreport?.toDateTime &&
+                        Ignitionreport?.fromDateTime)
+                        ? ""
+                        : "opacity-50 cursor-not-allowed"
+                    }`}
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <div className="col-span-3">
+                <svg
+                  className="lg:h-18 lg:w-10 md:h-12 md:w-12 sm:h-10 sm:w-10 h-12 w-12 py-3 px-2  text-white"
+                  // width="24"
+                  // height="24"
+                  viewBox="0 0 24 24"
+                  strokeWidth="4"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  {" "}
+                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                  <circle cx="10" cy="10" r="7" />{" "}
+                  <line x1="21" y1="21" x2="15" y2="15" />
+                </svg>
+              </div>
+              <div className="lg:col-span-8 md:col-span-8">
+                <button>SearchS</button>
+              </div>
+            </div> */}
             {/* <button
               onClick={handleSubmit}
               className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
@@ -1980,9 +2550,19 @@ export default function journeyReplayComp() {
                     <button
                       key={index}
                       // className=" my-2 "
-                      onClick={() =>
-                        handleDivClick(item.fromDateTime, item.toDateTime)
-                      }
+                      // onClick={() =>
+                      //   handleDivClickv3(item.fromDateTime, item.toDateTime)
+                      // }
+                      onClick={() => {
+                        travelV2 &&
+                          handleDivClick(item.fromDateTime, item.toDateTime);
+                        travelV3 &&
+                          handleDivClickv3(
+                            item.fromDateTime,
+                            item.toDateTime,
+                            item.id
+                          );
+                      }}
                     >
                       <div
                         className="py-5 hover:bg-[#e1f0e3] px-5 cursor-pointer border-b"
@@ -2380,10 +2960,7 @@ export default function journeyReplayComp() {
                                 })
                               }
                             >
-                              <Popup>
-                                {/* Add your popup content here */}
-                                Harsh Break
-                              </Popup>
+                              {harshPopUp && <Popup>Harsh Break</Popup>}
                             </Marker>
                           ) : (
                             ""
@@ -2402,10 +2979,9 @@ export default function journeyReplayComp() {
                                 })
                               }
                             >
-                              <Popup>
-                                {/* Add your popup content here */}
-                                Harsh Acceleration
-                              </Popup>
+                              {harshAccPopUp && (
+                                <Popup>Harsh Acceleration</Popup>
+                              )}
                             </Marker>
                           ) : (
                             ""
@@ -2473,23 +3049,35 @@ export default function journeyReplayComp() {
 
                 {getShowdetails ? (
                   <div className="bg-white lg:h-60 md:h-60 sm:h-60 h-24 overflow-y-scroll resposive_stop_details">
-                    {stops?.map((item: any) => {
+                    {stopWithSecond?.map((item: any) => {
+                      const getHour = item?.date?.slice(11, 13);
                       return loadingMap ? (
                         <div
                           onClick={() => handleClickStopCar(item)}
                           className="cursor-pointer"
                         >
                           <p className="text-black font-popins px-3 py-3 text-sm">
-                            <b>{item?.address?.substring(0, 50)}</b>
+                            <b>
+                              {item?.address?.display_name?.substring(0, 50)}
+                            </b>
                           </p>
 
-                          <div className="grid grid-cols-12">
-                            <div className="lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-2"></div>
-                            <div className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
-                              {moment(item?.date)
-                                .tz("Europe/London")
-                                .format("HH:mm:ss A")}
-                            </div>
+                          <div className="grid grid-cols-12 ">
+                            <div className="lg:col-span-2 md:col-span-2 sm:col-span-6 col-span-2"></div>
+                            {/* <div className="lg:col-span-9 md:col-span-8 sm:col-span-8 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time"> */}
+                            {/* {getHour > 12 ? getHourPm : getHour} */}
+                            {/* {item?.date?.slice(11, 19)}, {item?.time} */}
+                            {/* {period} */}
+                            {/* {moment(item?.date)
+                              date.format("hh:mm A");
+                            
+                                .format("HH:mm:ss A")} */}
+                            {/* </div> */}
+                            {/* <br></br>
+                            <div className="lg:col-span-2 md:col-span-2 sm:col-span-6 col-span-2"></div>
+                            <div className="lg:col-span-9 md:col-span-8 sm:col-span-8 col-span-11  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time mt-3">
+                              Duration: {item?.time}
+                            </div> */}
                           </div>
                           <br></br>
                           <hr className="text-gray"></hr>
@@ -2661,14 +3249,18 @@ export default function journeyReplayComp() {
                   </div>
                 ) : null}
 
-                {isPaused && (
+                {isPlaying || isPaused ? (
                   <p
                     className="bg-bgPlatBtn text-white mt-3 w-full px-2 py-3 rounded-md
                   trip_address
                   "
                   >
-                    {TripAddressData}
+                    {addressTravelHistory?.slice(0, 3).map((item, index) => (
+                      <div key={index}>{<p>{item}</p>}</div>
+                    ))}
                   </p>
+                ) : (
+                  ""
                 )}
                 {isPlaying && (
                   <div>
