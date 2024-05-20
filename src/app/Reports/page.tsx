@@ -699,26 +699,29 @@ export default function Reports() {
       if (session) {
         const { reportType, VehicleReg, period } = Ignitionreport;
         if (period === "today") {
-          const today = moment();
+          const today = moment().tz(session?.timezone);
           startDateTime =
-            today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+            today?.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
-            today.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+            today?.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
         }
         if (period === "yesterday") {
-          const yesterday = moment().subtract(1, "day");
+          const yesterday = moment().subtract(1, "day").tz(session?.timezone);
           startDateTime =
-            yesterday.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
+            yesterday?.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
             "Z";
           endDateTime =
-            yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+            yesterday?.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
         }
         if (period === "week") {
-          const startOfWeek = moment().subtract(7, "days").startOf("day");
+          const startOfWeek = moment()
+            .subtract(7, "days")
+            .startOf("day")
+            .tz(session?.timezone);
           const oneday = moment().subtract(1, "day");
           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
-            oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+            oneday?.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
         }
         if (period === "custom") {
           startDateTime =

@@ -105,9 +105,7 @@ const DynamicCarMap = ({
   //   let zoomLevel = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
   //   setZoom(zoomLevel);
   // }, [clientMapSettings]);
-  const name = "3";
-  const naneInt = parseInt(name);
-  console.log(naneInt);
+
   const handleClear = () => {
     setIsActiveColor("");
 
