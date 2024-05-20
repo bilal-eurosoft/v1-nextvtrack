@@ -599,21 +599,14 @@ export default function journeyReplayComp() {
 
         if (period == "today") {
           setWeekData(false);
-          const today = moment().tz(
-            session?.timezone === "Australia/Sydney" ||
-              session?.timezone === "America/Winnipeg" ||
-              session?.timezone === "Europe/London" ||
-              session?.timezone === "Asia/Karachi"
-              ? session?.timezone
-              : ""
-          );
+          const today = moment().tz(session?.timezone);
           startDateTime =
             today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
             today.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
         }
         if (period === "yesterday") {
-          const yesterday = moment().subtract(1, "day");
+          const yesterday = moment().subtract(1, "day").tz(session?.timezone);
           startDateTime =
             yesterday.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
             "Z";
@@ -623,7 +616,10 @@ export default function journeyReplayComp() {
         if (period == "week") {
           setWeekData(true);
 
-          const startOfWeek = moment().subtract(7, "days").startOf("day");
+          const startOfWeek = moment()
+            .subtract(7, "days")
+            .startOf("day")
+            .tz(session?.timezone);
           const oneday = moment().subtract(1, "day");
 
           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
