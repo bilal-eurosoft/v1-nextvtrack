@@ -639,21 +639,34 @@ export default function Reports() {
     }
   };
   const handleInputChangeSelect = (e: any) => {
-    // const { value, label } = e;
-    if (!e) return;
-    setIgnitionreport((prevReport: any) => ({
-      ...prevReport,
+    console.log("ee", e);
+    if (!e) {
+      return setIgnitionreport((prevReport: any) => ({
+        ...prevReport,
+        VehicleReg: "",
+        period: "",
+        // ["label"]: label,
+      }));
+    }
+    setIgnitionreport((preData) => ({
+      ...preData,
       VehicleReg: e?.value,
-      // ["label"]: label,
     }));
   };
+
   const handleInputChangeTrip = (e: any) => {
-    // const { value, label } = e;
-    if (!e) return;
+    if (!e) {
+      return setIgnitionreport((prevReport: any) => ({
+        ...prevReport,
+        reportType: 0,
+        period: "",
+        // ["label"]: label,
+      }));
+    }
+
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
       reportType: e?.value,
-      // ["label"]: label,
     }));
   };
   const optionsTrip = [

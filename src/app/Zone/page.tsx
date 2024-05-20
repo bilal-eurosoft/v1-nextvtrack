@@ -115,7 +115,6 @@ export default function Zone() {
       }
       setZoneList(allZones?.zone);
     }
-    console.log("zoneList",zoneList)
     // if (zoneList?.length >-0) {
     //   await dispatch(
     //     fetchZone({ token: session?.accessToken, clientId: session?.clientId })
