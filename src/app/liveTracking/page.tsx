@@ -75,6 +75,8 @@ const LiveTracking = () => {
   const [userVehicle, setuserVehicle] = useState([]);
   const [unselectVehicles, setunselectVehicles] = useState(false);
   const [zoom, setZoom] = useState(10);
+  const [showZones, setShowZones] = useState(false);
+
   const [mapCoordinates, setMapCoordinates] = useState<LatLng | null | []>(
     null
   );
@@ -267,6 +269,7 @@ const LiveTracking = () => {
           setunselectVehicles={setunselectVehicles}
           unselectVehicles={unselectVehicles}
           setZoom={setZoom}
+          setShowZones={setShowZones}
           setShowZonePopUp={setShowZonePopUp}
         />
         {carData?.current?.length !== 0 && (
@@ -281,6 +284,8 @@ const LiveTracking = () => {
             unselectVehicles={unselectVehicles}
             mapCoordinates={mapCoordinates}
             zoom={zoom}
+            setShowZones={setShowZones}
+            showZones={showZones}
             setShowZonePopUp={setShowZonePopUp}
             showZonePopUp={showZonePopUp}
           />

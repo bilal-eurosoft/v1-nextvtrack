@@ -475,7 +475,9 @@ export default function journeyReplayComp() {
           const centervalue = await session?.clientSetting.filter(
             (item: any) => item.PropertDesc == "Map"
           );
-          const centerMapValue = centervalue.map((item) => item.PropertyValue);
+          const centerMapValue = centervalue.map(
+            (item: any) => item.PropertyValue
+          );
 
           if (centerMapValue) {
             const match = centerMapValue?.[0]?.match(
@@ -556,6 +558,8 @@ export default function journeyReplayComp() {
     setTravelV3(false);
     setTravelV2(true);
     setIsDynamicTime("");
+    setlat("");
+    setlng("");
     setstops([]);
     setIsPaused(false);
     setPlayBtn(false);
@@ -1521,6 +1525,7 @@ export default function journeyReplayComp() {
       return setIgnitionreport((prevReport: any) => ({
         ...prevReport,
         period: "",
+        VehicleReg: "",
       }));
     }
     const { value, label } = e;
@@ -1572,9 +1577,7 @@ export default function journeyReplayComp() {
 
   const [lat, setlat] = useState<any>("");
   const [lng, setlng] = useState<any>("");
-  console.log(lat, lng);
   const handleClickStopCar = (item: any) => {
-    console.log("item", item);
     if (item?.address?.lat === lat) {
       setlat(null);
     } else {
@@ -2270,7 +2273,7 @@ export default function journeyReplayComp() {
             )}
           </div>
         </div>
-        <div className="grid lg:grid-cols-5  sm:grid-cols-5 md:grid-cols-12 sm:grid-cols-12 grid-cols-1 journey_sidebar">
+        <div className="grid lg:grid-cols-5   md:grid-cols-12 sm:grid-cols-12 grid-cols-1 journey_sidebar">
           <div className="xl:col-span-1 lg:col-span-2 md:col-span-5 sm:col-span-12 col-span-4 trips_journey">
             <p className="bg-green px-4 py-1 text-white font-semibold journey_sidebar_text flex items-center">
               Trips ({dataresponse?.length})

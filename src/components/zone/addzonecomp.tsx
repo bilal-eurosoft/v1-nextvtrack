@@ -198,7 +198,6 @@ export default function AddZoneComp() {
   };
 
   const handleSelectAddressOne = (e: any) => {
-    console.log("e", e);
     // const selectedIndex = e.target.selectedIndex;
     // setSelectedAddress(addresses[selectedIndex]);
     if (!e) return;
@@ -248,22 +247,26 @@ export default function AddZoneComp() {
   };
   const handleChange = (e: any) => {
     const { name, value } = e.target;
-    console.log("name, value ", name, value);
     setForm({ ...Form, [name]: value });
   };
   const handleChangeSelectValue = (e: any) => {
     const { label, value } = e;
-    setForm({ ...Form, [label]: value });
-    if (value === "Restricted-Area") {
-      setForm({ ...Form, label: value });
-    }
+    setForm({ ...Form, label: value });
+    // if (value === "Restricted-Area") {
+    //   setForm({ ...Form, label: value });
+    // }
   };
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Check if any of the required fields are empty
-    if (!Form.latlngCordinates || !Form.zoneName || !Form.zoneShortName) {
+    if (
+      !Form.latlngCordinates ||
+      !Form.zoneName ||
+      !Form.zoneShortName ||
+      !Form.label
+    ) {
       toast.error("Please Select All Field");
       return;
     } else if (polygondataById.length == 0 && circleDataById?.radius == null) {
@@ -387,7 +390,6 @@ export default function AddZoneComp() {
     } else if (circleDataById !== null) {
       setCircleDataById(null);
       setCircleData({ radius: "", latlng: "" });
-
       setForm({ ...Form, zoneType: "" });
       setDrawShape(true);
     } else {

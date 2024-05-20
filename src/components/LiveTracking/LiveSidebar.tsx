@@ -21,6 +21,7 @@ const LiveSidebar = ({
   unselectVehicles,
   setZoom,
   setShowZonePopUp,
+  setShowZones,
 }: {
   carData: VehicleData[];
   countPause: Number;
@@ -34,6 +35,7 @@ const LiveSidebar = ({
   unselectVehicles: any;
   setZoom: any;
   setShowZonePopUp: any;
+  setShowZones: any;
 }) => {
   const { data: session } = useSession();
   const [searchData, setSearchData] = useState({
@@ -134,8 +136,6 @@ const LiveSidebar = ({
           // Convert to uppercase for case-insensitive sorting
           const regAUpperCase = a.vehicleReg.toUpperCase();
           const regBUpperCase = b.vehicleReg.toUpperCase();
-
-          return regAUpperCase.localeCompare(regBUpperCase);
         }
       })
       .map((item: any) => {
@@ -159,7 +159,8 @@ const LiveSidebar = ({
     setSelectedVehicle(item);
     setshowAllVehicles(false);
     setIsActiveColor(item.vehicleId);
-    setShowZonePopUp(false);
+    // setShowZonePopUp(false);
+    setShowZones(false);
   };
 
   return (

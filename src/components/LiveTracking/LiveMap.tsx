@@ -11,7 +11,7 @@ import { useSession } from "next-auth/react";
 // import { getZoneListByClientId } from "@/utils/API_CALLS";
 import { fetchZone } from "@/lib/slices/zoneSlice";
 import { useSelector } from "react-redux";
-import { Marker, Popup } from "react-leaflet";
+import { Marker, Popup, Tooltip } from "react-leaflet";
 import L, { LatLng } from "leaflet";
 import { useSearchParams } from "next/navigation";
 
@@ -44,8 +44,8 @@ const DynamicCarMap = ({
   unselectVehicles,
   mapCoordinates,
   zoom,
-  setShowZonePopUp,
-  showZonePopUp,
+  setShowZones,
+  showZones,
 }: {
   carData: VehicleData[];
   clientSettings: ClientSettings[];
@@ -57,8 +57,8 @@ const DynamicCarMap = ({
   unselectVehicles: any;
   mapCoordinates: any;
   zoom: any;
-  setShowZonePopUp: any;
-  showZonePopUp: any;
+  setShowZones: any;
+  showZones: any;
 }) => {
   const clientMapSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Map"
@@ -74,7 +74,7 @@ const DynamicCarMap = ({
   const { data: session } = useSession();
 
   const [zoneList, setZoneList] = useState<zonelistType[]>([]);
-  const [showZones, setShowZones] = useState(false);
+  // const [showZones, setShowZones] = useState(false);
   // const [mapCoordinates, setMapCoordinates] = useState<LatLng | null>(null);
   // const [zoom, setZoom] = useState(10);
   // useEffect(() => {
@@ -105,14 +105,15 @@ const DynamicCarMap = ({
   //   let zoomLevel = clientZoomSettings ? parseInt(clientZoomSettings) : 11;
   //   setZoom(zoomLevel);
   // }, [clientMapSettings]);
-  console.log("showPop", showZonePopUp);
+
   const handleClear = () => {
     setIsActiveColor("");
-    // setShowZonePopUp(true);
+
     // console.log("test123");
     // setSelectedVehicle(null);
   };
-  const allZones = useSelector((state) => state.zone);
+
+  const allZones = useSelector((state: any) => state.zone);
 
   useEffect(() => {
     setZoneList(allZones?.zone);
@@ -138,7 +139,6 @@ const DynamicCarMap = ({
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
               />
-
               {showZones &&
                 zoneList.map((singleRecord: any) => {
                   const radius = Number(singleRecord.latlngCordinates);
@@ -159,6 +159,7 @@ const DynamicCarMap = ({
                         isCityArea ? "green" : isRestrictedArea ? "red" : "blue"
                       }
                     >
+                      {/* <Tooltip>{singleRecord.zoneName}</Tooltip> */}
                       <Popup>{singleRecord.zoneName}</Popup>
                     </Circle>
                   ) : (
@@ -169,6 +170,7 @@ const DynamicCarMap = ({
                         isCityArea ? "green" : isRestrictedArea ? "red" : "blue"
                       }
                     >
+                      {/* <Tooltip>{singleRecord.zoneName}</Tooltip> */}
                       <Popup>{singleRecord.zoneName}</Popup>
                     </Polygon>
                   );
@@ -221,6 +223,7 @@ const DynamicCarMap = ({
                   onClick={() => {
                     setShowZones(!showZones);
                   }}
+                  checked={showZones}
                   className="mx-2 mt-1"
                   style={{ accentColor: "green" }}
                 />
