@@ -715,7 +715,7 @@ export default function Reports() {
         }
         if (period === "week") {
           const startOfWeek = moment()
-            .subtract(7, "days")
+            .subtract(6, "days")
             .startOf("day")
             .tz(session?.timezone);
           const oneday = moment().subtract(1, "day");

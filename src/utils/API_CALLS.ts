@@ -1220,15 +1220,18 @@ export async function TravelHistoryByBucketV2({
   payload: replayreport;
 }) {
   try {
-    const response = await fetch(`${URL}/v2/TravelHistoryByBucketV2`, {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await fetch(
+      `http://172.16.10.47:80/v2/TravelHistoryByBucketV2`,
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");

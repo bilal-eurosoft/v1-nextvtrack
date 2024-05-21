@@ -488,7 +488,7 @@ input[type="checkbox"]:hover {
     grid-column: 5 span;
   }
   .stop_details_time {
-    grid-column: 7 span;
+    grid-column: 8 span;
   }
   .journey_replay_slider {
     grid-column: 12 span !important;
