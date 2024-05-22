@@ -253,7 +253,6 @@ export default function Reports() {
     setenddate(value);
   };
   const handleCustomDateChange = (fieldName: string, e: any) => {
-    console.log("e", e);
     // setIgnitionreport((prevReport: any) => ({
     //   ...prevReport,
     //   [fieldName]: e.toISOString().split("T")[0],
@@ -316,7 +315,6 @@ export default function Reports() {
           //console.log("start date time ", startDateTime);
           endDateTime =
             oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          //console.log("end date time", endDateTime);
         }
         if (period === "custom") {
           startDateTime =
@@ -405,7 +403,6 @@ export default function Reports() {
               // suraksha code
               if (response.success === true) {
                 setTableShow(true);
-                // console.log("Trips Data isssssssss:", response);
                 //  setIsFormSubmitted(true);
                 setTrisdata(response.data.tableData);
 
@@ -497,8 +494,6 @@ export default function Reports() {
                   | "Type"
                 )[] = [];
                 if (Ignitionreport.reportType.toString() === "Trip") {
-                  // console.log("trips data ", response.data);
-
                   if (response.data.clientModelProfile) {
                     newColumnHeaders = [
                       "AverageSpeed",
@@ -538,7 +533,6 @@ export default function Reports() {
                 } else if (
                   Ignitionreport.reportType.toString() === "Ignition"
                 ) {
-                  // console.log("ignition", response.data.tableData);
                   newColumnHeaders = ["0", "1", "2", "3", "4", "5"];
                   custom1HeaderTitles = [
                     "event",
@@ -550,7 +544,6 @@ export default function Reports() {
                   ];
                   setcustomHeaderTitles(custom1HeaderTitles);
                 } else if (Ignitionreport.reportType.toString() === "Events") {
-                  // console.log("event", response.data.tableData);
                   const filteredData = response.data.tableData.filter(
                     (eventitem: { event: string }) =>
                       eventitem.event !== "ignitionOn" &&
@@ -639,7 +632,6 @@ export default function Reports() {
     }
   };
   const handleInputChangeSelect = (e: any) => {
-    console.log("ee", e);
     if (!e) {
       return setIgnitionreport((prevReport: any) => ({
         ...prevReport,

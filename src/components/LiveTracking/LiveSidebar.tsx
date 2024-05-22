@@ -123,19 +123,17 @@ const LiveSidebar = ({
         data.vehicleReg.toLowerCase().includes(searchData.search.toLowerCase())
       )
       .sort((a: any, b: any) => {
-        const regA = parseInt(a.vehicleReg);
-        const regB = parseInt(b.vehicleReg);
+        const aReg = a.vehicleReg;
+        const bReg = b.vehicleReg;
 
-        // If both values are numeric, sort numerically
-        if (!isNaN(regA) && !isNaN(regB)) {
-          return regA - regB;
-        }
+        // Check if both are numbers
+        const aIsNumeric = !isNaN(parseInt(aReg));
+        const bIsNumeric = !isNaN(parseInt(bReg));
 
-        // If one or both values are non-numeric, sort alphabetically
-        if (isNaN(regA) || isNaN(regB)) {
-          // Convert to uppercase for case-insensitive sorting
-          const regAUpperCase = a.vehicleReg.toUpperCase();
-          const regBUpperCase = b.vehicleReg.toUpperCase();
+        if (aIsNumeric && bIsNumeric) {
+          return parseInt(aReg) - parseInt(bReg);
+        } else {
+          return aReg.localeCompare(bReg);
         }
       })
       .map((item: any) => {
@@ -154,12 +152,10 @@ const LiveSidebar = ({
       });
     setFilteredData(filtered);
   }, [searchData.search, carData]);
-
   const handleClickVehicle = (item: any) => {
     setSelectedVehicle(item);
     setshowAllVehicles(false);
     setIsActiveColor(item.vehicleId);
-    // setShowZonePopUp(false);
     setShowZones(false);
   };
 

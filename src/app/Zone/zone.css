@@ -10,7 +10,8 @@
   display: none;
 }
 .css-yuzg60-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected {
-  background-color: rgb(190, 190, 190) !important;
+  background-color: #00b56c !important;
+  color: white !important;
 }
 
 .css-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar
