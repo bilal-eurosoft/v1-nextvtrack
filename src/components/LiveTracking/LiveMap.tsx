@@ -14,7 +14,8 @@ import { useSelector } from "react-redux";
 import { Marker, Popup, Tooltip } from "react-leaflet";
 import L, { LatLng } from "leaflet";
 import { useSearchParams } from "next/navigation";
-
+import "leaflet/dist/leaflet.css";
+import "leaflet-draw/dist/leaflet.draw.css";
 const MapContainer = dynamic(
   () => import("react-leaflet").then((module) => module.MapContainer),
   { ssr: false }
