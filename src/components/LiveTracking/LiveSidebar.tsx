@@ -123,19 +123,17 @@ const LiveSidebar = ({
         data.vehicleReg.toLowerCase().includes(searchData.search.toLowerCase())
       )
       .sort((a: any, b: any) => {
-        const regA = parseInt(a.vehicleReg);
-        const regB = parseInt(b.vehicleReg);
+        const aReg = a.vehicleReg;
+        const bReg = b.vehicleReg;
 
-        // If both values are numeric, sort numerically
-        if (!isNaN(regA) && !isNaN(regB)) {
-          return regA - regB;
-        }
+        // Check if both are numbers
+        const aIsNumeric = !isNaN(parseInt(aReg));
+        const bIsNumeric = !isNaN(parseInt(bReg));
 
-        // If one or both values are non-numeric, sort alphabetically
-        if (isNaN(regA) || isNaN(regB)) {
-          // Convert to uppercase for case-insensitive sorting
-          const regAUpperCase = a.vehicleReg.toUpperCase();
-          const regBUpperCase = b.vehicleReg.toUpperCase();
+        if (aIsNumeric && bIsNumeric) {
+          return parseInt(aReg) - parseInt(bReg);
+        } else {
+          return aReg.localeCompare(bReg);
         }
       })
       .map((item: any) => {
@@ -154,18 +152,22 @@ const LiveSidebar = ({
       });
     setFilteredData(filtered);
   }, [searchData.search, carData]);
-
   const handleClickVehicle = (item: any) => {
     setSelectedVehicle(item);
     setshowAllVehicles(false);
     setIsActiveColor(item.vehicleId);
-    // setShowZonePopUp(false);
     setShowZones(false);
   };
 
   return (
     <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-2  col-span-5 main_sider_bar">
-      <div className="grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3 search_live_tracking">
+      <div
+        className={
+          fullparams == "full"
+            ? "grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3"
+            : "grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3 search_live_tracking"
+        }
+      >
         <div className="lg:col-span-7 w-full  md:col-span-5 sm:col-span-5 col-span-6 sticky top-0 search_vehicle_live_tracking">
           <div className="grid grid-cols-12 vehicle_search_left">
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1">

@@ -617,7 +617,7 @@ export default function journeyReplayComp() {
           setWeekData(true);
 
           const startOfWeek = moment()
-            .subtract(7, "days")
+            .subtract(6, "days")
             .startOf("day")
             .tz(session?.timezone);
           const oneday = moment().subtract(1, "day");
@@ -1159,9 +1159,12 @@ export default function journeyReplayComp() {
         // Iterate over data array
         for (let i = 0; i < TravelHistoryresponseapi?.data?.length; i++) {
           var currentData = TravelHistoryresponseapi?.data[i];
-
           // Check if current car's speed is 0 Mph
-          if (currentData.speed === "0 Mph" || currentData.speed === "0 Kph") {
+          if (
+            currentData.ignition === 1 &&
+            currentData.trip === 1 &&
+            (currentData.speed === "0 Mph" || currentData.speed === "0 Kph")
+          ) {
             let timeDiffInSeconds = 0;
             let nextIndex = i + 1;
 
@@ -1170,14 +1173,17 @@ export default function journeyReplayComp() {
               nextIndex < TravelHistoryresponseapi?.data?.length &&
               (TravelHistoryresponseapi?.data[nextIndex]?.speed === "0 Mph" ||
                 TravelHistoryresponseapi?.data[nextIndex]?.speed === "0 Kph")
+              // &&TravelHistoryresponseapi?.data[nextIndex]?.ignition
             ) {
+              // if(    TravelHistoryresponseapi?.data[nextIndex]?.ignition === 1 && TravelHistoryresponseapi?.data[nextIndex]?.trip === 1)
               const currentTime: any = new Date(currentData.date);
+
               const nextTime: any = new Date(
                 TravelHistoryresponseapi?.data[nextIndex].date
               );
 
               timeDiffInSeconds += Math.floor((nextTime - currentTime) / 1000);
-              currentData = TravelHistoryresponseapi?.data[nextIndex];
+              nextIndex = TravelHistoryresponseapi?.data[nextIndex];
               nextIndex++;
             }
 
@@ -1222,6 +1228,8 @@ export default function journeyReplayComp() {
     }
     setLaodingMap(true);
   };
+  // console.log("stopWithSecond", stopWithSecond);
+  // console.log("stops", stops);
   const handleDivClickv3 = async (
     TripStart: TripsByBucket["TripStart"],
     TripEnd: TripsByBucket["TripEnd"],
@@ -1394,7 +1402,7 @@ export default function journeyReplayComp() {
               stopDetailsArray.push(Data);
             }
           } else {
-            stopDetailsArray.push(point.address);
+            stopDetailsArray.push(point?.address);
           }
         } catch (error) {
           console.error("Error fetching zone data:", error);
@@ -2968,7 +2976,7 @@ export default function journeyReplayComp() {
                               icon={
                                 new L.Icon({
                                   iconUrl:
-                                    " https://img.icons8.com/nolan/64/speed-up.png",
+                                    "https://img.icons8.com/nolan/64/speed-up.png",
                                   iconSize: [30, 30],
                                   iconAnchor: [16, 37],
                                 })
@@ -2997,7 +3005,7 @@ export default function journeyReplayComp() {
                 >
                   <div className="lg:col-span-11  md:col-span-10 sm:col-span-10 col-span-11 stop_details_responsive">
                     <p className="text-white lg:px-3 ps-1 text-lg text_responsive">
-                      Stop Details ({loadingMap ? stops.length : ""})
+                      Stop Details ({loadingMap ? stopWithSecond.length : ""})
                     </p>
                   </div>
                   <div className="col-span-1 mt-1 lg:-ms-3 md:-ms-2 -ms-3">
@@ -3045,7 +3053,6 @@ export default function journeyReplayComp() {
                 {getShowdetails ? (
                   <div className="bg-white lg:h-60 md:h-60 sm:h-60 h-24 overflow-y-scroll resposive_stop_details">
                     {stopWithSecond?.map((item: any) => {
-                      const getHour = item?.date?.slice(11, 13);
                       return loadingMap ? (
                         <div
                           onClick={() => handleClickStopCar(item)}
@@ -3058,16 +3065,16 @@ export default function journeyReplayComp() {
                           </p>
 
                           <div className="grid grid-cols-12 ">
-                            <div className="lg:col-span-2 md:col-span-2 sm:col-span-6 col-span-2"></div>
-                            {/* <div className="lg:col-span-9 md:col-span-8 sm:col-span-8 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time"> */}
-                            {/* {getHour > 12 ? getHourPm : getHour} */}
-                            {/* {item?.date?.slice(11, 19)}, {item?.time} */}
-                            {/* {period} */}
-                            {/* {moment(item?.date)
+                            <div className="lg:col-span-1 md:col-span-2 sm:col-span-6 col-span-2"></div>
+                            <div className="lg:col-span-8 md:col-span-8 sm:col-span-8 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
+                              {/* {getHour > 12 ? getHourPm : getHour} */}
+                              {item?.date?.slice(11, 19)}, {item?.time}
+                              {/* {period} */}
+                              {/* {moment(item?.date)
                               date.format("hh:mm A");
                             
                                 .format("HH:mm:ss A")} */}
-                            {/* </div> */}
+                            </div>
                             {/* <br></br>
                             <div className="lg:col-span-2 md:col-span-2 sm:col-span-6 col-span-2"></div>
                             <div className="lg:col-span-9 md:col-span-8 sm:col-span-8 col-span-11  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time mt-3">
