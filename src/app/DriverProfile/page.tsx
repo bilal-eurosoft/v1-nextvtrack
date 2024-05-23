@@ -250,9 +250,9 @@ export default function DriverProfile() {
   };
 
   const handleChangeDriver = (key: any, e: any) => {
-    setFormData({ ...formData, [key]: e?.target?.value?.trim() });
-    setSelectedRFID(e.target.value);
-    setShowCardNumber(false);
+    setFormData({ ...formData, [key]: e });
+    setSelectedRFID(e);
+    // setShowCardNumber(true);
   };
 
   const handleEditDriver = (key: any, e: any) => {
@@ -369,6 +369,7 @@ export default function DriverProfile() {
   };
 
   const handleDriverSubmit = async (e: any) => {
+    console.log("handleSubmit");
     e.preventDefault();
     const existingDriver = DriverData.find(
       (driver: any) => driver.driverNo === formData.driverNo
@@ -811,14 +812,14 @@ export default function DriverProfile() {
                 <div className="grid grid-cols-12 mx-2 ">
                   <div className="lg:col-span-3 md:col-span-3 col-span-6 mx-2">
                     <label className="text-sm text-black font-popins font-medium">
-                      First Name
+                      <span className="text-red">*</span> First Name
                     </label>
                     <input
                       type="text"
                       value={formData.driverfirstName}
                       className="border border-grayLight w-full outline-green hover:border-green transition duration-700 ease-in-out "
                       onChange={(e: any) =>
-                        handleChangeDriver("driverfirstName", e)
+                        handleChangeDriver("driverfirstName", e.target.value)
                       }
                     />
                   </div>
@@ -831,30 +832,52 @@ export default function DriverProfile() {
                       value={formData.driverLastName}
                       className="border border-grayLight w-full  outline-green hover:border-green transition duration-700 ease-in-out "
                       onChange={(e: any) =>
-                        handleChangeDriver("driverLastName", e)
+                        handleChangeDriver("driverLastName", e.target.value)
                       }
                     />
                   </div>
                   <div className="lg:col-span-3 md:col-span-3 col-span-6 mx-2">
                     <label className="text-sm text-black font-popins font-medium">
-                      Driver Number
+                      <span className="text-red">*</span> Driver Number
                     </label>
                     <input
                       value={formData.driverNo}
                       type="text"
                       className="border border-grayLight w-full  outline-green hover:border-green transition duration-700 ease-in-out "
-                      onChange={(e: any) => handleChangeDriver("driverNo", e)}
+                      onChange={(e: any) => {
+                        const value = e.target.value.match(/\d+/g);
+                        if (value) {
+                          const numberOnly = value.join("");
+                          handleChangeDriver("driverNo", numberOnly);
+                        } else {
+                          handleChangeDriver("driverNo", "");
+                        }
+                      }}
                     />
                   </div>
                   <div className="lg:col-span-3 md:col-span-3 col-span-6 mx-2">
                     <label className="text-sm text-black font-popins font-medium">
-                      Driver ID
+                      <span className="text-red">*</span> Driver ID
                     </label>
                     <input
                       type="text"
                       value={formData.driverIdNo}
                       className="border border-grayLight w-full outline-green hover:border-green transition duration-700 ease-in-out "
-                      onChange={(e: any) => handleChangeDriver("driverIdNo", e)}
+                      onChange={(e: any) => {
+                        const value = e.target.value.match(/\d+/g);
+                        if (value) {
+                          const numericValue = value.join(""); // Join the array into a single string
+                          handleChangeDriver("driverIdNo", numericValue);
+                        } else {
+                          handleChangeDriver("driverIdNo", "");
+                        }
+                      }}
+                      // onChange={(e: any) => {
+                      //   handleChangeDriver(
+                      //     "driverIdNo",
+                      //     e.target.value
+                      //   );
+                      // }}
                     />
                   </div>
                 </div>
@@ -907,14 +930,28 @@ export default function DriverProfile() {
                         /> */}
                           <Select
                             onChange={(e: any) =>
-                              handleChangeDriver("driverRFIDCardNumber", e)
+                              handleChangeDriver(
+                                "driverRFIDCardNumber",
+                                e.target.value
+                              )
                             }
                             value={selectedRFID}
                             style={{ width: "100%" }}
                             className="h-6 "
                             displayEmpty
                           >
-                            <MenuItem value="" selected hidden disabled>
+                            <MenuItem
+                              value={
+                                formData.driverfirstName ||
+                                formData.driverLastName ||
+                                formData.driverNo ||
+                                formData.driverIdNo ||
+                                ""
+                              }
+                              selected
+                              hidden
+                              disabled
+                            >
                               Select RFID
                             </MenuItem>
                             {getRfid.map(

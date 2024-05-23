@@ -1402,7 +1402,7 @@ export default function journeyReplayComp() {
               stopDetailsArray.push(Data);
             }
           } else {
-            stopDetailsArray.push(point.address);
+            stopDetailsArray.push(point?.address);
           }
         } catch (error) {
           console.error("Error fetching zone data:", error);
@@ -2980,7 +2980,7 @@ export default function journeyReplayComp() {
                               icon={
                                 new L.Icon({
                                   iconUrl:
-                                    " https://img.icons8.com/nolan/64/speed-up.png",
+                                    "https://img.icons8.com/nolan/64/speed-up.png",
                                   iconSize: [30, 30],
                                   iconAnchor: [16, 37],
                                 })

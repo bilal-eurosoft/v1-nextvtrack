@@ -1121,9 +1121,9 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                         >
                           <svg
                             className={`w-20 h-14 py-3 
-  text-white-10  dark:text-white  ${
+  text-white-10  dark:text-white -ms-3 ${
     pathname === "/Notifications"
-      ? "border-r-2 border-#29303b -my-1"
+      ? "border-r-2 border-#29303b -my-1 "
       : "border-y-1 border-b-2"
   }`}
                             viewBox="0 0 24 24"
