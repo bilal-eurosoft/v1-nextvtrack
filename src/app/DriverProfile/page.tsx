@@ -946,6 +946,7 @@ export default function DriverProfile() {
                                 formData.driverLastName ||
                                 formData.driverNo ||
                                 formData.driverIdNo ||
+                                formData.driverAddress1 ||
                                 ""
                               }
                               selected

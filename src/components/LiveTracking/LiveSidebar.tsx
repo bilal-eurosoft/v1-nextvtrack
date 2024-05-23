@@ -161,7 +161,13 @@ const LiveSidebar = ({
 
   return (
     <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-2  col-span-5 main_sider_bar">
-      <div className="grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3 search_live_tracking">
+      <div
+        className={
+          fullparams == "full"
+            ? "grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3"
+            : "grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3 search_live_tracking"
+        }
+      >
         <div className="lg:col-span-7 w-full  md:col-span-5 sm:col-span-5 col-span-6 sticky top-0 search_vehicle_live_tracking">
           <div className="grid grid-cols-12 vehicle_search_left">
             <div className="lg:col-span-1 md:col-span-1 sm:col-span-1">
