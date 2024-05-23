@@ -1410,7 +1410,6 @@ export default function journeyReplayComp() {
       }
 
       const seen: Record<string | number, boolean> = {};
-
       const uniqueStopDetailsArray = stopDetailsArray.filter((item) => {
         const key = item.place_id;
         if (!seen[key]) {
