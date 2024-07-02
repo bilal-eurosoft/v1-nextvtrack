@@ -39,14 +39,11 @@ import Speedometer, {
 } from "react-speedometer";
 import {
   TravelHistoryByBucketV2,
-  TravelHistoryByBucketV3,
-  TripsByBucketAndVehicleV3,
   TripsByBucketAndVehicle,
   getAllVehicleByUserId,
-  // getClientSettingByClinetIdAndToken,
   getCurrentAddress,
-  // getZoneListByClientId,
   vehicleListByClientId,
+  TravelHistoryByBucketV2Two,
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { DeviceAttach } from "@/types/vehiclelistreports";
@@ -167,7 +164,6 @@ export default function journeyReplayComp() {
     toDateTime: "",
     unit: session?.unit || "",
   });
-
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [carPosition, setCarPosition] = useState<LatLng | null>(null);
@@ -221,9 +217,9 @@ export default function journeyReplayComp() {
     setExpanded(isExpanded ? panel : null);
   };
   const allData = useSelector((state) => state?.zone);
-  // useEffect(() => {
-  //   setZoneList(allZones?.zone);
-  // }, [allZones]);
+  useEffect(() => {
+    setZoneList(allData?.zone);
+  }, []);
 
   const moment = require("moment-timezone");
   const togglePicker = () => {
@@ -232,6 +228,7 @@ export default function journeyReplayComp() {
   // const togglePickerFromDate = () => {
   //   setIsPickerOpenFromDate(!isPickerOpenFromDate);
   // };
+
   const SetViewOnClick = ({ coords }: { coords: any }) => {
     if (isPaused) {
       setMapcenterToFly(null);
@@ -448,9 +445,7 @@ export default function journeyReplayComp() {
             setVehicleList(data);
           }
         }
-      } catch (error) {
-        console.error("Error fetching zone data:", error);
-      }
+      } catch (error) {}
     };
     vehicleListData();
     // (async function () {
@@ -600,6 +595,7 @@ export default function journeyReplayComp() {
         if (period == "today") {
           setWeekData(false);
           const today = moment().tz(session?.timezone);
+          const time = today.format("HH:mm:ss");
           startDateTime =
             today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
@@ -617,7 +613,7 @@ export default function journeyReplayComp() {
           setWeekData(true);
 
           const startOfWeek = moment()
-            .subtract(6, "days")
+            .subtract(7, "days")
             .startOf("day")
             .tz(session?.timezone);
           const oneday = moment().subtract(1, "day");
@@ -788,201 +784,7 @@ export default function journeyReplayComp() {
                   },
                 });
               }
-            } catch (error) {
-              console.error(`Error calling API for ${newdata}:`, error);
-            }
-          }
-        }
-      }
-    }
-    setSearchLoading(true);
-    setLoading(false);
-  };
-
-  const handleSubmitTwo = async (e: React.FormEvent) => {
-    setTravelV3(true);
-
-    setTravelV2(false);
-    e.preventDefault();
-    setIsDynamicTime("");
-    setstops([]);
-    setIsPaused(false);
-    setPlayBtn(false);
-    setStopBtn(false);
-    setPauseBtn(false);
-    setLaodingMap(false);
-    setIsPlaying(false);
-    setCarPosition(null);
-    setactiveTripColor("");
-    setTravelHistoryresponse([]);
-    setClearMapData(false);
-    setProgressWidth(0);
-    setLoading(true);
-    // setSearchLoading(true);
-    setDataResponse(null);
-    setExpanded(null);
-    setSearchLoading(false);
-    if (polylinedata.length > 0) {
-      setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
-    }
-    setCurrentPositionIndex(0);
-    setClearMapData(true);
-    if (
-      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "today") ||
-      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "yesterday") ||
-      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "week") ||
-      (Ignitionreport?.VehicleReg &&
-        Ignitionreport?.VehicleReg &&
-        Ignitionreport?.toDateTime &&
-        Ignitionreport?.fromDateTime)
-    ) {
-      if (session) {
-        const { VehicleReg, period } = await Ignitionreport;
-        if (period == "week") {
-          setWeekData(true);
-        }
-        if (period == "today") {
-          setWeekData(false);
-        }
-        if (VehicleReg && period) {
-          let newdata = {
-            ...Ignitionreport,
-          };
-          const timestart: string = "00:00:00";
-          const timeend: string = "23:59:59";
-          const currentDayOfWeek = new Date().getDay();
-          const currentDay = new Date().getDay();
-          const daysUntilMonday =
-            currentDayOfWeek === currentDay ? 7 : currentDayOfWeek - 1;
-          const fromDateTime = new Date();
-          fromDateTime.setDate(fromDateTime.getDate() - daysUntilMonday);
-          const toDateTime = new Date(fromDateTime);
-          toDateTime.setDate(toDateTime.getDate() + 6);
-          const formattedFromDateTime = formatDate(fromDateTime);
-          const formattedToDateTime = formatDate(toDateTime);
-          if (isCustomPeriod) {
-            newdata = {
-              ...newdata,
-              fromDateTime: `${
-                weekData ? formattedFromDateTime : Ignitionreport.fromDateTime
-              }T${timestart}Z`,
-              toDateTime: `${
-                weekData ? formattedToDateTime : Ignitionreport.toDateTime
-              }T${timeend}Z`,
-            };
-          } else {
-            newdata = {
-              ...newdata,
-              fromDateTime: `${
-                weekData ? formattedFromDateTime : currentDate
-              }T${timestart}Z`,
-              toDateTime: `${
-                weekData ? formattedToDateTime : currentDate
-              }T${timeend}Z`,
-            };
-          }
-          const fromDate: any = new Date(Ignitionreport?.fromDateTime);
-          const toDate: any = new Date(Ignitionreport?.toDateTime);
-
-          const differenceMs = toDate - fromDate;
-
-          const differenceDays = differenceMs / (1000 * 60 * 60 * 24);
-
-          // setIgnitionreport(newdata);
-          // if (
-          //   Ignitionreport.period == "today" ||
-          //   Ignitionreport.period == "yesterday"
-          // ) {
-          //   setTimeout(() => setweekDataGrouped(false), 1000);
-          // }
-          // if (
-          //   Ignitionreport.period == "week" ||
-          //   Ignitionreport.period == "custom"
-          // ) {
-          //   setTimeout(() => setweekDataGrouped(true), 3000);
-          // }
-          if (differenceDays > 5 || differenceDays < 0) {
-            toast.error("please Select 0nly Five Days");
-          } else {
-            try {
-              const response = await toast.promise(
-                TripsByBucketAndVehicleV3({
-                  token: session.accessToken,
-                  payload: newdata,
-                }),
-
-                {
-                  loading: "Loading...",
-                  success: "",
-                  error: "",
-                },
-                {
-                  style: {
-                    border: "1px solid #00B56C",
-                    padding: "16px",
-                    color: "#1A202C",
-                  },
-                  success: {
-                    duration: 10,
-                    iconTheme: {
-                      primary: "#00B56C",
-                      secondary: "#FFFAEE",
-                    },
-                  },
-                  error: {
-                    duration: 10,
-                    iconTheme: {
-                      primary: "#00B56C",
-                      secondary: "#FFFAEE",
-                    },
-                  },
-                }
-              );
-              if (
-                Ignitionreport.period == "today" ||
-                Ignitionreport.period == "yesterday"
-              ) {
-                // setTimeout(() => setweekDataGrouped(false), 1000);
-                setweekDataGrouped(false);
-              }
-              if (
-                Ignitionreport.period == "week" ||
-                Ignitionreport.period == "custom"
-              ) {
-                // setTimeout(() => setweekDataGrouped(true), 3000);
-                setweekDataGrouped(true);
-              }
-              setDataResponse(response?.data);
-
-              if (response.success === true) {
-                toast.success(`${response.message}`, {
-                  style: {
-                    border: "1px solid #00B56C",
-                    padding: "16px",
-                    color: "#1A202C",
-                  },
-                  duration: 4000,
-                  iconTheme: {
-                    primary: "#00B56C",
-                    secondary: "#FFFAEE",
-                  },
-                });
-              } else {
-                toast.error(`${response.message}`, {
-                  style: {
-                    border: "1px solid red",
-                    padding: "16px",
-                    color: "red",
-                  },
-                  iconTheme: {
-                    primary: "red",
-                    secondary: "white",
-                  },
-                });
-              }
-            } catch (error) {
-              console.error(`Error calling API for ${newdata}:`, error);
-            }
+            } catch (error) {}
           }
         }
       }
@@ -1039,10 +841,10 @@ export default function journeyReplayComp() {
     return date.toISOString().slice(0, 10);
   }
 
-  let displayName: any;
   const handleDivClick = async (
     TripStart: TripsByBucket["TripStart"],
-    TripEnd: TripsByBucket["TripEnd"]
+    TripEnd: TripsByBucket["TripEnd"],
+    id: any
   ) => {
     setlat(null);
     setlng(null);
@@ -1065,6 +867,7 @@ export default function journeyReplayComp() {
           ...Ignitionreport,
           fromDateTime: `${TripStart}`,
           toDateTime: `${TripEnd}`,
+          id,
         };
         setLaodingMap(false);
         const TravelHistoryresponseapi = await toast.promise(
@@ -1154,7 +957,200 @@ export default function journeyReplayComp() {
             return moment(a.date).diff(b.date);
           })
         );
-        let stopTimesArray = [];
+        let stopTimesArray: any = [];
+
+        // Iterate over data array
+        for (let i = 0; i < TravelHistoryresponseapi?.data?.length; i++) {
+          var currentData = TravelHistoryresponseapi?.data[i];
+
+          // Check if current car's speed is 0 Mph
+          if (
+            currentData.ignition === 1 &&
+            currentData.trip === 1 &&
+            (currentData.speed === "0 Mph" || currentData.speed === "0 Kph")
+          ) {
+            let timeDiffInSeconds = 0;
+            let nextIndex = i + 1;
+
+            // Include the time difference with consecutive 0 Mph speed data points
+            while (
+              nextIndex < TravelHistoryresponseapi?.data?.length &&
+              (TravelHistoryresponseapi?.data[nextIndex]?.speed === "0 Mph" ||
+                TravelHistoryresponseapi?.data[nextIndex]?.speed === "0 Kph")
+              // &&TravelHistoryresponseapi?.data[nextIndex]?.ignition
+            ) {
+              // if(    TravelHistoryresponseapi?.data[nextIndex]?.ignition === 1 && TravelHistoryresponseapi?.data[nextIndex]?.trip === 1)
+              const currentTime: any = new Date(currentData.date);
+
+              const nextTime: any = new Date(
+                TravelHistoryresponseapi?.data[nextIndex].date
+              );
+
+              timeDiffInSeconds += Math.floor((nextTime - currentTime) / 1000);
+              nextIndex = TravelHistoryresponseapi?.data[nextIndex];
+              nextIndex++;
+            }
+
+            if (timeDiffInSeconds != 0) {
+              i = nextIndex - 1;
+            }
+            if (
+              timeDiffInSeconds == 0 &&
+              (TravelHistoryresponseapi?.data[nextIndex]?.speed !== "0 Mph" ||
+                TravelHistoryresponseapi?.data[nextIndex]?.speed !== "0 Kph") &&
+              nextIndex < TravelHistoryresponseapi?.data?.length
+            ) {
+              const currentTime: any = new Date(currentData.date);
+              const nextTime: any = new Date(
+                TravelHistoryresponseapi?.data[nextIndex].date
+              );
+              timeDiffInSeconds += Math.floor((nextTime - currentTime) / 1000);
+            }
+
+            const minutes = Math.floor(timeDiffInSeconds / 60);
+            const seconds = timeDiffInSeconds % 60;
+
+            // Construct the formatted string
+            const formattedTime = ` ${
+              minutes > 0 ? minutes + "m" : ""
+            } ${seconds}s`;
+
+            // Display the time difference
+            stopTimesArray.push({
+              date: currentData.date,
+              time: formattedTime,
+              address: currentData.address,
+              lat: currentData.lat,
+              lng: currentData.lng,
+            });
+          }
+        }
+        setStopWithSecond(stopTimesArray);
+        setTravelHistoryresponse(TravelHistoryresponseapi.data);
+      }
+    } catch (error) {}
+
+    setLaodingMap(true);
+  };
+
+  const handleDivClickTwo = async (
+    TripStart: TripsByBucket["TripStart"],
+    TripEnd: TripsByBucket["TripEnd"]
+  ) => {
+    setlat(null);
+    setlng(null);
+    setPlayBtn(true);
+    setStopBtn(false);
+    setStopDetailsOpen(true);
+    setIsPlaying(false);
+    setIsPaused(false);
+    setstopVehicle(false);
+    try {
+      setTravelHistoryresponse([]);
+      setIsPauseColor(false);
+      setProgressWidth(0);
+      // if (polylinedata.length > 0) {
+      //   setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
+      // }
+      setCurrentPositionIndex(0);
+      if (session) {
+        let newresponsedata = {
+          ...Ignitionreport,
+          fromDateTime: `${TripStart}`,
+          toDateTime: `${TripEnd}`,
+        };
+        setLaodingMap(false);
+
+        const TravelHistoryresponseapi = await toast.promise(
+          TravelHistoryByBucketV2Two({
+            token: session.accessToken,
+            payload: newresponsedata,
+          }),
+          {
+            loading: "Loading...",
+            success: "",
+            error: "",
+          },
+          {
+            style: {
+              border: "1px solid #00B56C",
+              padding: "16px",
+              color: "#1A202C",
+            },
+            success: {
+              duration: 10,
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            },
+            error: {
+              duration: 10,
+              iconTheme: {
+                primary: "#00B56C",
+                secondary: "#FFFAEE",
+              },
+            },
+          }
+        );
+        // if (session?.unit == "Mile") {
+        //   unit = "Mph";
+        // } else {
+        //   unit = "Kph";
+        // }
+        var stopPoints = [];
+
+        if (session?.unit == "KM") {
+          stopPoints = TravelHistoryresponseapi?.data
+            ?.filter((x: any) => x.speed == "0 Kph")
+            ?.sort((x: any) => x.timeStamp);
+        } else {
+          stopPoints = TravelHistoryresponseapi?.data
+            ?.filter((x: any) => x.speed == "0 Mph")
+            ?.sort((x: any) => x.timeStamp);
+        }
+
+        // displayName = TravelHistoryresponse.map((item) => {
+        //   return item?.address?.display_name;
+        // });
+        var addresses: any = [];
+        if (TravelHistoryresponse)
+          stopPoints?.map(async function (singlePoint: any) {
+            let completeAddress;
+            if (!singlePoint.address?.display_name) {
+              completeAddress = await axios
+                .get(
+                  `http://osm.vtracksolutions.com/nominatim/reverse.php?lat=${singlePoint.lat}&lon=${singlePoint.lng}&zoom=19&format=jsonv2`
+                )
+                .then(async (response: any) => {
+                  return response.data;
+                });
+            } else {
+              completeAddress = singlePoint.address;
+            }
+
+            var record: any = {};
+            record["_id"] = singlePoint._id;
+            record["lat"] = singlePoint.lat;
+            record["lng"] = singlePoint.lng;
+            record["date"] = singlePoint.timeStamp;
+            record["speed"] = singlePoint.speed;
+            record["TimeStamp"] = singlePoint.timeStamp;
+            record["address"] = completeAddress.display_name;
+            if (
+              addresses.filter(
+                (x: any) => x.lat == record.lat && x.lng == record.lng
+              ).length == 0
+            ) {
+              addresses.push(record);
+            }
+          });
+        setstops(
+          addresses.sort((a: any, b: any) => {
+            return moment(a.date).diff(b.date);
+          })
+        );
+        let stopTimesArray: any = [];
 
         // Iterate over data array
         for (let i = 0; i < TravelHistoryresponseapi?.data?.length; i++) {
@@ -1219,148 +1215,18 @@ export default function journeyReplayComp() {
             });
           }
         }
-
         setStopWithSecond(stopTimesArray);
         setTravelHistoryresponse(TravelHistoryresponseapi.data);
       }
-    } catch (error) {
-      console.error(`Error calling API for:`, error);
-    }
-    setLaodingMap(true);
-  };
-  // console.log("stopWithSecond", stopWithSecond);
-  // console.log("stops", stops);
-  const handleDivClickv3 = async (
-    TripStart: TripsByBucket["TripStart"],
-    TripEnd: TripsByBucket["TripEnd"],
-    id: any
-  ) => {
-    setlat(null);
-    setlng(null);
-    setPlayBtn(true);
-    setStopBtn(false);
-    setStopDetailsOpen(true);
-    setIsPlaying(false);
-    setIsPaused(false);
-    setstopVehicle(false);
+    } catch (error) {}
 
-    try {
-      setTravelHistoryresponse([]);
-      setIsPauseColor(false);
-      setProgressWidth(0);
-      // if (polylinedata.length > 0) {
-      //   setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
-      // }
-      setCurrentPositionIndex(0);
-      if (session) {
-        let newresponsedata = {
-          ...Ignitionreport,
-          fromDateTime: `${TripStart}`,
-          toDateTime: `${TripEnd}`,
-          id: id,
-        };
-        setLaodingMap(false);
-        const TravelHistoryresponseapi = await toast.promise(
-          TravelHistoryByBucketV3({
-            token: session.accessToken,
-            payload: newresponsedata,
-          }),
-          {
-            loading: "Loading...",
-            success: "",
-            error: "",
-          },
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
-            },
-            success: {
-              duration: 10,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-            error: {
-              duration: 10,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-          }
-        );
-        // if (session?.unit == "Mile") {
-        //   unit = "Mph";
-        // } else {
-        //   unit = "Kph";
-        // }
-        var stopPoints = [];
-        if (session?.unit == "KM") {
-          stopPoints = TravelHistoryresponseapi.data
-            .filter((x: any) => x.speed == "0 Kph")
-            .sort((x: any) => x.date);
-        } else {
-          stopPoints = TravelHistoryresponseapi.data
-            .filter((x: any) => x.speed == "0 Mph")
-            .sort((x: any) => x.date);
-        }
-        // displayName = TravelHistoryresponse.map((item) => {
-        //   return item?.address?.display_name;
-        // });
-        var addresses: any = [];
-        if (TravelHistoryresponse)
-          stopPoints.map(async function (singlePoint: any) {
-            let completeAddress;
-            if (!singlePoint.address?.display_name) {
-              completeAddress = await axios
-                .get(
-                  `http://osm.vtracksolutions.com/nominatim/reverse.php?lat=${singlePoint.lat}&lon=${singlePoint.lng}&zoom=19&format=jsonv2`
-                )
-                .then(async (response: any) => {
-                  return response.data;
-                });
-            } else {
-              completeAddress = singlePoint.address;
-            }
-
-            var record: any = {};
-            record["_id"] = singlePoint._id;
-            record["lat"] = singlePoint.lat;
-            record["lng"] = singlePoint.lng;
-            record["date"] = singlePoint.date;
-            record["speed"] = singlePoint.speed;
-            record["TimeStamp"] = singlePoint.TimeStamp;
-            record["address"] = completeAddress.display_name;
-            if (
-              addresses.filter(
-                (x: any) => x.lat == record.lat && x.lng == record.lng
-              ).length == 0
-            ) {
-              addresses.push(record);
-            }
-          });
-        setstops(
-          addresses.sort((a: any, b: any) => {
-            return moment(a.date).diff(b.date);
-          })
-        );
-        // }
-
-        setTravelHistoryresponse(TravelHistoryresponseapi.data);
-      }
-    } catch (error) {
-      console.error(`Error calling API for:`, error);
-    }
     setLaodingMap(true);
   };
 
   useEffect(() => {
     if (TravelHistoryresponse && TravelHistoryresponse.length > 0) {
       setPolylinedata(
-        TravelHistoryresponse.map((item: TravelHistoryData) => [
+        TravelHistoryresponse?.map((item: TravelHistoryData) => [
           item.lat,
           item.lng,
         ])
@@ -1382,7 +1248,7 @@ export default function journeyReplayComp() {
       } else {
         unit = "Kph";
       }
-      const stopPoints = TravelHistoryresponse.filter((x) => {
+      const stopPoints = TravelHistoryresponse?.filter((x) => {
         return x.speed === `0 ${unit}`;
       });
 
@@ -1404,9 +1270,7 @@ export default function journeyReplayComp() {
           } else {
             stopDetailsArray.push(point?.address);
           }
-        } catch (error) {
-          console.error("Error fetching zone data:", error);
-        }
+        } catch (error) {}
       }
 
       const seen: Record<string | number, boolean> = {};
@@ -1423,7 +1287,7 @@ export default function journeyReplayComp() {
       setStopDetails(uniqueStopDetailsArray);
     })();
   }, [TravelHistoryresponse]);
-
+  // const item = TravelHistoryresponse[currentPositionIndex];
   const getSpeedAndDistance = () => {
     if (
       currentPositionIndex >= 0 &&
@@ -1584,16 +1448,16 @@ export default function journeyReplayComp() {
   const [lat, setlat] = useState<any>("");
   const [lng, setlng] = useState<any>("");
   const handleClickStopCar = (item: any) => {
-    if (item?.address?.lat === lat) {
+    if (item?.lat === lat) {
       setlat(null);
     } else {
-      setlat(item?.address?.lat);
+      setlat(item?.lat);
     }
 
-    if (item?.address?.lon === lng) {
+    if (item?.lng === lng) {
       setlng(null);
     } else {
-      setlng(item?.address?.lon);
+      setlng(item?.lng);
     }
   };
   const handleChangeValueSlider = (value: any) => {
@@ -1637,19 +1501,19 @@ export default function journeyReplayComp() {
   const groupedData: any = {};
 
   dataresponse?.map((item: any) => {
-    const tripDate = new Date(item.TripStartDateLabel);
+    const tripDate = new Date(item.TripEndDateLabel);
     const dayName = getDayName(tripDate);
-    if (!groupedData[item.TripStartDateLabel]) {
+    if (!groupedData[item.TripEndDateLabel]) {
       // If the date group doesn't exist, create it with an empty array and count set to 1
-      groupedData[item.TripStartDateLabel] = {
+      groupedData[item.TripEndDateLabel] = {
         trips: [item],
         count: 1,
         day: dayName,
       };
     } else {
       // If the date group already exists, push the trip and increment the count
-      groupedData[item.TripStartDateLabel].trips.push(item);
-      groupedData[item.TripStartDateLabel].count += 1;
+      groupedData[item.TripEndDateLabel].trips.push(item);
+      groupedData[item.TripEndDateLabel].count += 1;
     }
   });
   const options =
@@ -2132,6 +1996,21 @@ export default function journeyReplayComp() {
                 <button>Search</button>
               </div>
             </div>
+            <button
+              style={{
+                marginLeft: "40%",
+                backgroundColor: "green",
+                color: "white",
+              }}
+              onClick={() =>
+                handleDivClickTwo(
+                  "2024-06-20T00:00:00.000",
+                  "2024-06-20T23:59:59.999"
+                )
+              }
+            >
+              SEARCH
+            </button>
             {/* <div
               onClick={handleSubmitTwo}
               className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    search_btn_journey
@@ -2198,7 +2077,7 @@ export default function journeyReplayComp() {
           <div className="xl:col-span-3 lg:col-span-1 md:col-span-12 col-span-12 journey_replay_harsh">
             {" "}
           </div>
-          {TravelHistoryresponse.length > 0 && (
+          {TravelHistoryresponse?.length > 0 && (
             <div className="xl:col-span-1 lg:col-span-2  md:col-span-12 col-span-6  -mt-1 journey_replay_harsh_child  ">
               <div className="grid grid-cols-12  ">
                 <div className="col-span-2">
@@ -2218,7 +2097,7 @@ export default function journeyReplayComp() {
             </div>
           )}
           <div className="xl:col-span-1  lg:col-span-2 md:col-span-1 col-span-6 mt-1 -ms-5 mb-3 journey_replay_harsh_acce">
-            {TravelHistoryresponse.filter((item: any) => {
+            {TravelHistoryresponse?.filter((item: any) => {
               return (
                 item.vehicleEvents.filter(
                   (items: any) => items.Event === "HarshAcceleration"
@@ -2248,7 +2127,7 @@ export default function journeyReplayComp() {
               </div>
             )}
 
-            {TravelHistoryresponse.filter((item: any) => {
+            {TravelHistoryresponse?.filter((item: any) => {
               return (
                 item.vehicleEvents.filter(
                   (items: any) => items.Event == "HarshBreak"
@@ -2339,7 +2218,8 @@ export default function journeyReplayComp() {
                                   onClick={() =>
                                     handleDivClick(
                                       item.fromDateTime,
-                                      item.toDateTime
+                                      item.toDateTime,
+                                      item.id
                                     )
                                   }
                                   className="border-b hover:bg-[#e1f0e3]"
@@ -2555,16 +2435,9 @@ export default function journeyReplayComp() {
                   )
                 : dataresponse?.map((item: TripsByBucket, index: number) => (
                     <button
-                      key={index}
-                      // className=" my-2 "
-                      // onClick={() =>
-                      //   handleDivClickv3(item.fromDateTime, item.toDateTime)
-                      // }
                       onClick={() => {
                         travelV2 &&
-                          handleDivClick(item.fromDateTime, item.toDateTime);
-                        travelV3 &&
-                          handleDivClickv3(
+                          handleDivClick(
                             item.fromDateTime,
                             item.toDateTime,
                             item.id
@@ -2905,7 +2778,7 @@ export default function journeyReplayComp() {
                       }
                     ></Marker>
                   )}
-                  {TravelHistoryresponse.length > 0 && (
+                  {TravelHistoryresponse?.length > 0 && (
                     <div>
                       {loadingMap ? (
                         <Marker
@@ -2930,10 +2803,10 @@ export default function journeyReplayComp() {
                         <Marker
                           position={[
                             TravelHistoryresponse[
-                              TravelHistoryresponse.length - 1
+                              TravelHistoryresponse?.length - 1
                             ].lat,
                             TravelHistoryresponse[
-                              TravelHistoryresponse.length - 1
+                              TravelHistoryresponse?.length - 1
                             ].lng,
                           ]}
                           icon={
@@ -2951,7 +2824,7 @@ export default function journeyReplayComp() {
                     </div>
                   )}
 
-                  {TravelHistoryresponse.map((item) => {
+                  {TravelHistoryresponse?.map((item) => {
                     if (item.vehicleEvents.length > 0) {
                       return item.vehicleEvents.map((items) => {
                         if (items.Event === "HarshBreak") {
@@ -3128,7 +3001,7 @@ export default function journeyReplayComp() {
                   </button>
                 </div>
               </div> */}
-              {zoneList !== null && zoneList.length > 0 && (
+              {zoneList?.length > 0 ? (
                 <div
                   className="grid grid-cols-1 absolute lg:top-10 xl:top-1 md:top-10 top-0 xl:right-10 lg:right-10 md:right-10 sm:right-10 right-1  bg-bgLight py-2 px-2 show_zone_journey_replay"
                   style={{
@@ -3209,12 +3082,11 @@ export default function journeyReplayComp() {
                     </>
                   )}
                 </div>
+              ) : (
+                ""
               )}
             </div>
-            <div
-              className="grid lg:grid-cols-10  grid-cols-10"
-              id="speed_meter"
-            >
+            <div className="grid lg:grid-cols-10 grid-cols-10" id="speed_meter">
               <div className="col-span-2  lg:w-52 md:w-44 sm:w-44 w-48 rounded-md ">
                 {isPlaying || isPaused ? (
                   <div>
@@ -3232,9 +3104,9 @@ export default function journeyReplayComp() {
                     /> */}
                     <Speedometer
                       value={
-                        getSpeedAndDistance()?.speed.includes("Mph")
-                          ? getSpeedAndDistance()?.speed.replace("Mph", "")
-                          : getSpeedAndDistance()?.speed.replace("Kph", "")
+                        getSpeedAndDistance()?.speed?.includes("Mph")
+                          ? getSpeedAndDistance()?.speed?.replace("Mph", "")
+                          : getSpeedAndDistance()?.speed?.replace("Kph", "")
                       }
                       max={140}
                       angle={160}

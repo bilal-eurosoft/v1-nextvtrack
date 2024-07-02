@@ -74,7 +74,6 @@ export default function Notifications() {
             clientId: session?.clientId,
           });
           setEventsp(data);
-          console.log("data ", data);
         }
       } catch (error) {
         console.error("Error fetching zone data:", error);
@@ -140,8 +139,6 @@ export default function Notifications() {
           };
 
           setNotifications(notifications);
-
-          console.log("client data ", notifications);
         }
       } catch (error) {
         console.error("Error fetching zone data:", error);
@@ -160,7 +157,6 @@ export default function Notifications() {
           clientId: session?.clientId,
           payload: eventsp,
         });
-        console.log("set response for events permission is ", response1);
 
         // Call updateNotifications function
         const response2 = await clientsave({
@@ -168,7 +164,6 @@ export default function Notifications() {
           clientId: session.clientId,
           payload: notifications,
         });
-        console.log("set response for notifications is ", response2);
         toast("save Data Successfully");
       }
     } catch (error) {
@@ -210,7 +205,6 @@ export default function Notifications() {
   // }
 
   const handleEventsPermissionChange = async (e: any) => {
-    console.log("eeee ", e.target);
     const { name, checked } = e.target;
 
     if (name === "geofence") {

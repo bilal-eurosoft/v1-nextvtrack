@@ -72,7 +72,7 @@ export default function AddZoneComp() {
     zoneShortName: "",
     zoneType: "",
     latlngCordinates: "",
-    label: "",
+    GeoFenceType: "",
   });
   const [addresses, setAddresses] = useState<Address[]>([]);
   const router = useRouter();
@@ -250,13 +250,13 @@ export default function AddZoneComp() {
     setForm({ ...Form, [name]: value });
   };
   const handleChangeSelectValue = (e: any) => {
-    const { label, value } = e;
-    setForm({ ...Form, label: value });
+    const { value } = e;
+    setForm({ ...Form, GeoFenceType: value });
     // if (value === "Restricted-Area") {
     //   setForm({ ...Form, label: value });
     // }
   };
-
+  console.log("form", Form);
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -265,7 +265,7 @@ export default function AddZoneComp() {
       !Form.latlngCordinates ||
       !Form.zoneName ||
       !Form.zoneShortName ||
-      !Form.label
+      !Form.GeoFenceType
     ) {
       toast.error("Please Select All Field");
       return;

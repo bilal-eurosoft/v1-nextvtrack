@@ -191,9 +191,7 @@ export default function DriverProfile() {
   const [getAllAsignData, setgetAllAsignData] = useState<any>([]);
   const [selectedDriver, setSelectedDriver] = useState<any>({});
   const [selectVehicleNum, setSelectVehicleNum] = useState<any>({});
-
   const vehicleName = async () => {
-    // console.log("selected", selectedDriver);
     try {
       // setLaoding(true);
       if (session) {
@@ -201,6 +199,7 @@ export default function DriverProfile() {
           token: session?.accessToken,
           clientId: session?.clientId,
         });
+
         setDriverList(
           response.filter(
             (item: any) => item.isAvailable == true && item.isDeleted === false
@@ -695,7 +694,7 @@ export default function DriverProfile() {
                     id="table_head"
                     className="font-popins  font-bold text-black"
                   >
-                    Driver Number
+                    Driver Contact
                   </TableCell>
                   <TableCell
                     align="center"
@@ -732,9 +731,9 @@ export default function DriverProfile() {
                     <TableCell align="center" colSpan={2}>
                       {page * rowsPerPage + index + 1}
                     </TableCell>
-                    <TableCell align="center" colSpan={2}>
+                    {/* <TableCell align="center" colSpan={2}>
                       {row?.DriverDetails?.driverNo}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell align="center" colSpan={2}>
                       {" "}
                       {row?.DriverDetails?.driverfirstName}
@@ -751,8 +750,16 @@ export default function DriverProfile() {
                       {/* </TableCell> */}
                       {/* <TableCell>{row?.DriverDetails?.driverIdNo}</TableCell> */}
                       {/* <TableCell align="center"> */}
-                      {row?.DriverDetails?.driverContact}
+                      {/* {row?.DriverDetails?.driverContact} */}
                     </TableCell>
+
+                    <TableCell align="center" colSpan={2}>
+                      {row?.DriverDetails?.driverContact}
+                      {/* </TableCell> */}
+                      {/* <TableCell>{row?.DriverDetails?.driverIdNo}</TableCell> */}
+                      {/* <TableCell align="center"> */}{" "}
+                    </TableCell>
+
                     <TableCell align="center" colSpan={2}>
                       {row?.vehicleDetails?.vehicleReg}
                     </TableCell>

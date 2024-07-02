@@ -283,14 +283,7 @@ export default function Reports() {
       if (session) {
         const { reportType, VehicleReg, period } = Ignitionreport;
         if (period === "today") {
-          const today = moment().tz(
-            session?.timezone === "Australia/Sydney" ||
-              session?.timezone === "America/Winnipeg" ||
-              session?.timezone === "Europe/London" ||
-              session?.timezone === "Asia/Karachi"
-              ? session?.timezone
-              : ""
-          );
+          const today = moment().tz(session?.timezone);
           startDateTime =
             today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
@@ -707,7 +700,7 @@ export default function Reports() {
         }
         if (period === "week") {
           const startOfWeek = moment()
-            .subtract(6, "days")
+            .subtract(7, "days")
             .startOf("day")
             .tz(session?.timezone);
           const oneday = moment().subtract(1, "day");
@@ -866,7 +859,6 @@ export default function Reports() {
       }
     }
   };
-
   // suraksha code
   function calculateTotalDurationAndDistance(data: TripsByBucket[]): {
     duration: string;

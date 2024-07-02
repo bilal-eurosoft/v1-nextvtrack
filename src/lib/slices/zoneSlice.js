@@ -82,7 +82,6 @@ export const vehicleClientById = createAsyncThunk(
   async (args, thunkAPI) => {
     try {
       const data = await debouncedFetchVehicle(args);
-      console.log("Data:", data);
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);

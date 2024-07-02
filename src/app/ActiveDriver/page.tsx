@@ -424,7 +424,7 @@ export default function DriverProfile() {
                   colSpan={2}
                   id="table_head_inactive"
                 >
-                  Driver Contact.NO
+                  Driver Contact
                 </TableCell>
                 <TableCell
                   align="center"

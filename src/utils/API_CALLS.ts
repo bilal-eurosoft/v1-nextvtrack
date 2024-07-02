@@ -4,7 +4,8 @@ import axios from "axios";
 import { Events, Notifications } from "@/types/events";
 import { error } from "console";
 var URL = "https://backend.vtracksolutions.com";
-// var URL = 'http://172.16.10.47:80'
+// var localIp = "http://172.16.11.220";
+// var URL = "http://172.16.10.47:80/";
 
 // surakhSha api
 // "http0";
@@ -1101,9 +1102,61 @@ export async function postZoneDataByClientId({
   }
 }
 
+// bilal work
+// export async function getGprsCommandLatest({
+//   token,
+//   // payload,
+// }: {
+//   token: string;
+//   // payload: commandrequest;
+// }) {
+//   try {
+//     const response = await fetch(`http://172.16.10.99:3001/GetLatestGprsCommand`, {
+//       headers: {
+//         accept: "application/json, text/plain, */*",
+//         authorization: `Bearer ${token}`,
+//         "content-type": "application/json",
+//       },
+//       // body: JSON.stringify(payload),
+//       method: "POST",
+//     });
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch data from the API");
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.log("Error fetching data");
+//     return [];
+//   }
+// }
+
+export async function responsegprs({ token }: { token: string }) {
+  try {
+    const response = await fetch(
+      `http://172.16.10.46:80/gprscommands/most-recent`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        method: "POST", // Adjust the method according to your API's requirement
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log("Error fetching data", error);
+    return null;
+  }
+}
+
 export async function zoneDelete({ token, id }: { token: any; id: string }) {
   try {
-    console.log("before api", id);
     const response = await fetch(`${URL}/zoneDelete`, {
       headers: {
         accept: "application/json, text/plain, */*",
@@ -1162,35 +1215,6 @@ export async function TripsByBucketAndVehicle({
   payload: replayreport;
 }) {
   try {
-    const response = await fetch(`${URL}/v2/TripsByBucketAndVehicleV2`, {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    return [];
-  }
-}
-
-export async function TripsByBucketAndVehicleV3({
-  token,
-  payload,
-}: {
-  token: string;
-  payload: replayreport;
-}) {
-  try {
     const response = await fetch(`${URL}/v3/TripsByBucketAndVehicleV2`, {
       method: "POST",
       headers: {
@@ -1211,38 +1235,37 @@ export async function TripsByBucketAndVehicleV3({
     return [];
   }
 }
-
-export async function TravelHistoryByBucketV2({
+export async function portalGprsCommand({
   token,
   payload,
 }: {
   token: string;
-  payload: replayreport;
+  payload: any;
 }) {
   try {
-    const response = await fetch(`${URL}/v2/TravelHistoryByBucketV2`, {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
+    const response = await fetch(
+      `http://172.16.10.99:3001/portal/GprsCommand`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        method: "POST",
+      }
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
     }
-
     const data = await response.json();
-
     return data;
   } catch (error) {
-    console.error("Error fetching data", error);
+    console.log("Error fetching data");
     return [];
   }
 }
-export async function TravelHistoryByBucketV3({
+export async function TravelHistoryByBucketV2({
   token,
   payload,
 }: {
@@ -1259,6 +1282,37 @@ export async function TravelHistoryByBucketV3({
       },
       body: JSON.stringify(payload),
     });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+export async function TravelHistoryByBucketV2Two({
+  token,
+  payload,
+}: {
+  token: string;
+  payload: replayreport;
+}) {
+  try {
+    const response = await fetch(
+      `http://172.16.10.47:80/v2/getdataofvehiclebydate`,
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
@@ -1331,9 +1385,7 @@ export async function getCurrentAddress({
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
     }
-
     const data = await response.json();
-
     return data;
   } catch (error) {
     console.error("Error fetching data", error);
