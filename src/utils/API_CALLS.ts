@@ -4,8 +4,8 @@ import { commandrequest } from "@/types/commandrequest";
 import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
 import { error } from "console";
-var URL = "https://backend.vtracksolutions.com";
-// var URL = 'http://172.16.10.47:80'
+// var URL = "https://backend.vtracksolutions.com";
+var URL = 'http://172.16.10.99:3001'
 
 // surakhSha api
 // "http0";
@@ -140,7 +140,7 @@ export async function portalGprsCommand({
   payload: commandrequest;
 }) {
   try {
-    const response = await fetch(`${URL}/portal/GprsCommand`, {
+    const response = await fetch(`http://172.16.10.99:3001/portal/GprsCommand`, {
       headers: {
         accept: "application/json, text/plain, */*",
         authorization: `Bearer ${token}`,
@@ -159,6 +159,62 @@ export async function portalGprsCommand({
     return [];
   }
 }
+
+// bilal work
+export async function getGprsCommandLatest({
+  token,
+  // payload,
+}: {
+  token: string;
+  // payload: commandrequest;
+}) {
+  try {
+    const response = await fetch(`http://172.16.10.99:3001/GetLatestGprsCommand`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      // body: JSON.stringify(payload),
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log("Error fetching data");
+    return [];
+  }
+}
+
+export async function responsegprs({  token
+}: {
+  token: string;
+}) {
+  try {
+    const response = await fetch(`http://172.16.10.46:80/gprscommands/most-recent`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      method: "POST", // Adjust the method according to your API's requirement
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log("Error fetching data", error);
+    return null;
+  }
+}
+
+
+
 
 
 
@@ -250,7 +306,7 @@ export async function clientbyClientid({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    console.log("data", data);
+    // console.log("data", data);
     return data;
   } catch (error) {
     console.log("Error fetching data");
@@ -335,7 +391,7 @@ export async function vehiclebyClientid({
   clientId: string;
 }) {
   try {
-    const response = await fetch(`http://hammadserver/getDualCamVehicleByclientId`, {
+    const response = await fetch(`http://172.16.10.99:3001/getDualCamVehicleByclientId`, {
       headers: {
         accept: "application/json, text/plain, */*",
         authorization: `Bearer ${token}`,
@@ -348,7 +404,7 @@ export async function vehiclebyClientid({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    console.log("data", data);
+    // console.log("data", data);
     return data;
   } catch (error) {
     console.log("Error fetching data");
@@ -369,7 +425,7 @@ export async function IgnitionReportByTrip({
   payload: IgnitionReport;
 }) {
   try {
-    const response = await fetch(`${URL}/Report/IgnitionReport`, {
+    const response = await fetch(`http://172.16.10.46:80/Report/IgnitionReport`, {
       method: "POST",
       headers: {
         accept: "application/json, text/plain, */*",
@@ -384,7 +440,7 @@ export async function IgnitionReportByTrip({
     }
 
     const data = await response.json();
-    console.log("data", data);
+    // console.log("data", data);
     return data;
   } catch (error) {
     console.error("Error fetching data", error);
@@ -536,7 +592,7 @@ export async function videoList({
   clientId: string;
 }) {
   try {
-    const response = await fetch(`${URL}/videolistbyId`, {
+    const response = await fetch(`http://172.16.10.99:3001/videolistbyId`, {
       headers: {
         accept: "application/json, text/plain, */*",
         authorization: `Bearer ${token}`,
@@ -549,7 +605,7 @@ export async function videoList({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    console.log("data", data);
+    // console.log("data", data);
     return data;
   } catch (error) {
     console.log("Error fetching data");
@@ -779,7 +835,7 @@ export async function postDriverDataAssignByClientId({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    console.log("dataAssign", data);
+    // console.log("dataAssign", data);
     return data;
   } catch (error) {
     console.log("Error fetching data", error);
@@ -810,7 +866,7 @@ export async function postDriverDeDataAssignByClientId({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    console.log("dataAssign", data);
+    // console.log("dataAssign", data);
     return data;
   } catch (error) {
     console.log("Error fetching data", error);
@@ -1317,7 +1373,7 @@ export async function TripAddress({
     }
 
     const data = await response.json();
-    console.log("data", data);
+    // console.log("data", data);
     return data;
   } catch (error) {
     console.error("Error fetching data", error);

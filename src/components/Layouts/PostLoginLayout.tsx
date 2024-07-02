@@ -400,12 +400,18 @@ export default function RootLayout({
  {session?.cameraProfile && (
  <Link href="/DualCam">
  <Tooltip
-   className="bg-white  text-[#00B56C] shadow-lg rounded"
+   className="bg-[#00B56C] text-white shadow-lg rounded"
    placement="right"
    content="Camera"
  >
    <svg
-                          className="w-20 h-12 py-2  text-white-10  dark:text-white cursor-pointer"
+                          className={`w-20 h-14 py-3  text-white-10  dark:text-white 
+                
+                          ${
+                            pathname === "/DualCam"
+                              ? "border-r-2 border-#29303b -my-1"
+                              : "border-y-1 border-b-2"
+                          }`}
                           width="24"
                           height="24"
                           viewBox="0 0 24 24"
@@ -415,20 +421,10 @@ export default function RootLayout({
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           style={{
-                            color:
-                              pathname == "/DualCam" || pathname == "/DualCam"
-                                ? "green"
-                                : "white",
-                            backgroundColor:
-                              pathname == "/DualCam" || pathname == "/DualCam"
-                                ? "white"
-                                : "",
-
-                            border:
-                              pathname == "/DualCam" || pathname == "/DualCam"
-                                ? "none"
-                                : "",
+                            color: pathname == "/DualCam" ? "green" : "white",
+                            backgroundColor: pathname == "/DualCam" ? "white" : "",
                           }}
+                      
                         >
                           {" "}
                           <path stroke="none" d="M0 0h24v24H0z" />{" "}
@@ -590,13 +586,16 @@ export default function RootLayout({
             </Link>
             <Link href="/Notifications">
               <Tooltip
-                className="bg-white  text-[#00B56C] shadow-lg rounded"
+                className="bg-[#00B56C] text-white shadow-lg rounded"
                 placement="right"
                 content="Events and Notifications"
               >
                 <svg
-  className={`w-20 h-14 py-3 -my-1 text-white-10 dark:text-white ${
-    session?.userRole === "Controller" ? "border-b-2 border-white" : ""
+  className={`w-20 h-14 py-3 
+  text-white-10  dark:text-white  ${
+    pathname === "/Notifications"
+      ? "border-r-2 border-#29303b -my-1"
+      : "border-y-1 border-b-2"
   }`}
   viewBox="0 0 24 24"
   fill="none"
@@ -609,8 +608,8 @@ export default function RootLayout({
     backgroundColor: pathname === "/Notifications" ? "white" : "",
   }}
 >
-<path d="M9.5 19C8.89555 19 7.01237 19 5.61714 19C4.87375 19 4.39116 18.2177 4.72361 17.5528L5.57771 15.8446C5.85542 15.2892 6 14.6774 6 14.0564C6 13.2867 6 12.1434 6 11C6 9 7 5 12 5C17 5 18 9 18 11C18 12.1434 18 13.2867 18 14.0564C18 14.6774 18.1446 15.2892 18.4223 15.8446L19.2764 17.5528C19.6088 18.2177 19.1253 19 18.382 19H14.5M9.5 19C9.5 21 10.5 22 12 22C13.5 22 14.5 21 14.5 19M9.5 19C11.0621 19 14.5 19 14.5 19" stroke="#000000" stroke-linejoin="round"/>
-<path d="M12 5V3" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<path d="M9.5 19C8.89555 19 7.01237 19 5.61714 19C4.87375 19 4.39116 18.2177 4.72361 17.5528L5.57771 15.8446C5.85542 15.2892 6 14.6774 6 14.0564C6 13.2867 6 12.1434 6 11C6 9 7 5 12 5C17 5 18 9 18 11C18 12.1434 18 13.2867 18 14.0564C18 14.6774 18.1446 15.2892 18.4223 15.8446L19.2764 17.5528C19.6088 18.2177 19.1253 19 18.382 19H14.5M9.5 19C9.5 21 10.5 22 12 22C13.5 22 14.5 21 14.5 19M9.5 19C11.0621 19 14.5 19 14.5 19"  stroke-linejoin="round"/>
+<path d="M12 5V3"  stroke-linecap="round" stroke-linejoin="round"/></svg>
               </Tooltip>
             </Link>
 
@@ -1055,97 +1054,40 @@ export default function RootLayout({
                         session?.userRole == "Admin") && (
                         <div>
                           {session?.cameraProfile && (
-                            <Popover placement="right-start">
-                              {/* <Link href="/DriverProfile"> */}
-                              {/* <Link href={pathname ? "/DriverProfile" : "/DriverAssign"}> */}
-                              <Tooltip
-                                className="bg-[#00B56C] text-white shadow-lg rounded border-none"
-                                placement="right"
-                                content="Camera"
-                              >
-                                <PopoverHandler>
-                                  <svg
-                                    className="w-14 h-12 py-2  text-white-10  dark:text-white cursor-pointer"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth="2"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    style={{
-                                      color:
-                                        pathname == "/DualCam" ||
-                                        pathname == "/DualCam"
-                                          ? "green"
-                                          : "white",
-                                      backgroundColor:
-                                        pathname == "/DualCam" ||
-                                        pathname == "/DualCam"
-                                          ? "white"
-                                          : "",
-
-                                      border:
-                                        pathname == "/DualCam" ||
-                                        pathname == "/DualCam"
-                                          ? "none"
-                                          : "",
-                                    }}
-                                  >
-                                    {" "}
-                                    <path
-                                      stroke="none"
-                                      d="M0 0h24v24H0z"
-                                    />{" "}
-                                    <circle cx="6" cy="6" r="2" />{" "}
-                                    <circle cx="18" cy="18" r="2" />{" "}
-                                    <path d="M11 6h5a2 2 0 0 1 2 2v8" />{" "}
-                                    <polyline points="14 9 11 6 14 3" />{" "}
-                                    <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />{" "}
-                                    <polyline points="10 15 13 18 10 21" />
-                                  </svg>
-                                </PopoverHandler>
-                              </Tooltip>
-                              <PopoverContent className="border-none cursor-pointer bg-green">
-                                {/* <Link className="w-full text-white" href="/DriverProfile">
-                  Driver Profile
-                </Link> */}
-                                <Link
-                                  className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
-                                  href="/DualCam"
-                                  style={{
-                                    color:
-                                      pathname == "/DualCam"
-                                        ? "black"
-                                        : "white",
-                                    backgroundColor:
-                                      pathname == "/DualCam" ? "white" : "",
-                                  }}
-                                >
-                                  Get Image And Video
-                                </Link>
-                                <br></br>
-                                <br></br>
-
-                                <Link
-                                  className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
-                                  href="/DualCam"
-                                  // style={{
-                                  //   color: pathname == "/DualCam" ? "black" : "white",
-                                  //   backgroundColor: pathname == "/DualCam" ? "white" : "",
-                                  // }}
-                                >
-                                  View Image And Video
-                                </Link>
-                                <br></br>
-                              </PopoverContent>
-
-                              {/* </Link> */}
-                            </Popover>
+                             <Link href="/DualCam">
+                             <Tooltip
+                               className="bg-[#00B56C] text-white shadow-lg rounded"
+                               placement="right"
+                               content="Camera"
+                             >
+                              <svg
+                              className="w-14 h-12 py-2  text-[white]  text-white-10  dark:text-white cursor-pointer"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              strokeWidth="2"
+                              stroke="currentColor"
+                              fill="none"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              {" "}
+                              <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                              <circle cx="6" cy="6" r="2" />{" "}
+                              <circle cx="18" cy="18" r="2" />{" "}
+                              <path d="M11 6h5a2 2 0 0 1 2 2v8" />{" "}
+                              <polyline points="14 9 11 6 14 3" />{" "}
+                              <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />{" "}
+                              <polyline points="10 15 13 18 10 21" />
+                            </svg>
+                             </Tooltip>
+                           </Link>
+                          
                           )}
                         </div>
                       )}
+
+                      
                       <Link href="/Reports">
                         <Tooltip
                           className="bg-[#00B56C] text-white shadow-lg rounded"

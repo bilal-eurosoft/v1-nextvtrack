@@ -27,7 +27,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: gray;
+  background: #29303b;
   border-radius: 7px;
 }
 #zone_hover {

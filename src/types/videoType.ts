@@ -18,6 +18,8 @@ export type alldata = {
 };
 
 export type pictureVideoDataOfVehicleT = {
+    cameraType: String;
+    status: String;
     Vehicle: String;
     clientId: String;
     dateTime: Date,

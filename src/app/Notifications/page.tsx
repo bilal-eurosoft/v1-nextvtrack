@@ -222,7 +222,7 @@ export default function Notifications() {
           style={{accentColor: "green"}}
           className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded dark:focus:ring-green-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600 ml-4 "
         />
-    <label className="text-green" style={{fontSize: "23px"}}> Ignition On</label>   
+    <span className="text-green" style={{fontSize: "23px"}}> Ignition On</span>   
     <div className="flex flex-wrap mb-4">
       
     <Card 
@@ -294,7 +294,7 @@ export default function Notifications() {
           style={{accentColor: "green"}}
           className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
         />
-    <label className="text-green  pt-4" style={{fontSize: "23px", paddingTop: "10px"}}> Ignition Off</label>
+    <span className="text-green  pt-4" style={{fontSize: "23px", paddingTop: "10px"}}> Ignition Off</span>
     <div className="flex flex-wrap mb-4">
     <Card 
     style={{borderBottom: "none !important"}}
@@ -313,7 +313,7 @@ export default function Notifications() {
         style={{accentColor: "green"}}
         className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded dark:focus:ring-green-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600 ml-4"
       />
-      <span style={{fontSize: "21px"}}>  Push Notification </span>
+      <span style={{fontSize: "21px"}}> Push Notification </span>
     </Typography>
   </CardContent>
 </Card>
@@ -368,7 +368,7 @@ export default function Notifications() {
           style={{accentColor: "green"}}
           className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           />
-    <label className="text-green"style={{fontSize: "23px"}}> Geofence</label>
+    <span className="text-green"style={{fontSize: "23px"}}> Geofence</span>
     <div className="flex flex-wrap mb-4">
           <Card 
   className={`w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 p-2 transition-all duration-300 ease-in-out transform hover:bg-gray-300 hover:shadow-2xl hover:scale-105 ${
@@ -383,8 +383,9 @@ export default function Notifications() {
           onChange={handleEventsPermissionChange}
           style={{accentColor: "green"}}
           disabled={!eventsp.targetEnteredZone && !eventsp.targetLeftZone}
-          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600"
-          /> <span style={{fontSize: "21px"}}> Push Notification </span>
+          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
+          /> 
+           <span style={{fontSize: "21px"}}>  Push Notification </span>
           </Typography>
         </CardContent>
       </Card>
@@ -401,7 +402,7 @@ export default function Notifications() {
           onChange={handleEventsPermissionChange}
           disabled={!eventsp.targetEnteredZone && !eventsp.targetLeftZone}
           style={{accentColor: "green"}}
-          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600"
+          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           />
         <span style={{fontSize: "21px"}}> SMS</span>
           </Typography>
@@ -420,7 +421,7 @@ export default function Notifications() {
           onChange={handleEventsPermissionChange}
           style={{accentColor: "green"}}
           disabled={!eventsp.targetEnteredZone && !eventsp.targetLeftZone}
-          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600"
+          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           />
            <span style={{fontSize: "21px"}}> Email </span>
           </Typography>
@@ -439,7 +440,7 @@ export default function Notifications() {
           style={{accentColor: "green"}}
           className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           />
-    <label className="text-green "style={{fontSize: "23px"}}> Over Speed</label>
+    <span className="text-green "style={{fontSize: "23px"}}> Over Speed</span>
     <div className="flex flex-wrap mb-4">
              <Card 
   className={`w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 p-2 transition-all duration-300 ease-in-out transform hover:bg-gray-300 hover:shadow-2xl hover:scale-105 ${
@@ -454,7 +455,7 @@ export default function Notifications() {
           onChange={handleEventsPermissionChange}
           disabled={!eventsp.overSpeeding}
           style={{accentColor: "green"}}
-          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 "
+          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           />
             <span style={{fontSize: "21px"}}> Push Notification</span>
           </Typography>
@@ -473,7 +474,7 @@ export default function Notifications() {
           onChange={handleEventsPermissionChange}
           disabled={!eventsp.overSpeeding}
           style={{accentColor: "green"}}
-          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600"
+          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           />   <span style={{fontSize: "21px"}}>SMS</span>
           </Typography>
         </CardContent>
@@ -491,7 +492,7 @@ export default function Notifications() {
           onChange={handleEventsPermissionChange}
           disabled={!eventsp.overSpeeding}
           style={{accentColor: "green"}}
-          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 "
+          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           />
          <span style={{fontSize: "21px"}}> Email</span>
           </Typography>
@@ -510,7 +511,7 @@ export default function Notifications() {
           style={{accentColor: "green"}}
           className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
         />
-    <label className="text-green "style={{fontSize: "23px"}}> Harsh Break</label>
+    <span className="text-green "style={{fontSize: "23px"}}> Harsh Break</span>
     <div className="flex flex-wrap mb-4">
           <Card 
   className={`w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 p-2 transition-all duration-300 ease-in-out transform hover:bg-gray-300 hover:shadow-2xl hover:scale-105 ${
@@ -527,7 +528,7 @@ export default function Notifications() {
           style={{accentColor: "green"}}
           className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           />
-          <span style={{fontSize: "21px"}}>   Push Notification </span>
+          <span style={{fontSize: "21px"}}> Push Notification </span>
           </Typography>
         </CardContent>
       </Card>
@@ -578,7 +579,7 @@ export default function Notifications() {
           style={{accentColor: "green"}}
           className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
         />
-    <label className="text-green "style={{fontSize: "23px"}}> Harsh Cornering</label>
+    <span className="text-green "style={{fontSize: "23px"}}> Harsh Cornering</span>
     <div className="flex flex-wrap mb-4">
            <Card 
   className={`w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 p-2 transition-all duration-300 ease-in-out transform hover:bg-gray-300 hover:shadow-2xl hover:scale-105 ${
@@ -631,7 +632,7 @@ export default function Notifications() {
           onChange={handleEventsPermissionChange}
           disabled={!eventsp.harshCornering} 
           style={{accentColor: "green"}}
-          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600"
+          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           /> <span style={{fontSize: "21px"}}> Email </span>
           </Typography>
         </CardContent>
@@ -648,7 +649,7 @@ export default function Notifications() {
           style={{accentColor: "green"}}
           className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           />
-    <label className="text-green"style={{fontSize: "23px"}}> Harsh Acceleration</label>
+    <span className="text-green"style={{fontSize: "23px"}}> Harsh Acceleration</span>
     <div className="flex flex-wrap mb-4">
             <Card 
   className={`w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 p-2 transition-all duration-300 ease-in-out transform hover:bg-gray-300 hover:shadow-2xl hover:scale-105 ${
@@ -663,7 +664,7 @@ export default function Notifications() {
           onChange={handleEventsPermissionChange}
           disabled={!eventsp.harshAcceleration }
           style={{accentColor: "green"}}
-          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 "
+          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           />
         <span style={{fontSize: "21px"}}>  Push Notification </span>
           </Typography>
@@ -682,7 +683,7 @@ export default function Notifications() {
           onChange={handleEventsPermissionChange}
           disabled={!eventsp.harshAcceleration }
           style={{accentColor: "green"}}
-          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 "
+          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           />
           <span style={{fontSize: "21px"}}>  SMS </span>
           </Typography>
@@ -701,7 +702,7 @@ export default function Notifications() {
           onChange={handleEventsPermissionChange}
           disabled={!eventsp.harshAcceleration }
           style={{accentColor: "green"}}
-          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600"
+          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 ml-4"
           />
         <span style={{fontSize: "21px"}}>  Email </span>
           </Typography>
@@ -710,63 +711,21 @@ export default function Notifications() {
     </div>
   </div>
  
-  
-  {/* 8th */}
-  {/* <div>
-  <input
-          type="checkbox"
-          name="targetLeftZone"
-          checked={eventsp.targetLeftZone}
-          onChange={handleEventsPermissionChange}
-        />
-    <label className="text-green ml-4">Target Left Zone</label>
-    <div className="flex flex-wrap">
-    <Card 
-      className={`w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 p-2 hover:bg-gray-100 ${
-      !eventsp.targetLeftZone ? "disabled" : "" 
-    }`}>
-        <CardContent>
-          <Typography variant="h5" component="div">
-            <Checkbox disabled={!eventsp.targetLeftZone}/> Push Notification
-          </Typography>
-        </CardContent>
-      </Card>
-      <Card 
-      className={`w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 p-2 hover:bg-gray-100 ${
-      !eventsp.targetLeftZone ? "disabled" : "" 
-    }`}>
-        <CardContent>
-          <Typography variant="h5" component="div">
-            <Checkbox disabled={!eventsp.targetLeftZone} /> SMS
-          </Typography>
-        </CardContent>
-      </Card>
-      <Card 
-      className={`w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 p-2 hover:bg-gray-100 ${
-      !eventsp.targetLeftZone ? "disabled" : "" 
-    }`}>
-        <CardContent>
-          <Typography variant="h5" component="div">
-            <Checkbox disabled={!eventsp.targetLeftZone} /> Email
-          </Typography>
-        </CardContent>
-      </Card>
-    </div>
-  </div> */}
 </form>
 </div>
 <br></br><br></br>
 <div >
                  
                 </div>
-                          <button style={{marginLeft: "92%", color: "white", display: "flex", alignItems: "center", font: "bold", 
+           <div className="flex justify-end mx-5">     
+                          <button style={{ color: "white", display: "flex", alignItems: "center", font: "bold", 
                           fontSize: "16px",
                           backgroundColor: "#00B56C",
                           border: "none",
                           fontWeight: "bold",
                           borderRadius: "10px"
         }}
-                className={` text-white font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none px-4`}
+                className={`  text-white font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none px-4 `}
                               onClick={handleUpdatePermissions}
                               >
                                  <svg
@@ -786,7 +745,7 @@ export default function Notifications() {
                               </button>
 
                               
-                
+        </div>  
                               <Toaster position="top-center" reverseOrder={false} />
     </div>
     

@@ -529,7 +529,9 @@ export default function Reports() {
                   const filteredData = response.data.tableData.filter(
                     (eventitem: { event: string }) =>
                       eventitem.event !== "ignitionOn" &&
-                      eventitem.event !== "ignitionOff"
+                      eventitem.event !== "ignitionOff" && 
+                      eventitem.event !== "ignition On" &&
+                      eventitem.event !== "ignition Off"
                   );
                   setTrisdata(filteredData);
                   newColumnHeaders = ["event", "date", "Address"];
