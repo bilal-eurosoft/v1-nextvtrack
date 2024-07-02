@@ -1,11 +1,11 @@
 import { IgnitionReport, replayreport } from "@/types/IgnitionReport";
-import { Events , Notifications } from "@/types/events" 
+import { Events, Notifications } from "@/types/events";
 import { commandrequest } from "@/types/commandrequest";
 import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
 import { error } from "console";
 // var URL = "https://backend.vtracksolutions.com";
-var URL = 'http://172.16.10.99:3001'
+var URL = "http://172.16.10.99:3001";
 
 // surakhSha api
 // "http0";
@@ -131,7 +131,7 @@ export function expireForgotLink(payload: any) {
   return ressult;
 }
 
-// here 
+// here
 export async function portalGprsCommand({
   token,
   payload,
@@ -140,15 +140,18 @@ export async function portalGprsCommand({
   payload: commandrequest;
 }) {
   try {
-    const response = await fetch(`http://172.16.10.99:3001/portal/GprsCommand`, {
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payload),
-      method: "POST",
-    });
+    const response = await fetch(
+      `http://172.16.10.99:3001/portal/GprsCommand`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        method: "POST",
+      }
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
     }
@@ -161,62 +164,60 @@ export async function portalGprsCommand({
 }
 
 // bilal work
-export async function getGprsCommandLatest({
-  token,
-  // payload,
-}: {
-  token: string;
-  // payload: commandrequest;
-}) {
-  try {
-    const response = await fetch(`http://172.16.10.99:3001/GetLatestGprsCommand`, {
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      // body: JSON.stringify(payload),
-      method: "POST",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.log("Error fetching data");
-    return [];
-  }
-}
+// export async function getGprsCommandLatest({
+//   token,
+// }: // payload,
+// {
+//   token: string;
+//   // payload: commandrequest;
+// }) {
+//   try {
+//     const response = await fetch(
+//       `http://172.16.10.99:3001/GetLatestGprsCommand`,
+//       {
+//         headers: {
+//           accept: "application/json, text/plain, */*",
+//           authorization: `Bearer ${token}`,
+//           "content-type": "application/json",
+//         },
+//         // body: JSON.stringify(payload),
+//         method: "POST",
+//       }
+//     );
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch data from the API");
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.log("Error fetching data");
+//     return [];
+//   }
+// }
 
-export async function responsegprs({  token
-}: {
-  token: string;
-}) {
-  try {
-    const response = await fetch(`http://172.16.10.46:80/gprscommands/most-recent`, {
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      method: "POST", // Adjust the method according to your API's requirement
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.log("Error fetching data", error);
-    return null;
-  }
-}
-
-
-
-
-
+// export async function responsegprs({ token }: { token: string }) {
+//   try {
+//     const response = await fetch(
+//       `http://172.16.10.46:80/gprscommands/most-recent`,
+//       {
+//         headers: {
+//           accept: "application/json, text/plain, */*",
+//           authorization: `Bearer ${token}`,
+//           "content-type": "application/json",
+//         },
+//         method: "POST", // Adjust the method according to your API's requirement
+//       }
+//     );
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch data from the API");
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.log("Error fetching data", error);
+//     return null;
+//   }
+// }
 
 export async function getAllVehicleByUserId({
   token,
@@ -249,7 +250,7 @@ export async function getAllVehicleByUserId({
   }
 }
 
-// here events permission 
+// here events permission
 export async function updateEventPermissionByClientId({
   token,
   clientId,
@@ -284,7 +285,7 @@ export async function updateEventPermissionByClientId({
   }
 }
 
-// here get client 
+// here get client
 export async function clientbyClientid({
   token,
   clientId,
@@ -314,7 +315,6 @@ export async function clientbyClientid({
   }
 }
 
-  
 // here save client
 export async function clientsave({
   token,
@@ -326,7 +326,7 @@ export async function clientsave({
   payload: Notifications;
 }) {
   try {
-    const payloadWithClientId = {  id: clientId, ...payload }; // Construct payload object
+    const payloadWithClientId = { id: clientId, ...payload }; // Construct payload object
     const response = await fetch(`${URL}/clients`, {
       method: "POST",
       headers: {
@@ -351,36 +351,35 @@ export async function clientsave({
   }
 }
 
-  export async function getEventPermissionByClientId({
-    token,
-    clientId,
-  }: {
-    token: string;
-    clientId: string;
-  }) {
-    try {
-      const response = await fetch(
-        `${URL}/getEventPermissionByClientId?clientId=${clientId}`,
-        {
-          headers: {
-            accept: "application/json, text/plain, */*",
-            authorization: `Bearer ${token}`,
-            "content-type": "application/json",
-          },
-          method: "GET", // Use lowercase 'get' for method
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch data from the API");
+export async function getEventPermissionByClientId({
+  token,
+  clientId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(
+      `${URL}/getEventPermissionByClientId?clientId=${clientId}`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        method: "GET", // Use lowercase 'get' for method
       }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching data", error);
-      return [];
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
     }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
   }
-  
+}
 
 // here suraksha
 export async function vehiclebyClientid({
@@ -391,15 +390,18 @@ export async function vehiclebyClientid({
   clientId: string;
 }) {
   try {
-    const response = await fetch(`http://172.16.10.99:3001/getDualCamVehicleByclientId`, {
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: `{\"clientId\":\"${clientId}\"}`,
-      method: "POST",
-    });
+    const response = await fetch(
+      `http://172.16.10.99:3001/getDualCamVehicleByclientId`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: `{\"clientId\":\"${clientId}\"}`,
+        method: "POST",
+      }
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
     }
@@ -412,11 +414,6 @@ export async function vehiclebyClientid({
   }
 }
 
-
-
-
-
-
 export async function IgnitionReportByTrip({
   token,
   payload,
@@ -425,15 +422,18 @@ export async function IgnitionReportByTrip({
   payload: IgnitionReport;
 }) {
   try {
-    const response = await fetch(`http://172.16.10.46:80/Report/IgnitionReport`, {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await fetch(
+      `http://172.16.10.46:80/Report/IgnitionReport`,
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");

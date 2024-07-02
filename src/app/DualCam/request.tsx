@@ -1,18 +1,14 @@
 "use client";
 import React, { ChangeEvent, useRef } from "react";
 import { useSession } from "next-auth/react";
-
 import { useState, useEffect } from "react";
 import {
   portalGprsCommand,
-  // responsegprs
-  // ,
-  vehicleListByClientId,
+  // responsegprs,
+  // vehicleListByClientId,
   videoList,
   vehiclebyClientid,
-  getDualCamVehicleByclientId,
-  getVehicleDataByClientId,
-  // getGprsCommandLatest,
+  getGprsCommandLatest,
 } from "@/utils/API_CALLS";
 import { pictureVideoDataOfVehicleT } from "@/types/videoType";
 import Select from "react-select";
@@ -22,16 +18,12 @@ import { Toaster, toast } from "react-hot-toast";
 import "./newstyle.css";
 import { dateTimeToTimestamp } from "@/utils/unixTimestamp";
 // import { List, ListItem, ListItemText, Collapse, RadioGroup, Radio } from '@material-ui/core';
-import { socket } from "@/utils/socket";
-import uniqueDataByIMEIAndLatestTimestamp from "@/utils/uniqueDataByIMEIAndLatestTimestamp";
-import { useRouter } from "next/navigation";
 import DateFnsMomentUtils from "@date-io/date-fns";
 import EventIcon from "@material-ui/icons/Event";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 import { Box } from "@mui/material";
 import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import { isPagesAPIRouteMatch } from "next/dist/server/future/route-matches/pages-api-route-match";
-import { io } from "socket.io-client";
 import { VehicleData } from "@/types/vehicle";
 
 export default function Request({ socketdata, deviceCommandText }) {
@@ -41,41 +33,77 @@ export default function Request({ socketdata, deviceCommandText }) {
   const { data: session } = useSession();
   const [loading, setLaoding] = useState(false);
   const [currentPageVideo, setCurrentPageVideo] = useState(1);
+  const [input, setInput] = useState<any>("");
+  const [activeTab1, setActiveTab1] = useState("View");
+
   const [disabledButton, setdisabledButton] = useState(true);
+  const [disabledRequestButton, setdisabledRequestButton] = useState(true);
+  const carData = useRef<VehicleData[]>([]);
+
+  //   const handleClick = (tab: string) => {
+  //     setActiveTab1((prevTab) => (prevTab === tab ? 'View' : tab));
+  //   };
   const [CustomDateField, setCustomDateField] = useState(false);
   const [openFrontAndBackCamera, setOpenFrontAndBackCamera] = useState(false);
   const [selectedCameraType, setSelectedCameraType] = useState(null);
+  const [mediaType, setMediaType] = useState("images");
   const [selectedFileType, setSelectedFileType] = useState(null);
   const [selectedDateFilter, setSelectedDateFilter] = useState(null);
   const [customDate, setCustomDate] = useState(false);
   const [showDurationTab, setshowDurationTab] = useState(false);
   const [latestGprs, setLatestGprs] = useState(false);
-  const [deviceResponse, setDeviceResponse] = useState<any>("");
-  const [toastId, setToastId] = useState<any>(null);
-  const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
-  const [selectedVehicle, setSelectedVehicle] = useState<DeviceAttach | null>(
-    null
-  );
+  const [deviceResponse, setDeviceResponse] = useState([]);
   const sortedRecords = pictureVideoDataOfVehicle.sort(
     (a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime()
   );
+
   const [filteredRecords, setFilteredRecords] = useState(sortedRecords);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
-  const [selectedduration, setSelectedDuration] = useState("");
-  const [disabledRequestButton, setdisabledRequestButton] = useState(true);
-  const router = useRouter();
-  const carData = useRef<VehicleData[]>([]);
 
   const handlevideodate = (date: MaterialUiPickersDate | null) => {
+    console.log("date it has ", date);
+    console.log("selected time is ", selectedDate);
     if (date !== null) {
       const dateValue = moment(date).format("YYYY-MM-DD");
+      // const dateValue = moment(date).toDate();
       setSelectedDate(dateValue);
     }
   };
 
-  const currenTDates = new Date();
+  // useEffect(() => {
+  //   // Set filtered records when the component mounts
+  //   setFilteredRecords(sortedRecords);
+  // }, []);
 
+  const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
+  const [selectedVehicle, setSelectedVehicle] = useState<DeviceAttach | null>(
+    null
+  );
+
+  const currenTDates = new Date();
+  const isCurrentDate = (date: any) => {
+    if (date instanceof Date) {
+      const currentDate = new Date();
+      return (
+        date.getDate() === currentDate.getDate() &&
+        date.getMonth() === currentDate.getMonth() &&
+        date.getFullYear() === currentDate.getFullYear()
+      );
+    }
+    return false;
+  };
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
+  const [selectedduration, setSelectedDuration] = useState("");
+  const handleChangeVideo = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setCurrentPageVideo(value);
+  };
+
+  const hanldeCameraType = () => {
+    setOpenFrontAndBackCamera(!openFrontAndBackCamera);
+  };
   useEffect(() => {
     const vehicleListData = async () => {
       try {
@@ -114,142 +142,15 @@ export default function Request({ socketdata, deviceCommandText }) {
     vehicleListData();
   }, [session]);
 
-  useEffect(() => {
-    // Connect to the server
-    const socket = io(
-      "https://socketio.vtracksolutions.com:1102/?clientId=64f9c5c3b7f9957d81e36908"
-    );
-    // Listen for "message" event from the server
-    socket.on("device", async (data) => {
-      let message;
-      if (
-        data.commandtext ===
-        "Photo request from source 1. Preparing to send file from timestamp 1719846377."
-      ) {
-        message = "Wait for your file for downloading";
-      } else {
-        message = "Wait for your file for downloading";
-      }
-
-      toast.success(data?.commandtext, {
-        position: "top-center",
-      });
-    });
-
-    // Clean up on unmount
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  /* useEffect(() => {
-  // Check if selectedVehicle is not null
-  if (selectedVehicle) {
-    // Retrieve carData from localStorage and parse it into an array
-  //  const storedData = localStorage.getItem('carData');
-
-    if (carData.current) {
-     
-      // Find the selected vehicle in carData
-      const foundVehicle = carData.current.find((vehicle: { vehicleReg: string; }) => vehicle.vehicleReg === selectedVehicle.vehicleReg);
-      
-      // If the vehicle is found and its status is "Parked", enable the button
-      if (foundVehicle && foundVehicle.vehicleStatus === "Parked") {
-       
-        setdisabledButton(false);
-      } else {
- 
-        setdisabledButton(true);
-      }
-    } else {
-      // Handle the case where carData is not found in localStorage
-    }
-  }
-}, [selectedVehicle]); */
-  useEffect(() => {
-    (async function () {
-      if (session?.clientId) {
-        const clientVehicleData = await getVehicleDataByClientId(
-          session?.clientId
-        );
-
-        if (clientVehicleData?.data?.Value) {
-          let parsedData = JSON.parse(
-            clientVehicleData?.data?.Value
-          )?.cacheList;
-          // call a filter function here to filter by IMEI and latest time stamp
-          let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
-          carData.current = uniqueData;
-          if (carData.current) {
-            const foundVehicle = carData.current.find(
-              (vehicle: { vehicleReg: string }) =>
-                vehicle.vehicleReg === selectedVehicle?.vehicleReg
-            );
-            console.log("Dvfdbvf", foundVehicle);
-            if (
-              (foundVehicle?.frontCamera?.value == 3 &&
-                foundVehicle?.backCamera?.value == 3) ||
-              foundVehicle?.frontCamera?.value == 3 ||
-              foundVehicle?.backCamera?.value == 3
-            ) {
-              console.log("if");
-              setdisabledButton(true);
-              setdisabledRequestButton(false);
-            } else if (
-              foundVehicle?.frontCamera?.value == 0 &&
-              foundVehicle?.backCamera?.value == 0
-            ) {
-              console.log("else if");
-              setdisabledButton(false);
-              setdisabledRequestButton(true);
-            } else {
-              console.log("else ");
-              setdisabledButton(true);
-              setdisabledRequestButton(true);
-            }
-            //   setdisabledButton()
-          }
-          console.log("cardata", carData.current);
-        }
-      }
-    })();
-  }, [session, selectedVehicle]);
-
-  useEffect(() => {
-    if (session?.clientId) {
-      try {
-        socket.io.opts.query = { clientId: session?.clientId };
-        socket.connect();
-        socket.on(
-          "message",
-          async (data: { cacheList: VehicleData[] } | null | undefined) => {
-            if (data === null || data === undefined) {
-              return;
-            }
-
-            const uniqueData = uniqueDataByIMEIAndLatestTimestamp(
-              data?.cacheList
-            );
-
-            carData.current = uniqueData;
-            // console.log("cardata 2", carData.current)
-            //  console.log("carData.current", carData.current)
-            /*          const existingData = localStorage.getItem('carData');
-          if (existingData) {
-            localStorage.removeItem('carData');
-          }
-          localStorage.setItem('carData', JSON.stringify(uniqueData)); */
-          }
-        );
-      } catch (err) {
-        console.log("Socket Error", err);
-      }
-    }
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [selectedVehicle, session?.clientId]);
+  const handleCustom = () => {
+    setCustomDate(true);
+  };
+  const handleWeekend = () => {
+    setCustomDate(false);
+  };
+  const handleClickCustom = () => {
+    setCustomDateField(!CustomDateField);
+  };
 
   const handleSelectChange = (e: any) => {
     const selectedVehicleId = e;
@@ -258,7 +159,6 @@ export default function Request({ socketdata, deviceCommandText }) {
     );
     setSelectedVehicle(selectedVehicle || null);
   };
-
   const options =
     vehicleList?.map((item: any) => ({
       value: item.vehicleReg,
@@ -277,7 +177,45 @@ export default function Request({ socketdata, deviceCommandText }) {
       setshowDurationTab(false);
     }
   };
-
+  // here camera on code:
+  // useEffect(() => {
+  //   (async function () {
+  //     if (session?.clientId) {
+  //       const clientVehicleData = await getVehicleDataByClientId(
+  //         session?.clientId
+  //       );
+  //       if (clientVehicleData?.data?.Value) {
+  //         let parsedData = JSON.parse(
+  //           clientVehicleData?.data?.Value
+  //         )?.cacheList;
+  //         // call a filter function here to filter by IMEI and latest time stamp
+  //         let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
+  //        carData.current = uniqueData;
+  //        if(carData.current){
+  //         const foundVehicle = carData.current.find((vehicle: { vehicleReg: string; }) => vehicle.vehicleReg === selectedVehicle?.vehicleReg);
+  //       console.log("Dvfdbvf",foundVehicle )
+  //       if (foundVehicle?.frontCamera.value == 3 && foundVehicle?.backCamera.value == 3){
+  //         console.log("if" )
+  //         setdisabledButton(true)
+  //         setdisabledRequestButton(false)
+  //       }
+  //       else if (foundVehicle?.frontCamera.value == 0 && foundVehicle?.backCamera.value == 0 ) {
+  //         console.log("else if" )
+  //         setdisabledButton(false)
+  //         setdisabledRequestButton(true)
+  //       }
+  //       else {
+  //         console.log("else " )
+  //         setdisabledButton(true)
+  //         setdisabledRequestButton(true)
+  //       }
+  //      //   setdisabledButton()
+  //        }
+  //        console.log("cardata", carData.current )
+  //       }
+  //  }
+  //   })();
+  // }, [ session, selectedVehicle]);
   const handlecameraOn = async () => {
     toast("Data sent successfully");
     let duration = 500;
@@ -327,11 +265,31 @@ export default function Request({ socketdata, deviceCommandText }) {
           },
         }
       );
+      console.log("response is ", response);
     }
   };
 
+  const handleDateFilterChange = (event: { target: { value: any } }) => {
+    const selectedValue = event.target.value;
+    setSelectedDateFilter(selectedValue);
+    if (selectedValue === "custom") {
+      setCustomDate(true);
+    } else {
+      setCustomDate(false);
+    }
+  };
+
+  const [updatedstatus, setupdatedStatus] = useState("");
+  // const handleSubmit2 = async () => {
+  //   if (session) {
+  //     const ddt = await responsegprs({ token: session?.accessToken });
+  //     console.log("sssssssssssss", ddt);
+  //     setupdatedStatus(ddt);
+  //   }
+  // };
   const handleSubmit = async () => {
     setLatestGprs(true);
+
     const selectedValues = {
       vehicle: selectedVehicle,
       cameraType: selectedCameraType,
@@ -343,7 +301,11 @@ export default function Request({ socketdata, deviceCommandText }) {
       date: selectedDate || new Date(),
       time: selectedTime,
     };
+    console.log("datetime is ", dateTime);
+    console.log("date is ", selectedDate);
+    console.log("time is ", selectedTime);
     const timestamp = dateTimeToTimestamp(selectedDate, selectedTime);
+    console.log("time is ", timestamp);
     let Duration;
     if (Number(selectedduration) <= 10) {
       Duration = Number(selectedduration) + 1;
@@ -359,6 +321,7 @@ export default function Request({ socketdata, deviceCommandText }) {
       }
     } else if (selectedFileType === "Video") {
       if (selectedCameraType === "Front") {
+        console.log("timestamp is ", timestamp);
         commandText = `camreq: 0,1,${timestamp},${Duration}`;
       } else if (selectedCameraType === "Back") {
         commandText = `camreq: 0,2,${timestamp},${Duration}`;
@@ -408,30 +371,80 @@ export default function Request({ socketdata, deviceCommandText }) {
           },
         }
       );
+      toast.success(deviceCommandText?.commandtext, {
+        position: "top-center",
+      });
 
-      if (socketdata.filetype !== ".h265" || socketdata.filetype !== ".jpeg") {
-        if (!toastId) {
-          const id = toast.loading("Waiting for Device Response", {
-            position: "top-center",
-          });
-          setToastId(id);
-        }
-      }
-
+      console.log("valuesss", response);
       if (response.success) {
+        console.log("valuesss", response);
         setSelectedVehicle(null);
         setSelectedFileType(null);
         setSelectedCameraType(null);
         setSelectedDuration("");
         setSelectedTime("");
         setSelectedDate(null);
+        //   // Additional logic for success
+      } else {
+        console.log("formbsbsbbsbs");
       }
+      //  if(session){
+      // const ddt = await responsegprs({ token: session?.accessToken });
+      // console.log("sssssssssssss", ddt);
+      // } ;
+    }
+
+    if (socketdata?.progres > 1 && socketdata?.progres < 100) {
+      toast.success("popup", {
+        position: "top-center",
+      });
     }
   };
 
-  if (socketdata.filetype == ".h265" || socketdata.filetype == ".jpeg") {
-    toast.dismiss(toastId);
-  }
+  //bilal work
+  useEffect(() => {
+    if (latestGprs == true) {
+      if (session) {
+        setTimeout(async () => {
+          const response = await getGprsCommandLatest({
+            token: session?.accessToken,
+          });
+          setDeviceResponse(response);
+        }, 10000);
+      }
+    }
+  }, [latestGprs]);
+
+  console.log("deviceResponse", deviceResponse);
+
+  const handlePopup = () => {
+    toast.success("popup", {
+      position: "top-center",
+      duration: socketdata?.progress,
+    });
+  };
+  console.log("socketdata", socketdata);
+
+  // useEffect(() => {
+  //   setTimeout(async () => {
+  //    const response= await portalGprsCommand(session?.token)
+  //    console.log("response==>",response)
+  //   }, 4000)
+  // }, [handleSubmit()])
+
+  // get video indexing issue
+  // const [getVideoPagination, setVideoPagination] = useState<any>([]);
+  // useEffect(() => {
+  //   const func = async () => {
+  //     const data = await pictureVideoDataOfVehicle.map((item) => {
+  //       if (item.fileType == 2) {
+  //         return item.Vehicle;
+  //       }
+  //     });
+  //     setVideoPagination(data);
+  //   };
+  //   func();
+  // }, []);
 
   return (
     <div>
@@ -542,16 +555,13 @@ export default function Request({ socketdata, deviceCommandText }) {
           <div className="col-span-2">
             <button
               className={`bg-green px-5 py-2 text-white ${
-                disabledRequestButton == true
-                  ? "opacity-50 cursor-not-allowed"
-                  : "" ||
-                    selectedFileType === null ||
-                    selectedCameraType === null ||
-                    selectedVehicle === null ||
-                    (selectedFileType === "Video" &&
-                      (selectedDate === null ||
-                        selectedTime === "" ||
-                        selectedduration === ""))
+                selectedFileType === null ||
+                selectedCameraType === null ||
+                selectedVehicle === null ||
+                (selectedFileType === "Video" &&
+                  (selectedDate === null ||
+                    selectedTime === "" ||
+                    selectedduration === ""))
                   ? "disabled"
                   : ""
               }`}
@@ -568,25 +578,28 @@ export default function Request({ socketdata, deviceCommandText }) {
             >
               Request
             </button>{" "}
-            {/* <button
+            <button
               className={`bg-green px-5 py-2 text-white `}
               // onClick={handleSubmit2}
             >
               check Status
-            </button> */}
+            </button>
             <button
               className={`bg-green px-2 py-2 text-white  
-                   ${disabledButton ? "opacity-50 cursor-not-allowed" : ""}`}
+   
+      `}
               onClick={handlecameraOn}
               disabled={disabledButton}
               style={{ marginLeft: "10px" }}
             >
               camera On
             </button>
+            <p>{deviceCommandText?.commandtext}</p>
           </div>
         </div>
         <br></br>
         <br></br>
+        <button onClick={handlePopup}>Click Popup</button>
         <div>
           {showDurationTab && (
             <div className="dateTimeForm lg:grid-cols-3">
