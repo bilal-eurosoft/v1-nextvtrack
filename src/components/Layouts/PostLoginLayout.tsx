@@ -23,8 +23,8 @@ import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import TimeCounter from "@/app/context/timer";
 import { usePathname, useSearchParams } from "next/navigation";
 import { getZoneListByClientId } from "@/utils/API_CALLS";
+import { fetchZone } from "@/lib/slices/zoneSlice";
 import { useSelector } from "react-redux";
-
 import {
   Popover,
   PopoverHandler,
@@ -119,7 +119,11 @@ export default function RootLayout({
   const [loginTime, setLoginTime] = useState(new Date());
   const [elapsedTime, setElapsedTime] = useState(0);
   const fullparams = searchParams?.get("screen");
-  const allZones = useSelector((state: any) => state.zone);
+  // const dispatch = useDispatch();
+  const allZones = useSelector((state) => state.zone);
+  useEffect(() => {
+    setZoneList(allZones?.zone);
+  }, [allZones]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -130,37 +134,34 @@ export default function RootLayout({
     return () => clearInterval(interval);
   }, []); // Run effect when loginTime changes
 
-  // useEffect(() => {
-  //   const fetchZoneList = async () => {
-  //     if (session) {
-  //       try {
-  //         const allzoneList = await getZoneListByClientId({
-  //           token: session.accessToken,
-  //           clientId: session.clientId,
-  //         });
-  //         setZoneList(allzoneList);
-  //       } catch (error) {
-  //         console.log("Error fetching zone list:", error);
-  //       }
-  //     }
-  //   };
-
-  //   fetchZoneList();
-  // }, [session]);
   useEffect(() => {
-    setZoneList(allZones?.zone);
+    const fetchZoneList = async () => {
+      if (session) {
+        try {
+          const allzoneList = await getZoneListByClientId({
+            token: session.accessToken,
+            clientId: session.clientId,
+          });
+          setZoneList(allzoneList);
+        } catch (error) {
+          console.log("Error fetching zone list:", error);
+        }
+      }
+    };
+
+    fetchZoneList();
   }, [session]);
 
   // const allzoneList = zoneList?.map((item) => {
   //   return item?.id;
   // });
   // console.log("zoneId", allzoneList);
-  // const formatTime = (milliseconds: any) => {
-  //   const seconds = Math.floor(milliseconds / 1000);
-  //   const minutes = Math.floor(seconds / 60);
-  //   const remainingSeconds = seconds % 60;
-  //   return `${minutes} min ${remainingSeconds} sec`;
-  // };
+  const formatTime = (milliseconds: any) => {
+    const seconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes} min ${remainingSeconds} sec`;
+  };
 
   useEffect(() => {
     if (!session && fullparams != "full") {
@@ -201,6 +202,7 @@ export default function RootLayout({
 
     filterZoneIds();
   }, [zoneList]);
+
   return (
     // <div className={inter.className}>
     <div>
@@ -615,12 +617,12 @@ export default function RootLayout({
                 >
                   <path
                     d="M9.5 19C8.89555 19 7.01237 19 5.61714 19C4.87375 19 4.39116 18.2177 4.72361 17.5528L5.57771 15.8446C5.85542 15.2892 6 14.6774 6 14.0564C6 13.2867 6 12.1434 6 11C6 9 7 5 12 5C17 5 18 9 18 11C18 12.1434 18 13.2867 18 14.0564C18 14.6774 18.1446 15.2892 18.4223 15.8446L19.2764 17.5528C19.6088 18.2177 19.1253 19 18.382 19H14.5M9.5 19C9.5 21 10.5 22 12 22C13.5 22 14.5 21 14.5 19M9.5 19C11.0621 19 14.5 19 14.5 19"
-                    strokeLinejoin="round"
+                    stroke-linejoin="round"
                   />
                   <path
                     d="M12 5V3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                   />
                 </svg>
               </Tooltip>
@@ -634,7 +636,7 @@ export default function RootLayout({
                     {/* <Link href="/DriverProfile"> */}
                     {/* <Link href={pathname ? "/DriverProfile" : "/DriverAssign"}> */}
                     <Tooltip
-                      className={`bg-[#00B56C] text-white shadow-lg rounded border-none`}
+                      className={`bg-[#00B56C]  z-50 text-white shadow-lg rounded border-none`}
                       placement="right"
                       content="Driver"
                     >
@@ -679,7 +681,7 @@ export default function RootLayout({
                         </svg>
                       </PopoverHandler>
                     </Tooltip>
-                    <PopoverContent className="border-none cursor-pointer bg-green">
+                    <PopoverContent className="border-none cursor-pointer bg-green z-50">
                       {/* <Link className="w-full text-white" href="/DriverProfile">
                   Driver Profile
                 </Link> */}
@@ -697,8 +699,39 @@ export default function RootLayout({
                       </Link>
                       <br></br>
                       <br></br>
-                      {/* here suraksha code */}
-
+                      <Link href="/Notifications">
+                        <Tooltip
+                          className="bg-white  text-[#00B56C] shadow-lg rounded"
+                          placement="right"
+                          content="Notifications"
+                        >
+                          <svg
+                            className={`w-20 h-14 py-3  -my-1      text-white-10  dark:text-white ${
+                              session?.userRole === "Controller"
+                                ? "border-b-2 border-white"
+                                : ""
+                            }`}
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{
+                              color:
+                                pathname == "/Notifications"
+                                  ? "green"
+                                  : "white",
+                              backgroundColor:
+                                pathname == "/Notifications" ? "white" : "",
+                            }}
+                          >
+                            {" "}
+                            <circle cx="12" cy="12" r="10" />{" "}
+                            <polygon points="10 8 16 12 10 16 10 8" />
+                          </svg>
+                        </Tooltip>
+                      </Link>
                       <Link
                         className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
                         href="/DriverAssign"
@@ -1119,13 +1152,13 @@ export default function RootLayout({
                             <path
                               d="M9.5 19C8.89555 19 7.01237 19 5.61714 19C4.87375 19 4.39116 18.2177 4.72361 17.5528L5.57771 15.8446C5.85542 15.2892 6 14.6774 6 14.0564C6 13.2867 6 12.1434 6 11C6 9 7 5 12 5C17 5 18 9 18 11C18 12.1434 18 13.2867 18 14.0564C18 14.6774 18.1446 15.2892 18.4223 15.8446L19.2764 17.5528C19.6088 18.2177 19.1253 19 18.382 19H14.5M9.5 19C9.5 21 10.5 22 12 22C13.5 22 14.5 21 14.5 19M9.5 19C11.0621 19 14.5 19 14.5 19"
                               stroke="#ffffff"
-                              strokeLinejoin="round"
+                              stroke-linejoin="round"
                             />
                             <path
                               d="M12 5V3"
                               stroke="#ffffff"
                               stroke-linecap="round"
-                              strokeLinejoin="round"
+                              stroke-linejoin="round"
                             />
                           </svg>
                         </Tooltip>
@@ -1201,15 +1234,15 @@ export default function RootLayout({
                       />
                     </PopoverHandler> */}
                     <PopoverHandler {...triggers}>
-                      {session?.image !== " " && session?.image !== "null" ? (
+                      {session?.image !== "" && session?.image !== "null" ? (
                         <img
-                          className="cursor-pointer lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0 lg:w-10 md:w-10 sm:w-10 h-12 rounded-full user_avator_image"
+                          className="cursor-pointer lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0 lg:w-10 md:w-10 sm:w-10 h-12 rounded-full"
                           src={session?.image}
                           alt="Rounded avatar"
                         />
                       ) : (
                         <img
-                          className="cursor-pointer lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0 lg:w-10 md:w-10 sm:w-10 h-12 rounded-full user_avator_image"
+                          className="cursor-pointer lg:mt-0 md:mt-3 sm:mt-3 mt-6 w-14 lg:ms-0 lg:w-10 md:w-10 sm:w-10 h-12 rounded-full"
                           src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
                           alt="Rounded avatar"
                         />

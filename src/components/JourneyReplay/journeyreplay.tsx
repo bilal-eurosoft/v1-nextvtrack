@@ -4,13 +4,7 @@ import DateFnsMomemtUtils from "@date-io/moment";
 import { DatePicker } from "@material-ui/pickers";
 import BlinkingTime from "@/components/General/BlinkingTime";
 import axios, { all } from "axios";
-import PlaceIcon from "@mui/icons-material/Place";
 import EventIcon from "@material-ui/icons/Event";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
 import dynamic from "next/dynamic";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -18,7 +12,6 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import moment from "moment-timezone";
-
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import Image from "next/image";
@@ -64,7 +57,6 @@ import { StopAddressData } from "@/types/StopDetails";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 import { Tooltip, Button } from "@material-tailwind/react";
-// import Select from "react-select";
 import DateFnsUtils from "@date-io/date-fns";
 import {
   MuiPickersUtilsProvider,
@@ -72,11 +64,12 @@ import {
 } from "@material-ui/pickers";
 
 import MenuItem from "@mui/material/MenuItem";
-// import Select from "@mui/material/Select";
+import { makeStyles } from "@mui/styles";
+import Slider from "@mui/material/Slider";
 import car_icon from "../../../public/Images/journey_car_icon.png";
 import Select from "react-select";
+import "./index.css";
 
-// const { Option } = Select;
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -88,7 +81,6 @@ const MenuProps = {
   },
 };
 
-import "./index.css";
 interface Option {
   value: string;
   label: string;
@@ -116,20 +108,16 @@ const Circle = dynamic(
 );
 
 function filterWeekends(date: any) {
-  // Return false if Saturday or Sunday
   return date.value === 0 || date === 6;
 }
-import { makeStyles } from "@mui/styles";
-import Slider from "@mui/material/Slider";
 
-// Define custom styles using makeStyles
 const useStyles = makeStyles((theme) => ({
   select: {
     "&:before": {
-      borderColor: "green", // Change this to the desired border color
+      borderColor: "green",
     },
     "&:after": {
-      borderColor: "green", // Change this to the desired border color
+      borderColor: "green",
     },
   },
 }));
@@ -157,10 +145,8 @@ export default function journeyReplayComp() {
     TimeZone: session?.timezone || "",
     VehicleReg: "",
     clientId: session?.clientId || "",
-    // fromDateTime: new Date(),
     fromDateTime: "",
     period: "",
-    // toDateTime: new Date(),
     toDateTime: "",
     unit: session?.unit || "",
   });
@@ -206,11 +192,9 @@ export default function journeyReplayComp() {
   const [addressTravelHistory, setAddressTravelHistory] = useState([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isPickerOpenFromDate, setIsPickerOpenFromDate] = useState(true);
-
   const [travelV2, setTravelV2] = useState(false);
   const [travelV3, setTravelV3] = useState(false);
   const [stopWithSecond, setStopWithSecond] = useState([]);
-
   const startdate = new Date();
   const enddate = new Date();
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
@@ -225,9 +209,6 @@ export default function journeyReplayComp() {
   const togglePicker = () => {
     setIsPickerOpen(!isPickerOpen);
   };
-  // const togglePickerFromDate = () => {
-  //   setIsPickerOpenFromDate(!isPickerOpenFromDate);
-  // };
 
   const SetViewOnClick = ({ coords }: { coords: any }) => {
     if (isPaused) {
@@ -280,6 +261,7 @@ export default function journeyReplayComp() {
       }
     }
   };
+
   const pauseTick = async () => {
     setIsPlaying(false);
     setPauseBtn(false);
@@ -295,6 +277,7 @@ export default function journeyReplayComp() {
       clearInterval(carMovementInterval);
       setCarMovementInterval(undefined);
     }
+
     if (carPosition && session) {
       const Dataresponse = await Tripaddressresponse(
         carPosition?.lat,
@@ -304,6 +287,7 @@ export default function journeyReplayComp() {
       setTripAddressData(Dataresponse);
     }
   };
+
   const stopTick = async () => {
     setIsPlaying(false);
     setIsPaused(false);
@@ -448,24 +432,9 @@ export default function journeyReplayComp() {
       } catch (error) {}
     };
     vehicleListData();
-    // (async function () {
-    //   if (session) {
-
-    //     await dispatch(
-    //       fetchZone({
-    //         token: session?.accessToken,
-    //         clientId: session?.clientId,
-    //       })
-    //     );
-    //   }
-    // })();
 
     (async function () {
       if (session) {
-        // const clientSettingData = await getClientSettingByClinetIdAndToken({
-        //   token: session?.accessToken,
-        //   clientId: session?.clientId,
-        // });
         if (session) {
           const centervalue = await session?.clientSetting.filter(
             (item: any) => item.PropertDesc == "Map"
@@ -537,11 +506,6 @@ export default function journeyReplayComp() {
       fromDateTime: "",
       toDateTime: "",
     }));
-
-    // setIgnitionreport({
-    //   fromDateTime: "",
-    //   toDateTime: "",
-    // });
   };
   const formattedTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
   const parsedDateTime = new Date(currentTime);
@@ -1996,7 +1960,7 @@ export default function journeyReplayComp() {
                 <button>Search</button>
               </div>
             </div>
-            <button
+            {/* <button
               style={{
                 marginLeft: "40%",
                 backgroundColor: "green",
@@ -2010,7 +1974,7 @@ export default function journeyReplayComp() {
               }
             >
               SEARCH
-            </button>
+            </button> */}
             {/* <div
               onClick={handleSubmitTwo}
               className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    search_btn_journey
@@ -2167,7 +2131,7 @@ export default function journeyReplayComp() {
             </p>
             <div
               id="trips_handle"
-              className="overflow-y-scroll overflow-x-hidden bg-bgLight "
+              className="overflow-y-scroll overflow-x-hidden bg-bgLight"
             >
               {weekDataGrouped == true
                 ? Object.entries(groupedData).map(

@@ -648,7 +648,6 @@ export default DualCam;
 
 //   // console.log("tessst", getVideoPagination);
 
-//   // suraksha
 //   // const sortedRecords = records.filter(item => item.fileType === 1)
 //   // .slice()
 //   // .sort((a, b) => {
@@ -810,7 +809,6 @@ export default DualCam;
 //         </div>
 //       </div>
 //           </div>
-//    {/* here add suraksha */}
 //    <div className="col-span-2">
 //   <button
 //     className={`bg-green px-5 py-2 text-white ${selectedFileType === null || selectedCameraType === null || selectedVehicle === null || (selectedFileType === 'Video' && (selectedDate === null || selectedTime === '' || selectedduration === '')) ? 'disabled' : ''}`}
