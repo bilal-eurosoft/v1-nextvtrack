@@ -184,9 +184,9 @@ export default function Request({ socketdata, deviceCommandText }) {
     (async function () {
       if (
         session?.clientId &&
-        selectedVehicle?.vehicleReg &&
-        selectedCameraType &&
-        selectedFileType
+        selectedVehicle?.vehicleReg 
+        // selectedCameraType &&
+        // selectedFileType
       ) {
         const clientVehicleData = await getVehicleDataByClientId(
           session?.clientId
@@ -634,6 +634,7 @@ export default function Request({ socketdata, deviceCommandText }) {
                     /*    disabled={foundVehicleData?.frontCamera ? false : true} */
                     name="cameraType"
                     value="Front"
+                    disabled={foundVehicleData?.frontCamera?.value !=3}
                     checked={selectedCameraType === "Front"}
                     onChange={handleCameraTypeChange}
                   />
@@ -648,6 +649,8 @@ export default function Request({ socketdata, deviceCommandText }) {
                     /*    disabled={foundVehicleData?.backCamera ? false : true} */
                     name="cameraType"
                     value="Back"
+                    disabled={ foundVehicleData?.backCamera?.value !=3}
+
                     checked={selectedCameraType === "Back"}
                     onChange={handleCameraTypeChange}
                   />
