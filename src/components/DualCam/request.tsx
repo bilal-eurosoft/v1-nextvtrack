@@ -40,6 +40,7 @@ export default function Request({ socketdata, deviceCommandText }) {
   // const [disabledButton, setdisabledButton] = useState(true);
   const [disabledcameraButton, setdisabledcameraButton] = useState(true);
   const [disabledrequestButton, setdisabledrequestButton] = useState(true);
+  const [disableallButton, setdisableallButton] = useState(false);
   // const [CustomDateField, setCustomDateField] = useState(false);
   // const [openFrontAndBackCamera, setOpenFrontAndBackCamera] = useState(false);
   const [selectedCameraType, setSelectedCameraType] = useState(null);
@@ -50,6 +51,7 @@ export default function Request({ socketdata, deviceCommandText }) {
   // const [latestGprs, setLatestGprs] = useState(false);
   // const [deviceResponse, setDeviceResponse] = useState<any>("");
   const [toastId, setToastId] = useState<any>(null);
+  const [CameraResponseToastId,   setCameraResponseToastId  ] = useState<any>(null);
   const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<DeviceAttach | null>(
     ""
@@ -59,6 +61,11 @@ export default function Request({ socketdata, deviceCommandText }) {
     selectedVehicleRef.current = selectedVehicle;
   }, [selectedVehicle]);
   const [foundVehicleData, setFoundVehicleData] = useState<VehicleData[]>([]);
+
+  const cameraOnRef = useRef(CameraResponseToastId);
+  useEffect(() => {
+    cameraOnRef.current = CameraResponseToastId;
+  }, [CameraResponseToastId]);
 
   // const sortedRecords = pictureVideoDataOfVehicle.sort(
   //   (a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime()
@@ -72,7 +79,14 @@ export default function Request({ socketdata, deviceCommandText }) {
   // const router = useRouter();
   const carData = useRef<VehicleData[]>([]);
 
-  const handlevideodate = (date: MaterialUiPickersDate | null) => {
+  // const handlevideodate = (date: MaterialUiPickersDate | null) => {
+  //   if (date !== null) {
+  //     const dateValue = moment(date).format("YYYY-MM-DD");
+  //     setSelectedDate(dateValue);
+  //   }
+  // };
+  
+  const handlevideodate = (date: any | null) => {
     if (date !== null) {
       const dateValue = moment(date).format("YYYY-MM-DD");
       setSelectedDate(dateValue);
@@ -138,10 +152,16 @@ export default function Request({ socketdata, deviceCommandText }) {
       // } else {
       //   message = "Wait for your file for downloading";
       // }
+      /* if(!CameraResponseToastId){
+        toast.dismiss(CameraResponseToastId);
+      } */
+      if(data?.commandtext !== "DOUT1:1 Timeout:100s "){
+        toast.success(data?.commandtext, {
+          position: "top-center",
+        });
+      }
 
-      toast.success(data?.commandtext, {
-        position: "top-center",
-      });
+      
     });
 
     // Clean up on unmount
@@ -179,14 +199,13 @@ export default function Request({ socketdata, deviceCommandText }) {
   //     const result = await getVehicleDataByClientId(session?.clientId);
   //   }
   // };
-
   useEffect(() => {
     (async function () {
       if (
         session?.clientId &&
-        selectedVehicle?.vehicleReg 
-        // selectedCameraType &&
-        // selectedFileType
+        selectedVehicle?.vehicleReg &&
+        selectedCameraType &&
+        selectedFileType
       ) {
         const clientVehicleData = await getVehicleDataByClientId(
           session?.clientId
@@ -199,6 +218,7 @@ export default function Request({ socketdata, deviceCommandText }) {
           // call a filter function here to filter by IMEI and latest time stamp
           let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
           carData.current = uniqueData;
+       
           if (carData.current) {
             /*  console.log(
               "i0977 222",
@@ -207,6 +227,7 @@ export default function Request({ socketdata, deviceCommandText }) {
 
               localStorage.getItem("selectedVehicle")
             ); */
+           
             const foundVehicle = carData.current.find(
               (vehicle: { vehicleReg: string }) =>
                 vehicle.vehicleReg === selectedVehicle?.vehicleReg
@@ -214,6 +235,8 @@ export default function Request({ socketdata, deviceCommandText }) {
             );
             setFoundVehicleData(foundVehicle);
             /*   console.log(foundVehicle); */
+           
+           
             if (
               foundVehicle?.ignition == 0 &&
               foundVehicle?.camStatus?.value == 0
@@ -221,6 +244,8 @@ export default function Request({ socketdata, deviceCommandText }) {
               /*  console.log("disable request button"); */
               setdisabledcameraButton(false);
               setdisabledrequestButton(true);
+              
+              
             } else if (
               foundVehicle?.frontCamera?.value == 1 ||
               foundVehicle?.frontCamera?.value == 2 ||
@@ -230,9 +255,13 @@ export default function Request({ socketdata, deviceCommandText }) {
 
               setdisabledcameraButton(true);
               setdisabledrequestButton(true);
+              
+              
             } else if (foundVehicle?.frontCamera?.value == 3) {
               setdisabledcameraButton(true);
               setdisabledrequestButton(false);
+              
+             
             }
           }
         }
@@ -317,7 +346,7 @@ export default function Request({ socketdata, deviceCommandText }) {
                   vehicle.vehicleReg === selectedVehicleRef?.current?.vehicleReg
                 // localStorage.getItem("selectedVehicle")
               );
-
+           
               setFoundVehicleData(foundVehicle);
               /*     console.log(foundVehicle); */
               // if (foundVehicle?.frontCamera?.value == 0) {
@@ -335,6 +364,11 @@ export default function Request({ socketdata, deviceCommandText }) {
               ) {
                 setdisabledcameraButton(false);
                 setdisabledrequestButton(true);
+                if(cameraOnRef.current){
+                 
+                  toast.dismiss(CameraResponseToastId);
+                  setCameraResponseToastId(null)
+                }
               } else if (
                 foundVehicle?.frontCamera?.value == 1 ||
                 foundVehicle?.frontCamera?.value == 2 ||
@@ -344,9 +378,25 @@ export default function Request({ socketdata, deviceCommandText }) {
 
                 setdisabledcameraButton(true);
                 setdisabledrequestButton(true);
-              } else if (foundVehicle?.frontCamera?.value == 3) {
+                if(cameraOnRef.current){
+                  
+                  toast.dismiss(CameraResponseToastId);
+                  setCameraResponseToastId(null)
+                }
+              } else if (foundVehicle?.frontCamera?.value == 3 ) {
                 setdisabledcameraButton(true);
                 setdisabledrequestButton(false);
+                if(cameraOnRef.current){
+                
+                  toast.dismiss(CameraResponseToastId);
+                  setCameraResponseToastId(null)
+                  toast.success("Now, you can make a Request", {
+                    autoClose: 4000,
+                  });
+                }
+                
+
+
               }
             }
             /*          const existingData = localStorage.getItem('carData');
@@ -400,9 +450,18 @@ export default function Request({ socketdata, deviceCommandText }) {
   const handlecameraOn = async () => {
     //   if (duration == 100) toast("Data sent successfully");
     // let duration = 100;
+    if(!selectedVehicle || !selectedCameraType || !selectedFileType){
+      return toast.error("Please select the fields")
+    }
+   /*  if(showDurationTab == true){
+      if(!selectedDate || !selectedTime || !selectedduration){
+        return toast.error("Please select the fields")
+      }
+    } */
+   
     let duration;
     if (selectedFileType == "Video") {
-      duration = (Number(selectedduration) + 2) * 60;
+      duration = 200//(Number(selectedduration) + 2) * 60;
     } else {
       duration = 100;
     }
@@ -453,6 +512,21 @@ export default function Request({ socketdata, deviceCommandText }) {
           },
         }
       );
+
+        if (!CameraResponseToastId) {
+          const id = toast.loading("Waiting for Camera on", {
+            position: "top-center",
+          });
+          setCameraResponseToastId(id);
+        }
+      
+      if(response.success){
+        setdisableallButton(true)
+        if(selectedFileType === "Video"){
+          setshowDurationTab(true)
+        }
+       
+      }
     }
   };
 
@@ -470,6 +544,11 @@ export default function Request({ socketdata, deviceCommandText }) {
     //   date: selectedDate || new Date(),
     //   time: selectedTime,
     // };
+    if(selectedFileType === "Video"){
+      if(!selectedDate || !selectedTime || !selectedduration){
+        return toast.error("Please select the fields")
+      }
+    } 
     const timestamp = dateTimeToTimestamp(selectedDate, selectedTime);
     let Duration;
     if (Number(selectedduration) <= 10) {
@@ -552,11 +631,14 @@ export default function Request({ socketdata, deviceCommandText }) {
 
       if (response.success) {
         // setSelectedVehicle(null);
+   
+          setdisableallButton(false)
+        
         setSelectedFileType(null);
         setSelectedCameraType(null);
         setSelectedDuration("");
         setSelectedTime("");
-        setSelectedDate(null);
+        setSelectedDate("");
       }
     }
     // setToastId(null);
@@ -634,7 +716,7 @@ export default function Request({ socketdata, deviceCommandText }) {
                     /*    disabled={foundVehicleData?.frontCamera ? false : true} */
                     name="cameraType"
                     value="Front"
-                    disabled={foundVehicleData?.frontCamera?.value !=3}
+                     disabled={disableallButton}
                     checked={selectedCameraType === "Front"}
                     onChange={handleCameraTypeChange}
                   />
@@ -649,8 +731,8 @@ export default function Request({ socketdata, deviceCommandText }) {
                     /*    disabled={foundVehicleData?.backCamera ? false : true} */
                     name="cameraType"
                     value="Back"
-                    disabled={ foundVehicleData?.backCamera?.value !=3}
-
+                    // disabled={ foundVehicleData?.backCamera?.value !=3}
+                    disabled={disableallButton}
                     checked={selectedCameraType === "Back"}
                     onChange={handleCameraTypeChange}
                   />
@@ -672,6 +754,7 @@ export default function Request({ socketdata, deviceCommandText }) {
                     className="w-3 h-3 mr-2 form-radio text-green"
                     name="fileType"
                     value="Photo"
+                    disabled={disableallButton}
                     checked={selectedFileType === "Photo"}
                     onChange={handleFileTypeChange}
                   />
@@ -684,6 +767,7 @@ export default function Request({ socketdata, deviceCommandText }) {
                     className="w-3 h-3 mr-2 form-radio text-green lg:ms-5"
                     name="fileType"
                     value="Video"
+                    disabled={disableallButton}
                     checked={selectedFileType === "Video"}
                     onChange={handleFileTypeChange}
                   />
@@ -750,68 +834,58 @@ export default function Request({ socketdata, deviceCommandText }) {
         <br></br>
         <br></br>
         <div>
-          {showDurationTab && (
-            <div className="dateTimeForm lg:grid-cols-3">
-              <form className="grid lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-1 gap-2">
-                <div className="formGroup lg:col-span-1 ">
-                  <label htmlFor="date">Date:</label>
-                  <Box
-                    sx={{
-                      width: "100%",
-                      border: "1px solid #ccc",
-                      borderBottom: "none",
-                      paddingTop: "7px",
-                    }}
-                  >
-                    <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
-                      <DatePicker
-                        format="MM/dd/yyyy"
-                        value={selectedDate}
-                        onChange={(item) => handlevideodate(item)}
-                        variant="inline"
-                        maxDate={currenTDates}
-                        autoOk
-                        style={{ width: "100%" }} // Set the width to 100% to fill the entire div
-                        inputProps={{ readOnly: true }}
-                        InputProps={{
-                          endAdornment: (
-                            <EventIcon style={{ width: "20", height: "20" }} />
-                          ),
-                        }}
-                      />
-                    </MuiPickersUtilsProvider>
-                  </Box>
-                </div>
-                <div className="formGroup col-span-1">
-                  <label htmlFor="time">Time:</label>
-                  <input
-                    type="time"
-                    id="time"
-                    value={selectedTime >= fullTime ? "" : selectedTime}
-                    onChange={(e) => setSelectedTime(e.target.value)}
-                    step="1"
-                    onKeyPress={(e) => e.preventDefault()}
-                  />
-                </div>
-                <div className="formGroup col-span-1">
-                  <label htmlFor="time">Duration: (in seconds)</label>
-                  <input
-                    type="number"
-                    id="Duration"
-                    value={selectedduration}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (/^[1-9]$|^10$/.test(value)) {
-                        setSelectedDuration(value);
-                      }
-                    }}
-                    placeholder="Enter duration between 1-10 sec"
-                    style={{ padding: "9px", border: "1px solid #ccc" }}
-                  />
-                </div>
-              </form>
-            </div>
-          )}
+        {showDurationTab && (
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', padding: '20px', backgroundColor: '#f9f9f9' }}>
+    <form style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', padding: '10px', borderRadius: '5px', backgroundColor: '#ffffff', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+        <label htmlFor="date" style={{ marginBottom: '5px', fontWeight: 'bold', color: '#333' }}>Date:</label>
+        <input
+          type="date"
+          id="date"
+          form="MM/dd/yyyy"
+          value={selectedDate}
+          onChange={(item) => handlevideodate(item)}
+          step="1"
+          onKeyPress={(e) => e.preventDefault()}
+          required
+          style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '16px' }}
+        />
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', padding: '10px', borderRadius: '5px', backgroundColor: '#ffffff', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+        <label htmlFor="time" style={{ marginBottom: '5px', fontWeight: 'bold', color: '#333' }}>Time:</label>
+        <input
+          type="time"
+          id="time"
+          value={selectedTime >= fullTime ? '' : selectedTime}
+          onChange={(e) => setSelectedTime(e.target.value)}
+          step="1"
+          onKeyPress={(e) => e.preventDefault()}
+          required
+          style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '16px' }}
+        />
+      </div>
+      <div style={{ display: 'flex', width: '150%', flexDirection: 'column', padding: '10px', borderRadius: '5px', backgroundColor: '#ffffff', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+        <label htmlFor="duration" style={{ marginBottom: '5px', fontWeight: 'bold', color: '#333' }}>Duration: (in seconds)</label>
+        <input
+          type="number"
+          id="duration"
+          value={selectedduration}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (/^[1-9]$|^10$/.test(value)) {
+              setSelectedDuration(value);
+            }
+          }}
+          placeholder="Enter duration between 1-10 sec"
+          required
+          style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '16px' }}
+        />
+      </div>
+    </form>
+  </div>
+)}
+
+
         </div>
       </div>
       <br></br>

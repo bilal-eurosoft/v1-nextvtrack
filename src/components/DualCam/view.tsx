@@ -51,7 +51,7 @@ import { isPagesAPIRouteMatch } from "next/dist/server/future/route-matches/page
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import logo from "../../../public/Images/loadinglogo.png"
 import { setLoginTime } from "@/utils/time";
 
@@ -62,7 +62,7 @@ export default function DualCam() {
   const { data: session } = useSession();
   const [open, setOpen] = React.useState(false);
   const [openSecond, setOpenSecond] = React.useState(false);
-  const [toastId, setToastId] = useState(null);
+  const [toastId, setToastId] = useState<string | null>(null);
   const [singleImage, setSingleImage] = useState<any>();
   const [singleVideo, setSingleVideo] = useState<any>();
   const [loading, setLaoding] = useState(false);
@@ -104,14 +104,89 @@ export default function DualCam() {
   });
   const [progressHundred, setprogressHundred] = useState(false);
 
+  const [socketConnected, setSocketConnected] = useState<boolean>(true);
+  const socketRef = useRef<Socket | null>(null);
+  const socketTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleSocketDisconnection = () => {
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    }
+  };
+
   useEffect(() => {
-    // Connect to the server
-    // const socket = io(
-    //   "http://203.135.34.139:8080/?clientId=64f9c5c3b7f9957d81e36908"
-    // );
-    // Listen for "message" event from the server
+    socketRef.current = io("http://157.90.155.83:7057", {
+      autoConnect: false,
+      query: { clientId: "64f9c5c3b7f9957d81e36908" },
+      transports: ["websocket", "polling", "flashsocket"],
+    });
+
+    socketRef.current.connect();
+
+    socketRef.current.on("message", async (data: any) => {
+      setProgress(Math.floor(data.progress));
+      setSocketdata(data);
+      setSocketConnected(true); // Socket is receiving data
+
+      if (socketTimeoutRef.current) {
+        clearTimeout(socketTimeoutRef.current);
+      }
+
+      socketTimeoutRef.current = setTimeout(() => {
+        if (socketConnected) {
+          // Socket has been inactive
+          setProgress(100); // Move progress to 100%
+          setSocketConnected(false); // Update connection status
+          if (!toastId) {
+            const id = toast.error("Socket is stopped", {
+              position: "top-center",
+              autoClose: 5000,
+            });
+            setToastId(id);
+          }
+        }
+      }, 10000); // 5 seconds inactivity timeout
+    });
+
+    // Clean up on unmount
+    return () => {
+      if (socketTimeoutRef.current) {
+        clearTimeout(socketTimeoutRef.current);
+      }
+      handleSocketDisconnection();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (socketdata?.filetype === ".h265" && socketdata.progress > 1 && socketdata.progress < 100) {
+      if (!toastId) {
+        const id = toast.loading("Video Downloading", {
+          position: "top-center",
+        });
+        setActiveTab1("View");
+        setMediaType("videos");
+        setToastId(id);
+      }
+    } else if (socketdata?.progress === 100 && toastId) {
     
-    const socket = io("http://203.135.34.139:8080", {
+      toast.dismiss(toastId);
+      setToastId(null);
+    }
+  }, [socketdata, toastId]);
+
+  useEffect(() => {
+     if (socketdata?.progress === 100 && toastId) {
+    
+      toast.dismiss(toastId);
+      setToastId(null);
+    }
+  }, [socketdata, toastId]);
+
+  /* useEffect(() => {
+  
+    
+    const socket = io("http://157.90.155.83:7057", {
       autoConnect: false,
       query: { clientId: "64f9c5c3b7f9957d81e36908" }, // This gets updated later on with client code.
       transports: ["websocket", "polling", "flashsocket"],
@@ -135,7 +210,7 @@ export default function DualCam() {
     return () => {
       socket.disconnect();
     };
-  }, [session]);
+  }, [session]); */
 
   useEffect(() => {
     // Connect to the server
@@ -167,7 +242,7 @@ export default function DualCam() {
       socket2.disconnect();
     };
   }, []); //
-  useEffect(() => {
+  /* useEffect(() => {
     if (
       socketdata.filetype === ".h265" &&
       socketdata.progress > 1 &&
@@ -185,7 +260,7 @@ export default function DualCam() {
       toast.dismiss(toastId);
       setToastId(null);
     }
-  }, [socketdata, toastId]);
+  }, [socketdata, toastId]); */
 
   useEffect(() => {
     if (
@@ -202,6 +277,7 @@ export default function DualCam() {
         setToastId(id);
       }
     } else if (socketdata.progress == 100 && toastId) {
+      
       toast.dismiss(toastId);
       setToastId(null);
     }
@@ -573,7 +649,7 @@ export default function DualCam() {
     <div>
       <hr className="text-white"></hr>
       <p className="bg-green px-4 py-1 text-white mb-5 font-bold text-center">
-        View Image & Videos
+        Camera Management
       </p>
       {/* <div>
         {showPopup && (
@@ -630,7 +706,7 @@ export default function DualCam() {
           }}
         >
           <ListItemText
-            primary="Request Camera"
+            primary="Request Media"
             style={{ fontWeight: "900" }}
           />
           {activeTab1 === "Request" ? (
@@ -659,7 +735,7 @@ export default function DualCam() {
             background: "#00b56c",
           }}
         >
-          <ListItemText primary="View Camera" style={{ fontWeight: "900" }} />
+          <ListItemText primary="View Media" style={{ fontWeight: "900" }} />
           {activeTab1 === "View" ? (
             <ExpandLessIcon style={{ width: "24px", height: "24px" }} />
           ) : (

@@ -662,7 +662,7 @@ export default DualCam;
 //        <hr className="text-white"></hr>
 //       <p className="bg-green px-4 py-1 text-white mb-5 font-bold text-center">
 
-//         View Image & Videos
+//         Camera Management
 //       </p>
 //       {/* here add collapse */}
 //       <List component="nav" className="nav nav-tabs mb-3 nav nav-pills bg-nav-pills mb-3">
@@ -673,7 +673,7 @@ export default DualCam;
 
 //         style={{color: "white", border: "1px solid green", background: "#00b56c",  marginBottom: "2px"}}
 //       >
-//         <ListItemText primary="Request Camera" style={{ fontWeight: '900' }} />
+//         <ListItemText primary="Request Media" style={{ fontWeight: '900' }} />
 //         {activeTab1 === 'Request' ?
 //   <ExpandLessIcon style={{ width: '24px', height: '24px' }} /> :
 //   <ExpandMoreIcon style={{ width: '24px', height: '24px' }} />
@@ -912,7 +912,7 @@ export default DualCam;
 //         selected={activeTab1 === 'View'}
 //         style={{color: "white", border: "1px solid green", background: "#00b56c",}}
 //       >
-//         <ListItemText primary="View Camera" style={{ fontWeight: '900' }} />
+//         <ListItemText primary="View Media" style={{ fontWeight: '900' }} />
 //         {activeTab1 === 'View' ?
 //         <ExpandLessIcon style={{ width: '24px', height: '24px' }} /> :
 //         <ExpandMoreIcon style={{ width: '24px', height: '24px' }} />
