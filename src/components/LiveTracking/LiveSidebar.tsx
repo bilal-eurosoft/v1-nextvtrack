@@ -469,9 +469,9 @@ const LiveSidebar = ({
               </div>
               <button className="border-b-2  border-green w-full text-end -mt-10">
                 {/* {filteredData?.duration[index]?.duration} */}
-                {formattedTimes[index].duration !==
+                {/* {formattedTimes[index].duration !==
                   "NaN hours, NaN minutes, NaN seconds" &&
-                  formattedTimes[index].duration}
+                  formattedTimes[index].duration} */}
               </button>
             </div>
           );
