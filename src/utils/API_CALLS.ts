@@ -1281,7 +1281,7 @@ export async function TripsByBucketAndVehicle({
   payload: replayreport;
 }) {
   try {
-    const response = await fetch(`${URL}/v3/TripsByBucketAndVehicleV2`, {
+    const response = await fetch(`${URL}/v2/TripsByBucketAndVehicleV2`, {
       method: "POST",
       headers: {
         accept: "application/json, text/plain, */*",
@@ -1310,7 +1310,7 @@ export async function TravelHistoryByBucketV2({
   payload: replayreport;
 }) {
   try {
-    const response = await fetch(`${URL}/v3/TravelHistoryByBucketV2`, {
+    const response = await fetch(`${URL}/v2/TravelHistoryByBucketV2`, {
       method: "POST",
       headers: {
         accept: "application/json, text/plain, */*",
