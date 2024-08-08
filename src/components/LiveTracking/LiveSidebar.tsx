@@ -465,11 +465,11 @@ const LiveSidebar = ({
                   </span> */}
                 </div>
               </div>
-              {/* <button className="border-b-2  border-green w-full text-end -mt-10">
-                {formattedTimes[index].duration !==
+              <button className="border-b-2  border-green w-full text-end -mt-10">
+                {/* {formattedTimes[index].duration !==
                   "NaN hours, NaN minutes, NaN seconds" &&
-                  formattedTimes[index].duration} 
-              </button> */}
+                  formattedTimes[index].duration}  */}
+              </button>
             </div>
           );
         })}
