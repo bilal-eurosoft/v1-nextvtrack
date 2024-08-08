@@ -7,7 +7,6 @@ import { error } from "console";
 var URL = "https://backend.vtracksolutions.com";
 // var URL = "http://172.16.10.99:3001";
 
-
 export async function getVehicleDataByClientId(clientId: string) {
   try {
     const response = await fetch(
@@ -1282,7 +1281,7 @@ export async function TripsByBucketAndVehicle({
   payload: replayreport;
 }) {
   try {
-    const response = await fetch(`${URL}/v2/TripsByBucketAndVehicleV2`, {
+    const response = await fetch(`${URL}/v3/TripsByBucketAndVehicleV2`, {
       method: "POST",
       headers: {
         accept: "application/json, text/plain, */*",
@@ -1311,7 +1310,7 @@ export async function TravelHistoryByBucketV2({
   payload: replayreport;
 }) {
   try {
-    const response = await fetch(`${URL}/v2/TravelHistoryByBucketV2`, {
+    const response = await fetch(`${URL}/v3/TravelHistoryByBucketV2`, {
       method: "POST",
       headers: {
         accept: "application/json, text/plain, */*",
