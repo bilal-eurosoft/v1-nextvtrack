@@ -6,8 +6,7 @@ import { useState, useEffect } from "react";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import {
-  portalGprsCommand,
-  vehicleListByClientId,
+ 
   videoList,
   vehiclebyClientid,
 } from "@/utils/API_CALLS";
@@ -32,8 +31,6 @@ import {
   ListItem,
   ListItemText,
   Collapse,
-  RadioGroup,
-  Radio,
 } from "@material-ui/core";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -44,16 +41,11 @@ import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import { Modal, Backdrop, Fade, IconButton } from "@mui/material";
 import Request from "./request";
-import Loading from "../../app/loading";
-import Loadcomponent from "./loadcomponent";
 import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
-import { isPagesAPIRouteMatch } from "next/dist/server/future/route-matches/pages-api-route-match";
-import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import { io, Socket } from "socket.io-client";
 import logo from "../../../public/Images/loadinglogo.png"
-import { setLoginTime } from "@/utils/time";
+
 
 export default function DualCam() {
   const [pictureVideoDataOfVehicle, setPictureVideoDataOfVehicle] = useState<
@@ -76,18 +68,9 @@ export default function DualCam() {
   const [openvideo, setopenvideo] = React.useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [progress, setProgress] = useState<number>(0);
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupShown, setPopupShown] = useState(false);
   const [deviceCommandText, setDeviceCommandText] = useState<any>([]);
+  const [servertoastId, setservertoastId] = useState<string | null>(null);
 
-  //  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //    const value = Number(event.target.value);
-  //    if (!isNaN(value) && value >= 0 && value <= 100) {
-  //      setProgress(value);
-  //    }
-  //  };
-
-  // for progress
   const [socketdata, setSocketdata] = useState({
     camera: 0,
     camera_type: "",
@@ -114,7 +97,7 @@ export default function DualCam() {
       socketRef.current = null;
     }
   };
-
+console.log("DSfservertoastId", servertoastId);
   useEffect(() => {
     socketRef.current = io("http://157.90.155.83:7057", {
       autoConnect: false,
@@ -123,11 +106,34 @@ export default function DualCam() {
     });
 
     socketRef.current.connect();
+    socketRef.current.on("connect_error", () => {
+      if (!servertoastId) {
+        console.log("in");
+        const id = toast.loading("Socket connection failed. Retrying...", {
+          position: "top-center",
+          autoClose: false, // Keep the toast visible until successful connection
+        });
+        setservertoastId(id);
+      }
+    });
 
-    socketRef.current.on("message", async (data: any) => {
+    // Clear error toast if connection is successful
+    socketRef.current.on("connect", () => {
+      if (servertoastId) {
+     
+        toast.dismiss(servertoastId);
+        setservertoastId(null);
+      }
+      toast.success("Socket connected successfully!", {
+        position: "top-center",
+        autoClose: 5000,
+      });
+      setSocketConnected(true); // Update connection status on successful connection
+    });
+
+    socketRef.current.on("message", async (data) => {
       setProgress(Math.floor(data.progress));
       setSocketdata(data);
-      setSocketConnected(true); // Socket is receiving data
 
       if (socketTimeoutRef.current) {
         clearTimeout(socketTimeoutRef.current);
@@ -135,7 +141,6 @@ export default function DualCam() {
 
       socketTimeoutRef.current = setTimeout(() => {
         if (socketConnected) {
-          // Socket has been inactive
           setProgress(100); // Move progress to 100%
           setSocketConnected(false); // Update connection status
           if (!toastId) {
@@ -146,7 +151,7 @@ export default function DualCam() {
             setToastId(id);
           }
         }
-      }, 10000); // 5 seconds inactivity timeout
+      }, 100000); // 100 seconds inactivity timeout
     });
 
     // Clean up on unmount
@@ -156,7 +161,7 @@ export default function DualCam() {
       }
       handleSocketDisconnection();
     };
-  }, []);
+  }, [servertoastId]);
 
   useEffect(() => {
     if (socketdata?.filetype === ".h265" && socketdata.progress > 1 && socketdata.progress < 100) {
@@ -169,7 +174,10 @@ export default function DualCam() {
         setToastId(id);
       }
     } else if (socketdata?.progress === 100 && toastId) {
-    
+    toast.success("Video Downloaded Successfully", {
+      position: "top-center",
+      autoClose: 5000,
+    })
       toast.dismiss(toastId);
       setToastId(null);
     }
@@ -182,35 +190,6 @@ export default function DualCam() {
       setToastId(null);
     }
   }, [socketdata, toastId]);
-
-  /* useEffect(() => {
-  
-    
-    const socket = io("http://157.90.155.83:7057", {
-      autoConnect: false,
-      query: { clientId: "64f9c5c3b7f9957d81e36908" }, // This gets updated later on with client code.
-      transports: ["websocket", "polling", "flashsocket"],
-    });
-    socket.connect()
-    socket.on("message", async (data) => {
-      setProgress(Math.floor(data.progress));
-      setSocketdata(data);
-      if (!popupShown) {
-        setPopupShown(true);
-        setShowPopup(true);
-      }
-
-      if (Math.floor(data.progress) === 100) {
-        setPopupShown(false);
-        setShowPopup(false);
-      }
-    });
-    // Clean up on unmount
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [session]); */
 
   useEffect(() => {
     // Connect to the server
@@ -242,25 +221,6 @@ export default function DualCam() {
       socket2.disconnect();
     };
   }, []); //
-  /* useEffect(() => {
-    if (
-      socketdata.filetype === ".h265" &&
-      socketdata.progress > 1 &&
-      socketdata.progress < 100
-    ) {
-      if (!toastId) {
-        const id: any = toast.loading(`Video Downloading `, {
-          position: "top-center",
-        });
-        setActiveTab1("View");
-        setMediaType("videos");
-        setToastId(id);
-      }
-    } else if (socketdata.progress == 100 && toastId) {
-      toast.dismiss(toastId);
-      setToastId(null);
-    }
-  }, [socketdata, toastId]); */
 
   useEffect(() => {
     if (
@@ -277,7 +237,10 @@ export default function DualCam() {
         setToastId(id);
       }
     } else if (socketdata.progress == 100 && toastId) {
-      
+      toast.success("Image Downloaded Successfully", {
+        position: "top-center",
+        autoClose: 5000,
+      })
       toast.dismiss(toastId);
       setToastId(null);
     }
@@ -419,12 +382,8 @@ export default function DualCam() {
       }
     }
   };
-  //here code:
-  // const [currentPage1, setCurrentPage1] = useState(1);
+
   const [inputValue, setInputValue] = useState("");
-  // const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
-  //   setCurrentPage1(value);
-  // };
 
   const handleClickGo = () => {
     const pageNumber = parseInt(inputValue);
@@ -438,9 +397,6 @@ export default function DualCam() {
 
   const [fromDate, setFromDate] = useState<Date | null>(null);
   const [toDate, setToDate] = useState<Date | null>(null);
-  //  const [selectedFromDate, setSelectedFromDate] = useState('');
-  // const [selectedToDate, setSelectedToDate] = useState('');
-
   const handleDateChange1 = (
     type: string,
     date: MaterialUiPickersDate | null
@@ -503,13 +459,6 @@ export default function DualCam() {
     }
   },[fromDate,toDate])
   
-
-  // useEffect(() => {
-  //   // Set filtered records when the component mounts
-  //   setFilteredRecords(sortedRecords);
-  // }, []);
-
-  // records for Image Pagination
   const recordsPerPage = 8;
   const lastIndex = currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
@@ -651,45 +600,7 @@ export default function DualCam() {
       <p className="bg-green px-4 py-1 text-white mb-5 font-bold text-center">
         Camera Management
       </p>
-      {/* <div>
-        {showPopup && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-            <div className="bg-white p-6 rounded shadow-lg relative">
-              <button
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                onClick={() => {
-                  setPopupShown(false);
-                  setShowPopup(false);
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-              <p className="text-center">
-                {socketdata.filetype === ".jpeg" &&
-                  "Image Downloading is in progress"}
-                {socketdata.filetype === ".h265" && toast.success("Dawnlaoding Video",{
-                  position:"top-center"
-                })}
-              </p>
-            </div>
-          </div>
-        )}
-      </div> */}
-
-      {/* here add collapse */}
+    
       <List
         component="nav"
         className="nav nav-tabs  nav nav-pills bg-nav-pills "
@@ -1196,7 +1107,7 @@ export default function DualCam() {
               </div>
             ) : (
               <div>
-                <div className="grid lg:grid-cols-6  mt-5  ">
+                <div className="grid lg:grid-cols-3  mt-5  ">
                   <div
                     className="col-span-1 gap-2 "
                     style={{ marginRight: "50px", marginLeft: "20px" }}
@@ -1235,140 +1146,208 @@ export default function DualCam() {
                       }}
                     />
                   </div>
+
+
+                  {/* 
+                  
+                  */}
+
+                  
                   <div className="col-span-2 mt-2">
-                    <form>
-                      <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 -mt-5 grid-cols-12 xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2  justify-center">
-                        <div
-                          className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0"
-                          // style={{ display: "flex", alignItems: "flex-end" }}
-                        >
-                          <label
-                            className="text-green"
-                            style={{ marginRight: "5px" }}
-                          >
-                            From 
-                          </label>
-                          <br></br>
-                          <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
-                            <DatePicker
-                              format="MM/dd/yyyy"
-                              value={fromDate}
-                              onChange={(date) =>
-                                handleDateChange1("from", date)
-                              }
-                              variant="inline"
-                              maxDate={currenTDates}
-                              placeholder="Start Date"
-                              autoOk
-                              style={{ width: "100%" }}
-                              inputProps={{ readOnly: true }}
-                              InputProps={{
-                                endAdornment: (
-                                  <EventIcon
-                                    style={{ width: "20", height: "20" }}
-                                  />
-                                ),
-                              }}
-                            />
-                          </MuiPickersUtilsProvider>
-                        </div>
-                        <div
-                          className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5"
-                          // style={{ display: "flex", alignItems: "flex-end" }}
-                        >
-                          <label
-                            className="text-green"
-                            style={{ marginRight: "5px" }}
-                          >
-                            To 
-                         </label>
-                         <br></br>
-                          <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
-                            <DatePicker
-                              format="MM/dd/yyyy"
-                              value={toDate}
-                              onChange={(date) => handleDateChange1("to", date)}
-                              variant="inline"
-                              placeholder="End Date"
-                              maxDate={currenTDates}
-                              autoOk
-                              inputProps={{ readOnly: true }}
-                              InputProps={{
-                                endAdornment: (
-                                  <EventIcon
-                                    style={{ width: "20", height: "20" }}
-                                  />
-                                ),
-                              }}
-                            />
-                          </MuiPickersUtilsProvider>
-                        </div>
-                        <div
-                          className="lg:col-span-1 col-span-1"
-                          style={{ marginLeft: "-37px" }}
-                        >
-                          <button
-                            style={{ background: "none" }}
-                            className="text-green  text-2xl"
-                            onClick={(e) => handleClear(e)}
-                          >
-                            x
-                          </button>
-                        </div>
-                        <div className="lg:col-span-1 col-span-1">
-                          <button
-                            className="bg-green py-2 text-white mt-4 flex justify-between items-stretch
-   font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none hover:border-none px-4
- "
-                            onClick={(e) => handleSearch1(e)}
-                            style={{ fontWeight: "bold", borderRadius: "10px" }}
-                          >
-                            <svg
-                              className="h-5 w-5 ms-1 mt-0.5 text-white mr-1"
-                              style={{ fontWeight: "bold" }}
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                              strokeLinejoin="round"
-                            >
-                              {" "}
-                              <circle cx="10" cy="10" r="7"></circle>{" "}
-                              <line x1="21" y1="21" x2="15" y2="15"></line>
-                            </svg>
-                            <span>Search</span>{" "}
-                          </button>
-                        </div>
-                      </div>
-                    </form>
-                  </div>
-                  <div className="flex items-center justify-end lg:col-span-1 col-span-1 ml-4 ">
-                    <label className="text-sm  px-7">
-                      <input
-                        type="radio"
-                        className="w-3 h-3 mr-2 form-radio text-green"
-                        name="mediaType"
-                        value="images"
-                        checked={mediaType === "images"}
-                        onChange={handleMediaType}
-                        style={{ accentColor: "green" }}
-                      />
-                      Images
-                    </label>
-                    <label className="text-sm mr-5">
-                      <input
-                        type="radio"
-                        className="w-3 h-3 mr-2 form-radio text-green lg:ms-5"
-                        name="mediaType"
-                        value="videos"
-                        checked={mediaType === "videos"}
-                        onChange={handleMediaType}
-                        style={{ accentColor: "green" }}
-                      />
-                      Videos
-                    </label>
-                  </div>
+  <form>
+    {/* Container for large screens (from 1024px upwards) */}
+    <div className="hidden lg:grid lg:grid-cols-12 lg:gap-4 px-4 md:px-6 lg:px-10 items-center">
+      <div className="lg:col-span-3 flex flex-col">
+        <label className="text-green mb-1">From</label>
+        <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
+          <DatePicker
+            format="MM/dd/yyyy"
+            value={fromDate}
+            onChange={(date) => handleDateChange1("from", date)}
+            variant="inline"
+            maxDate={currenTDates}
+            placeholder="Start Date"
+            autoOk
+            style={{ width: "100%" }}
+            inputProps={{ readOnly: true }}
+            InputProps={{
+              endAdornment: (
+                <EventIcon style={{ width: 20, height: 20 }} />
+              ),
+            }}
+          />
+        </MuiPickersUtilsProvider>
+      </div>
+      <div className="lg:col-span-3 flex flex-col">
+        <label className="text-green mb-1">To</label>
+        <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
+          <DatePicker
+            format="MM/dd/yyyy"
+            value={toDate}
+            onChange={(date) => handleDateChange1("to", date)}
+            variant="inline"
+            placeholder="End Date"
+            maxDate={currenTDates}
+            autoOk
+            inputProps={{ readOnly: true }}
+            InputProps={{
+              endAdornment: (
+                <EventIcon style={{ width: 20, height: 20 }} />
+              ),
+            }}
+          />
+        </MuiPickersUtilsProvider>
+      </div>
+      <div className="lg:col-span-2 flex items-center justify-center">
+        <button
+          style={{ background: "none" }}
+          className="text-green text-2xl"
+          onClick={(e) => handleClear(e)}
+        >
+          x
+        </button>
+      </div>
+      <div className="lg:col-span-2 flex items-center justify-center">
+        <button
+          className="bg-green py-2 text-white flex items-center justify-center font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none px-4 rounded-lg"
+          onClick={(e) => handleSearch1(e)}
+          style={{ fontWeight: "bold" }}
+        >
+          <svg
+            className="h-5 w-5 text-white mr-2"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="4"
+            strokeLinejoin="round"
+          >
+            <circle cx="10" cy="10" r="7"></circle>
+            <line x1="21" y1="21" x2="15" y2="15"></line>
+          </svg>
+          <span>Search</span>
+        </button>
+      </div>
+    </div>
+
+    {/* Container for smaller screens (up to 770px) */}
+    <div className="lg:hidden flex flex-col gap-4 px-4 md:px-6 lg:px-10">
+  <div className="flex items-start gap-4">
+    <div className="flex flex-col flex-grow mb-2">
+      <label className="text-green mb-1">From</label>
+      <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
+        <DatePicker
+          format="MM/dd/yyyy"
+          value={fromDate}
+          onChange={(date) => handleDateChange1("from", date)}
+          variant="inline"
+          maxDate={currenTDates}
+          placeholder="Start Date"
+          autoOk
+          style={{ width: "100%" }}
+          inputProps={{ readOnly: true }}
+          InputProps={{
+            endAdornment: (
+              <EventIcon style={{ width: 20, height: 20 }} />
+            ),
+          }}
+        />
+      </MuiPickersUtilsProvider>
+    </div>
+
+    <div className="flex flex-col flex-grow mb-2">
+      <label className="text-green mb-1">To</label>
+      <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
+        <DatePicker
+          format="MM/dd/yyyy"
+          value={toDate}
+          onChange={(date) => handleDateChange1("to", date)}
+          variant="inline"
+          placeholder="End Date"
+          maxDate={currenTDates}
+          autoOk
+          inputProps={{ readOnly: true }}
+          InputProps={{
+            endAdornment: (
+              <EventIcon style={{ width: 20, height: 20 }} />
+            ),
+          }}
+        />
+      </MuiPickersUtilsProvider>
+    </div>
+
+    <div className="flex">
+      <button
+        style={{ background: "none" }}
+        className="text-green text-2xl"
+        onClick={(e) => handleClear(e)}
+      >
+        x
+      </button>
+    </div>
+  </div>
+
+      <div className="flex items-center">
+        <button
+          className="bg-green py-2 text-white flex items-center justify-center font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none px-4 rounded-lg"
+          onClick={(e) => handleSearch1(e)}
+          style={{ fontWeight: "bold", margin: "auto" }}
+        >
+          <svg
+            className="h-5 w-5 text-white mr-2"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="4"
+            strokeLinejoin="round"
+          >
+            <circle cx="10" cy="10" r="7"></circle>
+            <line x1="21" y1="21" x2="15" y2="15"></line>
+          </svg>
+          <span>Search</span>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+
                 </div>
+                
+<div className=" lg:flex lg:items-center lg:justify-center lg:mt-4 lg:w-full" style={{margin: "auto", marginTop: "20px"}}>
+  <div className="flex items-center justify-center gap-4">
+    <label className="text-sm flex items-center">
+      <input
+        type="radio"
+        className="w-4 h-4 mr-2 form-radio text-green"
+        name="mediaType"
+        value="images"
+        checked={mediaType === "images"}
+        onChange={handleMediaType}
+        style={{ accentColor: "green" }}
+      />
+      Images
+    </label>
+    <label className="text-sm flex items-center">
+      <input
+        type="radio"
+        className="w-4 h-4 mr-2 form-radio text-green"
+        name="mediaType"
+        value="videos"
+        checked={mediaType === "videos"}
+        onChange={handleMediaType}
+        style={{ accentColor: "green" }}
+      />
+      Videos
+    </label>
+  </div>
+</div>
+
+
+
+
+
+{/*  */}
                 <div
                   className="grid lg:grid-cols-5  sm:grid-cols-5 md:grid-cols-5 grid-cols-1  mt-5 "
                   style={{
@@ -2536,22 +2515,9 @@ export default function DualCam() {
                                                     padding: "4px 8px",
                                                   }}
                                                 >
-                                                  {/* const timingZone = session.timezone;
-      const timerequested = backFromUnix(filenametodate, timingZone); */}
+                                               
                                                   {timerequested}
-                                                  {/* {new Date(item?.dateTime).toLocaleString(
-                                      "en-US",
-                                      {
-                                        timeZone: session?.timezone,
-                                        year: "numeric", 
-                 month: "long",                
-                 day: "2-digit", 
-                 hour: "numeric", 
-                 minute: "numeric", 
-                 second: "numeric", 
-                 hour12: true,
-                                      }
-                                    )} */}
+                                    
                                                 </TableCell>
                                                 <TableCell
                                                   align="center"
