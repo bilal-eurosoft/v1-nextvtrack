@@ -456,22 +456,15 @@ const LiveSidebar = ({
                         Driver Name: {item.DriverName.replace("undefine", "")}
                       </p>
                     )}
-                  {/* {item.DriverName.replace("undefine", "")} */}
-                  {/* </p> */}
-                  <span className="text-labelColor">
-                    {item?.OSM?.address?.road}
-                    {/* {item?.OSM?.address?.neighbourhood}
-                  {item?.OSM?.address?.road}
-                  {item?.OSM?.address?.city} */}
-                    <br></br>
-                  </span>
+                 
+                 
                 </div>
               </div>
               <button className="border-b-2  border-green w-full text-end -mt-10">
-                {/* {filteredData?.duration[index]?.duration} */}
-                {formattedTimes[index].duration !==
+              
+                {/* {formattedTimes[index].duration !==
                   "NaN hours, NaN minutes, NaN seconds" &&
-                  formattedTimes[index].duration}
+                  formattedTimes[index].duration} */}
               </button>
             </div>
           );
