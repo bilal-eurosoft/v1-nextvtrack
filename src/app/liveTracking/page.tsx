@@ -235,13 +235,13 @@ const LiveTracking = () => {
             }
             // carData.current = uniqueData;
 
-            //  console.log("carData.current", carData.current)
+            
 
             setLastDataReceivedTimestamp(new Date());
           }
         );
       } catch (err) {
-        console.log("Socket Error", err);
+        
       }
     }
     if (!isOnline) {

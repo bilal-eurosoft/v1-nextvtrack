@@ -23,9 +23,7 @@ export default function Verification() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id: any = searchParams.get("q");
-  // console.log(base64decode(id))
-  // const decodedValue = decodeURIComponent(id);
-  // console.log(decodedValue);
+  
   const [formData, setFormData] = useState<any>({
     password: "",
     link: base64decode(id),
@@ -35,7 +33,7 @@ export default function Verification() {
   const [lineExpire, setLinkExpire] = useState(false);
   const moment = require("moment-timezone");
   // Use the decoded value in your component
-  // console.log('Decoded value of "q":', decodedValue);
+  
   const handleInputChange = (key: any, e: any) => {
     setFormData({ ...formData, [key]: e.target.value });
   };

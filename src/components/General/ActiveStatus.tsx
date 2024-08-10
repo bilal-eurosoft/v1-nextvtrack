@@ -26,7 +26,7 @@ export const ActiveStatus: React.FC<ActiveStatusProps> = ({
     // Calculate the time difference in minutes
     const timeDiffMinutes =
       (currentHours * 60 + currentMinutes) - (targetHours * 60 + targetMinutes);
-    console.log("car ", reg, timeDiffMinutes)
+    
     // Determine the color based on the time difference
     const newDivColor = timeDiffMinutes <= 120 ? "green" : "red";
 

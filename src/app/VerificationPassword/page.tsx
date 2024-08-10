@@ -31,7 +31,7 @@ export default function ForgetPassword(props: any) {
     e.preventDefault();
     // const value = queryString.parse(props.location.search);
     // let encoded = base64decode(value.q);
-    // console.log(encoded);
+    
     // if (
     //   encoded ===
     //   "?q=NjFlNmQwMGZkOWNjNzEwMmFjNjQ2NGEzNjU2ZjAzZTVkZDgwNDQyMTA5NWI4ZTJhMTcwMTc3OTkyOTExNA=="
@@ -44,10 +44,6 @@ export default function ForgetPassword(props: any) {
     //   ...formData,
     //   clientId: session?.clientId,
     // };
-    // console.log(props);
-    // console.log(props.location);
-
-    // console.log(props.location.search);
 
     // const response = await toast.promise(
     //   forgetPasswordUpdateLinkClientId({
@@ -86,7 +82,7 @@ export default function ForgetPassword(props: any) {
   };
 
   useEffect(() => {
-    console.log(props.searchParams.q);
+    
     const newformdata: any = {
       clientId: session?.clientId,
     };

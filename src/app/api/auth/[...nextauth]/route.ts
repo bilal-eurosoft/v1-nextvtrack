@@ -127,7 +127,7 @@ export const authOptions: AuthOptions = {
 
             // }
           } catch (error: any) {
-            console.log(error);
+            
             throw new Error(error.message);
 
             return error;

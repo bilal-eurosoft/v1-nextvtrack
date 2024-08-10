@@ -220,13 +220,13 @@ export default function AddZoneComp() {
           setAddresses(response);
         })
         .catch((error) => {
-          console.log("Error fetching address:", error);
+          
         });
     }
   };
 
   // const handleAAdressSearch = async (inputValue: any) => {
-  //   console.log("e", inputValue.target.value);
+  
   //   let query: string = inputValue.target.value;
   //   if (session) {
   //     const getAddress = await getSearchAddress({

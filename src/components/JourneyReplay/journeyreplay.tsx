@@ -1228,8 +1228,8 @@ export default function journeyReplayComp() {
     }
     setLaodingMap(true);
   };
-  // console.log("stopWithSecond", stopWithSecond);
-  // console.log("stops", stops);
+  
+  
   const handleDivClickv3 = async (
     TripStart: TripsByBucket["TripStart"],
     TripEnd: TripsByBucket["TripEnd"],

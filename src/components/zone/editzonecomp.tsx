@@ -233,12 +233,12 @@ export default function EditZoneComp() {
     let circlePoint = formatCenterPoints(latlng.lat, latlng.lng);
 
     const newlatlng = circlePoint?.split(",").map(Number);
-    console.log("newlatlng", newlatlng, drawShape);
+    
 
     if (drawShape == true || drawShape == false) {
       setCircleDataById({ radius: radius });
       const updateCircleData = (newLatlng: string, newRadius: string): void => {
-        console.log("updateCircleData", newLatlng, newRadius);
+        
         setCircleData({
           latlng: newLatlng,
           radius: newRadius,
@@ -248,13 +248,13 @@ export default function EditZoneComp() {
       setMapcenter([newlatlng[0], newlatlng[1]]);
     }
   };
-  console.log("circledata", circleData);
+  
   const handleChange = (e: any) => {
     const { name, value } = e.target;
-    console.log("e", name, value);
+  
     setForm({ ...Form, [name]: value });
   };
-  // console.log(drawShape);
+  
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -265,7 +265,7 @@ export default function EditZoneComp() {
       toast.error("Please Draw a Zone");
       return;
     }
-    console.log("[pqwoepiwqouwiy", Form);
+    
     try {
       if (session) {
         const newformdata = {
@@ -338,7 +338,7 @@ export default function EditZoneComp() {
       } else if (layer instanceof L.Circle) {
         const latlng: L.LatLng = layer.getLatLng();
         const radius: number = layer.getRadius();
-        console.log("vsdfvfd", latlng, radius);
+        
         handleCircleSave(latlng, radius.toString());
         setDrawShape(true);
       }
@@ -361,7 +361,7 @@ export default function EditZoneComp() {
       setDrawShape(true);
     }
   };
-  console.log("form", Form, drawShape);
+  
   const handleCreated = (e: any) => {
     const createdLayer = e.layer;
     const type = e.layerType;

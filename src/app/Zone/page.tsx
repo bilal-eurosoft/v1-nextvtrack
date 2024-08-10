@@ -88,7 +88,7 @@ export default function Zone() {
   // let filterZoneResult;
   // filterZoneResult = filteredZones.slice(firstIndexFilter, lastIndexFilter);
   // const totalPagesFilter = Math.ceil(filteredZones.length / filterZonePerPage);
-  // console.log("filteredZones", filterZoneResult);
+  
   const handleClickPagination = () => {
     setCurrentPage(input);
     setInputPagination(true);
@@ -371,7 +371,7 @@ export default function Zone() {
         duration: 3000,
         position: "top-center",
       });
-      console.log(error);
+      
     }
   }
 
@@ -382,7 +382,7 @@ export default function Zone() {
   //     id: zoneId,
   //   });
   // } catch (error) {
-  //   console.log(error);
+  
   // }
   // allZone();
 
@@ -462,7 +462,7 @@ export default function Zone() {
 
   const handleZoneSortName = (e: any) => {
     // const { value, label } = e;
-    // console.log("value", value);
+    
     if (!e) {
       return setSearchCriteria((PreData: any) => ({
         ...PreData,

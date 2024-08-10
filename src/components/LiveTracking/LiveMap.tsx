@@ -110,7 +110,7 @@ const DynamicCarMap = ({
   const handleClear = () => {
     setIsActiveColor("");
 
-    // console.log("test123");
+    
     // setSelectedVehicle(null);
   };
 

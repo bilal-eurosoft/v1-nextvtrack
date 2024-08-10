@@ -23,7 +23,7 @@ const fetchZoneApi = async ({ token, clientId }) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data:", error);
+    
     throw error;
   }
 };
@@ -67,7 +67,7 @@ const fetchvehicleApi = async ({ token, clientId }) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data:", error);
+    
     throw error;
   }
 };
@@ -82,7 +82,7 @@ export const vehicleClientById = createAsyncThunk(
   async (args, thunkAPI) => {
     try {
       const data = await debouncedFetchVehicle(args);
-      console.log("Data:", data);
+      
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);

@@ -228,7 +228,7 @@ export default function Reports() {
   const formattedDateTime = `${parsedDateTime
     .toISOString()
     .slice(0, 10)}TO${timeOnly}`;
-  // console.log("inigintion", Ignitionreport);
+  
 
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
@@ -306,13 +306,13 @@ export default function Reports() {
             yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
         }
         if (period === "week") {
-          //console.log("week is starting");
+          
           const startOfWeek = moment().subtract(7, "days").startOf("day");
-          //console.log("start of week", startOfWeek);
+          
           const oneday = moment().subtract(1, "day");
 
           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          //console.log("start date time ", startDateTime);
+          
           endDateTime =
             oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
         }
@@ -557,7 +557,7 @@ export default function Reports() {
                 } else if (
                   Ignitionreport.reportType.toString() === "IdlingActivity"
                 ) {
-                  // console.log("idling---------", response.data.tableData);
+
 
                   // Constructing new column headers based on the data format
                   newColumnHeaders = ["0", "1", "2"];

@@ -28,7 +28,7 @@ export async function getVehicleDataByClientId(clientId: string) {
 
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -56,7 +56,7 @@ export async function getVehicleDataByClientId(clientId: string) {
 //     const data = await response.json();
 //     return data;
 //   } catch (error) {
-//     console.log("Error fetching data");
+//     
 //     return [];
 //   }
 // }
@@ -84,7 +84,7 @@ export async function vehicleListByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -116,7 +116,7 @@ export async function vehicleListByClientId({
 //     const data = await response.json();
 //     return data;
 //   } catch (error) {
-//     console.log("Error fetching data");
+//     
 //     return [];
 //   }
 // }
@@ -125,7 +125,7 @@ export function expireForgotLink(payload: any) {
     .post(`${URL}/forgotpassword/UpdateLink`, payload)
     .then((response: any) => response?.data)
     .catch((error) => {
-      console.log("Error Expire Update Link", error);
+      
     });
   return ressult;
 }
@@ -184,7 +184,7 @@ export async function IgnitionReportByTrip({
     }
 
     const data = await response.json();
-    console.log("data", data);
+    
     return data;
   } catch (error) {
     console.error("Error fetching data", error);
@@ -215,7 +215,7 @@ export async function IgnitionReportByDailyactivity({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -242,7 +242,7 @@ export async function IgnitionReportByIgnition({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -269,7 +269,7 @@ export async function IgnitionReportByEvents({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -296,7 +296,7 @@ export async function IgnitionReportByDetailReport({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -323,7 +323,7 @@ export async function IgnitionReportByIdlingActivity({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -349,10 +349,10 @@ export async function videoList({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    console.log("data", data);
+    
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -442,10 +442,10 @@ export async function clientbyClientid({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    console.log("data", data);
+    
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -502,7 +502,7 @@ export async function getZoneListByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -530,7 +530,7 @@ export async function forgetEmailByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -558,7 +558,7 @@ export async function forgetPasswordClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -587,7 +587,7 @@ export async function forgetPasswordByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -616,7 +616,7 @@ export async function forgetPasswordUpdateLinkClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -650,13 +650,13 @@ export async function postDriverDataByClientId({
 
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
 export async function AssignRfidtodriver(token: any, payload: any) {
   try {
-    console.log(token, payload);
+    
     const response = await fetch(`${URL}/AssignRfidToDriver`, {
       method: "POST",
       headers: {
@@ -674,7 +674,7 @@ export async function AssignRfidtodriver(token: any, payload: any) {
 
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -685,7 +685,7 @@ export async function postDriverDataAssignByClientId({
   token: string;
   newformdata: any;
 }) {
-  console.log("api response", newformdata);
+  
   try {
     const response = await fetch(`${URL}/v2/DriverAssign`, {
       method: "POST",
@@ -701,10 +701,10 @@ export async function postDriverDataAssignByClientId({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    console.log("dataAssign", data);
+  
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -716,7 +716,7 @@ export async function postDriverDeDataAssignByClientId({
   token: string;
   newformdata: any;
 }) {
-  console.log("api response", newformdata);
+  
   try {
     const response = await fetch(`${URL}/v2/DriverDeAssign`, {
       method: "POST",
@@ -732,10 +732,10 @@ export async function postDriverDeDataAssignByClientId({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    console.log("dataAssign", data);
+    
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -763,7 +763,7 @@ export async function GetDriverDataByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -792,7 +792,7 @@ export async function GetRfIdByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -821,7 +821,7 @@ export async function onAssignRfid({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -849,7 +849,7 @@ export async function GetDriverDataAssignByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -877,7 +877,7 @@ export async function GetDriverforvehicel({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -905,7 +905,7 @@ export async function ZoneFindById({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -935,7 +935,7 @@ export async function alertSettingCountZone({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -963,7 +963,7 @@ export async function zoneRuleDeleteByZoneId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -994,7 +994,7 @@ export async function zonevehicleByZoneId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -1022,7 +1022,7 @@ export async function modifyCollectionStatus({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -1044,7 +1044,7 @@ export async function getSearchAddress({
       throw new Error("Failed to fetch data from the API");
     }
   //   const data = await response.json();
-  console.log("frtgfbhjn", response) */
+   */
     const response = await fetch(
       `https://backend.vtracksolutions.com/zoneaddresssearch?q=${query},${country}`,
       {
@@ -1064,12 +1064,10 @@ export async function getSearchAddress({
     const data = await response.json();
 
     return data;
-    /* console.log("Response data:", response);
-const data = await response.json();
-console.log("Response data:", data); */
+    
     //  return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -1096,14 +1094,14 @@ export async function postZoneDataByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
 
 export async function zoneDelete({ token, id }: { token: any; id: string }) {
   try {
-    console.log("before api", id);
+    
     const response = await fetch(`${URL}/zoneDelete`, {
       headers: {
         accept: "application/json, text/plain, */*",
@@ -1119,7 +1117,7 @@ export async function zoneDelete({ token, id }: { token: any; id: string }) {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -1149,7 +1147,7 @@ export async function zonenamesearch({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data:", error);
+    
     return [];
   }
 }
@@ -1298,7 +1296,7 @@ export async function TripAddress({
     }
 
     const data = await response.json();
-    console.log("data", data);
+    
     return data;
   } catch (error) {
     console.error("Error fetching data", error);

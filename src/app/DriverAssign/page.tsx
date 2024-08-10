@@ -193,7 +193,7 @@ export default function DriverProfile() {
   const [selectVehicleNum, setSelectVehicleNum] = useState<any>({});
 
   const vehicleName = async () => {
-    // console.log("selected", selectedDriver);
+    
     try {
       // setLaoding(true);
       if (session) {
@@ -216,7 +216,7 @@ export default function DriverProfile() {
   useEffect(() => {
     vehicleName();
   }, [session]);
-  // console.log("getallAssign", getAllAsignData);
+
   const AllAsignData = async () => {
     try {
       // setLaoding(true);
@@ -460,7 +460,7 @@ export default function DriverProfile() {
           </div>
         ));
 
-        // console.log("deAssign", newformdata);
+        
         // const response = await toast.promise(
         //   postDriverDeDataAssignByClientId({
         //     token: session?.accessToken,

@@ -129,7 +129,7 @@ export default function DualCam() {
   //   func();
   // }, []);
 
-  // console.log("tessst", getVideoPagination);
+  
 
   return (
     <div>

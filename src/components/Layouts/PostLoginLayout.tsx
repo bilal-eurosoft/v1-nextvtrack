@@ -143,7 +143,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
   //           })
   //         );
   //       } catch (error) {
-  //         console.log("Error fetching zone list:", error);
+  
   //       }
   //     }
   //   };
@@ -154,7 +154,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
   // const allzoneList = zoneList?.map((item) => {
   //   return item?.id;
   // });
-  // console.log("zoneId", allzoneList);
+  
   const formatTime = (milliseconds: any) => {
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
@@ -194,7 +194,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
           setFilterId(filteredIds?.id);
           // Use filteredIds as needed
         } catch (error) {
-          console.log("Error filtering zone ids:", error);
+          
         }
       }
     };

@@ -120,7 +120,7 @@ export default function ForgetPassword() {
     //   );
     // }
   };
-  console.log("session", session);
+
 
   return (
     <div
