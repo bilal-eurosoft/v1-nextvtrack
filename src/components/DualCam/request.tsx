@@ -461,7 +461,7 @@ export default function Request({ socketdata, deviceCommandText }) {
    
     let duration;
     if (selectedFileType == "Video") {
-      duration = 200//(Number(selectedduration) + 2) * 60;
+      duration = 300//(Number(selectedduration) + 2) * 60;
     } else {
       duration = 100;
     }
@@ -660,237 +660,193 @@ export default function Request({ socketdata, deviceCommandText }) {
   let getMinute = getDate.getMinutes();
   let getSecond = getDate.getSeconds();
   let fullTime = `${getHour}:${getMinute}:${getSecond}`;
-
   return (
-    <div>
-      <div className="tab-pane" id="">
-        <div className="grid lg:grid-cols-5  md:grid-cols-3 sm:grid-col-1   px-4 text-start gap-5 bg-bgLight pt-3 gap-16">
-          <div className="css-b62m3t-container ">
-            <Select
-              value={selectedOption}
-              // value={selectedVehicle}
-              onChange={handleSelectChange}
-              options={options}
-              placeholder="Pick Vehicle"
-              isClearable
-              isSearchable
-              noOptionsMessage={() => "No options available"}
-              className="rounded-md w-full  outline-green border border-grayLight  hover:border-green select_vehicle"
-              styles={{
-                control: (provided, state) => ({
-                  ...provided,
-                  border: "none",
-                  boxShadow: state.isFocused ? null : null,
-                }),
-                option: (provided, state) => ({
-                  ...provided,
-                  backgroundColor: state.isSelected
-                    ? "#00B56C"
-                    : state.isFocused
-                    ? "#E1F0E3"
-                    : "transparent",
-                  color: state.isSelected
-                    ? "white"
-                    : state.isFocused
-                    ? "black"
-                    : "black",
-                  "&:hover": {
-                    backgroundColor: "#E1F0E3",
-                    color: "black",
-                  },
-                }),
-              }}
-            />
-          </div>
-          <div className="col-span-1">
-            <div className="border border-gray ">
-              <p className="text-sm text-green -mt-3  bg-bgLight lg:w-32 ms-14 px-4 ">
-                Camera Type
-              </p>
-              <div className="flex items-center">
-                <label className="text-sm  px-7">
-                  <input
-                    type="radio"
-                    style={{ accentColor: "green" }}
-                    className="w-3 h-3 mr-2 form-radio text-green"
-                    /*    disabled={foundVehicleData?.frontCamera ? false : true} */
-                    name="cameraType"
-                    value="Front"
-                     disabled={disableallButton}
-                    checked={selectedCameraType === "Front"}
-                    onChange={handleCameraTypeChange}
-                  />
-                  Front
-                </label>
-
-                <label className="text-sm mr-5">
-                  <input
-                    type="radio"
-                    style={{ accentColor: "green" }}
-                    className="w-3 h-3 mr-2 form-radio text-green lg:ms-5"
-                    /*    disabled={foundVehicleData?.backCamera ? false : true} */
-                    name="cameraType"
-                    value="Back"
-                    // disabled={ foundVehicleData?.backCamera?.value !=3}
-                    disabled={disableallButton}
-                    checked={selectedCameraType === "Back"}
-                    onChange={handleCameraTypeChange}
-                  />
-                  Back
-                </label>
-              </div>
+    <div className="p-4 bg-bgLight">
+      {/* Container for responsive layout */}
+      <div className="grid gap-5 grid-cols-1 sm:grid-cols-1 md:grid-cols-3">
+  
+        {/* Vehicle Select */}
+        <div className="col-span-1">
+          <Select
+            value={selectedOption}
+            onChange={handleSelectChange}
+            options={options}
+            placeholder="Pick Vehicle"
+            isClearable
+            isSearchable
+            noOptionsMessage={() => "No options available"}
+            className="rounded-md w-full outline-green border border-grayLight hover:border-green"
+            styles={{
+              control: (provided, state) => ({
+                ...provided,
+                border: "none",
+                boxShadow: state.isFocused ? null : null,
+              }),
+              option: (provided, state) => ({
+                ...provided,
+                backgroundColor: state.isSelected
+                  ? "#00B56C"
+                  : state.isFocused
+                  ? "#E1F0E3"
+                  : "transparent",
+                color: state.isSelected
+                  ? "white"
+                  : state.isFocused
+                  ? "black"
+                  : "black",
+                "&:hover": {
+                  backgroundColor: "#E1F0E3",
+                  color: "black",
+                },
+              }),
+            }}
+          />
+        </div>
+  
+        {/* Camera Type */}
+        <div className="col-span-1">
+          <div className="border border-gray p-2">
+            <p className="text-sm text-green bg-bgLight px-4">Camera Type</p>
+            <div className="flex flex-wrap gap-4">
+              <label className="text-sm flex items-center">
+                <input
+                  type="radio"
+                  style={{ accentColor: "green" }}
+                  className="w-3 h-3 mr-2"
+                  name="cameraType"
+                  value="Front"
+                  disabled={disableallButton}
+                  checked={selectedCameraType === "Front"}
+                  onChange={handleCameraTypeChange}
+                />
+                Front
+              </label>
+              <label className="text-sm flex items-center">
+                <input
+                  type="radio"
+                  style={{ accentColor: "green" }}
+                  className="w-3 h-3 mr-2"
+                  name="cameraType"
+                  value="Back"
+                  disabled={disableallButton}
+                  checked={selectedCameraType === "Back"}
+                  onChange={handleCameraTypeChange}
+                />
+                Back
+              </label>
             </div>
           </div>
-          <div className="col-span-1">
-            <div className="border border-gray">
-              <p className="text-sm text-green  -mt-3  bg-bgLight lg:w-24 ms-16 px-4">
-                File Type
-              </p>
-              <div className="flex items-center">
-                <label className="text-sm px-5">
-                  <input
-                    type="radio"
-                    style={{ accentColor: "green" }}
-                    className="w-3 h-3 mr-2 form-radio text-green"
-                    name="fileType"
-                    value="Photo"
-                    disabled={disableallButton}
-                    checked={selectedFileType === "Photo"}
-                    onChange={handleFileTypeChange}
-                  />
-                  Image
-                </label>
-                <label className="text-sm mr-5">
-                  <input
-                    type="radio"
-                    style={{ accentColor: "green" }}
-                    className="w-3 h-3 mr-2 form-radio text-green lg:ms-5"
-                    name="fileType"
-                    value="Video"
-                    disabled={disableallButton}
-                    checked={selectedFileType === "Video"}
-                    onChange={handleFileTypeChange}
-                  />
-                  &nbsp;Video
-                </label>
-              </div>
+        </div>
+  
+        {/* File Type */}
+        <div className="col-span-1">
+          <div className="border border-gray p-2">
+            <p className="text-sm text-green bg-bgLight px-4">File Type</p>
+            <div className="flex flex-wrap gap-4">
+              <label className="text-sm flex items-center">
+                <input
+                  type="radio"
+                  style={{ accentColor: "green" }}
+                  className="w-3 h-3 mr-2"
+                  name="fileType"
+                  value="Photo"
+                  disabled={disableallButton}
+                  checked={selectedFileType === "Photo"}
+                  onChange={handleFileTypeChange}
+                />
+                Image
+              </label>
+              <label className="text-sm flex items-center">
+                <input
+                  type="radio"
+                  style={{ accentColor: "green" }}
+                  className="w-3 h-3 mr-2"
+                  name="fileType"
+                  value="Video"
+                  disabled={disableallButton}
+                  checked={selectedFileType === "Video"}
+                  onChange={handleFileTypeChange}
+                />
+                Video
+              </label>
             </div>
           </div>
-          <div className="col-span-2">
-            <button
-              className={`bg-green px-2 py-2 text-white
-              ${disabledrequestButton ? "opacity-50 cursor-not-allowed" : ""}`}
-              // className={`bg-green px-5 py-2 text-white ${
-              //   disabledRequestButton == true
-              //     ? "opacity-50 cursor-not-allowed"
-              //     : "" ||
-              //       selectedFileType === null ||
-              //       selectedCameraType === null ||
-              //       selectedVehicle === null ||
-              //       (selectedFileType === "Video" &&
-              //         (selectedDate === null ||
-              //           selectedTime === "" ||
-              //           selectedduration === ""))
-              //     ? "disabled"
-              //     : ""
-              // }`}
-              onClick={handleSubmit}
-              disabled={
-                disabledrequestButton == true /*  ||
-                selectedFileType === null ||
-                selectedCameraType === null ||
-                selectedVehicle === null ||
-                (selectedFileType === "Video" &&
-                  (selectedDate === null ||
-                    selectedTime === "" ||
-                    selectedduration === "")) */
-              }
-            >
-              Request
-            </button>{" "}
-            {/* <button
-              className={`bg-green px-5 py-2 text-white `}
-              // onClick={handleSubmit2}
-            >
-              check Status
-            </button> */}
-            <button
-              className={`bg-green px-2 py-2 text-white
-                    ${
-                      disabledcameraButton
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
-                    }`}
-              onClick={() => {
-                handlecameraOn({});
-              }}
-              disabled={disabledcameraButton}
-              style={{ marginLeft: "10px" }}
-            >
-              camera On
-            </button>
-          </div>
         </div>
-        <br></br>
-        <br></br>
-        <div>
-        {showDurationTab && (
-  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', padding: '20px', backgroundColor: '#f9f9f9' }}>
-    <form style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', padding: '10px', borderRadius: '5px', backgroundColor: '#ffffff', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
-        <label htmlFor="date" style={{ marginBottom: '5px', fontWeight: 'bold', color: '#333' }}>Date:</label>
-        <input
-          type="date"
-          id="date"
-          form="MM/dd/yyyy"
-          value={selectedDate}
-          onChange={(item) => handlevideodate(item)}
-          step="1"
-          onKeyPress={(e) => e.preventDefault()}
-          required
-          style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '16px' }}
-        />
+  
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', padding: '10px', borderRadius: '5px', backgroundColor: '#ffffff', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
-        <label htmlFor="time" style={{ marginBottom: '5px', fontWeight: 'bold', color: '#333' }}>Time:</label>
-        <input
-          type="time"
-          id="time"
-          value={selectedTime >= fullTime ? '' : selectedTime}
-          onChange={(e) => setSelectedTime(e.target.value)}
-          step="1"
-          onKeyPress={(e) => e.preventDefault()}
-          required
-          style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '16px' }}
-        />
+  
+      {/* Buttons */}
+      <div className="flex flex-wrap gap-4 my-6">
+        <button
+          className={`bg-green px-4 py-2 text-white ${disabledrequestButton ? "opacity-50 cursor-not-allowed" : ""}`}
+          onClick={handleSubmit}
+          disabled={disabledrequestButton}
+        >
+          Request
+        </button>
+        <button
+          className={`bg-green px-4 py-2 text-white ${disabledcameraButton ? "opacity-50 cursor-not-allowed" : ""}`}
+          onClick={() => handlecameraOn({})}
+          disabled={disabledcameraButton}
+        >
+          Camera On
+        </button>
       </div>
-      <div style={{ display: 'flex', width: '150%', flexDirection: 'column', padding: '10px', borderRadius: '5px', backgroundColor: '#ffffff', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
-        <label htmlFor="duration" style={{ marginBottom: '5px', fontWeight: 'bold', color: '#333' }}>Duration: (in seconds)</label>
-        <input
-          type="number"
-          id="duration"
-          value={selectedduration}
-          onChange={(e) => {
-            const value = e.target.value;
-            if (/^[1-9]$|^10$/.test(value)) {
-              setSelectedDuration(value);
-            }
-          }}
-          placeholder="Enter duration between 1-10 sec"
-          required
-          style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '16px' }}
-        />
-      </div>
-    </form>
-  </div>
-)}
-
-
+  
+      {/* Date, Time, and Duration Form */}
+      {showDurationTab && (
+        <div className="my-6 bg-gray-100 p-4 rounded-lg shadow-md">
+          <form className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            <div className="flex flex-col p-2 bg-white border rounded-md shadow-sm">
+              <label htmlFor="date" className="font-bold text-gray-700 mb-1">Date:</label>
+              <input
+                type="date"
+                id="date"
+                value={selectedDate}
+                onChange={(item) => handlevideodate(item)}
+                step="1"
+                onKeyPress={(e) => e.preventDefault()}
+                required
+                className="border p-2 rounded-md"
+              />
+            </div>
+            <div className="flex flex-col p-2 bg-white border rounded-md shadow-sm">
+              <label htmlFor="time" className="font-bold text-gray-700 mb-1">Time:</label>
+              <input
+                type="time"
+                id="time"
+                value={selectedTime >= fullTime ? '' : selectedTime}
+                onChange={(e) => setSelectedTime(e.target.value)}
+                step="1"
+                onKeyPress={(e) => e.preventDefault()}
+                required
+                className="border p-2 rounded-md"
+              />
+            </div>
+            <div className="flex flex-col p-2 bg-white border rounded-md shadow-sm">
+              <label htmlFor="duration" className="font-bold text-gray-700 mb-1">Duration: (in seconds)</label>
+              <input
+                type="number"
+                id="duration"
+                value={selectedduration}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^[1-9]$|^10$/.test(value)) {
+                    setSelectedDuration(value);
+                  }
+                }}
+                placeholder="Enter duration between 1-10 sec"
+                required
+                className="border p-2 rounded-md"
+              />
+            </div>
+          </form>
         </div>
-      </div>
-      <br></br>
-      <br></br>
+      )}
+  
       <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
+  
+  
 }
