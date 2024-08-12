@@ -699,7 +699,7 @@ export default function RootLayout({
                       </Link>
                       <br></br>
                       <br></br>
-                      <Link href="/Notifications">
+                      {/* <Link href="/Notifications">
                         <Tooltip
                           className="bg-white  text-[#00B56C] shadow-lg rounded"
                           placement="right"
@@ -731,7 +731,7 @@ export default function RootLayout({
                             <polygon points="10 8 16 12 10 16 10 8" />
                           </svg>
                         </Tooltip>
-                      </Link>
+                      </Link> */}
                       <Link
                         className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
                         href="/DriverAssign"
