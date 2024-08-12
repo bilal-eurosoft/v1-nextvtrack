@@ -99,7 +99,7 @@ export default function DualCam() {
   };
 console.log("DSfservertoastId", servertoastId);
   useEffect(() => {
-    socketRef.current = io("http://157.90.155.83:7057", {
+    socketRef.current = io("https://camera.vtracksolutions:7057", {
       autoConnect: false,
       query: { clientId: "64f9c5c3b7f9957d81e36908" },
       transports: ["websocket", "polling", "flashsocket"],
@@ -154,6 +154,7 @@ console.log("DSfservertoastId", servertoastId);
       }, 100000); // 100 seconds inactivity timeout
     });
 
+
     // Clean up on unmount
     return () => {
       if (socketTimeoutRef.current) {
@@ -193,6 +194,7 @@ console.log("DSfservertoastId", servertoastId);
 
   useEffect(() => {
     // Connect to the server
+    
     const socket2 = io("https://socketio.vtracksolutions.com:1102", {
       autoConnect: false,
       query: { clientId: "64f9c5c3b7f9957d81e36908" }, // This gets updated later on with client code.
