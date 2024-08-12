@@ -409,7 +409,7 @@ export async function IgnitionReportByTrip({
 }) {
   try {
     const response = await fetch(
-      `http://172.16.10.46:80/Report/IgnitionReport`,
+      `${URL}/Report/IgnitionReport`,
       {
         method: "POST",
         headers: {
@@ -1154,32 +1154,39 @@ export async function getSearchAddress({
   country: string;
 }) {
   try {
-    /* const response = await fetch(
-      `http://osm.vtracksolutions.com/nominatim/search.php?q=${query}+Pakistan&format=json`,
-      {
-        method: "GET",
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-  //   const data = await response.json();
-  console.log("frtgfbhjn", response) */
     const response = await fetch(
-      `https://backend.vtracksolutions.com/zoneaddresssearch?q=${query},${country}`,
+      
+      `http://osm.vtracksolutions.com/nominatim/search.php?q=${query}+${country}&format=json`,
       {
         method: "GET",
-        headers: {
+         headers: {
           accept: "application/json, text/plain, */*",
           "content-type": "application/json",
-          "Content-Security-Policy": "default-src 'self' https: http:",
-        },
+          "Content-Security-Policy": "default-src 'self' https: http:"
+        }
       }
     );
-
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
     }
+  // const data = await response.json();
+  
+  // https://backend.vtracksolutions.com
+    // const response = await fetch(
+    //   `http://localhost:80/zoneaddresssearch?q=${query},${country}`,
+    //   {
+    //     method: "GET",
+    //     headers: {
+    //       accept: "application/json, text/plain, */*",
+    //       "content-type": "application/json",
+    //       "Content-Security-Policy": "default-src 'self' https: http:",
+    //     },
+    //   }
+    // );
+
+    // if (!response.ok) {
+    //   throw new Error("Failed to fetch data from the API");
+    // }
 
     const data = await response.json();
 

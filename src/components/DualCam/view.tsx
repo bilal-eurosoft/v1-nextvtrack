@@ -116,7 +116,7 @@ export default function DualCam() {
   };
 
   useEffect(() => {
-    socketRef.current = io("http://157.90.155.83:7057", {
+    socketRef.current = io("https://157.90.155.83:7057", {
       autoConnect: false,
       query: { clientId: "64f9c5c3b7f9957d81e36908" },
       transports: ["websocket", "polling", "flashsocket"],
