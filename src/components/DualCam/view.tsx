@@ -99,7 +99,8 @@ export default function DualCam() {
   };
 console.log("DSfservertoastId", servertoastId);
   useEffect(() => {
-    socketRef.current = io("https://camera.vtracksolutions:7057", {
+   
+    socketRef.current = io("https://camera.vtracksolutions.com:7057", {
       autoConnect: false,
       query: { clientId: "64f9c5c3b7f9957d81e36908" },
       transports: ["websocket", "polling", "flashsocket"],
