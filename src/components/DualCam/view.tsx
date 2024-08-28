@@ -97,72 +97,73 @@ export default function DualCam() {
       socketRef.current = null;
     }
   };
-console.log("DSfservertoastId", servertoastId);
+
   useEffect(() => {
+  
+  socketRef.current = io("https://camera.vtracksolutions.com:7057", {
+    autoConnect: false,
+    query: { clientId: session?.clientId },
+    transports: ["websocket", "polling", "flashsocket"],
+  });
+
+  socketRef.current.connect();
+  socketRef.current.on("connect_error", () => {
+    //console.log("Socket connection failed. Retrying...")
+    // if (!servertoastId) {
+      
+    //   const id = toast.loading("Socket connection failed. Retrying...", {
+    //     position: "top-center",
+    //     autoClose: false, // Keep the toast visible until successful connection
+    //   });
+    //   setservertoastId(id);
+    // }
+  });
+
+  // Clear error toast if connection is successful
+  socketRef.current.on("connect", () => {
+    if (servertoastId) {
    
-    socketRef.current = io("https://camera.vtracksolutions.com:7057", {
-      autoConnect: false,
-      query: { clientId: "64f9c5c3b7f9957d81e36908" },
-      transports: ["websocket", "polling", "flashsocket"],
+      toast.dismiss(servertoastId);
+      setservertoastId(null);
+    }
+    toast.success("Socket connected successfully!", {
+      position: "top-center",
+      autoClose: 5000,
     });
+    setSocketConnected(true); // Update connection status on successful connection
+  });
 
-    socketRef.current.connect();
-    socketRef.current.on("connect_error", () => {
-      if (!servertoastId) {
-        console.log("in");
-        const id = toast.loading("Socket connection failed. Retrying...", {
-          position: "top-center",
-          autoClose: false, // Keep the toast visible until successful connection
-        });
-        setservertoastId(id);
-      }
-    });
+  socketRef.current.on("message", async (data) => {
+    setProgress(Math.floor(data.progress));
+    setSocketdata(data);
 
-    // Clear error toast if connection is successful
-    socketRef.current.on("connect", () => {
-      if (servertoastId) {
-     
-        toast.dismiss(servertoastId);
-        setservertoastId(null);
-      }
-      toast.success("Socket connected successfully!", {
-        position: "top-center",
-        autoClose: 5000,
-      });
-      setSocketConnected(true); // Update connection status on successful connection
-    });
+    if (socketTimeoutRef.current) {
+      clearTimeout(socketTimeoutRef.current);
+    }
 
-    socketRef.current.on("message", async (data) => {
-      setProgress(Math.floor(data.progress));
-      setSocketdata(data);
-
-      if (socketTimeoutRef.current) {
-        clearTimeout(socketTimeoutRef.current);
-      }
-
-      socketTimeoutRef.current = setTimeout(() => {
-        if (socketConnected) {
-          setProgress(100); // Move progress to 100%
-          setSocketConnected(false); // Update connection status
-          if (!toastId) {
-            const id = toast.error("Socket is stopped", {
-              position: "top-center",
-              autoClose: 5000,
-            });
-            setToastId(id);
-          }
+    socketTimeoutRef.current = setTimeout(() => {
+      if (socketConnected) {
+        setProgress(100); // Move progress to 100%
+        setSocketConnected(false); // Update connection status
+        if (!toastId) {
+          const id = toast.error("Socket is stopped", {
+            position: "top-center",
+            autoClose: 5000,
+          });
+          setToastId(id);
         }
-      }, 100000); // 100 seconds inactivity timeout
-    });
-
-
-    // Clean up on unmount
-    return () => {
-      if (socketTimeoutRef.current) {
-        clearTimeout(socketTimeoutRef.current);
       }
-      handleSocketDisconnection();
-    };
+    }, 100000); // 100 seconds inactivity timeout
+  });
+
+
+  // Clean up on unmount
+  return () => {
+    if (socketTimeoutRef.current) {
+      clearTimeout(socketTimeoutRef.current);
+    }
+    handleSocketDisconnection();
+  };
   }, [servertoastId]);
 
   useEffect(() => {
@@ -198,14 +199,14 @@ console.log("DSfservertoastId", servertoastId);
     
     const socket2 = io("https://socketio.vtracksolutions.com:1102", {
       autoConnect: false,
-      query: { clientId: "64f9c5c3b7f9957d81e36908" }, // This gets updated later on with client code.
+      query: { clientId: session.clientId }, // This gets updated later on with client code.
       transports: ["websocket", "polling", "flashsocket"],
     });
 
     socket2.connect(); // Explicitly connect the socket
 
     socket2.on("device", async (data) => {
-      console.log("device data view", data);
+      
       let message;
       if (
         data.commandtext ===
@@ -2473,7 +2474,7 @@ console.log("DSfservertoastId", servertoastId);
                                               item.fileName.split(".")[0],
                                               10
                                             );
-                                            const timingZone = session.timezone;
+                                            const timingZone = session?.timezone;
                                             const timerequested = backFromUnix(
                                               filenametodate,
                                               timingZone

@@ -220,13 +220,7 @@ export default function Request({ socketdata, deviceCommandText }) {
           carData.current = uniqueData;
        
           if (carData.current) {
-            /*  console.log(
-              "i0977 222",
-              selectedVehicle,
-              "||",
-
-              localStorage.getItem("selectedVehicle")
-            ); */
+           
            
             const foundVehicle = carData.current.find(
               (vehicle: { vehicleReg: string }) =>
@@ -234,14 +228,14 @@ export default function Request({ socketdata, deviceCommandText }) {
               // localStorage.getItem("selectedVehicle")
             );
             setFoundVehicleData(foundVehicle);
-            /*   console.log(foundVehicle); */
+           
            
            
             if (
               foundVehicle?.ignition == 0 &&
               foundVehicle?.camStatus?.value == 0
             ) {
-              /*  console.log("disable request button"); */
+              
               setdisabledcameraButton(false);
               setdisabledrequestButton(true);
               
@@ -269,53 +263,11 @@ export default function Request({ socketdata, deviceCommandText }) {
     })();
   }, [session, selectedVehicle, selectedCameraType, selectedFileType]);
 
-  // useEffect(() => {
-  //   if (
-  //     (foundVehicleData?.frontCamera?.value == 3 &&
-  //       selectedCameraType == "Front") ||
-  //     (foundVehicleData?.backCamera?.value == 3 && selectedCameraType == "Back")
-  //   ) {
-  //     setdisabledButton(true);
-  //     setdisabledRequestButton(false);
-  //   } else if (
-  //     (foundVehicleData?.frontCamera?.value == 0 &&
-  //       selectedCameraType == "Front") ||
-  //     (foundVehicleData?.backCamera?.value == 0 && selectedCameraType == "Back")
-  //   ) {
-  //     toast.error("Camera Is Off", {
-  //       position: "top-center",
-  //     });
-  //     setdisabledButton(false);
-  //     setdisabledRequestButton(true);
-  //   }
-  //   if (
-  //     (selectedFileType === "Photo" || selectedFileType === "Video") &&
-  //     selectedCameraType == "Front" &&
-  //     foundVehicleData?.frontCamera?.value == 1
-  //   ) {
-  //     toast.error("Memory Card Is Missing", {
-  //       position: "top-center",
-  //     });
-  //   }
-  // }, [selectedFileType, selectedCameraType, foundVehicleData]);
-  // console.log("selectedVehicle", selectedVehicle);
   useEffect(() => {
     if (session?.clientId) {
-      /*  console.log(
-        "i0977",
-        selectedVehicle,
-        "||||",
-        disabledrequestButton,
-        localStorage.getItem("selectedVehicle")
-      ); */
+     
       try {
-        /*   const socket2 = io("https://socketio.vtracksolutions.com:1102", {
-          autoConnect: false,
-          query: { clientId: "64f9c5c3b7f9957d81e36908" }, // This gets updated later on with client code.
-          transports: ["websocket", "polling", "flashsocket"],
-        });
-        socket2.connect();
-        socket2.on( */
+       
         socket.io.opts.query = { clientId: session?.clientId };
         socket.connect();
         socket.on(
@@ -328,35 +280,19 @@ export default function Request({ socketdata, deviceCommandText }) {
             const uniqueData = uniqueDataByIMEIAndLatestTimestamp(
               data?.cacheList
             );
-            /*  console.log(
-              "i0977 111",
-              selectedVehicle,
-              "||",
-              selectedVehicleRef.current,
-              "||",
-              localStorage.getItem("selectedVehicle")
-            ); */
+            
             carData.current = uniqueData;
 
             if (carData.current) {
-              /*  console.log("i0977", selectedVehicle); */
-              /*   console.log(carData.current); */
+              
               const foundVehicle = carData.current.find(
                 (vehicle: { vehicleReg: string }) =>
                   vehicle.vehicleReg === selectedVehicleRef?.current?.vehicleReg
-                // localStorage.getItem("selectedVehicle")
+                
               );
            
               setFoundVehicleData(foundVehicle);
-              /*     console.log(foundVehicle); */
-              // if (foundVehicle?.frontCamera?.value == 0) {
-              //   setdisabledButton(false);
-              //   setdisabledcameraButton(true);
-              //   setdisabledrequestButton(false);
-              // } else {
-              //   setdisabledcameraButton(false);
-              //   setdisabledrequestButton(true);
-              // }
+            
 
               if (
                 foundVehicle?.ignition == 0 &&
@@ -407,7 +343,7 @@ export default function Request({ socketdata, deviceCommandText }) {
           }
         );
       } catch (err) {
-        console.log("Error: ", err);
+       
       }
     }
 
@@ -421,8 +357,8 @@ export default function Request({ socketdata, deviceCommandText }) {
     const selectedVehicle = vehicleList.find(
       (vehicle) => vehicle.vehicleReg === selectedVehicleId?.value
     );
-    /*     console.log(selectedVehicle, selectedVehicleId?.value, "=========");
-    localStorage.setItem("selectedVehicle", selectedVehicle?.vehicleReg); */
+    
+    // localStorage.setItem("selectedVehicle", selectedVehicle?.vehicleReg); 
     setSelectedVehicle(selectedVehicle || null);
   };
 
@@ -647,7 +583,7 @@ export default function Request({ socketdata, deviceCommandText }) {
   //   toast.dismiss(toastId);
   // }
   if (socketdata.filetype == ".h265" || socketdata.filetype == ".jpeg") {
-    /*  console.log(socketdata, toastId); */
+    
     toast.dismiss(toastId);
   }
 

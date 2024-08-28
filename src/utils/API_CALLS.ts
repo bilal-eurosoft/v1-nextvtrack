@@ -3,9 +3,8 @@ import { Events, Notifications } from "@/types/events";
 import { commandrequest } from "@/types/commandrequest";
 import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
-import { error } from "console";
-var URL = "https://backend.vtracksolutions.com";
-// var URL = "http://172.16.10.99:3001";
+// var URL = "http://172.16.10.47:80"
+var URL ="https://backend.vtracksolutions.com";
 
 
 export async function getVehicleDataByClientId(clientId: string) {
@@ -23,7 +22,7 @@ export async function getVehicleDataByClientId(clientId: string) {
 
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -51,7 +50,7 @@ export async function getClientSettingByClinetIdAndToken({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -79,7 +78,7 @@ export async function vehicleListByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -111,16 +110,16 @@ export async function vehicleListByClientId({
 //     const data = await response.json();
 //     return data;
 //   } catch (error) {
-//     console.log("Error fetching data");
+//     
 //     return [];
 //   }
 // }
 export function expireForgotLink(payload: any) {
   const ressult = axios
-    .post(`http://172.16.10.99/forgotpassword/UpdateLink`, payload)
+    .post(`${URL}/forgotpassword/UpdateLink`, payload)
     .then((response: any) => response?.data)
     .catch((error) => {
-      console.log("Error Expire Update Link", error);
+      
     });
   return ressult;
 }
@@ -149,7 +148,7 @@ export async function portalGprsCommand({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -180,7 +179,7 @@ export async function portalGprsCommand({
 //     const data = await response.json();
 //     return data;
 //   } catch (error) {
-//     console.log("Error fetching data");
+//     
 //     return [];
 //   }
 // }
@@ -204,7 +203,7 @@ export async function portalGprsCommand({
 //     const data = await response.json();
 //     return data;
 //   } catch (error) {
-//     console.log("Error fetching data", error);
+//     
 //     return null;
 //   }
 // }
@@ -297,10 +296,10 @@ export async function clientbyClientid({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    // console.log("data", data);
+    
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -392,10 +391,10 @@ export async function vehiclebyClientid({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    // console.log("data", data);
+    
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -426,7 +425,7 @@ export async function IgnitionReportByTrip({
     }
 
     const data = await response.json();
-    // console.log("data", data);
+    
     return data;
   } catch (error) {
     console.error("Error fetching data", error);
@@ -457,7 +456,7 @@ export async function IgnitionReportByDailyactivity({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -484,7 +483,7 @@ export async function IgnitionReportByIgnition({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -511,7 +510,7 @@ export async function IgnitionReportByEvents({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -538,7 +537,7 @@ export async function IgnitionReportByDetailReport({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -565,7 +564,7 @@ export async function IgnitionReportByIdlingActivity({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -591,10 +590,9 @@ export async function videoList({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    // console.log("data", data);
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -622,7 +620,7 @@ export async function getZoneListByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -650,7 +648,7 @@ export async function forgetEmailByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -678,7 +676,7 @@ export async function forgetPasswordClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -707,7 +705,7 @@ export async function forgetPasswordByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -736,7 +734,7 @@ export async function forgetPasswordUpdateLinkClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -770,13 +768,13 @@ export async function postDriverDataByClientId({
 
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
 export async function AssignRfidtodriver(token: any, payload: any) {
   try {
-    console.log(token, payload);
+  
     const response = await fetch(`${URL}/AssignRfidToDriver`, {
       method: "POST",
       headers: {
@@ -794,7 +792,7 @@ export async function AssignRfidtodriver(token: any, payload: any) {
 
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -805,7 +803,7 @@ export async function postDriverDataAssignByClientId({
   token: string;
   newformdata: any;
 }) {
-  console.log("api response", newformdata);
+
   try {
     const response = await fetch(`${URL}/v2/DriverAssign`, {
       method: "POST",
@@ -821,10 +819,10 @@ export async function postDriverDataAssignByClientId({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    // console.log("dataAssign", data);
+   
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -836,7 +834,7 @@ export async function postDriverDeDataAssignByClientId({
   token: string;
   newformdata: any;
 }) {
-  console.log("api response", newformdata);
+  
   try {
     const response = await fetch(`${URL}/v2/DriverDeAssign`, {
       method: "POST",
@@ -852,10 +850,10 @@ export async function postDriverDeDataAssignByClientId({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    // console.log("dataAssign", data);
+    
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -883,7 +881,7 @@ export async function GetDriverDataByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -912,7 +910,7 @@ export async function GetRfIdByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -941,7 +939,7 @@ export async function onAssignRfid({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -969,7 +967,7 @@ export async function GetDriverDataAssignByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -997,7 +995,7 @@ export async function GetDriverforvehicel({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -1025,7 +1023,7 @@ export async function ZoneFindById({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -1055,7 +1053,7 @@ export async function alertSettingCountZone({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -1083,7 +1081,7 @@ export async function zoneRuleDeleteByZoneId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -1114,7 +1112,7 @@ export async function zonevehicleByZoneId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -1142,7 +1140,7 @@ export async function modifyCollectionStatus({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -1154,49 +1152,29 @@ export async function getSearchAddress({
   country: string;
 }) {
   try {
+   
     const response = await fetch(
-      
-      `http://osm.vtracksolutions.com/nominatim/search.php?q=${query}+${country}&format=json`,
+      `${URL}/zoneaddresssearch?q=${query},${country}`,
       {
         method: "GET",
-         headers: {
+        headers: {
           accept: "application/json, text/plain, */*",
           "content-type": "application/json",
-          "Content-Security-Policy": "default-src 'self' https: http:"
-        }
+          "Content-Security-Policy": "default-src 'self' https: http:",
+        },
       }
     );
+
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
     }
-  // const data = await response.json();
-  
-  // https://backend.vtracksolutions.com
-    // const response = await fetch(
-    //   `http://localhost:80/zoneaddresssearch?q=${query},${country}`,
-    //   {
-    //     method: "GET",
-    //     headers: {
-    //       accept: "application/json, text/plain, */*",
-    //       "content-type": "application/json",
-    //       "Content-Security-Policy": "default-src 'self' https: http:",
-    //     },
-    //   }
-    // );
-
-    // if (!response.ok) {
-    //   throw new Error("Failed to fetch data from the API");
-    // }
 
     const data = await response.json();
 
     return data;
-    /* console.log("Response data:", response);
-const data = await response.json();
-console.log("Response data:", data); */
-    //  return data;
+   
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
@@ -1223,14 +1201,14 @@ export async function postZoneDataByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data", error);
+    
     return [];
   }
 }
 
 export async function zoneDelete({ token, id }: { token: any; id: string }) {
   try {
-    console.log("before api", id);
+    
     const response = await fetch(`${URL}/zoneDelete`, {
       headers: {
         accept: "application/json, text/plain, */*",
@@ -1246,7 +1224,7 @@ export async function zoneDelete({ token, id }: { token: any; id: string }) {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data");
+    
     return [];
   }
 }
@@ -1276,7 +1254,7 @@ export async function zonenamesearch({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data:", error);
+    
     return [];
   }
 }
@@ -1366,7 +1344,7 @@ export async function TripAddress({
     }
 
     const data = await response.json();
-    // console.log("data", data);
+    
     return data;
   } catch (error) {
     console.error("Error fetching data", error);
