@@ -2704,7 +2704,7 @@ export default function JourneyReplayComp() {
                 </div>
 
                 {getShowdetails ? (
-                  <div className="bg-white lg:h-60 md:h-60 sm:h-60 h-24 overflow-y-scroll resposive_stop_details">
+                  <div className={`bg-white overflow-y-scroll resposive_stop_details ${stopWithSecond.length>1?"lg:h-60 md:h-60 sm:h-60 h-24":""}`}>
                     {stopWithSecond?.map((item: any) => {
                       return loadingMap ? (
                         <div
