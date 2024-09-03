@@ -75,7 +75,7 @@ export default function Request({ socketdata, deviceCommandText }) {
   const [selectedTime, setSelectedTime] = useState("");
   const [selectedduration, setSelectedDuration] = useState("");
   /*  const [disabledRequestButton, setdisabledRequestButton] = useState(true); */
-
+  const [deviceresponse, setdeviceresponse] = useState(null);
   // const router = useRouter();
   const carData = useRef<VehicleData[]>([]);
 
@@ -86,12 +86,35 @@ export default function Request({ socketdata, deviceCommandText }) {
   //   }
   // };
   
-  const handlevideodate = (date: any | null) => {
+ /*  const handlevideodate = (date: any | null) => {
     if (date !== null) {
       const dateValue = moment(date).format("YYYY-MM-DD");
       setSelectedDate(dateValue);
     }
+  }; */
+  const handlevideodate = (e) => {
+    const selectedDate = e.target.value;
+    const currentDate = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
+  
+    if (selectedDate > currentDate) {
+      toast.error("Selected date cannot be in the future");
+      return;
+    }
+  //console.log("qqq", selectedDate);
+    setSelectedDate(selectedDate);
+  
+    // Clear time if the selected date is now in the past
+    /* if (selectedTime && selectedDate) {
+      const selectedDateTime = new Date(`${selectedDate}T${selectedTime}`);
+      const currentDateTime = new Date();
+  
+      if (selectedDateTime > currentDateTime) {
+        setSelectedTime("");
+      }
+    } */
   };
+  
+  
 
   const currenTDates = new Date();
 
@@ -112,6 +135,44 @@ export default function Request({ socketdata, deviceCommandText }) {
     vehicleListData();
   }, []);
 
+  
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+    //  console.log("SDdsfsdfsd");
+      if (CameraResponseToastId && !deviceresponse) {
+        toast.dismiss(CameraResponseToastId);
+        setCameraResponseToastId(null);
+        toast.error("There is an issue for camera on..!   Please try again later", {
+          duration: 6000,
+        })
+        setdeviceresponse(null)
+        setdisableallButton(false)
+        setSelectedVehicle(null);
+        setSelectedFileType(null);
+        setSelectedCameraType(null);
+       
+      }
+      if (toastId && !deviceresponse ) {
+        toast.dismiss(toastId);
+        setToastId(null);
+        toast.error("There is an issue for request..!     Please try again later", {
+          duration: 6000,
+        })
+        setdeviceresponse(null)
+        setdisableallButton(false)
+        setSelectedVehicle(null);
+        setSelectedFileType(null);
+        setSelectedCameraType(null);
+        setSelectedDuration("");
+        setSelectedTime("");
+        setSelectedDate("");
+      }
+    }, 30000); // 10000 milliseconds = 10 seconds
+  
+    // Cleanup function to clear the timeout if the component unmounts or the effect is re-run
+    return () => clearTimeout(timeoutId);
+  }, [CameraResponseToastId, toastId, deviceresponse]);
+  
   // useEffect(() => {
   //   const vehicleListData = async () => {
   //     try {
@@ -155,11 +216,14 @@ export default function Request({ socketdata, deviceCommandText }) {
       /* if(!CameraResponseToastId){
         toast.dismiss(CameraResponseToastId);
       } */
-      if(data?.commandtext !== "DOUT1:1 Timeout:100s "){
-        toast.success(data?.commandtext, {
-          position: "top-center",
-        });
-      }
+
+      // if(data?.commandtext !== "DOUT1:1 Timeout:100s "){
+      //   toast.success(data?.commandtext, {
+      //     position: "top-center",
+      //   });
+      // }
+      setdeviceresponse(data?.commandtext)
+    //  console.log("resp", data);
 
       
     });
@@ -364,11 +428,11 @@ export default function Request({ socketdata, deviceCommandText }) {
               ) {
                 setdisabledcameraButton(false);
                 setdisabledrequestButton(true);
-                if(cameraOnRef.current){
-                 
+                /* if(cameraOnRef.current){
+                console.log("if");
                   toast.dismiss(CameraResponseToastId);
                   setCameraResponseToastId(null)
-                }
+                } */
               } else if (
                 foundVehicle?.frontCamera?.value == 1 ||
                 foundVehicle?.frontCamera?.value == 2 ||
@@ -378,26 +442,21 @@ export default function Request({ socketdata, deviceCommandText }) {
 
                 setdisabledcameraButton(true);
                 setdisabledrequestButton(true);
-                if(cameraOnRef.current){
+                /* if(cameraOnRef.current){
                   
                   toast.dismiss(CameraResponseToastId);
                   setCameraResponseToastId(null)
-                }
+                } */
               } else if (foundVehicle?.frontCamera?.value == 3 ) {
+             //   console.log("else if 2");
                 setdisabledcameraButton(true);
                 setdisabledrequestButton(false);
                 if(cameraOnRef.current){
                 
                   toast.dismiss(CameraResponseToastId);
                   setCameraResponseToastId(null)
-                  toast.success("Now, you can make a Request", {
-                    autoClose: 4000,
-                  });
-                }
-                
-
-
-              }
+                  toast.success("Now, you can make a Request");
+                }}
             }
             /*          const existingData = localStorage.getItem('carData');
           if (existingData) {
@@ -453,6 +512,9 @@ export default function Request({ socketdata, deviceCommandText }) {
     if(!selectedVehicle || !selectedCameraType || !selectedFileType){
       return toast.error("Please select the fields")
     }
+    if(CameraResponseToastId){
+      return toast.error("Please wait")
+    }
    /*  if(showDurationTab == true){
       if(!selectedDate || !selectedTime || !selectedduration){
         return toast.error("Please select the fields")
@@ -461,9 +523,9 @@ export default function Request({ socketdata, deviceCommandText }) {
    
     let duration;
     if (selectedFileType == "Video") {
-      duration = 300//(Number(selectedduration) + 2) * 60;
+      duration = 500//(Number(selectedduration) + 2) * 60;
     } else {
-      duration = 100;
+      duration = 180;
     }
     let formvalues = {
       commandtext: `setdigout 1 ${duration}`,
@@ -480,6 +542,8 @@ export default function Request({ socketdata, deviceCommandText }) {
     }
 
     if (session) {
+  
+    
       const response = await toast.promise(
         portalGprsCommand({
           token: session?.accessToken,
@@ -511,7 +575,7 @@ export default function Request({ socketdata, deviceCommandText }) {
             },
           },
         }
-      );
+      ); 
 
         if (!CameraResponseToastId) {
           const id = toast.loading("Waiting for Camera on", {
@@ -521,7 +585,7 @@ export default function Request({ socketdata, deviceCommandText }) {
         }
       
       if(response.success){
-        setdisableallButton(true)
+      //  setdisableallButton(true)
         if(selectedFileType === "Video"){
           setshowDurationTab(true)
         }
@@ -529,7 +593,7 @@ export default function Request({ socketdata, deviceCommandText }) {
       }
     }
   };
-
+//console.log("toast", toastId);
   const handleSubmit = async () => {
     // setLatestGprs(true);
 
@@ -549,6 +613,17 @@ export default function Request({ socketdata, deviceCommandText }) {
         return toast.error("Please select the fields")
       }
     } 
+    if (toastId) {
+      return toast.error("Please wait 11")
+    }
+
+    const selectedDateTime = new Date(`${selectedDate}T${selectedTime}`);
+    const currentDateTime = new Date();
+  
+    if (selectedDateTime > currentDateTime) {
+      return toast.error("Selected date and time cannot be in the future");
+    }
+
     const timestamp = dateTimeToTimestamp(selectedDate, selectedTime);
     let Duration;
     if (Number(selectedduration) <= 10) {
@@ -562,8 +637,9 @@ export default function Request({ socketdata, deviceCommandText }) {
         commandText = "camreq: 1,1";
       } else if (selectedCameraType === "Back") {
         commandText = "camreq: 1,2";
-      }
-    } else if (selectedFileType === "Video") {
+      } 
+      
+        } else if (selectedFileType === "Video") {
       if (selectedCameraType === "Front") {
         commandText = `camreq: 0,1,${timestamp},${Duration}`;
       } else if (selectedCameraType === "Back") {
@@ -585,8 +661,11 @@ export default function Request({ socketdata, deviceCommandText }) {
       status: "Pending",
       vehicleReg: selectedVehicle?.vehicleReg,
     };
-
+if(!formvalues.commandtext){
+  return  toast.error("Please select the fields")
+}
     if (session) {
+     
       const response = await toast.promise(
         portalGprsCommand({
           token: session?.accessToken,
@@ -620,17 +699,25 @@ export default function Request({ socketdata, deviceCommandText }) {
         }
       );
 
-      if (socketdata.filetype !== ".h265" || socketdata.filetype !== ".jpeg") {
+      // if (socketdata.filetype !== ".h265" || socketdata.filetype !== ".jpeg") {
+      //   if (!toastId) {
+      //     const id = toast.loading("Waiting for Device Response", {
+      //       position: "top-center",
+      //     });
+      //     setToastId(id);
+      //   }
+      // }
+//console.log("socketdata", socketdata);
+      if (response.success) {
+        // setSelectedVehicle(null);
+       // console.log("asas");
         if (!toastId) {
+        //  console.log("asasassssssssssssss");
           const id = toast.loading("Waiting for Device Response", {
             position: "top-center",
           });
           setToastId(id);
         }
-      }
-
-      if (response.success) {
-        // setSelectedVehicle(null);
    
           setdisableallButton(false)
         
@@ -646,10 +733,22 @@ export default function Request({ socketdata, deviceCommandText }) {
   // if (socketdata) {
   //   toast.dismiss(toastId);
   // }
-  if (socketdata.filetype == ".h265" || socketdata.filetype == ".jpeg") {
-    /*  console.log(socketdata, toastId); */
+  useEffect(() =>{
+    if (socketdata.filetype == ".h265" || socketdata.filetype == ".jpeg") {
+      //  console.log(socketdata, toastId); 
+      if(    socketdata.progress > 1 &&
+        socketdata.progress < 100){
+
+       
+      setToastId(null)
+      toast.dismiss(toastId);
+    } }
+  }, [toastId, socketdata])
+  /* if (socketdata.filetype == ".h265" || socketdata.filetype == ".jpeg") {
+    /*  console.log(socketdata, toastId); 
+   // setToastId(null)
     toast.dismiss(toastId);
-  }
+  } */
 
   const selectedOption =
     options.find((option) => option.value === selectedVehicle?.vehicleReg) ||
@@ -815,8 +914,22 @@ export default function Request({ socketdata, deviceCommandText }) {
               <input
                 type="time"
                 id="time"
-                value={selectedTime >= fullTime ? '' : selectedTime}
-                onChange={(e) => setSelectedTime(e.target.value)}
+               /*  value={selectedTime >= fullTime ? '' : selectedTime} */
+               value={selectedTime}
+                onChange={(e) => {
+                  if (selectedDate) {
+                    
+                    const selectedDateTime = new Date(`${selectedDate}T${e.target.value}`);
+                    
+                    const currentDateTime = new Date();
+                    
+                    if (selectedDateTime > currentDateTime) {
+                      toast.error("Selected time cannot be in the future for the chosen date");
+                      return;
+                    }
+                  }
+                  setSelectedTime(e.target.value);
+                }}
                 step="1"
                 onKeyPress={(e) => e.preventDefault()}
                 required

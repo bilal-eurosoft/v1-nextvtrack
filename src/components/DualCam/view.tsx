@@ -70,6 +70,7 @@ export default function DualCam() {
   const [progress, setProgress] = useState<number>(0);
   const [deviceCommandText, setDeviceCommandText] = useState<any>([]);
   const [servertoastId, setservertoastId] = useState<string | null>(null);
+  const [fetchdata, setfetchdata] = useState<Boolean>(false); 
 
   const [socketdata, setSocketdata] = useState({
     camera: 0,
@@ -97,9 +98,9 @@ export default function DualCam() {
       socketRef.current = null;
     }
   };
-console.log("DSfservertoastId", servertoastId);
+//console.log("DSfservertoastId", servertoastId);
   useEffect(() => {
-   
+    let connectionErrorToastShown: Boolean = false;
     socketRef.current = io("https://camera.vtracksolutions.com:7057", {
       autoConnect: false,
       query: { clientId: "64f9c5c3b7f9957d81e36908" },
@@ -107,34 +108,58 @@ console.log("DSfservertoastId", servertoastId);
     });
 
     socketRef.current.connect();
-    socketRef.current.on("connect_error", () => {
-      if (!servertoastId) {
+    
+    /* socketRef.current.on("connect_error", () => {
+     // if (!servertoastId) {
         console.log("in");
-        const id = toast.loading("Socket connection failed. Retrying...", {
+        const id = toast.error("Socket connection failed. Retrying...", {
           position: "top-center",
-          autoClose: false, // Keep the toast visible until successful connection
+         duration: 5000
         });
-        setservertoastId(id);
+       // setservertoastId(id); }
+    }); */
+    socketRef.current.on("connect_error", () => {
+      if (!connectionErrorToastShown) {
+        connectionErrorToastShown = true;
+        const id = toast.error("Socket connection failed. Retrying...", {
+          position: "top-center",
+          duration: 5000,
+        });
+        setToastId(id);
       }
     });
 
     // Clear error toast if connection is successful
     socketRef.current.on("connect", () => {
-      if (servertoastId) {
-     
-        toast.dismiss(servertoastId);
-        setservertoastId(null);
-      }
+      // if (servertoastId) {
+
+      //   toast.dismiss(servertoastId);
+      //   setservertoastId(null);
+      // }
+    //  console.log("notifiy");
       toast.success("Socket connected successfully!", {
         position: "top-center",
         autoClose: 5000,
       });
-      setSocketConnected(true); // Update connection status on successful connection
+      connectionErrorToastShown = false;
+      //setSocketConnected(true); // Update connection status on successful connection
     });
 
     socketRef.current.on("message", async (data) => {
       setProgress(Math.floor(data.progress));
       setSocketdata(data);
+      //console.log("object", data);
+      if (data.message) {
+     // console.log("object", data);
+        toast.dismiss(toastId);
+      setToastId(null);
+    
+        // Show toast notification if 'message' attribute is present
+        toast.success(data.message, {
+          position: "top-center",
+          duration: 5000,
+        });
+      } 
 
       if (socketTimeoutRef.current) {
         clearTimeout(socketTimeoutRef.current);
@@ -149,6 +174,7 @@ console.log("DSfservertoastId", servertoastId);
               position: "top-center",
               autoClose: 5000,
             });
+            
             setToastId(id);
           }
         }
@@ -162,10 +188,12 @@ console.log("DSfservertoastId", servertoastId);
         clearTimeout(socketTimeoutRef.current);
       }
       handleSocketDisconnection();
+  
     };
-  }, [servertoastId]);
+  }, []);
+    //  }, [servertoastId]);
 
-  useEffect(() => {
+/*   useEffect(() => {
     if (socketdata?.filetype === ".h265" && socketdata.progress > 1 && socketdata.progress < 100) {
       if (!toastId) {
         const id = toast.loading("Video Downloading", {
@@ -183,15 +211,40 @@ console.log("DSfservertoastId", servertoastId);
       toast.dismiss(toastId);
       setToastId(null);
     }
-  }, [socketdata, toastId]);
+  }, [socketdata, toastId]); */
 
   useEffect(() => {
      if (socketdata?.progress === 100 && toastId) {
-    
+      let timeoutId;
+     // setfetchdata(!fetchdata)
       toast.dismiss(toastId);
       setToastId(null);
+        // Delay state change by 2 seconds
+      
+        timeoutId = setTimeout(() => {
+          setfetchdata(!fetchdata);
+       //   console.log("ACassa");
+        }, 2000);
+
+      // Cleanup function to clear the timeout if dependencies change
+      return () => clearTimeout(timeoutId);
+ /*      setfetchdata(!fetchdata)
+      toast.dismiss(toastId);
+      setToastId(null); */
     }
   }, [socketdata, toastId]);
+  useEffect(() => {
+    if (socketdata?.progress === 100) {
+     let timeoutId;
+    // console.log("ddd");
+       timeoutId = setTimeout(() => {
+         setfetchdata(!fetchdata);
+       //  console.log("ACassa");
+       }, 2000); 
+
+     return () => clearTimeout(timeoutId);
+   }
+ }, [socketdata]);
 
   useEffect(() => {
     // Connect to the server
@@ -227,10 +280,11 @@ console.log("DSfservertoastId", servertoastId);
 
   useEffect(() => {
     if (
-      socketdata.filetype === ".jpeg" &&
+      socketdata.filetype == ".jpeg" &&
       socketdata.progress > 1 &&
       socketdata.progress < 100
     ) {
+    //  console.log("if");
       if (!toastId) {
         const id: any = toast.loading(`Image Downloading `, {
           position: "top-center",
@@ -239,13 +293,36 @@ console.log("DSfservertoastId", servertoastId);
         setMediaType("images");
         setToastId(id);
       }
-    } else if (socketdata.progress == 100 && toastId) {
+    } else if (socketdata.progress == 100 && toastId && socketdata.filetype == ".jpeg") {
+    //  console.log("else if 11");
       toast.success("Image Downloaded Successfully", {
         position: "top-center",
         autoClose: 5000,
       })
       toast.dismiss(toastId);
       setToastId(null);
+    }
+    else if (socketdata.progress == 100 && toastId && socketdata.filetype == ".mp4") {
+   //   console.log("else if 22");
+      toast.success("Video Downloaded Successfully", {
+        position: "top-center",
+        autoClose: 5000,
+      })
+        toast.dismiss(toastId);
+        setToastId(null);
+    }
+    else {
+      if ( socketdata.filetype == ".mp4" && socketdata.progress > 1 && socketdata.progress < 100) {
+      //  console.log("els");
+        if (!toastId) {
+          const id = toast.loading("Video Downloading", {
+            position: "top-center",
+          });
+          setActiveTab1("View");
+          setMediaType("videos");
+          setToastId(id);
+        }
+      } 
     }
   }, [socketdata, toastId]);
 
@@ -256,6 +333,7 @@ console.log("DSfservertoastId", servertoastId);
           token: session?.accessToken,
           clientId: session?.clientId,
         });
+      //  console.log("acd");
         setFilteredRecords(response);
       }
       //  setLaoding(false);
@@ -417,6 +495,19 @@ console.log("DSfservertoastId", servertoastId);
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
+    if(!selectedVehiclelist){
+      toast.error("Please select Vehicle")
+      return
+    }
+    if (!fromDate){
+      toast.error("Please select From Date")
+      return
+    }
+
+    if (!toDate){
+      toast.error("Please select To Date")
+      return
+    }
     // setCurrentPage1(1);
     setCurrentPage(1);
     if (fromDate && toDate) {
@@ -460,7 +551,7 @@ console.log("DSfservertoastId", servertoastId);
     if(fromDate==null && toDate==null){
        fetchVideoListData()
     }
-  },[fromDate,toDate])
+  },[fromDate,toDate, fetchdata])
   
   const recordsPerPage = 8;
   const lastIndex = currentPage * recordsPerPage;
@@ -596,6 +687,48 @@ console.log("DSfservertoastId", servertoastId);
       return item;
     }
   });
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+//sonsole.log("windowWidth", windowWidth);
+  const getImageStyles = () => {
+    if (isFullScreen) {
+      return {
+        width: '100%',
+        height: '90%',
+        objectFit: 'contain',
+      };
+    }
+
+    // Adjust styles based on screen width
+    if (windowWidth < 640) {
+      // For small screens
+      return {
+        width: '100%',
+        height: 'auto',
+      //  objectFit: 'contain',
+      };
+    } else if (windowWidth < 1024) {
+      // For medium screens
+      return {
+        width: '100%',
+          height: '490px',
+      //  objectFit: 'contain',
+      };
+    } else {
+      // For large screens
+      return {
+        width: '1100px',
+        height: '490px',
+     //   objectFit: 'contain',
+      };
+    }
+  };
 
   return (
     <div>
@@ -1387,7 +1520,7 @@ console.log("DSfservertoastId", servertoastId);
                     ) : (
                       <div className="grid grid-cols-1  gap-5 ">
                         {mediaType === "images" && (
-                          <div className="col-span-1 shadow-lg w-full  ">
+                          <div className="col-span-1 shadow-lg w-full ">
                             <div className="bg-green shadow-lg sticky top-0">
                               <h1
                                 className="text-center text-xl text-white font-serif pb-2 pt-2"
@@ -1520,7 +1653,7 @@ console.log("DSfservertoastId", servertoastId);
                                             </TableCell>
                                           </TableRow>
                                         )}
-                                        {
+                                       {/*  {
                                           progress == 100 &&
                                           socketdata.filetype === ".jpeg" &&(
                                             <TableRow
@@ -1563,7 +1696,7 @@ console.log("DSfservertoastId", servertoastId);
                                                    session.timezone
                                                 )
                                                 }
-      }
+
                                             </TableCell>
                                             <TableCell
                                               align="center"
@@ -1770,7 +1903,7 @@ console.log("DSfservertoastId", servertoastId);
                                             </TableCell>
                                           </TableRow>
                                           )
-                                        }
+                                        } */}
                                       {records.map((item, index) => {
                                         if (item.fileType === 1) {
                                           const currentPage1 = currentPage;
@@ -1968,15 +2101,7 @@ console.log("DSfservertoastId", servertoastId);
                                                       <img
                                                         src={singleImage}
                                                         alt="Modal Content"
-                                                        style={{
-                                                          height: isFullScreen
-                                                            ? "90%"
-                                                            : "490px",
-                                                          width: isFullScreen
-                                                            ? "100%"
-                                                            : "1100px",
-                                                          radius: "2px",
-                                                        }}
+                                                        style={getImageStyles()}
                                                       />
                                                     </Box>
                                                   </Fade>
@@ -2245,7 +2370,7 @@ console.log("DSfservertoastId", servertoastId);
                                             </TableCell>
                                           </TableRow>
                                         )}
-                                         {
+                                        {/*  {
                                           progress == 100 &&
                                           socketdata.filetype === ".h265" &&
                                             <TableRow
@@ -2288,7 +2413,7 @@ console.log("DSfservertoastId", servertoastId);
                                                    session.timezone
                                                 )
                                                 }
-      }
+      
                                             </TableCell>
                                             <TableCell
                                               align="center"
@@ -2462,7 +2587,7 @@ console.log("DSfservertoastId", servertoastId);
                                             </TableCell>
                                           </TableRow>
                                           
-                                        }
+                                        } */}
                                       {recordsVideo.map(
                                         (
                                           item: pictureVideoDataOfVehicleT,
