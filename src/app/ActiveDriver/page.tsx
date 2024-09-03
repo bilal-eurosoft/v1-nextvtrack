@@ -424,7 +424,7 @@ export default function DriverProfile() {
                   colSpan={2}
                   id="table_head_inactive"
                 >
-                  Driver Contact
+                  Driver Number
                 </TableCell>
                 <TableCell
                   align="center"
@@ -466,6 +466,7 @@ export default function DriverProfile() {
             <TableBody className="bg-bgLight cursor-pointer ">
               {result.map((row: any, index: any) => (
                 <TableRow
+                key={index}
                   className="hover:bg-bgHoverTabel"
                   // style={{ backgroundColor: isColor == "on" ? "gray" : "" }}
                 >

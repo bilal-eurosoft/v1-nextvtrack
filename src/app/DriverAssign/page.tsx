@@ -727,7 +727,7 @@ export default function DriverProfile() {
               </TableHead>
               <TableBody className="bg-bgLight cursor-pointer  ">
                 {getAllAsignData?.data?.map((row: any, index: any) => (
-                  <TableRow className="hover:bg-bgHoverTabel w-full">
+                  <TableRow className="hover:bg-bgHoverTabel w-full" key ={index}>
                     <TableCell align="center" colSpan={2}>
                       {page * rowsPerPage + index + 1}
                     </TableCell>

@@ -357,7 +357,7 @@ const LiveSidebar = ({
       >
         {filteredData?.map((item: VehicleData, index: any) => {
           return (
-            <div
+            <div key = {index}
               style={{
                 backgroundColor: activeColor == item.vehicleId ? "#e1f0e3" : "",
               }}

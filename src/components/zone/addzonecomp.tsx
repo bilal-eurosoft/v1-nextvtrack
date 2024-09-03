@@ -822,7 +822,14 @@ export default function AddZoneComp() {
                         }}
                       />
                       {shapeType === "Polygon" && polygondataById.length > 0 ? (
-                        <Polygon positions={polygondataById} color="#97009c" />
+                        <Polygon positions={polygondataById} 
+                        color={
+                          Form.GeoFenceType=="City-Area"
+                          ? "green"
+                          :  Form.GeoFenceType=="Restricted-Area"
+                          ? "red"
+                          : "blue"
+                        } />
                       ) : null}
 
                       {shapeType === "Circle" &&
@@ -832,7 +839,13 @@ export default function AddZoneComp() {
                         <Circle
                           radius={Number(circleDataById?.radius)}
                           center={mapcenter}
-                          color="#97009c"
+                          color={
+                            Form.GeoFenceType=="City-Area"
+                            ? "green"
+                            :  Form.GeoFenceType=="Restricted-Area"
+                            ? "red"
+                            : "blue"
+                          }
                         />
                       ) : null}
                     </FeatureGroup>

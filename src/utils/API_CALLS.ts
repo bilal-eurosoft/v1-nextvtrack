@@ -774,7 +774,6 @@ export async function postDriverDataByClientId({
 }
 export async function AssignRfidtodriver(token: any, payload: any) {
   try {
-  
     const response = await fetch(`${URL}/AssignRfidToDriver`, {
       method: "POST",
       headers: {
@@ -787,12 +786,9 @@ export async function AssignRfidtodriver(token: any, payload: any) {
     if (!response.ok) {
       throw new Error("Failed to Assign rfid to driver");
     }
-
     const data = await response.json();
-
     return data;
   } catch (error) {
-    
     return [];
   }
 }

@@ -35,8 +35,7 @@ import {
   TripsByBucketAndVehicle,
   getAllVehicleByUserId,
   getCurrentAddress,
-  vehicleListByClientId,
-  TravelHistoryByBucketV2Two,
+  vehicleListByClientId,  
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { DeviceAttach } from "@/types/vehiclelistreports";
@@ -121,7 +120,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-export default function journeyReplayComp() {
+export default function JourneyReplayComp() {
   const { data: session } = useSession();
   const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
   const [zoneList, setZoneList] = useState<zonelistType[]>([]);
@@ -200,16 +199,15 @@ export default function journeyReplayComp() {
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
     setExpanded(isExpanded ? panel : null);
   };
-  const allData = useSelector((state) => state?.zone);
-  useEffect(() => {
-    setZoneList(allData?.zone);
-  }, []);
+  const allData = useSelector((state) => state?.zone);  
+  // useEffect(() => {
+  //   setZoneList(allZones?.zone);
+  // }, [allZones]);
 
   const moment = require("moment-timezone");
   const togglePicker = () => {
     setIsPickerOpen(!isPickerOpen);
   };
-
   const SetViewOnClick = ({ coords }: { coords: any }) => {
     if (isPaused) {
       setMapcenterToFly(null);
@@ -559,7 +557,7 @@ export default function journeyReplayComp() {
         if (period == "today") {
           setWeekData(false);
           const today = moment().tz(session?.timezone);
-          const time = today.format("HH:mm:ss");
+          // const time = today.format("HH:mm:ss");
           startDateTime =
             today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
@@ -997,196 +995,9 @@ export default function journeyReplayComp() {
     setLaodingMap(true);
   };
 
-  const handleDivClickTwo = async (
-    TripStart: TripsByBucket["TripStart"],
-    TripEnd: TripsByBucket["TripEnd"]
-  ) => {
-    setlat(null);
-    setlng(null);
-    setPlayBtn(true);
-    setStopBtn(false);
-    setStopDetailsOpen(true);
-    setIsPlaying(false);
-    setIsPaused(false);
-    setstopVehicle(false);
-    try {
-      setTravelHistoryresponse([]);
-      setIsPauseColor(false);
-      setProgressWidth(0);
-      // if (polylinedata.length > 0) {
-      //   setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
-      // }
-      setCurrentPositionIndex(0);
-      if (session) {
-        let newresponsedata = {
-          ...Ignitionreport,
-          fromDateTime: `${TripStart}`,
-          toDateTime: `${TripEnd}`,
-        };
-        setLaodingMap(false);
-
-        const TravelHistoryresponseapi = await toast.promise(
-          TravelHistoryByBucketV2Two({
-            token: session.accessToken,
-            payload: newresponsedata,
-          }),
-          {
-            loading: "Loading...",
-            success: "",
-            error: "",
-          },
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
-            },
-            success: {
-              duration: 10,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-            error: {
-              duration: 10,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-          }
-        );
-        // if (session?.unit == "Mile") {
-        //   unit = "Mph";
-        // } else {
-        //   unit = "Kph";
-        // }
-        var stopPoints = [];
-
-        if (session?.unit == "KM") {
-          stopPoints = TravelHistoryresponseapi?.data
-            ?.filter((x: any) => x.speed == "0 Kph")
-            ?.sort((x: any) => x.timeStamp);
-        } else {
-          stopPoints = TravelHistoryresponseapi?.data
-            ?.filter((x: any) => x.speed == "0 Mph")
-            ?.sort((x: any) => x.timeStamp);
-        }
-
-        // displayName = TravelHistoryresponse.map((item) => {
-        //   return item?.address?.display_name;
-        // });
-        var addresses: any = [];
-        if (TravelHistoryresponse)
-          stopPoints?.map(async function (singlePoint: any) {
-            let completeAddress;
-            if (!singlePoint.address?.display_name) {
-              completeAddress = await axios
-                .get(
-                  `http://osm.vtracksolutions.com/nominatim/reverse.php?lat=${singlePoint.lat}&lon=${singlePoint.lng}&zoom=19&format=jsonv2`
-                )
-                .then(async (response: any) => {
-                  return response.data;
-                });
-            } else {
-              completeAddress = singlePoint.address;
-            }
-
-            var record: any = {};
-            record["_id"] = singlePoint._id;
-            record["lat"] = singlePoint.lat;
-            record["lng"] = singlePoint.lng;
-            record["date"] = singlePoint.timeStamp;
-            record["speed"] = singlePoint.speed;
-            record["TimeStamp"] = singlePoint.timeStamp;
-            record["address"] = completeAddress.display_name;
-            if (
-              addresses.filter(
-                (x: any) => x.lat == record.lat && x.lng == record.lng
-              ).length == 0
-            ) {
-              addresses.push(record);
-            }
-          });
-        setstops(
-          addresses.sort((a: any, b: any) => {
-            return moment(a.date).diff(b.date);
-          })
-        );
-        let stopTimesArray: any = [];
-
-        // Iterate over data array
-        for (let i = 0; i < TravelHistoryresponseapi?.data?.length; i++) {
-          var currentData = TravelHistoryresponseapi?.data[i];
-          // Check if current car's speed is 0 Mph
-          if (
-            currentData.ignition === 1 &&
-            currentData.trip === 1 &&
-            (currentData.speed === "0 Mph" || currentData.speed === "0 Kph")
-          ) {
-            let timeDiffInSeconds = 0;
-            let nextIndex = i + 1;
-
-            // Include the time difference with consecutive 0 Mph speed data points
-            while (
-              nextIndex < TravelHistoryresponseapi?.data?.length &&
-              (TravelHistoryresponseapi?.data[nextIndex]?.speed === "0 Mph" ||
-                TravelHistoryresponseapi?.data[nextIndex]?.speed === "0 Kph")
-              // &&TravelHistoryresponseapi?.data[nextIndex]?.ignition
-            ) {
-              // if(    TravelHistoryresponseapi?.data[nextIndex]?.ignition === 1 && TravelHistoryresponseapi?.data[nextIndex]?.trip === 1)
-              const currentTime: any = new Date(currentData.date);
-
-              const nextTime: any = new Date(
-                TravelHistoryresponseapi?.data[nextIndex].date
-              );
-
-              timeDiffInSeconds += Math.floor((nextTime - currentTime) / 1000);
-              nextIndex = TravelHistoryresponseapi?.data[nextIndex];
-              nextIndex++;
-            }
-
-            if (timeDiffInSeconds != 0) {
-              i = nextIndex - 1;
-            }
-            if (
-              timeDiffInSeconds == 0 &&
-              (TravelHistoryresponseapi?.data[nextIndex]?.speed !== "0 Mph" ||
-                TravelHistoryresponseapi?.data[nextIndex]?.speed !== "0 Kph") &&
-              nextIndex < TravelHistoryresponseapi?.data?.length
-            ) {
-              const currentTime: any = new Date(currentData.date);
-              const nextTime: any = new Date(
-                TravelHistoryresponseapi?.data[nextIndex].date
-              );
-              timeDiffInSeconds += Math.floor((nextTime - currentTime) / 1000);
-            }
-
-            const minutes = Math.floor(timeDiffInSeconds / 60);
-            const seconds = timeDiffInSeconds % 60;
-
-            // Construct the formatted string
-            const formattedTime = ` ${
-              minutes > 0 ? minutes + "m" : ""
-            } ${seconds}s`;
-
-            // Display the time difference
-            stopTimesArray.push({
-              date: currentData.date,
-              time: formattedTime,
-              address: currentData.address,
-            });
-          }
-        }
-        setStopWithSecond(stopTimesArray);
-        setTravelHistoryresponse(TravelHistoryresponseapi.data);
-      }
-    } catch (error) {}
-
-    setLaodingMap(true);
-  };
-
+ 
+  
+  
   useEffect(() => {
     if (TravelHistoryresponse && TravelHistoryresponse.length > 0) {
       setPolylinedata(
@@ -2648,6 +2459,7 @@ export default function journeyReplayComp() {
             style={{ position: "relative" }}
           >
             <div onClick={() => setMapcenterToFly(null)}>
+           
               {mapcenter !== null && (
                 <MapContainer
                   id="map"
@@ -2837,7 +2649,7 @@ export default function journeyReplayComp() {
                 </MapContainer>
               )}
             </div>
-
+            
             <div className="absolute lg:top-4 lg:left-20 lg:right-5 left-12 top-6 right-2 grid lg:grid-cols-10 md:grid-cols-10 sm:grid-cols-10 grid-cols-10 lg:mt-0 ">
               <div className="xl:col-span-2 mr-5 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6 stop_journey">
                 <div
@@ -2965,7 +2777,8 @@ export default function journeyReplayComp() {
                   </button>
                 </div>
               </div> */}
-              {zoneList?.length > 0 ? (
+              
+              {/* {zoneList?.length > 0 ? (
                 <div
                   className="grid grid-cols-1 absolute lg:top-10 xl:top-1 md:top-10 top-0 xl:right-10 lg:right-10 md:right-10 sm:right-10 right-1  bg-bgLight py-2 px-2 show_zone_journey_replay"
                   style={{
@@ -2987,9 +2800,7 @@ export default function journeyReplayComp() {
                     <button className="text-labelColor font-popins text-sm font-bold">
                       Show Zones
                     </button>
-                  </div>
-
-                  {/* Three rows with colored dots and text meaning */}
+                  </div>                  
                   {showZones && (
                     <>
                       <div className="flex items-center mt-2 ml-2">
@@ -3048,7 +2859,7 @@ export default function journeyReplayComp() {
                 </div>
               ) : (
                 ""
-              )}
+              )} */}
             </div>
             <div className="grid lg:grid-cols-10 grid-cols-10" id="speed_meter">
               <div className="col-span-2  lg:w-52 md:w-44 sm:w-44 w-48 rounded-md ">
