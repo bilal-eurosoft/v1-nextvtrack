@@ -110,7 +110,7 @@ const DynamicCarMap = ({
   const handleClear = () => {
     setIsActiveColor("");
 
-    // console.log("test123");
+    
     // setSelectedVehicle(null);
   };
 
@@ -122,14 +122,7 @@ const DynamicCarMap = ({
   const handleShowZone = () => {
     setShowZones(!showZones);
   };
-  let filterData;
-  if (session?.clientId === "64f9c5c3b7f9957d81e36908") {
-    // console.log("session", session);
-    filterData = carData.find(
-      (item: any) => item.vehicleId === selectedVehicle?.vehicleId
-    );
-    // console.log("filterData", filterData);
-  }
+ 
   return (
     <>
       <div className="xl:col-span-4 lg:col-span-3  md:col-span-3  sm:col-span-3 col-span-4 main_map">
@@ -217,7 +210,7 @@ const DynamicCarMap = ({
             </div>
           </div> */}
 
-          {zoneList !== null && zoneList.length > 0 && (
+          {zoneList !== null && zoneList?.length > 0 && (
             <div
               className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2"
               style={{

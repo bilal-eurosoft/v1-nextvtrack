@@ -96,7 +96,7 @@ export default function Zone() {
   const dispatch=useDispatch()
  
   const allZone = async () => {
-    if (session) {
+    if (session && zoneList?.length==0) {
       if (allZones?.zone?.length <= 0 ) {
         const Data = await getZoneListByClientId({
           token: session.accessToken,
@@ -365,7 +365,7 @@ if (session?.userRole === "Controller") {
         duration: 3000,
         position: "top-center",
       });
-      console.log(error);
+
     }
   }
 

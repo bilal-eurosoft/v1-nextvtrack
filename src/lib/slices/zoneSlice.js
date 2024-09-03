@@ -23,7 +23,7 @@ const fetchZoneApi = async ({ token, clientId }) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data:", error);
+    
     throw error;
   }
 };
@@ -67,7 +67,7 @@ const fetchvehicleApi = async ({ token, clientId }) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching data:", error);
+    
     throw error;
   }
 };

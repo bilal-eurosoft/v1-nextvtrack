@@ -106,6 +106,8 @@ export default function DualCam() {
       query: { clientId: "64f9c5c3b7f9957d81e36908" },
       transports: ["websocket", "polling", "flashsocket"],
     });
+    setSocketConnected(true); // Update connection status on successful connection
+  
 
     socketRef.current.connect();
     
@@ -178,18 +180,10 @@ export default function DualCam() {
             setToastId(id);
           }
         }
-      }, 100000); // 100 seconds inactivity timeout
-    });
-
-
-    // Clean up on unmount
-    return () => {
-      if (socketTimeoutRef.current) {
-        clearTimeout(socketTimeoutRef.current);
-      }
+      }, 100000)
       handleSocketDisconnection();
   
-    };
+    });
   }, []);
     //  }, [servertoastId]);
 
@@ -251,14 +245,14 @@ export default function DualCam() {
     
     const socket2 = io("https://socketio.vtracksolutions.com:1102", {
       autoConnect: false,
-      query: { clientId: "64f9c5c3b7f9957d81e36908" }, // This gets updated later on with client code.
+      query: { clientId: session.clientId }, // This gets updated later on with client code.
       transports: ["websocket", "polling", "flashsocket"],
     });
 
     socket2.connect(); // Explicitly connect the socket
 
     socket2.on("device", async (data) => {
-      console.log("device data view", data);
+      
       let message;
       if (
         data.commandtext ===
@@ -2598,7 +2592,7 @@ export default function DualCam() {
                                               item.fileName.split(".")[0],
                                               10
                                             );
-                                            const timingZone = session.timezone;
+                                            const timingZone = session?.timezone;
                                             const timerequested = backFromUnix(
                                               filenametodate,
                                               timingZone
