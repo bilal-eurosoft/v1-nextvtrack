@@ -73,6 +73,7 @@ export default function Notifications() {
             token: session.accessToken,
             clientId: session?.clientId,
           });
+
           setEventsp(data);
         }
       } catch (error) {
@@ -180,7 +181,7 @@ export default function Notifications() {
   //         clientId: session?.clientId,
   //         payload: eventsp,
   //       });
-  //       console.log("set response is ", response);
+  
   //     }
   //   } catch (error) {
   //     console.error("Error updating event permission:", error);
@@ -196,7 +197,7 @@ export default function Notifications() {
   //         clientId: session?.clientId,
   //         payload: notifications,
   //       });
-  //       console.log("set response is ", response);
+  
   //     }
   //   }
   //   catch (error) {

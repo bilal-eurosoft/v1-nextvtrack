@@ -98,7 +98,7 @@ export default function DualCam() {
       socketRef.current = null;
     }
   };
-//console.log("DSfservertoastId", servertoastId);
+
   useEffect(() => {
     let connectionErrorToastShown: Boolean = false;
     socketRef.current = io("https://camera.vtracksolutions.com:7057", {
@@ -113,7 +113,7 @@ export default function DualCam() {
     
     /* socketRef.current.on("connect_error", () => {
      // if (!servertoastId) {
-        console.log("in");
+        
         const id = toast.error("Socket connection failed. Retrying...", {
           position: "top-center",
          duration: 5000
@@ -138,7 +138,7 @@ export default function DualCam() {
       //   toast.dismiss(servertoastId);
       //   setservertoastId(null);
       // }
-    //  console.log("notifiy");
+    
       toast.success("Socket connected successfully!", {
         position: "top-center",
         autoClose: 5000,
@@ -150,9 +150,9 @@ export default function DualCam() {
     socketRef.current.on("message", async (data) => {
       setProgress(Math.floor(data.progress));
       setSocketdata(data);
-      //console.log("object", data);
+      
       if (data.message) {
-     // console.log("object", data);
+     
         toast.dismiss(toastId);
       setToastId(null);
     
@@ -217,7 +217,7 @@ export default function DualCam() {
       
         timeoutId = setTimeout(() => {
           setfetchdata(!fetchdata);
-       //   console.log("ACassa");
+       
         }, 2000);
 
       // Cleanup function to clear the timeout if dependencies change
@@ -230,10 +230,10 @@ export default function DualCam() {
   useEffect(() => {
     if (socketdata?.progress === 100) {
      let timeoutId;
-    // console.log("ddd");
+    
        timeoutId = setTimeout(() => {
          setfetchdata(!fetchdata);
-       //  console.log("ACassa");
+    
        }, 2000); 
 
      return () => clearTimeout(timeoutId);
@@ -245,7 +245,7 @@ export default function DualCam() {
     
     const socket2 = io("https://socketio.vtracksolutions.com:1102", {
       autoConnect: false,
-      query: { clientId: session.clientId }, // This gets updated later on with client code.
+      query: { clientId: session?.clientId }, // This gets updated later on with client code.
       transports: ["websocket", "polling", "flashsocket"],
     });
 
@@ -278,7 +278,7 @@ export default function DualCam() {
       socketdata.progress > 1 &&
       socketdata.progress < 100
     ) {
-    //  console.log("if");
+    
       if (!toastId) {
         const id: any = toast.loading(`Image Downloading `, {
           position: "top-center",
@@ -288,7 +288,7 @@ export default function DualCam() {
         setToastId(id);
       }
     } else if (socketdata.progress == 100 && toastId && socketdata.filetype == ".jpeg") {
-    //  console.log("else if 11");
+    
       toast.success("Image Downloaded Successfully", {
         position: "top-center",
         autoClose: 5000,
@@ -297,7 +297,7 @@ export default function DualCam() {
       setToastId(null);
     }
     else if (socketdata.progress == 100 && toastId && socketdata.filetype == ".mp4") {
-   //   console.log("else if 22");
+   
       toast.success("Video Downloaded Successfully", {
         position: "top-center",
         autoClose: 5000,
@@ -307,7 +307,7 @@ export default function DualCam() {
     }
     else {
       if ( socketdata.filetype == ".mp4" && socketdata.progress > 1 && socketdata.progress < 100) {
-      //  console.log("els");
+      
         if (!toastId) {
           const id = toast.loading("Video Downloading", {
             position: "top-center",
@@ -327,7 +327,7 @@ export default function DualCam() {
           token: session?.accessToken,
           clientId: session?.clientId,
         });
-      //  console.log("acd");
+      
         setFilteredRecords(response);
       }
       //  setLaoding(false);

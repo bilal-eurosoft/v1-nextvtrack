@@ -799,7 +799,6 @@ export async function postDriverDataAssignByClientId({
   token: string;
   newformdata: any;
 }) {
-
   try {
     const response = await fetch(`${URL}/v2/DriverAssign`, {
       method: "POST",

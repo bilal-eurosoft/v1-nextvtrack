@@ -62,13 +62,7 @@ export default function DriverProfile() {
   const [selectedRFID, setSelectedRFID] = useState("");
   const [previousValue, setPreviousValue] = useState("");
   const [inactiveRFIDs, setInactiveRFIDs] = useState<any>([]);
-  if (
-    session?.userRole === "Controller" ||
-    (session?.userRole == "Admin" && session?.driverProfile === false)
-  ) {
-    router.push("/signin");
-    return null;
-  }
+ 
   const handleClose = () => {
     setOpen(false);
     setSelectedRFID("");
@@ -260,9 +254,9 @@ export default function DriverProfile() {
     // }
     setSelectedRFID(e);
   };
-  console.log("showCardNumber", showCardNumber);
+  
   const handleEditDriver = (key: any, e: any) => {
-    console.log("e==>", e);
+  
     // let { value } = e;
     // if (key == "driverRFIDCardNumber") {
     //   setFormData({ ...singleFormData, [key]: e.value });
@@ -529,7 +523,7 @@ export default function DriverProfile() {
       try {
         // Show a custom confirmation toast with "OK" and "Cancel" buttons
 
-        const { id } = toast.custom((t) => (
+        const { id }:any = toast.custom((t) => (
           <div className="bg-white p-2 rounded-md">
             <p>Are you sure you want to InActive this Driver?</p>
             <button
@@ -538,13 +532,13 @@ export default function DriverProfile() {
                 if (session) {
                   const newformdata = {
                     ...payLoad,
-                    clientId: session.clientId,
+                    clientId: session?.clientId,
                   };
 
                   // Send a request to delete the zone
                   const response = await toast.promise(
                     postDriverDataByClientId({
-                      token: session.accessToken,
+                      token: session?.accessToken,
                       newformdata: newformdata,
                     }),
                     {
@@ -606,7 +600,7 @@ export default function DriverProfile() {
           duration: 3000,
           position: "top-center",
         });
-        console.log(error);
+        
       }
     } else {
       toast.error("Please Driver Deasign");
@@ -679,19 +673,26 @@ export default function DriverProfile() {
     // await vehicleListData();
   };
 
-  const handleNoEdit = () => {
-    toast.error("Please Driver UnAssign", {
-      duration: 3000, // Toast will be shown for 3 seconds
-    });
-  };
+  // const handleNoEdit = () => {
+  //   toast.error("Please Driver UnAssign", {
+  //     duration: 3000, // Toast will be shown for 3 seconds
+  //   });
+  // };
 
-  const test = 20;
-  const optionsRfid = getRfid
-    .filter((item: any) => item.DriverId === "")
-    .map((item: any) => ({
-      value: item.RFIDCardNo,
-      label: item.RFIDCardNo,
-    }));
+  // const test = 20;
+  // const optionsRfid = getRfid
+  //   .filter((item: any) => item.DriverId === "")
+  //   .map((item: any) => ({
+  //     value: item.RFIDCardNo,
+  //     label: item.RFIDCardNo,
+  //   }));
+    if (
+      session?.userRole === "Controller" ||
+      (session?.userRole == "Admin" && session?.driverProfile === false)
+    ) {
+      router.push("/signin");
+      return null;
+    }
   return (
     <div className="main_driver">
       <p className="bg-green px-4 py-1   text-center text-2xl text-white font-bold font-popins drivers_text">

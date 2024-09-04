@@ -250,7 +250,7 @@ export default function EditZoneComp() {
     const { name, value } = e.target;
     setForm({ ...Form, [name]: value });
   };
-  // console.log(drawShape);
+  
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -355,7 +355,7 @@ export default function EditZoneComp() {
       setDrawShape(true);
     }
   };
-  console.log("form", Form);
+  
   const handleCreated = (e: any) => {
     const createdLayer = e.layer;
     const type = e.layerType;

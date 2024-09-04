@@ -124,7 +124,7 @@ const LiveSidebar = ({
   }, []);
   const currentMoment = moment.tz(session?.timezone);
   // const formattedDateTime = currentMoment.format("MMMM DD YYYY hh:mm:ss A");
-  // console.log("formattedDateTime", formattedDateTime);
+  
 
   const formattedTimes = filteredData?.map((item: any) => {
     const timestampMoment = moment.tz(
@@ -153,12 +153,12 @@ const LiveSidebar = ({
   // let hourConvertIntoDay;
   // if (formattedTimes?.hours >= 24) {
   //   hourConvertIntoDay = formattedTimes?.hours;
-  //   console.log(hourConvertIntoDay);
+  
   // }
 
-  // console.log("hourConvertIntoDay", hourConvertIntoDay);
+  
 
-  // console.log("dataFilter", dataFilter);
+  
   // const dataArray = Object.values(dataFilter);
   // const mappedDataArray = dataArray.map((item: any, index) => {
   //   return {
@@ -166,7 +166,7 @@ const LiveSidebar = ({
   //     duration: dataFilter,
   //   };
   // });
-  // console.log("mappedDataArray", mappedDataArray);
+  
   useEffect(() => {
     const zoneLatlog = zoneList?.map((item: any) => {
       if (item.zoneType == "Polygon") {
@@ -223,7 +223,7 @@ const LiveSidebar = ({
     const filterData = carData.filter(
       (items) => items.vehicleId === item.vehicleId
     );
-    // console.log("filterDATA", filterData);
+    
     setSelectedVehicle(item);
     setshowAllVehicles(false);
     setIsActiveColor(item.vehicleId);
@@ -247,7 +247,7 @@ const LiveSidebar = ({
   //   duration.minutes()
   // )} minutes, ${Math.abs(duration.seconds())} seconds`;
 
-  // console.log("Time Difference:", formattedDuration);
+  
 
   return (
     <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-2  col-span-5 main_sider_bar">

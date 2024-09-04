@@ -81,7 +81,7 @@ export default function DriverProfile() {
   const handleChangeDriver = (key: any, e: any) => {
     setFormDate({ ...formData, [key]: e.target.value });
   };
-  // console.log("data", DriverData);
+  
   const handleDriverSubmit = async (e: any) => {
     e.preventDefault();
 
@@ -205,7 +205,7 @@ export default function DriverProfile() {
       }
     } catch (e) {}
     // await vehicleListData();
-    // console.log("Updated Data from API:", updatedData);
+    
   };
 
   const handleActive = async (data: any) => {
@@ -294,7 +294,7 @@ export default function DriverProfile() {
       ));
     } catch (e) {}
     // await vehicleListData();
-    // console.log("Updated Data from API:", updatedData);
+    
   };
 
   return (

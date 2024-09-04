@@ -60,8 +60,7 @@ export default function Request({ socketdata, deviceCommandText }) {
   const [filteredRecords, setFilteredRecords] = useState(sortedRecords);
 
   const handlevideodate = (date: MaterialUiPickersDate | null) => {
-    console.log("date it has ", date);
-    console.log("selected time is ", selectedDate);
+    
     if (date !== null) {
       const dateValue = moment(date).format("YYYY-MM-DD");
       // const dateValue = moment(date).toDate();
@@ -193,25 +192,25 @@ export default function Request({ socketdata, deviceCommandText }) {
   //        carData.current = uniqueData;
   //        if(carData.current){
   //         const foundVehicle = carData.current.find((vehicle: { vehicleReg: string; }) => vehicle.vehicleReg === selectedVehicle?.vehicleReg);
-  //       console.log("Dvfdbvf",foundVehicle )
+  
   //       if (foundVehicle?.frontCamera.value == 3 && foundVehicle?.backCamera.value == 3){
-  //         console.log("if" )
+  
   //         setdisabledButton(true)
   //         setdisabledRequestButton(false)
   //       }
   //       else if (foundVehicle?.frontCamera.value == 0 && foundVehicle?.backCamera.value == 0 ) {
-  //         console.log("else if" )
+  
   //         setdisabledButton(false)
   //         setdisabledRequestButton(true)
   //       }
   //       else {
-  //         console.log("else " )
+  
   //         setdisabledButton(true)
   //         setdisabledRequestButton(true)
   //       }
   //      //   setdisabledButton()
   //        }
-  //        console.log("cardata", carData.current )
+  
   //       }
   //  }
   //   })();
@@ -265,7 +264,7 @@ export default function Request({ socketdata, deviceCommandText }) {
           },
         }
       );
-      console.log("response is ", response);
+      
     }
   };
 
@@ -280,13 +279,7 @@ export default function Request({ socketdata, deviceCommandText }) {
   };
 
   const [updatedstatus, setupdatedStatus] = useState("");
-  // const handleSubmit2 = async () => {
-  //   if (session) {
-  //     const ddt = await responsegprs({ token: session?.accessToken });
-  //     console.log("sssssssssssss", ddt);
-  //     setupdatedStatus(ddt);
-  //   }
-  // };
+  
   const handleSubmit = async () => {
     setLatestGprs(true);
 
@@ -301,11 +294,9 @@ export default function Request({ socketdata, deviceCommandText }) {
       date: selectedDate || new Date(),
       time: selectedTime,
     };
-    console.log("datetime is ", dateTime);
-    console.log("date is ", selectedDate);
-    console.log("time is ", selectedTime);
+    
     const timestamp = dateTimeToTimestamp(selectedDate, selectedTime);
-    console.log("time is ", timestamp);
+    
     let Duration;
     if (Number(selectedduration) <= 10) {
       Duration = Number(selectedduration) + 1;
@@ -321,7 +312,7 @@ export default function Request({ socketdata, deviceCommandText }) {
       }
     } else if (selectedFileType === "Video") {
       if (selectedCameraType === "Front") {
-        console.log("timestamp is ", timestamp);
+        
         commandText = `camreq: 0,1,${timestamp},${Duration}`;
       } else if (selectedCameraType === "Back") {
         commandText = `camreq: 0,2,${timestamp},${Duration}`;
@@ -375,9 +366,9 @@ export default function Request({ socketdata, deviceCommandText }) {
         position: "top-center",
       });
 
-      console.log("valuesss", response);
+      
       if (response.success) {
-        console.log("valuesss", response);
+       
         setSelectedVehicle(null);
         setSelectedFileType(null);
         setSelectedCameraType(null);
@@ -386,12 +377,9 @@ export default function Request({ socketdata, deviceCommandText }) {
         setSelectedDate(null);
         //   // Additional logic for success
       } else {
-        console.log("formbsbsbbsbs");
+      
       }
-      //  if(session){
-      // const ddt = await responsegprs({ token: session?.accessToken });
-      // console.log("sssssssssssss", ddt);
-      // } ;
+  
     }
 
     if (socketdata?.progres > 1 && socketdata?.progres < 100) {
@@ -414,7 +402,7 @@ export default function Request({ socketdata, deviceCommandText }) {
     }
   }, [latestGprs]);
 
-  console.log("deviceResponse", deviceResponse);
+
 
   const handlePopup = () => {
     toast.success("popup", {
@@ -422,28 +410,8 @@ export default function Request({ socketdata, deviceCommandText }) {
       duration: socketdata?.progress,
     });
   };
-  console.log("socketdata", socketdata);
+  
 
-  // useEffect(() => {
-  //   setTimeout(async () => {
-  //    const response= await portalGprsCommand(session?.token)
-  //    console.log("response==>",response)
-  //   }, 4000)
-  // }, [handleSubmit()])
-
-  // get video indexing issue
-  // const [getVideoPagination, setVideoPagination] = useState<any>([]);
-  // useEffect(() => {
-  //   const func = async () => {
-  //     const data = await pictureVideoDataOfVehicle.map((item) => {
-  //       if (item.fileType == 2) {
-  //         return item.Vehicle;
-  //       }
-  //     });
-  //     setVideoPagination(data);
-  //   };
-  //   func();
-  // }, []);
 
 
 

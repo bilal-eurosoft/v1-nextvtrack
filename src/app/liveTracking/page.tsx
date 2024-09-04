@@ -106,7 +106,7 @@ const LiveTracking = () => {
     function onlineHandler() {
       setIsOnline(true);
     }
-    console.log("carData", carData);
+    
     function offlineHandler() {
       setIsOnline(false);
     }
@@ -234,13 +234,13 @@ const LiveTracking = () => {
             }
             // carData.current = uniqueData;
 
-            //  console.log("carData.current", carData.current)
+            
 
             setLastDataReceivedTimestamp(new Date());
           }
         );
       } catch (err) {
-        console.log("Socket Error", err);
+        
       }
     }
     if (!isOnline) {

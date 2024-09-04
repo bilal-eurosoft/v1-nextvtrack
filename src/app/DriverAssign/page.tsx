@@ -164,28 +164,7 @@ export default function DriverProfile() {
   const { data: session } = useSession();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-  if (
-    session?.userRole === "Controller" ||
-    (session?.userRole == "Admin" && session?.driverProfile === false)
-  ) {
-    router.push("/signin");
-    return null;
-  }
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [open, setOpen] = useState(false);
   const [DriverList, setDriverList] = useState([]);
   const [vehicleNums, setvehicleNum] = useState([]);
   const [getAllAsignData, setgetAllAsignData] = useState<any>([]);
@@ -199,7 +178,7 @@ export default function DriverProfile() {
           token: session?.accessToken,
           clientId: session?.clientId,
         });
-
+  
         setDriverList(
           response.filter(
             (item: any) => item.isAvailable == true && item.isDeleted === false
@@ -211,11 +190,8 @@ export default function DriverProfile() {
       console.error("Error fetching zone data:", error);
     }
   };
-
-  useEffect(() => {
-    vehicleName();
-  }, [session]);
-  // console.log("getallAssign", getAllAsignData);
+ 
+  
   const AllAsignData = async () => {
     try {
       // setLaoding(true);
@@ -235,21 +211,6 @@ export default function DriverProfile() {
     AllAsignData();
   }, []);
 
-  const handleVehicle = (e: any) => {
-    const selectedVehicle: any = vehicleNums?.find(
-      (driver: any) => driver.id === e.target.value
-    );
-    setSelectVehicleNum(selectedVehicle);
-    // setSelectVehicleNum(e.target.value);
-  };
-
-  const handleSelectDriver = (e: any) => {
-    const selectedDriverObject: any = DriverList.find(
-      (driver: any) => driver._id === e.target.value
-    );
-    setSelectedDriver(selectedDriverObject);
-  };
-  // useEffect(() => {
   const vehicleNum = async () => {
     try {
       // setLaoding(true);
@@ -266,10 +227,52 @@ export default function DriverProfile() {
       console.error("Error fetching zone data:", error);
     }
   };
-  // }, [session]);
+  
   useEffect(() => {
     vehicleNum();
+    vehicleName();
   }, [session]);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+  if (
+    session?.userRole === "Controller" ||
+    (session?.userRole == "Admin" && session?.driverProfile === false)
+  ) {
+    router.push("/signin");
+    return null;
+  }
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+ 
+
+
+  const handleVehicle = (e: any) => {
+    const selectedVehicle: any = vehicleNums?.find(
+      (driver: any) => driver.id === e.target.value
+    );
+    setSelectVehicleNum(selectedVehicle);
+    // setSelectVehicleNum(e.target.value);
+  };
+
+  const handleSelectDriver = (e: any) => {
+    const selectedDriverObject: any = DriverList.find(
+      (driver: any) => driver._id === e.target.value
+    );
+    setSelectedDriver(selectedDriverObject);
+  };
+  
+  
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -391,7 +394,7 @@ export default function DriverProfile() {
     };
     try {
       if (session) {
-        const { id } = toast.custom((t) => (
+        const { id }:any= toast.custom((t) => (
           <div className="bg-white p-2 rounded-md">
             <p>Are you sure you want to Deasign This Driver ?</p>
             <button
@@ -459,7 +462,7 @@ export default function DriverProfile() {
           </div>
         ));
 
-        // console.log("deAssign", newformdata);
+        
         // const response = await toast.promise(
         //   postDriverDeDataAssignByClientId({
         //     token: session?.accessToken,

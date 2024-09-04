@@ -83,7 +83,6 @@ export default function Zone() {
   const [inputPagination, setInputPagination] = useState(false);
   const lastIndexFilter = filterZonePerPage * filterZonepage;
   const firstIndexFilter = lastIndexFilter - filterZonePerPage;
-
   const handleClickPagination = () => {
     setCurrentPage(input);
     setInputPagination(true);

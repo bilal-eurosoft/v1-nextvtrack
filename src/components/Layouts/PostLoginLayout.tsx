@@ -134,25 +134,27 @@ export default function RootLayout({
     return () => clearInterval(interval);
   }, []); // Run effect when loginTime changes
 
-  useEffect(() => {
-    const fetchZoneList = async () => {
-      if (session && zoneList?.length==0) {
-        try {
-          const allzoneList = await getZoneListByClientId({
-            token: session.accessToken,
-            clientId: session.clientId,
-          });
-          setZoneList(allzoneList);
-        } catch (error) {
-         
-        }
-      }
-    };
-
-    fetchZoneList();
-  }, [session]);
+  // useEffect(() => {
+  //   const fetchZoneList = async () => {
+  //     if (session) {
+  //       try {
+  //         await dispatch(
+  //           fetchZone({
+  //             token: session?.accessToken,
+  //             clientId: session?.clientId,
+  //           })
+  //         );
+  //       } catch (error) {
+  
+  //       }
+  //     }
+  //   };
 
 
+  // const allzoneList = zoneList?.map((item) => {
+  //   return item?.id;
+  // });
+  
   const formatTime = (milliseconds: any) => {
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);

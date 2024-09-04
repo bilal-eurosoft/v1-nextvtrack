@@ -130,7 +130,7 @@ export default DualCam;
 //   // const [selectedDate1, setSelectedDate1] = useState('');
 //   const handleVehicleChange1 = (e: any) => {
 //     const selectedVehicleId = e;
-//     console.log("eeee", selectedVehicleId);
+
 //     setSelectedVehiclelist(selectedVehicleId);
 //     if (selectedVehicleId === '' || selectedVehicleId === null) {
 //       if(fromDate && toDate !== null){
@@ -344,13 +344,13 @@ export default DualCam;
 //     setSingleImage(item.path);
 //   };
 //   const handleDownload = (item: any) => {
-//     console.log("download hooooo", item.path);
+
 //      window.location.href = item.path;
 //   };
 
 //   const handleOpenSecond = (item: any) => {
 //     setOpenSecond(!openSecond);
-//     console.log("video is ",item.path );
+
 //     setSingleVideo(item.path);
 //   };
 
@@ -449,25 +449,25 @@ export default DualCam;
 //   //        carData.current = uniqueData;
 //   //        if(carData.current){
 //   //         const foundVehicle = carData.current.find((vehicle: { vehicleReg: string; }) => vehicle.vehicleReg === selectedVehicle?.vehicleReg);
-//   //       console.log("Dvfdbvf",foundVehicle )
+
 //   //       if (foundVehicle?.frontCamera.value == 3 && foundVehicle?.backCamera.value == 3){
-//   //         console.log("if" )
+
 //   //         setdisabledButton(true)
 //   //         setdisabledRequestButton(false)
 //   //       }
 //   //       else if (foundVehicle?.frontCamera.value == 0 && foundVehicle?.backCamera.value == 0 ) {
-//   //         console.log("else if" )
+
 //   //         setdisabledButton(false)
 //   //         setdisabledRequestButton(true)
 //   //       }
 //   //       else {
-//   //         console.log("else " )
+
 //   //         setdisabledButton(true)
 //   //         setdisabledRequestButton(true)
 //   //       }
 //   //      //   setdisabledButton()
 //   //        }
-//   //        console.log("cardata", carData.current )
+
 //   //       }
 //   //  }
 //   //   })();
@@ -646,7 +646,7 @@ export default DualCam;
 //   //   func();
 //   // }, []);
 
-//   // console.log("tessst", getVideoPagination);
+
 
 //   // const sortedRecords = records.filter(item => item.fileType === 1)
 //   // .slice()
@@ -1613,7 +1613,7 @@ export default DualCam;
 //  {records.map((item: pictureVideoDataOfVehicleT, index) => {
 
 // if (item.fileType === 1) {
-//   console.log("paggeee",currentPage1 )
+
 //  const currentPage = currentPage1;
 // const itemIndex = index % 8;
 // const currentItemNumber = (currentPage - 1) * 8 + itemIndex + 1;

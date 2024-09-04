@@ -200,6 +200,7 @@ export default function JourneyReplayComp() {
     setExpanded(isExpanded ? panel : null);
   };
   const allData = useSelector((state) => state?.zone);  
+  
   // useEffect(() => {
   //   setZoneList(allZones?.zone);
   // }, [allZones]);
@@ -1094,12 +1095,10 @@ export default function JourneyReplayComp() {
       setShowZones(false);
     }
   };
-
   const handleShowDetails = () => {
     setShowDetails(!getShowdetails);
     setShowIcon(!getShowICon);
   };
-
   const handleChangeChecked = () => {
     setCheckedInput(!getCheckedInput);
   };
@@ -1706,7 +1705,6 @@ export default function JourneyReplayComp() {
               // </div>
             )}
           </div>
-
           <div className="xl:col-span-1 lg:col-span-1 md:col-span-1 col-span-12 text-white font-bold flex justify-center items-center mt-2 journey_replay_search">
             {/* {clearMapData ? (
               <button
@@ -1727,8 +1725,7 @@ export default function JourneyReplayComp() {
               >
                 Search
               </button>
-            ) : (
-           
+            ) : (           
             )} */}
             <div
               onClick={(e) => seacrhLoading && handleSubmit(e)}
@@ -2210,7 +2207,8 @@ export default function JourneyReplayComp() {
                   )
                 : dataresponse?.map((item: TripsByBucket, index: number) => (
                     <button
-                      onClick={() => {
+key={index}
+                    onClick={() => {
                         travelV2 &&
                           handleDivClick(
                             item.fromDateTime,
