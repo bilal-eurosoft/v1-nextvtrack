@@ -15,6 +15,12 @@
   height: 2vh;
 }
 
+.user_avator_image {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+}
+
 .css-s73ghq-MuiModal-root-MuiDrawer-root .MuiDrawer-paper {
   overflow: hidden !important;
 }

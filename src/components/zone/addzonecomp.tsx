@@ -10,7 +10,7 @@ import Select from "react-select";
 import {
   // getClientSettingByClinetIdAndToken,
   postZoneDataByClientId,
-  getSearchAddress,
+  getSearchAddress
 } from "@/utils/API_CALLS";
 import L, { LatLngTuple } from "leaflet";
 import { Toaster, toast } from "react-hot-toast";
@@ -59,7 +59,7 @@ export default function AddZoneComp() {
   >([]);
   const [circleData, setCircleData] = useState({
     latlng: "",
-    radius: "",
+    radius: ""
   });
 
   const [clientsetting, setClientsetting] = useState<ClientSettings[] | null>(
@@ -72,7 +72,7 @@ export default function AddZoneComp() {
     zoneShortName: "",
     zoneType: "",
     latlngCordinates: "",
-    label: "",
+    GeoFenceType: ""
   });
   const [addresses, setAddresses] = useState<Address[]>([]);
   const router = useRouter();
@@ -128,24 +128,24 @@ export default function AddZoneComp() {
           latlngCordinates: JSON.stringify(
             polygondata.map(({ latitude, longitude }) => ({
               lat: latitude,
-              lng: longitude,
+              lng: longitude
             }))
           ),
           centerPoints: "",
-          zoneType: "Polygon",
+          zoneType: "Polygon"
         });
       } else if (circleData.radius) {
         setForm({
           ...Form,
           latlngCordinates: circleData.radius.toString(),
           centerPoints: circleData.latlng,
-          zoneType: "Circle",
+          zoneType: "Circle"
         });
       } else {
         setForm((prevForm) => ({
           ...prevForm,
           latlngCordinates: "",
-          centerPoints: "",
+          centerPoints: ""
         }));
       }
     }
@@ -154,14 +154,14 @@ export default function AddZoneComp() {
   const handlePolygonSave = (coordinates: [number, number][]) => {
     const zoneCoords = coordinates.slice(0, -1).map(([lat, lng]) => ({
       latitude: lat,
-      longitude: lng,
+      longitude: lng
     }));
 
     if (drawShape == true) {
       const formattedCoordinate: [number, number][] = zoneCoords.map(
         (coord: { latitude: number; longitude: number }) => [
           coord.latitude,
-          coord.longitude,
+          coord.longitude
         ]
       );
 
@@ -186,7 +186,7 @@ export default function AddZoneComp() {
       const updateCircleData = (newLatlng: string, newRadius: string): void => {
         setCircleData({
           latlng: newLatlng,
-          radius: newRadius,
+          radius: newRadius
         });
       };
       updateCircleData(circlePoint, radius);
@@ -214,19 +214,17 @@ export default function AddZoneComp() {
     if (session) {
       getSearchAddress({
         query: query,
-        country: session?.country,
+        country: session?.country
       })
         .then((response) => {
           setAddresses(response);
         })
-        .catch((error) => {
-          
-        });
+        .catch((error) => {});
     }
   };
 
   // const handleAAdressSearch = async (inputValue: any) => {
-  
+  //
   //   let query: string = inputValue.target.value;
   //   if (session) {
   //     const getAddress = await getSearchAddress({
@@ -250,13 +248,11 @@ export default function AddZoneComp() {
     setForm({ ...Form, [name]: value });
   };
   const handleChangeSelectValue = (e: any) => {
-    const { label, value } = e;
-    setForm({ ...Form, label: value });
-    // if (value === "Restricted-Area") {
-    //   setForm({ ...Form, label: value });
-    // }
+    if (e.value) {
+      setForm({ ...Form, GeoFenceType: e.value });
+    }    
   };
-
+  
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -265,7 +261,7 @@ export default function AddZoneComp() {
       !Form.latlngCordinates ||
       !Form.zoneName ||
       !Form.zoneShortName ||
-      !Form.label
+      !Form.GeoFenceType
     ) {
       toast.error("Please Select All Field");
       return;
@@ -277,39 +273,39 @@ export default function AddZoneComp() {
       if (session) {
         const newformdata = {
           ...Form,
-          clientId: session?.clientId,
+          clientId: session?.clientId
         };
 
         const response = await toast.promise(
           postZoneDataByClientId({
             token: session?.accessToken,
-            newformdata: newformdata,
+            newformdata: newformdata
           }),
           {
             loading: "Saving data...",
             success: "Data saved successfully!",
-            error: "Error saving data. Please try again.",
+            error: "Error saving data. Please try again."
           },
           {
             style: {
               border: "1px solid #00B56C",
               padding: "16px",
-              color: "#1A202C",
+              color: "#1A202C"
             },
             success: {
               duration: 2000,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
+                secondary: "#FFFAEE"
+              }
             },
             error: {
               duration: 2000,
               iconTheme: {
                 primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
+                secondary: "#FFFAEE"
+              }
+            }
           }
         );
 
@@ -322,7 +318,7 @@ export default function AddZoneComp() {
         dispatch(
           fetchZone({
             clientId: session?.clientId,
-            token: session?.accessToken,
+            token: session?.accessToken
           })
         );
       }
@@ -336,7 +332,7 @@ export default function AddZoneComp() {
       zoneShortName: "",
       zoneType: "",
       latlngCordinates: "",
-      label: "",
+      label: ""
     });
     router.push("/Zone");
   };
@@ -371,7 +367,7 @@ export default function AddZoneComp() {
         ).map((latLng: L.LatLng) => [latLng.lat, latLng.lng]);
         const zoneCoords = coordinates.map(([lat, lng]) => ({
           latitude: lat,
-          longitude: lng,
+          longitude: lng
         }));
         setPolygondata(zoneCoords);
       } else if (layer instanceof L.Circle) {
@@ -400,16 +396,16 @@ export default function AddZoneComp() {
     { value: "On-Site", label: "On-Site" },
     { value: "Off-Site", label: "Off-Site" },
     { value: "City-Area", label: "City-Area" },
-    { value: "Restricted-Area", label: "Restricted-Area" },
+    { value: "Restricted-Area", label: "Restricted-Area" }
   ];
   const optionsSite: any = [
     { value: "On-Site", label: "On-Site" },
-    { value: "Off-Site", label: "Off-Site" },
+    { value: "Off-Site", label: "Off-Site" }
   ];
   const optionsCitys: any =
     addresses?.map((item: any) => ({
       value: JSON.stringify(item),
-      label: item.display_name,
+      label: item.display_name
     })) || [];
   // {addresses.map((address, index) => (
   //   <option key={address.place_id} value={JSON.stringify(address)}>
@@ -462,7 +458,7 @@ export default function AddZoneComp() {
                   control: (provided, state) => ({
                     ...provided,
                     border: "none",
-                    boxShadow: state.isFocused ? null : null,
+                    boxShadow: state.isFocused ? null : null
                   }),
                   option: (provided, state) => ({
                     ...provided,
@@ -478,9 +474,9 @@ export default function AddZoneComp() {
                       : "black",
                     "&:hover": {
                       backgroundColor: "#e1f0e3",
-                      color: "black",
-                    },
-                  }),
+                      color: "black"
+                    }
+                  })
                 }}
               />
             ) : (
@@ -498,7 +494,7 @@ export default function AddZoneComp() {
                   control: (provided, state) => ({
                     ...provided,
                     border: "none",
-                    boxShadow: state.isFocused ? null : null,
+                    boxShadow: state.isFocused ? null : null
                   }),
                   option: (provided, state) => ({
                     ...provided,
@@ -514,9 +510,9 @@ export default function AddZoneComp() {
                       : "black",
                     "&:hover": {
                       backgroundColor: "#e1f0e3",
-                      color: "black",
-                    },
-                  }),
+                      color: "black"
+                    }
+                  })
                 }}
               />
             )}
@@ -618,7 +614,7 @@ export default function AddZoneComp() {
                       fontSize: "16px",
                       backgroundColor: "#00b56c",
                       color: "white",
-                      border: "none",
+                      border: "none"
                     }}
                     startIcon={
                       <span style={{ fontWeight: "600" }}>
@@ -661,7 +657,7 @@ export default function AddZoneComp() {
                       fontSize: "16px",
                       backgroundColor: "red",
                       color: "white",
-                      border: "none",
+                      border: "none"
                     }}
                     startIcon={
                       <span style={{ fontWeight: "600" }}>
@@ -707,7 +703,7 @@ export default function AddZoneComp() {
                 control: (provided, state) => ({
                   ...provided,
                   border: "none",
-                  boxShadow: state.isFocused ? null : null,
+                  boxShadow: state.isFocused ? null : null
                 }),
                 option: (provided, state) => ({
                   ...provided,
@@ -724,9 +720,9 @@ export default function AddZoneComp() {
                     : "black",
                   "&:hover": {
                     backgroundColor: "#e1f0e3",
-                    color: "black",
-                  },
-                }),
+                    color: "black"
+                  }
+                })
               }}
             />
           </div>
@@ -745,7 +741,7 @@ export default function AddZoneComp() {
               fontSize: "16px",
               backgroundColor: "#00b56c",
               color: "white",
-              border: "none",
+              border: "none"
             }}
             id="add_zone_redraw_btn"
             startIcon={
@@ -818,11 +814,20 @@ export default function AddZoneComp() {
                           circle: drawShape,
                           marker: false,
                           circlemarker: false,
-                          rectangle: false,
+                          rectangle: false
                         }}
                       />
                       {shapeType === "Polygon" && polygondataById.length > 0 ? (
-                        <Polygon positions={polygondataById} color="#97009c" />
+                        <Polygon
+                          positions={polygondataById}
+                          color={
+                            Form.GeoFenceType == "City-Area"
+                              ? "green"
+                              : Form.GeoFenceType == "Restricted-Area"
+                              ? "red"
+                              : "blue"
+                          }
+                        />
                       ) : null}
 
                       {shapeType === "Circle" &&
@@ -832,7 +837,13 @@ export default function AddZoneComp() {
                         <Circle
                           radius={Number(circleDataById?.radius)}
                           center={mapcenter}
-                          color="#97009c"
+                          color={
+                            Form.GeoFenceType == "City-Area"
+                              ? "green"
+                              : Form.GeoFenceType == "Restricted-Area"
+                              ? "red"
+                              : "blue"
+                          }
                         />
                       ) : null}
                     </FeatureGroup>
@@ -850,7 +861,7 @@ export default function AddZoneComp() {
                           circle: true,
                           marker: false,
                           circlemarker: false,
-                          rectangle: false,
+                          rectangle: false
                         }}
                       />
                       {shapeType === "Polygon" && polygondataById.length > 0 ? (

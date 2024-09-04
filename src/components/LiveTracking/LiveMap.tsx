@@ -122,7 +122,7 @@ const DynamicCarMap = ({
   const handleShowZone = () => {
     setShowZones(!showZones);
   };
-
+ 
   return (
     <>
       <div className="xl:col-span-4 lg:col-span-3  md:col-span-3  sm:col-span-3 col-span-4 main_map">
@@ -140,6 +140,7 @@ const DynamicCarMap = ({
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
               />
+
               {showZones &&
                 zoneList.map((singleRecord: any) => {
                   const radius = Number(singleRecord.latlngCordinates);
@@ -208,7 +209,7 @@ const DynamicCarMap = ({
               </button>
             </div>
           </div> */}
-          {zoneList !== null && zoneList.length > 0 && (
+          {zoneList !== null && zoneList?.length > 0 && (
             <div
               className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2"
               style={{

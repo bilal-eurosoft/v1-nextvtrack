@@ -233,12 +233,10 @@ export default function EditZoneComp() {
     let circlePoint = formatCenterPoints(latlng.lat, latlng.lng);
 
     const newlatlng = circlePoint?.split(",").map(Number);
-    
 
     if (drawShape == true || drawShape == false) {
       setCircleDataById({ radius: radius });
       const updateCircleData = (newLatlng: string, newRadius: string): void => {
-        
         setCircleData({
           latlng: newLatlng,
           radius: newRadius,
@@ -248,10 +246,8 @@ export default function EditZoneComp() {
       setMapcenter([newlatlng[0], newlatlng[1]]);
     }
   };
-  
   const handleChange = (e: any) => {
     const { name, value } = e.target;
-  
     setForm({ ...Form, [name]: value });
   };
   
@@ -265,7 +261,6 @@ export default function EditZoneComp() {
       toast.error("Please Draw a Zone");
       return;
     }
-    
     try {
       if (session) {
         const newformdata = {
@@ -338,7 +333,6 @@ export default function EditZoneComp() {
       } else if (layer instanceof L.Circle) {
         const latlng: L.LatLng = layer.getLatLng();
         const radius: number = layer.getRadius();
-        
         handleCircleSave(latlng, radius.toString());
         setDrawShape(true);
       }
@@ -409,6 +403,7 @@ export default function EditZoneComp() {
               <label className="text-md font-popins text-black font-semibold">
                 <span className="text-red font-extraboldbold">*</span> Geofence:{" "}
               </label>
+
               {session?.clickToCall === true ? (
                 <Select
                   onChange={handleChange}

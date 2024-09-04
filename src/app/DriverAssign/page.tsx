@@ -164,36 +164,13 @@ export default function DriverProfile() {
   const { data: session } = useSession();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-  if (
-    session?.userRole === "Controller" ||
-    (session?.userRole == "Admin" && session?.driverProfile === false)
-  ) {
-    router.push("/signin");
-    return null;
-  }
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [open, setOpen] = useState(false);
   const [DriverList, setDriverList] = useState([]);
   const [vehicleNums, setvehicleNum] = useState([]);
   const [getAllAsignData, setgetAllAsignData] = useState<any>([]);
   const [selectedDriver, setSelectedDriver] = useState<any>({});
   const [selectVehicleNum, setSelectVehicleNum] = useState<any>({});
-
   const vehicleName = async () => {
-    
     try {
       // setLaoding(true);
       if (session) {
@@ -201,6 +178,7 @@ export default function DriverProfile() {
           token: session?.accessToken,
           clientId: session?.clientId,
         });
+  
         setDriverList(
           response.filter(
             (item: any) => item.isAvailable == true && item.isDeleted === false
@@ -212,11 +190,8 @@ export default function DriverProfile() {
       console.error("Error fetching zone data:", error);
     }
   };
-
-  useEffect(() => {
-    vehicleName();
-  }, [session]);
-
+ 
+  
   const AllAsignData = async () => {
     try {
       // setLaoding(true);
@@ -236,21 +211,6 @@ export default function DriverProfile() {
     AllAsignData();
   }, []);
 
-  const handleVehicle = (e: any) => {
-    const selectedVehicle: any = vehicleNums?.find(
-      (driver: any) => driver.id === e.target.value
-    );
-    setSelectVehicleNum(selectedVehicle);
-    // setSelectVehicleNum(e.target.value);
-  };
-
-  const handleSelectDriver = (e: any) => {
-    const selectedDriverObject: any = DriverList.find(
-      (driver: any) => driver._id === e.target.value
-    );
-    setSelectedDriver(selectedDriverObject);
-  };
-  // useEffect(() => {
   const vehicleNum = async () => {
     try {
       // setLaoding(true);
@@ -267,10 +227,52 @@ export default function DriverProfile() {
       console.error("Error fetching zone data:", error);
     }
   };
-  // }, [session]);
+  
   useEffect(() => {
     vehicleNum();
+    vehicleName();
   }, [session]);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+  if (
+    session?.userRole === "Controller" ||
+    (session?.userRole == "Admin" && session?.driverProfile === false)
+  ) {
+    router.push("/signin");
+    return null;
+  }
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+ 
+
+
+  const handleVehicle = (e: any) => {
+    const selectedVehicle: any = vehicleNums?.find(
+      (driver: any) => driver.id === e.target.value
+    );
+    setSelectVehicleNum(selectedVehicle);
+    // setSelectVehicleNum(e.target.value);
+  };
+
+  const handleSelectDriver = (e: any) => {
+    const selectedDriverObject: any = DriverList.find(
+      (driver: any) => driver._id === e.target.value
+    );
+    setSelectedDriver(selectedDriverObject);
+  };
+  
+  
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -392,7 +394,7 @@ export default function DriverProfile() {
     };
     try {
       if (session) {
-        const { id } = toast.custom((t) => (
+        const { id }:any= toast.custom((t) => (
           <div className="bg-white p-2 rounded-md">
             <p>Are you sure you want to Deasign This Driver ?</p>
             <button
@@ -695,7 +697,7 @@ export default function DriverProfile() {
                     id="table_head"
                     className="font-popins  font-bold text-black"
                   >
-                    Driver Number
+                    Driver Contact
                   </TableCell>
                   <TableCell
                     align="center"
@@ -728,13 +730,13 @@ export default function DriverProfile() {
               </TableHead>
               <TableBody className="bg-bgLight cursor-pointer  ">
                 {getAllAsignData?.data?.map((row: any, index: any) => (
-                  <TableRow className="hover:bg-bgHoverTabel w-full">
+                  <TableRow className="hover:bg-bgHoverTabel w-full" key ={index}>
                     <TableCell align="center" colSpan={2}>
                       {page * rowsPerPage + index + 1}
                     </TableCell>
-                    <TableCell align="center" colSpan={2}>
+                    {/* <TableCell align="center" colSpan={2}>
                       {row?.DriverDetails?.driverNo}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell align="center" colSpan={2}>
                       {" "}
                       {row?.DriverDetails?.driverfirstName}
@@ -751,8 +753,16 @@ export default function DriverProfile() {
                       {/* </TableCell> */}
                       {/* <TableCell>{row?.DriverDetails?.driverIdNo}</TableCell> */}
                       {/* <TableCell align="center"> */}
-                      {row?.DriverDetails?.driverContact}
+                      {/* {row?.DriverDetails?.driverContact} */}
                     </TableCell>
+
+                    <TableCell align="center" colSpan={2}>
+                      {row?.DriverDetails?.driverContact}
+                      {/* </TableCell> */}
+                      {/* <TableCell>{row?.DriverDetails?.driverIdNo}</TableCell> */}
+                      {/* <TableCell align="center"> */}{" "}
+                    </TableCell>
+
                     <TableCell align="center" colSpan={2}>
                       {row?.vehicleDetails?.vehicleReg}
                     </TableCell>

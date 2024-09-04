@@ -16,8 +16,8 @@ import { useSession } from "next-auth/react";
 import { socket } from "@/utils/socket";
 import countCars from "@/utils/countCars";
 import LiveSidebar from "@/components/LiveTracking/LiveSidebar";
-import Image from "next/image";
-import logo from "../../../public/Images/loadinglogo.png";
+// import Image from "next/image";
+// import logo from "../../../public/Images/loadinglogo.png";
 const LiveMap = dynamic(() => import("@/components/LiveTracking/LiveMap"), {
   // loading: () => (
   //   <div>
@@ -106,7 +106,7 @@ const LiveTracking = () => {
     function onlineHandler() {
       setIsOnline(true);
     }
-
+    
     function offlineHandler() {
       setIsOnline(false);
     }
@@ -154,7 +154,6 @@ const LiveTracking = () => {
             matchingVehicles = uniqueData.filter((vehicle) =>
               vehicleIds.includes(vehicle.vehicleId)
             );
-
             carData.current = matchingVehicles;
           } else {
             carData.current = uniqueData;

@@ -1,18 +1,12 @@
 import { IgnitionReport, replayreport } from "@/types/IgnitionReport";
+import { Events, Notifications } from "@/types/events";
+import { commandrequest } from "@/types/commandrequest";
 import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
-import { Events, Notifications } from "@/types/events";
-import { error } from "console";
-var URL = "https://backend.vtracksolutions.com";
-// var URL = 'http://172.16.10.47:80'
+// var URL = "http://172.16.10.47:80"
+var URL ="https://backend.vtracksolutions.com";
 
-// surakhSha api
-// "http0";
 
-// 'http://172.16.10.46:80'
-
-//""http://172.16.11.210:3001; //"http://172.16.11.210:3001";
-// https://backend.vtracksolutions.com
 export async function getVehicleDataByClientId(clientId: string) {
   try {
     const response = await fetch(
@@ -33,33 +27,33 @@ export async function getVehicleDataByClientId(clientId: string) {
   }
 }
 
-// export async function getClientSettingByClinetIdAndToken({
-//   token,
-//   clientId,
-// }: {
-//   token: string;
-//   clientId: string;
-// }) {
-//   try {
-//     const response = await fetch(`${URL}/SettingByClientId`, {
-//       headers: {
-//         accept: "application/json, text/plain, */*",
-//         authorization: `Bearer ${token}`,
-//         "content-type": "application/json",
-//       },
-//       body: `{\"ClientId\":\"${clientId}\"}`,
-//       method: "POST",
-//     });
-//     if (!response.ok) {
-//       throw new Error("Failed to fetch data from the API");
-//     }
-//     const data = await response.json();
-//     return data;
-//   } catch (error) {
-//     
-//     return [];
-//   }
-// }
+export async function getClientSettingByClinetIdAndToken({
+  token,
+  clientId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(`${URL}/SettingByClientId`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"ClientId\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
 
 export async function vehicleListByClientId({
   token,
@@ -130,6 +124,90 @@ export function expireForgotLink(payload: any) {
   return ressult;
 }
 
+// here
+export async function portalGprsCommand({
+  token,
+  payload,
+}: {
+  token: string;
+  payload: commandrequest;
+}) {
+  try {
+    const response = await fetch(`${URL}/portal/GprsCommand`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
+
+// export async function getGprsCommandLatest({
+//   token,
+// }: // payload,
+// {
+//   token: string;
+//   // payload: commandrequest;
+// }) {
+//   try {
+//     const response = await fetch(
+//       `http://172.16.10.99:3001/GetLatestGprsCommand`,
+//       {
+//         headers: {
+//           accept: "application/json, text/plain, */*",
+//           authorization: `Bearer ${token}`,
+//           "content-type": "application/json",
+//         },
+//         // body: JSON.stringify(payload),
+//         method: "POST",
+//       }
+//     );
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch data from the API");
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     
+//     return [];
+//   }
+// }
+
+// export async function responsegprs({ token }: { token: string }) {
+//   try {
+//     const response = await fetch(
+//       `http://172.16.10.46:80/gprscommands/most-recent`,
+//       {
+//         headers: {
+//           accept: "application/json, text/plain, */*",
+//           authorization: `Bearer ${token}`,
+//           "content-type": "application/json",
+//         },
+//         method: "POST", // Adjust the method according to your API's requirement
+//       }
+//     );
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch data from the API");
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     
+//     return null;
+//   }
+// }
+
 export async function getAllVehicleByUserId({
   token,
   userId,
@@ -161,6 +239,166 @@ export async function getAllVehicleByUserId({
   }
 }
 
+// here events permission
+export async function updateEventPermissionByClientId({
+  token,
+  clientId,
+  payload,
+}: {
+  token: string;
+  clientId: string;
+  payload: Events;
+}) {
+  try {
+    const payloadWithClientId = { clientId, ...payload }; // Construct payload object
+    const response = await fetch(`${URL}/updateEventPermissionByClientId`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payloadWithClientId), // Stringify payload with clientId
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+
+// here get client
+export async function clientbyClientid({
+  token,
+  clientId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(`${URL}/GetClientById`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"id\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
+
+// here save client
+export async function clientsave({
+  token,
+  clientId,
+  payload,
+}: {
+  token: string;
+  clientId: string;
+  payload: Notifications;
+}) {
+  try {
+    const payloadWithClientId = { id: clientId, ...payload }; // Construct payload object
+    const response = await fetch(`${URL}/clients`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      // add here client id in this form]
+      body: JSON.stringify(payloadWithClientId), // Stringify payload with clientId
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+
+export async function getEventPermissionByClientId({
+  token,
+  clientId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(
+      `${URL}/getEventPermissionByClientId?clientId=${clientId}`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        method: "GET", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+
+export async function vehiclebyClientid({
+  token,
+  clientId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(`${URL}/getDualCamVehicleByclientId`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"clientId\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
+
 export async function IgnitionReportByTrip({
   token,
   payload,
@@ -169,15 +407,18 @@ export async function IgnitionReportByTrip({
   payload: IgnitionReport;
 }) {
   try {
-    const response = await fetch(`${URL}/Report/IgnitionReport`, {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await fetch(
+      `${URL}/Report/IgnitionReport`,
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
@@ -349,132 +590,9 @@ export async function videoList({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    
     return data;
   } catch (error) {
     
-    return [];
-  }
-}
-export async function clientsave({
-  token,
-  clientId,
-  payload,
-}: {
-  token: string;
-  clientId: string;
-  payload: Notifications;
-}) {
-  try {
-    const payloadWithClientId = { id: clientId, ...payload }; // Construct payload object
-    const response = await fetch(`${URL}/clients`, {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      // add here client id in this form]
-      body: JSON.stringify(payloadWithClientId), // Stringify payload with clientId
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching data", error);
-    return [];
-  }
-}
-export async function updateEventPermissionByClientId({
-  token,
-  clientId,
-  payload,
-}: {
-  token: string;
-  clientId: string;
-  payload: Events;
-}) {
-  try {
-    const payloadWithClientId = { clientId, ...payload }; // Construct payload object
-    const response = await fetch(`${URL}/updateEventPermissionByClientId`, {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payloadWithClientId), // Stringify payload with clientId
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.error("Error fetching data", error);
-    return [];
-  }
-}
-
-export async function clientbyClientid({
-  token,
-  clientId,
-}: {
-  token: string;
-  clientId: string;
-}) {
-  try {
-    const response = await fetch(`${URL}/GetClientById`, {
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: `{\"id\":\"${clientId}\"}`,
-      method: "POST",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    
-    return data;
-  } catch (error) {
-    
-    return [];
-  }
-}
-export async function getEventPermissionByClientId({
-  token,
-  clientId,
-}: {
-  token: string;
-  clientId: string;
-}) {
-  try {
-    const response = await fetch(
-      `${URL}/getEventPermissionByClientId?clientId=${clientId}`,
-      {
-        headers: {
-          accept: "application/json, text/plain, */*",
-          authorization: `Bearer ${token}`,
-          "content-type": "application/json",
-        },
-        method: "GET", // Use lowercase 'get' for method
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching data", error);
     return [];
   }
 }
@@ -483,8 +601,8 @@ export async function getZoneListByClientId({
   token,
   clientId,
 }: {
-  token: any;
-  clientId: any;
+  token: string;
+  clientId: string;
 }) {
   try {
     const response = await fetch(`${URL}/zonelist`, {
@@ -656,7 +774,6 @@ export async function postDriverDataByClientId({
 }
 export async function AssignRfidtodriver(token: any, payload: any) {
   try {
-    
     const response = await fetch(`${URL}/AssignRfidToDriver`, {
       method: "POST",
       headers: {
@@ -669,12 +786,9 @@ export async function AssignRfidtodriver(token: any, payload: any) {
     if (!response.ok) {
       throw new Error("Failed to Assign rfid to driver");
     }
-
     const data = await response.json();
-
     return data;
   } catch (error) {
-    
     return [];
   }
 }
@@ -685,7 +799,6 @@ export async function postDriverDataAssignByClientId({
   token: string;
   newformdata: any;
 }) {
-  
   try {
     const response = await fetch(`${URL}/v2/DriverAssign`, {
       method: "POST",
@@ -701,7 +814,7 @@ export async function postDriverDataAssignByClientId({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-  
+   
     return data;
   } catch (error) {
     
@@ -1034,19 +1147,9 @@ export async function getSearchAddress({
   country: string;
 }) {
   try {
-    /* const response = await fetch(
-      `http://osm.vtracksolutions.com/nominatim/search.php?q=${query}+Pakistan&format=json`,
-      {
-        method: "GET",
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-  //   const data = await response.json();
-   */
+   
     const response = await fetch(
-      `https://backend.vtracksolutions.com/zoneaddresssearch?q=${query},${country}`,
+      `${URL}/zoneaddresssearch?q=${query},${country}`,
       {
         method: "GET",
         headers: {
@@ -1064,8 +1167,7 @@ export async function getSearchAddress({
     const data = await response.json();
 
     return data;
-    
-    //  return data;
+   
   } catch (error) {
     
     return [];
@@ -1181,35 +1283,6 @@ export async function TripsByBucketAndVehicle({
   }
 }
 
-export async function TripsByBucketAndVehicleV3({
-  token,
-  payload,
-}: {
-  token: string;
-  payload: replayreport;
-}) {
-  try {
-    const response = await fetch(`${URL}/v3/TripsByBucketAndVehicleV2`, {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    return [];
-  }
-}
-
 export async function TravelHistoryByBucketV2({
   token,
   payload,
@@ -1219,36 +1292,6 @@ export async function TravelHistoryByBucketV2({
 }) {
   try {
     const response = await fetch(`${URL}/v2/TravelHistoryByBucketV2`, {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.error("Error fetching data", error);
-    return [];
-  }
-}
-export async function TravelHistoryByBucketV3({
-  token,
-  payload,
-}: {
-  token: string;
-  payload: replayreport;
-}) {
-  try {
-    const response = await fetch(`${URL}/v3/TravelHistoryByBucketV2`, {
       method: "POST",
       headers: {
         accept: "application/json, text/plain, */*",

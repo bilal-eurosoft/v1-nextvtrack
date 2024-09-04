@@ -9,7 +9,13 @@ export type GPSData = {
   speedWithUnit: null;
   speedWithUnitDesc: string;
 };
-
+export type camStatusData = {
+  dimension: String;
+  id: Number;
+  label: String;
+  value: Number;
+  valueHuman: String;
+};
 export type OSMData = {
   place_id: string;
   licence: string;
@@ -57,6 +63,9 @@ export type VehicleData = {
   vehicleColor: string;
   vehicleTextColor: string;
   clientId: string;
+  camStatus: camStatusData;
+  backCamera: camStatusData;
+  frontCamera: camStatusData;
   vehicleId: string;
   vehicleNo: string;
   vehicleMake: string;

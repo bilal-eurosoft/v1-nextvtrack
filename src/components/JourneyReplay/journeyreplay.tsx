@@ -4,13 +4,7 @@ import DateFnsMomemtUtils from "@date-io/moment";
 import { DatePicker } from "@material-ui/pickers";
 import BlinkingTime from "@/components/General/BlinkingTime";
 import axios, { all } from "axios";
-import PlaceIcon from "@mui/icons-material/Place";
 import EventIcon from "@material-ui/icons/Event";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
 import dynamic from "next/dynamic";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -18,7 +12,6 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import moment from "moment-timezone";
-
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import Image from "next/image";
@@ -39,14 +32,10 @@ import Speedometer, {
 } from "react-speedometer";
 import {
   TravelHistoryByBucketV2,
-  TravelHistoryByBucketV3,
-  TripsByBucketAndVehicleV3,
   TripsByBucketAndVehicle,
   getAllVehicleByUserId,
-  // getClientSettingByClinetIdAndToken,
   getCurrentAddress,
-  // getZoneListByClientId,
-  vehicleListByClientId,
+  vehicleListByClientId,  
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { DeviceAttach } from "@/types/vehiclelistreports";
@@ -67,7 +56,6 @@ import { StopAddressData } from "@/types/StopDetails";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 import { Tooltip, Button } from "@material-tailwind/react";
-// import Select from "react-select";
 import DateFnsUtils from "@date-io/date-fns";
 import {
   MuiPickersUtilsProvider,
@@ -75,11 +63,12 @@ import {
 } from "@material-ui/pickers";
 
 import MenuItem from "@mui/material/MenuItem";
-// import Select from "@mui/material/Select";
+import { makeStyles } from "@mui/styles";
+import Slider from "@mui/material/Slider";
 import car_icon from "../../../public/Images/journey_car_icon.png";
 import Select from "react-select";
+import "./index.css";
 
-// const { Option } = Select;
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -91,7 +80,6 @@ const MenuProps = {
   },
 };
 
-import "./index.css";
 interface Option {
   value: string;
   label: string;
@@ -119,24 +107,20 @@ const Circle = dynamic(
 );
 
 function filterWeekends(date: any) {
-  // Return false if Saturday or Sunday
   return date.value === 0 || date === 6;
 }
-import { makeStyles } from "@mui/styles";
-import Slider from "@mui/material/Slider";
 
-// Define custom styles using makeStyles
 const useStyles = makeStyles((theme) => ({
   select: {
     "&:before": {
-      borderColor: "green", // Change this to the desired border color
+      borderColor: "green",
     },
     "&:after": {
-      borderColor: "green", // Change this to the desired border color
+      borderColor: "green",
     },
   },
 }));
-export default function journeyReplayComp() {
+export default function JourneyReplayComp() {
   const { data: session } = useSession();
   const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
   const [zoneList, setZoneList] = useState<zonelistType[]>([]);
@@ -160,14 +144,11 @@ export default function journeyReplayComp() {
     TimeZone: session?.timezone || "",
     VehicleReg: "",
     clientId: session?.clientId || "",
-    // fromDateTime: new Date(),
     fromDateTime: "",
     period: "",
-    // toDateTime: new Date(),
     toDateTime: "",
     unit: session?.unit || "",
   });
-
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [carPosition, setCarPosition] = useState<LatLng | null>(null);
@@ -210,17 +191,16 @@ export default function journeyReplayComp() {
   const [addressTravelHistory, setAddressTravelHistory] = useState([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isPickerOpenFromDate, setIsPickerOpenFromDate] = useState(true);
-
   const [travelV2, setTravelV2] = useState(false);
   const [travelV3, setTravelV3] = useState(false);
   const [stopWithSecond, setStopWithSecond] = useState([]);
-
   const startdate = new Date();
   const enddate = new Date();
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
     setExpanded(isExpanded ? panel : null);
   };
-  const allData = useSelector((state) => state?.zone);
+  const allData = useSelector((state) => state?.zone);  
+  
   // useEffect(() => {
   //   setZoneList(allZones?.zone);
   // }, [allZones]);
@@ -229,9 +209,6 @@ export default function journeyReplayComp() {
   const togglePicker = () => {
     setIsPickerOpen(!isPickerOpen);
   };
-  // const togglePickerFromDate = () => {
-  //   setIsPickerOpenFromDate(!isPickerOpenFromDate);
-  // };
   const SetViewOnClick = ({ coords }: { coords: any }) => {
     if (isPaused) {
       setMapcenterToFly(null);
@@ -283,6 +260,7 @@ export default function journeyReplayComp() {
       }
     }
   };
+
   const pauseTick = async () => {
     setIsPlaying(false);
     setPauseBtn(false);
@@ -298,6 +276,7 @@ export default function journeyReplayComp() {
       clearInterval(carMovementInterval);
       setCarMovementInterval(undefined);
     }
+
     if (carPosition && session) {
       const Dataresponse = await Tripaddressresponse(
         carPosition?.lat,
@@ -307,6 +286,7 @@ export default function journeyReplayComp() {
       setTripAddressData(Dataresponse);
     }
   };
+
   const stopTick = async () => {
     setIsPlaying(false);
     setIsPaused(false);
@@ -448,29 +428,12 @@ export default function journeyReplayComp() {
             setVehicleList(data);
           }
         }
-      } catch (error) {
-        console.error("Error fetching zone data:", error);
-      }
+      } catch (error) {}
     };
     vehicleListData();
-    // (async function () {
-    //   if (session) {
-
-    //     await dispatch(
-    //       fetchZone({
-    //         token: session?.accessToken,
-    //         clientId: session?.clientId,
-    //       })
-    //     );
-    //   }
-    // })();
 
     (async function () {
       if (session) {
-        // const clientSettingData = await getClientSettingByClinetIdAndToken({
-        //   token: session?.accessToken,
-        //   clientId: session?.clientId,
-        // });
         if (session) {
           const centervalue = await session?.clientSetting.filter(
             (item: any) => item.PropertDesc == "Map"
@@ -542,11 +505,6 @@ export default function journeyReplayComp() {
       fromDateTime: "",
       toDateTime: "",
     }));
-
-    // setIgnitionreport({
-    //   fromDateTime: "",
-    //   toDateTime: "",
-    // });
   };
   const formattedTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
   const parsedDateTime = new Date(currentTime);
@@ -600,6 +558,7 @@ export default function journeyReplayComp() {
         if (period == "today") {
           setWeekData(false);
           const today = moment().tz(session?.timezone);
+          // const time = today.format("HH:mm:ss");
           startDateTime =
             today.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
@@ -617,7 +576,7 @@ export default function journeyReplayComp() {
           setWeekData(true);
 
           const startOfWeek = moment()
-            .subtract(6, "days")
+            .subtract(7, "days")
             .startOf("day")
             .tz(session?.timezone);
           const oneday = moment().subtract(1, "day");
@@ -788,201 +747,7 @@ export default function journeyReplayComp() {
                   },
                 });
               }
-            } catch (error) {
-              console.error(`Error calling API for ${newdata}:`, error);
-            }
-          }
-        }
-      }
-    }
-    setSearchLoading(true);
-    setLoading(false);
-  };
-
-  const handleSubmitTwo = async (e: React.FormEvent) => {
-    setTravelV3(true);
-
-    setTravelV2(false);
-    e.preventDefault();
-    setIsDynamicTime("");
-    setstops([]);
-    setIsPaused(false);
-    setPlayBtn(false);
-    setStopBtn(false);
-    setPauseBtn(false);
-    setLaodingMap(false);
-    setIsPlaying(false);
-    setCarPosition(null);
-    setactiveTripColor("");
-    setTravelHistoryresponse([]);
-    setClearMapData(false);
-    setProgressWidth(0);
-    setLoading(true);
-    // setSearchLoading(true);
-    setDataResponse(null);
-    setExpanded(null);
-    setSearchLoading(false);
-    if (polylinedata.length > 0) {
-      setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
-    }
-    setCurrentPositionIndex(0);
-    setClearMapData(true);
-    if (
-      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "today") ||
-      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "yesterday") ||
-      (Ignitionreport?.VehicleReg && Ignitionreport?.period === "week") ||
-      (Ignitionreport?.VehicleReg &&
-        Ignitionreport?.VehicleReg &&
-        Ignitionreport?.toDateTime &&
-        Ignitionreport?.fromDateTime)
-    ) {
-      if (session) {
-        const { VehicleReg, period } = await Ignitionreport;
-        if (period == "week") {
-          setWeekData(true);
-        }
-        if (period == "today") {
-          setWeekData(false);
-        }
-        if (VehicleReg && period) {
-          let newdata = {
-            ...Ignitionreport,
-          };
-          const timestart: string = "00:00:00";
-          const timeend: string = "23:59:59";
-          const currentDayOfWeek = new Date().getDay();
-          const currentDay = new Date().getDay();
-          const daysUntilMonday =
-            currentDayOfWeek === currentDay ? 7 : currentDayOfWeek - 1;
-          const fromDateTime = new Date();
-          fromDateTime.setDate(fromDateTime.getDate() - daysUntilMonday);
-          const toDateTime = new Date(fromDateTime);
-          toDateTime.setDate(toDateTime.getDate() + 6);
-          const formattedFromDateTime = formatDate(fromDateTime);
-          const formattedToDateTime = formatDate(toDateTime);
-          if (isCustomPeriod) {
-            newdata = {
-              ...newdata,
-              fromDateTime: `${
-                weekData ? formattedFromDateTime : Ignitionreport.fromDateTime
-              }T${timestart}Z`,
-              toDateTime: `${
-                weekData ? formattedToDateTime : Ignitionreport.toDateTime
-              }T${timeend}Z`,
-            };
-          } else {
-            newdata = {
-              ...newdata,
-              fromDateTime: `${
-                weekData ? formattedFromDateTime : currentDate
-              }T${timestart}Z`,
-              toDateTime: `${
-                weekData ? formattedToDateTime : currentDate
-              }T${timeend}Z`,
-            };
-          }
-          const fromDate: any = new Date(Ignitionreport?.fromDateTime);
-          const toDate: any = new Date(Ignitionreport?.toDateTime);
-
-          const differenceMs = toDate - fromDate;
-
-          const differenceDays = differenceMs / (1000 * 60 * 60 * 24);
-
-          // setIgnitionreport(newdata);
-          // if (
-          //   Ignitionreport.period == "today" ||
-          //   Ignitionreport.period == "yesterday"
-          // ) {
-          //   setTimeout(() => setweekDataGrouped(false), 1000);
-          // }
-          // if (
-          //   Ignitionreport.period == "week" ||
-          //   Ignitionreport.period == "custom"
-          // ) {
-          //   setTimeout(() => setweekDataGrouped(true), 3000);
-          // }
-          if (differenceDays > 5 || differenceDays < 0) {
-            toast.error("please Select 0nly Five Days");
-          } else {
-            try {
-              const response = await toast.promise(
-                TripsByBucketAndVehicleV3({
-                  token: session.accessToken,
-                  payload: newdata,
-                }),
-
-                {
-                  loading: "Loading...",
-                  success: "",
-                  error: "",
-                },
-                {
-                  style: {
-                    border: "1px solid #00B56C",
-                    padding: "16px",
-                    color: "#1A202C",
-                  },
-                  success: {
-                    duration: 10,
-                    iconTheme: {
-                      primary: "#00B56C",
-                      secondary: "#FFFAEE",
-                    },
-                  },
-                  error: {
-                    duration: 10,
-                    iconTheme: {
-                      primary: "#00B56C",
-                      secondary: "#FFFAEE",
-                    },
-                  },
-                }
-              );
-              if (
-                Ignitionreport.period == "today" ||
-                Ignitionreport.period == "yesterday"
-              ) {
-                // setTimeout(() => setweekDataGrouped(false), 1000);
-                setweekDataGrouped(false);
-              }
-              if (
-                Ignitionreport.period == "week" ||
-                Ignitionreport.period == "custom"
-              ) {
-                // setTimeout(() => setweekDataGrouped(true), 3000);
-                setweekDataGrouped(true);
-              }
-              setDataResponse(response?.data);
-
-              if (response.success === true) {
-                toast.success(`${response.message}`, {
-                  style: {
-                    border: "1px solid #00B56C",
-                    padding: "16px",
-                    color: "#1A202C",
-                  },
-                  duration: 4000,
-                  iconTheme: {
-                    primary: "#00B56C",
-                    secondary: "#FFFAEE",
-                  },
-                });
-              } else {
-                toast.error(`${response.message}`, {
-                  style: {
-                    border: "1px solid red",
-                    padding: "16px",
-                    color: "red",
-                  },
-                  iconTheme: {
-                    primary: "red",
-                    secondary: "white",
-                  },
-                });
-              }
-            } catch (error) {
-              console.error(`Error calling API for ${newdata}:`, error);
-            }
+            } catch (error) {}
           }
         }
       }
@@ -1039,10 +804,10 @@ export default function journeyReplayComp() {
     return date.toISOString().slice(0, 10);
   }
 
-  let displayName: any;
   const handleDivClick = async (
     TripStart: TripsByBucket["TripStart"],
-    TripEnd: TripsByBucket["TripEnd"]
+    TripEnd: TripsByBucket["TripEnd"],
+    id: any
   ) => {
     setlat(null);
     setlng(null);
@@ -1065,6 +830,7 @@ export default function journeyReplayComp() {
           ...Ignitionreport,
           fromDateTime: `${TripStart}`,
           toDateTime: `${TripEnd}`,
+          id,
         };
         setLaodingMap(false);
         const TravelHistoryresponseapi = await toast.promise(
@@ -1154,11 +920,12 @@ export default function journeyReplayComp() {
             return moment(a.date).diff(b.date);
           })
         );
-        let stopTimesArray = [];
+        let stopTimesArray: any = [];
 
         // Iterate over data array
         for (let i = 0; i < TravelHistoryresponseapi?.data?.length; i++) {
           var currentData = TravelHistoryresponseapi?.data[i];
+
           // Check if current car's speed is 0 Mph
           if (
             currentData.ignition === 1 &&
@@ -1216,151 +983,26 @@ export default function journeyReplayComp() {
               date: currentData.date,
               time: formattedTime,
               address: currentData.address,
+              lat: currentData.lat,
+              lng: currentData.lng,
             });
           }
         }
-
         setStopWithSecond(stopTimesArray);
         setTravelHistoryresponse(TravelHistoryresponseapi.data);
       }
-    } catch (error) {
-      console.error(`Error calling API for:`, error);
-    }
-    setLaodingMap(true);
-  };
-  
-  
-  const handleDivClickv3 = async (
-    TripStart: TripsByBucket["TripStart"],
-    TripEnd: TripsByBucket["TripEnd"],
-    id: any
-  ) => {
-    setlat(null);
-    setlng(null);
-    setPlayBtn(true);
-    setStopBtn(false);
-    setStopDetailsOpen(true);
-    setIsPlaying(false);
-    setIsPaused(false);
-    setstopVehicle(false);
+    } catch (error) {}
 
-    try {
-      setTravelHistoryresponse([]);
-      setIsPauseColor(false);
-      setProgressWidth(0);
-      // if (polylinedata.length > 0) {
-      //   setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
-      // }
-      setCurrentPositionIndex(0);
-      if (session) {
-        let newresponsedata = {
-          ...Ignitionreport,
-          fromDateTime: `${TripStart}`,
-          toDateTime: `${TripEnd}`,
-          id: id,
-        };
-        setLaodingMap(false);
-        const TravelHistoryresponseapi = await toast.promise(
-          TravelHistoryByBucketV3({
-            token: session.accessToken,
-            payload: newresponsedata,
-          }),
-          {
-            loading: "Loading...",
-            success: "",
-            error: "",
-          },
-          {
-            style: {
-              border: "1px solid #00B56C",
-              padding: "16px",
-              color: "#1A202C",
-            },
-            success: {
-              duration: 10,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-            error: {
-              duration: 10,
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            },
-          }
-        );
-        // if (session?.unit == "Mile") {
-        //   unit = "Mph";
-        // } else {
-        //   unit = "Kph";
-        // }
-        var stopPoints = [];
-        if (session?.unit == "KM") {
-          stopPoints = TravelHistoryresponseapi.data
-            .filter((x: any) => x.speed == "0 Kph")
-            .sort((x: any) => x.date);
-        } else {
-          stopPoints = TravelHistoryresponseapi.data
-            .filter((x: any) => x.speed == "0 Mph")
-            .sort((x: any) => x.date);
-        }
-        // displayName = TravelHistoryresponse.map((item) => {
-        //   return item?.address?.display_name;
-        // });
-        var addresses: any = [];
-        if (TravelHistoryresponse)
-          stopPoints.map(async function (singlePoint: any) {
-            let completeAddress;
-            if (!singlePoint.address?.display_name) {
-              completeAddress = await axios
-                .get(
-                  `http://osm.vtracksolutions.com/nominatim/reverse.php?lat=${singlePoint.lat}&lon=${singlePoint.lng}&zoom=19&format=jsonv2`
-                )
-                .then(async (response: any) => {
-                  return response.data;
-                });
-            } else {
-              completeAddress = singlePoint.address;
-            }
-
-            var record: any = {};
-            record["_id"] = singlePoint._id;
-            record["lat"] = singlePoint.lat;
-            record["lng"] = singlePoint.lng;
-            record["date"] = singlePoint.date;
-            record["speed"] = singlePoint.speed;
-            record["TimeStamp"] = singlePoint.TimeStamp;
-            record["address"] = completeAddress.display_name;
-            if (
-              addresses.filter(
-                (x: any) => x.lat == record.lat && x.lng == record.lng
-              ).length == 0
-            ) {
-              addresses.push(record);
-            }
-          });
-        setstops(
-          addresses.sort((a: any, b: any) => {
-            return moment(a.date).diff(b.date);
-          })
-        );
-        // }
-
-        setTravelHistoryresponse(TravelHistoryresponseapi.data);
-      }
-    } catch (error) {
-      console.error(`Error calling API for:`, error);
-    }
     setLaodingMap(true);
   };
 
+ 
+  
+  
   useEffect(() => {
     if (TravelHistoryresponse && TravelHistoryresponse.length > 0) {
       setPolylinedata(
-        TravelHistoryresponse.map((item: TravelHistoryData) => [
+        TravelHistoryresponse?.map((item: TravelHistoryData) => [
           item.lat,
           item.lng,
         ])
@@ -1382,7 +1024,7 @@ export default function journeyReplayComp() {
       } else {
         unit = "Kph";
       }
-      const stopPoints = TravelHistoryresponse.filter((x) => {
+      const stopPoints = TravelHistoryresponse?.filter((x) => {
         return x.speed === `0 ${unit}`;
       });
 
@@ -1404,9 +1046,7 @@ export default function journeyReplayComp() {
           } else {
             stopDetailsArray.push(point?.address);
           }
-        } catch (error) {
-          console.error("Error fetching zone data:", error);
-        }
+        } catch (error) {}
       }
 
       const seen: Record<string | number, boolean> = {};
@@ -1423,7 +1063,7 @@ export default function journeyReplayComp() {
       setStopDetails(uniqueStopDetailsArray);
     })();
   }, [TravelHistoryresponse]);
-
+  // const item = TravelHistoryresponse[currentPositionIndex];
   const getSpeedAndDistance = () => {
     if (
       currentPositionIndex >= 0 &&
@@ -1582,16 +1222,16 @@ export default function journeyReplayComp() {
   const [lat, setlat] = useState<any>("");
   const [lng, setlng] = useState<any>("");
   const handleClickStopCar = (item: any) => {
-    if (item?.address?.lat === lat) {
+    if (item?.lat === lat) {
       setlat(null);
     } else {
-      setlat(item?.address?.lat);
+      setlat(item?.lat);
     }
 
-    if (item?.address?.lon === lng) {
+    if (item?.lng === lng) {
       setlng(null);
     } else {
-      setlng(item?.address?.lon);
+      setlng(item?.lng);
     }
   };
   const handleChangeValueSlider = (value: any) => {
@@ -1635,19 +1275,19 @@ export default function journeyReplayComp() {
   const groupedData: any = {};
 
   dataresponse?.map((item: any) => {
-    const tripDate = new Date(item.TripStartDateLabel);
+    const tripDate = new Date(item.TripEndDateLabel);
     const dayName = getDayName(tripDate);
-    if (!groupedData[item.TripStartDateLabel]) {
+    if (!groupedData[item.TripEndDateLabel]) {
       // If the date group doesn't exist, create it with an empty array and count set to 1
-      groupedData[item.TripStartDateLabel] = {
+      groupedData[item.TripEndDateLabel] = {
         trips: [item],
         count: 1,
         day: dayName,
       };
     } else {
       // If the date group already exists, push the trip and increment the count
-      groupedData[item.TripStartDateLabel].trips.push(item);
-      groupedData[item.TripStartDateLabel].count += 1;
+      groupedData[item.TripEndDateLabel].trips.push(item);
+      groupedData[item.TripEndDateLabel].count += 1;
     }
   });
   const options =
@@ -2128,6 +1768,21 @@ export default function journeyReplayComp() {
                 <button>Search</button>
               </div>
             </div>
+            {/* <button
+              style={{
+                marginLeft: "40%",
+                backgroundColor: "green",
+                color: "white",
+              }}
+              onClick={() =>
+                handleDivClickTwo(
+                  "2024-06-20T00:00:00.000",
+                  "2024-06-20T23:59:59.999"
+                )
+              }
+            >
+              SEARCH
+            </button> */}
             {/* <div
               onClick={handleSubmitTwo}
               className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    search_btn_journey
@@ -2194,7 +1849,7 @@ export default function journeyReplayComp() {
           <div className="xl:col-span-3 lg:col-span-1 md:col-span-12 col-span-12 journey_replay_harsh">
             {" "}
           </div>
-          {TravelHistoryresponse.length > 0 && (
+          {TravelHistoryresponse?.length > 0 && (
             <div className="xl:col-span-1 lg:col-span-2  md:col-span-12 col-span-6  -mt-1 journey_replay_harsh_child  ">
               <div className="grid grid-cols-12  ">
                 <div className="col-span-2">
@@ -2214,7 +1869,7 @@ export default function journeyReplayComp() {
             </div>
           )}
           <div className="xl:col-span-1  lg:col-span-2 md:col-span-1 col-span-6 mt-1 -ms-5 mb-3 journey_replay_harsh_acce">
-            {TravelHistoryresponse.filter((item: any) => {
+            {TravelHistoryresponse?.filter((item: any) => {
               return (
                 item.vehicleEvents.filter(
                   (items: any) => items.Event === "HarshAcceleration"
@@ -2244,7 +1899,7 @@ export default function journeyReplayComp() {
               </div>
             )}
 
-            {TravelHistoryresponse.filter((item: any) => {
+            {TravelHistoryresponse?.filter((item: any) => {
               return (
                 item.vehicleEvents.filter(
                   (items: any) => items.Event == "HarshBreak"
@@ -2284,7 +1939,7 @@ export default function journeyReplayComp() {
             </p>
             <div
               id="trips_handle"
-              className="overflow-y-scroll overflow-x-hidden bg-bgLight "
+              className="overflow-y-scroll overflow-x-hidden bg-bgLight"
             >
               {weekDataGrouped == true
                 ? Object.entries(groupedData).map(
@@ -2335,7 +1990,8 @@ export default function journeyReplayComp() {
                                   onClick={() =>
                                     handleDivClick(
                                       item.fromDateTime,
-                                      item.toDateTime
+                                      item.toDateTime,
+                                      item.id
                                     )
                                   }
                                   className="border-b hover:bg-[#e1f0e3]"
@@ -2551,16 +2207,10 @@ export default function journeyReplayComp() {
                   )
                 : dataresponse?.map((item: TripsByBucket, index: number) => (
                     <button
-                      key={index}
-                      // className=" my-2 "
-                      // onClick={() =>
-                      //   handleDivClickv3(item.fromDateTime, item.toDateTime)
-                      // }
-                      onClick={() => {
+key={index}
+                    onClick={() => {
                         travelV2 &&
-                          handleDivClick(item.fromDateTime, item.toDateTime);
-                        travelV3 &&
-                          handleDivClickv3(
+                          handleDivClick(
                             item.fromDateTime,
                             item.toDateTime,
                             item.id
@@ -2807,6 +2457,7 @@ export default function journeyReplayComp() {
             style={{ position: "relative" }}
           >
             <div onClick={() => setMapcenterToFly(null)}>
+           
               {mapcenter !== null && (
                 <MapContainer
                   id="map"
@@ -2901,7 +2552,7 @@ export default function journeyReplayComp() {
                       }
                     ></Marker>
                   )}
-                  {TravelHistoryresponse.length > 0 && (
+                  {TravelHistoryresponse?.length > 0 && (
                     <div>
                       {loadingMap ? (
                         <Marker
@@ -2926,10 +2577,10 @@ export default function journeyReplayComp() {
                         <Marker
                           position={[
                             TravelHistoryresponse[
-                              TravelHistoryresponse.length - 1
+                              TravelHistoryresponse?.length - 1
                             ].lat,
                             TravelHistoryresponse[
-                              TravelHistoryresponse.length - 1
+                              TravelHistoryresponse?.length - 1
                             ].lng,
                           ]}
                           icon={
@@ -2947,7 +2598,7 @@ export default function journeyReplayComp() {
                     </div>
                   )}
 
-                  {TravelHistoryresponse.map((item) => {
+                  {TravelHistoryresponse?.map((item) => {
                     if (item.vehicleEvents.length > 0) {
                       return item.vehicleEvents.map((items) => {
                         if (items.Event === "HarshBreak") {
@@ -2996,7 +2647,7 @@ export default function journeyReplayComp() {
                 </MapContainer>
               )}
             </div>
-
+            
             <div className="absolute lg:top-4 lg:left-20 lg:right-5 left-12 top-6 right-2 grid lg:grid-cols-10 md:grid-cols-10 sm:grid-cols-10 grid-cols-10 lg:mt-0 ">
               <div className="xl:col-span-2 mr-5 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6 stop_journey">
                 <div
@@ -3051,7 +2702,7 @@ export default function journeyReplayComp() {
                 </div>
 
                 {getShowdetails ? (
-                  <div className="bg-white lg:h-60 md:h-60 sm:h-60 h-24 overflow-y-scroll resposive_stop_details">
+                  <div className={`bg-white overflow-y-scroll resposive_stop_details ${stopWithSecond.length>1?"lg:h-60 md:h-60 sm:h-60 h-24":""}`}>
                     {stopWithSecond?.map((item: any) => {
                       return loadingMap ? (
                         <div
@@ -3124,7 +2775,8 @@ export default function journeyReplayComp() {
                   </button>
                 </div>
               </div> */}
-              {zoneList !== null && zoneList.length > 0 && (
+              
+              {/* {zoneList?.length > 0 ? (
                 <div
                   className="grid grid-cols-1 absolute lg:top-10 xl:top-1 md:top-10 top-0 xl:right-10 lg:right-10 md:right-10 sm:right-10 right-1  bg-bgLight py-2 px-2 show_zone_journey_replay"
                   style={{
@@ -3146,9 +2798,7 @@ export default function journeyReplayComp() {
                     <button className="text-labelColor font-popins text-sm font-bold">
                       Show Zones
                     </button>
-                  </div>
-
-                  {/* Three rows with colored dots and text meaning */}
+                  </div>                  
                   {showZones && (
                     <>
                       <div className="flex items-center mt-2 ml-2">
@@ -3205,12 +2855,11 @@ export default function journeyReplayComp() {
                     </>
                   )}
                 </div>
-              )}
+              ) : (
+                ""
+              )} */}
             </div>
-            <div
-              className="grid lg:grid-cols-10  grid-cols-10"
-              id="speed_meter"
-            >
+            <div className="grid lg:grid-cols-10 grid-cols-10" id="speed_meter">
               <div className="col-span-2  lg:w-52 md:w-44 sm:w-44 w-48 rounded-md ">
                 {isPlaying || isPaused ? (
                   <div>
@@ -3228,9 +2877,9 @@ export default function journeyReplayComp() {
                     /> */}
                     <Speedometer
                       value={
-                        getSpeedAndDistance()?.speed.includes("Mph")
-                          ? getSpeedAndDistance()?.speed.replace("Mph", "")
-                          : getSpeedAndDistance()?.speed.replace("Kph", "")
+                        getSpeedAndDistance()?.speed?.includes("Mph")
+                          ? getSpeedAndDistance()?.speed?.replace("Mph", "")
+                          : getSpeedAndDistance()?.speed?.replace("Kph", "")
                       }
                       max={140}
                       angle={160}

@@ -73,8 +73,8 @@ export default function Notifications() {
             token: session.accessToken,
             clientId: session?.clientId,
           });
+
           setEventsp(data);
-          
         }
       } catch (error) {
         console.error("Error fetching zone data:", error);
@@ -140,8 +140,6 @@ export default function Notifications() {
           };
 
           setNotifications(notifications);
-
-          
         }
       } catch (error) {
         console.error("Error fetching zone data:", error);
@@ -160,7 +158,6 @@ export default function Notifications() {
           clientId: session?.clientId,
           payload: eventsp,
         });
-        
 
         // Call updateNotifications function
         const response2 = await clientsave({
@@ -168,7 +165,6 @@ export default function Notifications() {
           clientId: session.clientId,
           payload: notifications,
         });
-        
         toast("save Data Successfully");
       }
     } catch (error) {
@@ -210,7 +206,6 @@ export default function Notifications() {
   // }
 
   const handleEventsPermissionChange = async (e: any) => {
-    
     const { name, checked } = e.target;
 
     if (name === "geofence") {

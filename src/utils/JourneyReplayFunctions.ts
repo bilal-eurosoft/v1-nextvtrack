@@ -48,7 +48,9 @@ export function calculateZoomCenter(data: TravelHistoryData[]) {
 
   let zoomlevel = Math.min(latZoom, lngZoom) + 1;
   if (zoomlevel > 18) {
-    zoomlevel = 18;
+    zoomlevel = 14;
+  } else if (zoomlevel >= 15) {
+    zoomlevel = 13;
   }
   return { zoomlevel, centerLat, centerLng };
 }

@@ -18,6 +18,7 @@ import Typography from "@mui/material/Typography";
 import { useRouter } from "next/navigation";
 import { pictureVideoDataOfVehicleT } from "@/types/videoType";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
+
 import "./driver.css";
 import {
   postDriverDataByClientId,
@@ -29,6 +30,8 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
+
+// import Select from "react-select";
 
 const style = {
   position: "absolute" as "absolute",
@@ -57,14 +60,9 @@ export default function DriverProfile() {
   const [selectedData, setSelectedData] = useState<any>(null);
   const [getRfid, setRfid] = useState([]);
   const [selectedRFID, setSelectedRFID] = useState("");
+  const [previousValue, setPreviousValue] = useState("");
   const [inactiveRFIDs, setInactiveRFIDs] = useState<any>([]);
-  if (
-    session?.userRole === "Controller" ||
-    (session?.userRole == "Admin" && session?.driverProfile === false)
-  ) {
-    router.push("/signin");
-    return null;
-  }
+ 
   const handleClose = () => {
     setOpen(false);
     setSelectedRFID("");
@@ -109,7 +107,6 @@ export default function DriverProfile() {
       setShowCardNumber(true);
     }
 
-
     if (id.isAvailable == true) {
       setOpenEdit(true);
     } else {
@@ -133,7 +130,7 @@ export default function DriverProfile() {
   };
   const [singleFormData, setSingleFormData] = useState<any>({
     id: "",
-    clientId: "",
+    DriverId: "",
     driverNo: "",
     driverfirstName: "",
     driverMiddleName: "",
@@ -145,12 +142,11 @@ export default function DriverProfile() {
     driverRFIDCardNumber: "",
     isAvailabl: false,
   });
-
   useEffect(() => {
     if (selectedData) {
       setSingleFormData({
         id: selectedData.id,
-        clientId: selectedData.clientId,
+        DriverId: selectedData?.id,
         driverNo: selectedData.driverNo,
         driverfirstName: selectedData.driverfirstName,
         driverMiddleName: selectedData.driverMiddleName,
@@ -250,24 +246,32 @@ export default function DriverProfile() {
   };
 
   const handleChangeDriver = (key: any, e: any) => {
-    setFormData({ ...formData, [key]: e });
+    // let { value } = e;
+    // if (key == "driverRFIDCardNumber") {
+    //   setFormData({ ...formData, [key]: value });
+    // } else {
+    setFormData({ ...formData, [key]: e.trim() });
+    // }
     setSelectedRFID(e);
-    // setShowCardNumber(true);
   };
-
+  
   const handleEditDriver = (key: any, e: any) => {
-    setSelectedData({ ...singleFormData, [key]: e.target.value.trim() });
+  
+    // let { value } = e;
+    // if (key == "driverRFIDCardNumber") {
+    //   setFormData({ ...singleFormData, [key]: e.value });
+    // } else {
+    setSelectedData({ ...singleFormData, [key]: e });
+    // }
   };
-
   const id: any = selectedData?._id;
-
   const handleDriverEditedSubmit = async (e: React.FormEvent, value: any) => {
-    
     e.preventDefault();
     const payLoad: any = {
       id: selectedData.id,
       driverNo: selectedData.driverNo,
       driverfirstName: selectedData.driverfirstName,
+      DriverId: selectedData?.id,
       driverMiddleName: selectedData.driverMiddleName,
       driverLastName: selectedData.driverLastName,
       driverContact: selectedData.driverContact,
@@ -288,7 +292,6 @@ export default function DriverProfile() {
             ...payLoad,
             clientId: session?.clientId,
           };
-        
 
           const response = await toast.promise(
             postDriverDataByClientId({
@@ -322,42 +325,52 @@ export default function DriverProfile() {
               },
             }
           );
-          
-
-          const response2 = await toast.promise(
-            AssignRfidtodriver(session?.accessToken, {
-              DriverId: selectedData.id,
-              RFIDid: getRfid?.find((i: any) => {
-                return i.RFIDCardNo === selectedData.driverRFIDCardNumber;
-              })._id,
-            }),
-            {
-              loading: "Saving data...",
-              success: "Data saved successfully!",
-              error: "Error saving data. Please try again.",
-            },
-            {
-              style: {
-                border: "1px solid #00B56C",
-                padding: "16px",
-                color: "#1A202C",
-              },
-              success: {
-                duration: 2000,
-                iconTheme: {
-                  primary: "#00B56C",
-                  secondary: "#FFFAEE",
-                },
-              },
-              error: {
-                duration: 2000,
-                iconTheme: {
-                  primary: "#00B56C",
-                  secondary: "#FFFAEE",
-                },
-              },
-            }
+          let findRfid: any = getRfid.find(
+            (item: any) =>
+              item?.RFIDCardNo === selectedData?.driverRFIDCardNumber
           );
+          const newShowCardNum = !showCardNumber;
+          if (
+            selectedData?.driverRFIDCardNumber !== previousValue ||
+            newShowCardNum
+          ) {
+            const response2 = await toast.promise(
+              AssignRfidtodriver(session?.accessToken, {
+                RFIDid: getRfid?.find((i: any) => {
+                  return i.RFIDCardNo === selectedData?.driverRFIDCardNumber;
+                })._id,
+                DriverId: selectedData?.id || singleFormData?.id,
+              }),
+              {
+                loading: "Saving data...",
+                success: "Data saved successfully!",
+                error: "Error saving data. Please try again.",
+              },
+              {
+                style: {
+                  border: "1px solid #00B56C",
+                  padding: "16px",
+                  color: "#1A202C",
+                },
+                success: {
+                  duration: 2000,
+                  iconTheme: {
+                    primary: "#00B56C",
+                    secondary: "#FFFAEE",
+                  },
+                },
+                error: {
+                  duration: 2000,
+                  iconTheme: {
+                    primary: "#00B56C",
+                    secondary: "#FFFAEE",
+                  },
+                },
+              }
+            );
+            setPreviousValue(selectedData?.driverRFIDCardNumber);
+            setShowCardNumber(newShowCardNum);
+          }
         }
       } catch (error) {
         console.error("Error fetching zone data:", error);
@@ -369,10 +382,9 @@ export default function DriverProfile() {
   };
 
   const handleDriverSubmit = async (e: any) => {
-    
     e.preventDefault();
     const existingDriver = DriverData.find(
-      (driver: any) => driver.driverNo === formData.driverNo
+      (driver: any) => driver.driverContact === formData.driverContact
     );
     if (existingDriver) {
       alert("This Driver Number Is Already Exit");
@@ -478,7 +490,6 @@ export default function DriverProfile() {
       console.error("Error fetching zone data:", error);
     }
   };
-  
 
   useEffect(() => {
     vehicleListData();
@@ -512,7 +523,7 @@ export default function DriverProfile() {
       try {
         // Show a custom confirmation toast with "OK" and "Cancel" buttons
 
-        const { id } = toast.custom((t) => (
+        const { id }:any = toast.custom((t) => (
           <div className="bg-white p-2 rounded-md">
             <p>Are you sure you want to InActive this Driver?</p>
             <button
@@ -521,13 +532,13 @@ export default function DriverProfile() {
                 if (session) {
                   const newformdata = {
                     ...payLoad,
-                    clientId: session.clientId,
+                    clientId: session?.clientId,
                   };
 
                   // Send a request to delete the zone
                   const response = await toast.promise(
                     postDriverDataByClientId({
-                      token: session.accessToken,
+                      token: session?.accessToken,
                       newformdata: newformdata,
                     }),
                     {
@@ -613,7 +624,6 @@ export default function DriverProfile() {
       isAvailable: data.isAvailable,
       isDeleted: false,
     };
-
     if (session) {
       const newformdata: any = {
         ...payLoad,
@@ -661,17 +671,28 @@ export default function DriverProfile() {
       RFid();
     }
     // await vehicleListData();
-    
   };
 
-  const handleNoEdit = () => {
-    toast.error("Please Driver UnAssign", {
-      duration: 3000, // Toast will be shown for 3 seconds
-    });
-  };
+  // const handleNoEdit = () => {
+  //   toast.error("Please Driver UnAssign", {
+  //     duration: 3000, // Toast will be shown for 3 seconds
+  //   });
+  // };
 
-  
-  const test = 20;
+  // const test = 20;
+  // const optionsRfid = getRfid
+  //   .filter((item: any) => item.DriverId === "")
+  //   .map((item: any) => ({
+  //     value: item.RFIDCardNo,
+  //     label: item.RFIDCardNo,
+  //   }));
+    if (
+      session?.userRole === "Controller" ||
+      (session?.userRole == "Admin" && session?.driverProfile === false)
+    ) {
+      router.push("/signin");
+      return null;
+    }
   return (
     <div className="main_driver">
       <p className="bg-green px-4 py-1   text-center text-2xl text-white font-bold font-popins drivers_text">
@@ -838,19 +859,19 @@ export default function DriverProfile() {
                   </div>
                   <div className="lg:col-span-3 md:col-span-3 col-span-6 mx-2">
                     <label className="text-sm text-black font-popins font-medium">
-                      <span className="text-red">*</span> Driver Number
+                      <span className="text-red">*</span> Driver Contact
                     </label>
                     <input
-                      value={formData.driverNo}
+                      value={formData.driverContact}
                       type="text"
                       className="border border-grayLight w-full  outline-green hover:border-green transition duration-700 ease-in-out "
                       onChange={(e: any) => {
                         const value = e.target.value.match(/\d+/g);
                         if (value) {
                           const numberOnly = value.join("");
-                          handleChangeDriver("driverNo", numberOnly);
+                          handleChangeDriver("driverContact", numberOnly);
                         } else {
-                          handleChangeDriver("driverNo", "");
+                          handleChangeDriver("driverContact", "");
                         }
                       }}
                     />
@@ -889,10 +910,10 @@ export default function DriverProfile() {
                     </label>
                     <br></br>
                     <textarea
-                      value={formData.driverAddress1}
+                      value={formData?.driverAddress1}
                       className="w-full border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out h-16 "
                       onChange={(e: any) =>
-                        handleChangeDriver("driverAddress1", e)
+                        handleChangeDriver("driverAddress1", e.target.value)
                       }
                     ></textarea>
                   </div>
@@ -937,7 +958,7 @@ export default function DriverProfile() {
                             }
                             value={selectedRFID}
                             style={{ width: "100%" }}
-                            className="h-6 "
+                            className="h-6 w-full  border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-outoutline-none color-gray"
                             displayEmpty
                           >
                             <MenuItem
@@ -960,14 +981,45 @@ export default function DriverProfile() {
                                 item.DriverId == "" && (
                                   <MenuItem
                                     key={item?.RFIDCardNo}
-                                    value={item?._id}
-                                    className="bg_hover_rfid"
+                                    value={item?.RFIDCardNo}
+                                    className="assign_driver_hover"
                                   >
                                     {item?.RFIDCardNo}
                                   </MenuItem>
                                 )
                             )}
                           </Select>
+                          {/* <Select
+                            onChange={(e: any) =>
+                              handleChangeDriver("driverRFIDCardNumber", e)
+                            }
+                            options={optionsRfid}
+                            className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green select_vehicle"
+                            styles={{
+                              control: (provided, state) => ({
+                                ...provided,
+                                border: "none",
+                                boxShadow: state.isFocused ? null : null,
+                              }),
+                              option: (provided, state) => ({
+                                ...provided,
+                                backgroundColor: state.isSelected
+                                  ? "#00B56C"
+                                  : state.isFocused
+                                  ? "#e1f0e3"
+                                  : "transparent",
+                                color: state.isSelected
+                                  ? "white"
+                                  : state.isFocused
+                                  ? "black"
+                                  : "black",
+                                "&:hover": {
+                                  backgroundColor: "#e1f0e3",
+                                  color: "black",
+                                },
+                              }),
+                            }}
+                          /> */}
                           {/* <button onClick={handleInactiveClick}>
                               Active
                             </button>
@@ -1003,16 +1055,14 @@ export default function DriverProfile() {
                         cursor:
                           formData.driverfirstName.trim() === "" ||
                           formData.driverLastName.trim() === "" ||
-                          formData.driverNo.trim() === "" ||
-                          showCardNumber == true
+                          formData.driverContact.trim() === ""
                             ? "not-allowed"
                             : "",
                       }}
                       disabled={
                         formData.driverfirstName.trim() === "" ||
                         formData.driverLastName.trim() === "" ||
-                        formData.driverNo.trim() === "" ||
-                        showCardNumber == true
+                        formData.driverContact.trim() === ""
                           ? true
                           : false
                       }
@@ -1050,7 +1100,7 @@ export default function DriverProfile() {
             >
               <div className="grid grid-cols-12 bg-green">
                 <div className="col-span-11">
-                  <p className="  p-3 text-white w-full font-popins font-bold w-full ">
+                  <p className="p-3 text-white w-full font-popins font-bold">
                     Edit Driver
                   </p>
                 </div>
@@ -1085,14 +1135,14 @@ export default function DriverProfile() {
                 >
                   <div className="lg:col-span-3 md:col-span-3 col-span-6 mx-2 ">
                     <label className="text-sm text-black font-popins font-medium">
-                      First Name
+                      <span className="text-red">*</span>First Name
                     </label>
                     <input
                       type="text"
                       value={singleFormData.driverfirstName}
                       className="border border-grayLight w-full  outline-green hover:border-green px-2 transition duration-700 ease-in-out "
                       onChange={(e: any) =>
-                        handleEditDriver("driverfirstName", e)
+                        handleEditDriver("driverfirstName", e.target.value)
                       }
                     />
                   </div>
@@ -1116,30 +1166,63 @@ export default function DriverProfile() {
                       value={singleFormData.driverLastName}
                       className="border px-2 border-grayLight w-full  outline-green hover:border-green transition duration-700 ease-in-out "
                       onChange={(e: any) =>
-                        handleEditDriver("driverLastName", e)
+                        handleEditDriver("driverLastName", e.target.value)
                       }
                     />
                   </div>
                   <div className="lg:col-span-3 md:col-span-3 col-span-6 mx-2 ">
                     <label className="text-sm text-black font-popins font-medium">
-                      Driver Number
+                      {/*   <span className="text-red">*</span> */}
+                      Contact No
                     </label>
                     <input
-                      value={singleFormData.driverNo}
+                      value={singleFormData.driverContact}
                       type="text"
                       className="border px-2 border-grayLight  w-full outline-green hover:border-green transition duration-700 ease-in-out "
-                      onChange={(e: any) => handleEditDriver("driverNo", e)}
+                      // onChange={(e: any) => {
+                      //   const value = e.target.value.match(/\d+/g);
+                      //   handleEditDriver("driverNo", e);
+                      // }}
+                      // onChange={(e: any) => {
+                      //   const value = e.target.value.match(/\d+/g);
+                      //   if (value) {
+                      //     const numberOnly = value.join("");
+                      //     handleChangeDriver("driverNo", numberOnly);
+                      //   } else {
+                      //     handleChangeDriver("driverNo", "");
+                      //   }
+                      // }}
+
+                      onChange={(e: any) => {
+                        const value = e.target.value.match(/\d+/g);
+                        if (value) {
+                          const numberOnly = value.join("");
+                          handleEditDriver("driverContact", numberOnly);
+                        } else {
+                          handleEditDriver("driverContact", "");
+                        }
+                      }}
                     />
                   </div>
                   <div className="lg:col-span-3 md:col-span-3 col-span-6 mx-2 ">
                     <label className="text-sm text-black font-popins font-medium">
+                      {/* <span className="text-red">*</span> */}
                       Driver ID
                     </label>
                     <input
                       type="text"
                       value={singleFormData.driverIdNo}
                       className="border px-2 border-grayLight w-full outline-green hover:border-green transition duration-700 ease-in-out "
-                      onChange={(e: any) => handleEditDriver("driverIdNo", e)}
+                      // onChange={(e: any) => handleEditDriver("driverIdNo", e)}
+                      onChange={(e: any) => {
+                        const value = e.target.value.match(/\d+/g);
+                        if (value) {
+                          const numberOnly: any = value.join("");
+                          handleEditDriver("driverIdNo", numberOnly);
+                        } else {
+                          handleEditDriver("driverIdNo", "");
+                        }
+                      }}
                     />
                   </div>
                 </div>
@@ -1194,7 +1277,7 @@ export default function DriverProfile() {
                       value={singleFormData.driverAddress1}
                       className="w-full border border-grayLight  outline-green hover:border-green transition duration-700 ease-in-out h-16 "
                       onChange={(e: any) =>
-                        handleEditDriver("driverAddress1", e)
+                        handleEditDriver("driverAddress1", e.target.value)
                       }
                     ></textarea>
                   </div>
@@ -1269,7 +1352,7 @@ export default function DriverProfile() {
                           }
                         /> */}
                           {showCardNumber ? (
-                            <div className="lg:col-span-8 col-span-1 ">
+                            <div className="lg:col-span-8 col-span-1 custom-dropdown">
                               {/* <input
                                   type="text"
                                   value={singleFormData.driverRFIDCardNumber}
@@ -1283,7 +1366,10 @@ export default function DriverProfile() {
                                   singleFormData.driverRFIDCardNumber || "none"
                                 }
                                 onChange={(e: any) =>
-                                  handleEditDriver("driverRFIDCardNumber", e)
+                                  handleEditDriver(
+                                    "driverRFIDCardNumber",
+                                    e.target.value
+                                  )
                                 }
                                 style={{
                                   width: "100%",
@@ -1307,13 +1393,74 @@ export default function DriverProfile() {
                                       <option
                                         key={item?.RFIDCardNo}
                                         value={item?.RFIDCardNo}
-                                        className={"bg-green text-white"}
+                                        className={
+                                          "bg-green text-white option-item"
+                                        }
                                       >
                                         {item?.RFIDCardNo}
                                       </option>
                                     )
                                 )}
                               </select>
+                              {/* 
+                              <Select
+                                value={singleFormData.driverRFIDCardNumber}
+                                onChange={(e: any) =>
+                                  handleEditDriver(
+                                    "driverRFIDCardNumber",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full"
+                              >
+                                {getRfid.map(
+                                  (item: any) =>
+                                    item.DriverId === "" && (
+                                      <MenuItem
+                                        key={item?.RFIDCardNo}
+                                        value={item?.RFIDCardNo}
+                                        className={
+                                          "bg-green text-white option-item w-full"
+                                        }
+                                      >
+                                        {item?.RFIDCardNo}
+                                      </MenuItem>
+                                    )
+                                )}
+                              </Select> */}
+                              {/* {singleFormData.driverRFIDCardNumber} */}
+                              {/* <Select
+                                options={optionsRfid}
+                                // value={singleFormData.driverRFIDCardNumber}
+                                onChange={(e) =>
+                                  handleEditDriver("driverRFIDCardNumber", e)
+                                }
+                                className="rounded-md w-full  outline-green border border-grayLight  hover:border-green select_vehicle"
+                                styles={{
+                                  control: (provided, state) => ({
+                                    ...provided,
+                                    border: "none",
+                                    boxShadow: state.isFocused ? null : null,
+                                  }),
+                                  option: (provided, state) => ({
+                                    ...provided,
+                                    backgroundColor: state.isSelected
+                                      ? "#00B56C"
+                                      : state.isFocused
+                                      ? "#e1f0e3"
+                                      : "transparent",
+                                    color: state.isSelected
+                                      ? "white"
+                                      : state.isFocused
+                                      ? "black"
+                                      : "black",
+                                    "&:hover": {
+                                      backgroundColor: "#e1f0e3",
+                                      color: "black",
+                                    },
+                                  }),
+                                }}
+                              /> */}
                             </div>
                           ) : (
                             ""
@@ -1344,7 +1491,7 @@ export default function DriverProfile() {
                     </div>
                   </div>
 
-                  <div className="lg:col-span-2 md:col-span-2 col-span-6   lg:-mt-0 md:-mt-0 sm:-mt-0  -mt-8  ">
+                  <div className="lg:col-span-2 md:col-span-2 col-span-6   lg:-mt-0 md:-mt-0 sm:-mt-0 -mt-8">
                     {/* <label className="text-sm text-labelColor">
                         Address 2
                       </label>
@@ -1430,7 +1577,7 @@ export default function DriverProfile() {
                   className="font-popins  font-bold text-black"
                   colSpan={2}
                 >
-                  Driver Number
+                  Driver Contact
                 </TableCell>
                 <TableCell
                   align="center"
@@ -1527,7 +1674,7 @@ export default function DriverProfile() {
                       colSpan={2}
                       className="table_text"
                     >
-                      {row.driverNo}
+                      {row.driverContact}
                     </TableCell>
                     <TableCell
                       align="center"
