@@ -185,7 +185,7 @@ export default function DualCam() {
           }
         }
       }, 100000)
-      handleSocketDisconnection();
+     // handleSocketDisconnection();
   
     });
   }, []);

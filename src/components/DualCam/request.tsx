@@ -161,7 +161,7 @@ export default function Request({ socketdata, deviceCommandText }) {
         toast.error("There is an issue for camera on..!   Please try again later", {
           duration: 6000,
         })
-        sentSmsForCameraApi()
+       // sentSmsForCameraApi()
         setdeviceresponse(null)
         setdisableallButton(false)
         setSelectedVehicle(null);
