@@ -3,7 +3,7 @@ import { Events, Notifications } from "@/types/events";
 import { commandrequest } from "@/types/commandrequest";
 import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
-// var URL = "http://172.16.10.47:80"
+ //var URL = "http://172.16.10.99:80"
 var URL ="https://backend.vtracksolutions.com";
 
 
@@ -1429,6 +1429,45 @@ export async function GetUsersByClientId({
         "content-type": "application/json",
       },
       body: `{\"clientId\":\"${clientId}\"}`,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+
+export async function sentSmsForCamera({
+  token,
+  vehicleId,
+  clientId,
+}: {
+   token: string;
+  vehicleId: string;
+  clientId: string;
+}) {
+  try {
+    let payload  =  {
+      vehicleId,
+  clientId,
+
+    }
+    
+    const response = await fetch(`${URL}/commandSenddAdd`, {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+         authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
