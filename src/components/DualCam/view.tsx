@@ -103,8 +103,12 @@ export default function DualCam() {
     let connectionErrorToastShown: Boolean = false;
     socketRef.current = io("https://camera.vtracksolutions.com:7057", {
       autoConnect: false,
-      query: { clientId: "64f9c5c3b7f9957d81e36908" },
+      query: { clientId: session?.clientId },
       transports: ["websocket", "polling", "flashsocket"],
+      reconnection: true, // Enable automatic reconnections
+    reconnectionAttempts: Infinity, // Attempt reconnections indefinitely
+    reconnectionDelay: 1000, // Delay between reconnections (in milliseconds)
+    reconnectionDelayMax: 5000 // Max delay between reconnections (in milliseconds)
     });
     setSocketConnected(true); // Update connection status on successful connection
   
@@ -144,7 +148,7 @@ export default function DualCam() {
         autoClose: 5000,
       });
       connectionErrorToastShown = false;
-      //setSocketConnected(true); // Update connection status on successful connection
+      setSocketConnected(true); // Update connection status on successful connection
     });
 
     socketRef.current.on("message", async (data) => {
@@ -181,7 +185,7 @@ export default function DualCam() {
           }
         }
       }, 100000)
-      handleSocketDisconnection();
+     // handleSocketDisconnection();
   
     });
   }, []);

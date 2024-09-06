@@ -9,6 +9,7 @@ import {
   vehiclebyClientid,
   getDualCamVehicleByclientId,
   getVehicleDataByClientId,
+  sentSmsForCamera,
   // getGprsCommandLatest,
 } from "@/utils/API_CALLS";
 // import { pictureVideoDataOfVehicleT } from "@/types/videoType";
@@ -135,6 +136,21 @@ export default function Request({ socketdata, deviceCommandText }) {
     vehicleListData();
   }, []);
 
+
+  const sentSmsForCameraApi = async () => {
+    try {
+     
+        const Data = await sentSmsForCamera({
+          token: session?.accessToken,
+          vehicleId: selectedVehicle?._id,
+          clientId: session?.clientId,
+        });
+        toast.success("Vehicle data successfully fetched!");
+      
+    } catch (error) {
+      console.error("Error fetching zone data:", error);
+    }
+  };
   
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -145,6 +161,7 @@ export default function Request({ socketdata, deviceCommandText }) {
         toast.error("There is an issue for camera on..!   Please try again later", {
           duration: 6000,
         })
+       // sentSmsForCameraApi()
         setdeviceresponse(null)
         setdisableallButton(false)
         setSelectedVehicle(null);
@@ -480,7 +497,6 @@ export default function Request({ socketdata, deviceCommandText }) {
 
     if (session) {
   
-    
       const response = await toast.promise(
         portalGprsCommand({
           token: session?.accessToken,
