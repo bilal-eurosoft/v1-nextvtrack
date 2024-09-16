@@ -36,7 +36,7 @@ export default function Request({ socketdata, deviceCommandText }) {
   //   pictureVideoDataOfVehicleT[]
   // >([]);
   const { data: session } = useSession();
-  // const [loading, setLaoding] = useState(false);
+  
   // const [currentPageVideo, setCurrentPageVideo] = useState(1);
   // const [disabledButton, setdisabledButton] = useState(true);
   const [disabledcameraButton, setdisabledcameraButton] = useState(true);
@@ -193,7 +193,7 @@ export default function Request({ socketdata, deviceCommandText }) {
   // useEffect(() => {
   //   const vehicleListData = async () => {
   //     try {
-  //       // setLaoding(true);
+  
   //       if (session) {
   //         const response = await videoList({
   //           token: session?.accessToken,
@@ -202,7 +202,7 @@ export default function Request({ socketdata, deviceCommandText }) {
   //         setPictureVideoDataOfVehicle(response);
   //         // setFilteredRecords(response);
   //       }
-  //       // setLaoding(false);
+  
   //     } catch (error) {
   //       selectedVehicle;
   //       console.error("Error fetching zone data:", error);
@@ -466,7 +466,7 @@ export default function Request({ socketdata, deviceCommandText }) {
       return toast.error("Please select the fields")
     }
     if(CameraResponseToastId){
-      console.log(CameraResponseToastId)
+      
       return toast.error("Please wait")
     }
    /*  if(showDurationTab == true){
@@ -485,10 +485,13 @@ export default function Request({ socketdata, deviceCommandText }) {
       commandtext: `setdigout 1 ${duration}`,
       vehicleReg: selectedVehicle?.vehicleReg,
       command: "",
-      createdDate: "",
+      
       modifyDate: "",
       parameter: "",
-      deviceIMEI: "",
+      deviceIMEI: selectedVehicle?.deviceIMEI,      
+      createdDate:moment(new Date())
+      .tz(session?.timezone)
+      .format("MM/DD/YYYY hh:mm:ss"),
       status: "Pending",
     };
     if (selectedVehicle == null) {
@@ -567,7 +570,7 @@ export default function Request({ socketdata, deviceCommandText }) {
       }
     } 
     if (toastId) {
-      console.log(toastId)
+      
       // return toast.error("Please wait 11")
     }
 
@@ -607,11 +610,13 @@ export default function Request({ socketdata, deviceCommandText }) {
     } */
     let formvalues = {
       command: "",
-      commandtext: commandText,
-      createdDate: "",
+      commandtext: commandText,      
       modifyDate: "",
       parameter: "",
-      deviceIMEI: "",
+      deviceIMEI: selectedVehicle?.deviceIMEI,      
+      createdDate:moment(new Date())
+      .tz(session?.timezone)
+      .format("MM/DD/YYYY hh:mm:ss"),
       status: "Pending",
       vehicleReg: selectedVehicle?.vehicleReg,
     };

@@ -7,4 +7,5 @@ export type commandrequest = {
     modifyDate: string;
     parameter: string;
     status: string;
+    requestStatus:string;
   }

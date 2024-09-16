@@ -129,7 +129,7 @@ export default function DriverProfile() {
 
   const vehicleListData = async () => {
     try {
-      // setLaoding(true);
+      
       if (session) {
         const response = await GetDriverDataByClientId({
           token: session?.accessToken,
@@ -137,7 +137,7 @@ export default function DriverProfile() {
         });
         setDriverData(response.filter((item: any) => item.isDeleted === true));
       }
-      // setLaoding(false);
+      
     } catch (error) {
       console.error("Error fetching zone data:", error);
     }

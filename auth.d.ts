@@ -24,5 +24,7 @@ declare module "next-auth" {
     driverProfile: Boolean;
     ClientSettingsMap: String;
     ClientSettingsZoom: String;
+    smsForCamera:Boolean;
+    immobilising:Boolean;
   }
 }

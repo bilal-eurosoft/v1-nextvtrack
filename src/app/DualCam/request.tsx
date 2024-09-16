@@ -31,7 +31,7 @@ export default function Request({ socketdata, deviceCommandText }) {
     pictureVideoDataOfVehicleT[]
   >([]);
   const { data: session } = useSession();
-  const [loading, setLaoding] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [currentPageVideo, setCurrentPageVideo] = useState(1);
   const [input, setInput] = useState<any>("");
   const [activeTab1, setActiveTab1] = useState("View");
@@ -123,7 +123,7 @@ export default function Request({ socketdata, deviceCommandText }) {
   useEffect(() => {
     const vehicleListData = async () => {
       try {
-        setLaoding(true);
+        setLoading(true);
         if (session) {
           const response = await videoList({
             token: session?.accessToken,
@@ -132,7 +132,7 @@ export default function Request({ socketdata, deviceCommandText }) {
           setPictureVideoDataOfVehicle(response);
           setFilteredRecords(response);
         }
-        setLaoding(false);
+        setLoading(false);
       } catch (error) {
         selectedVehicle;
         console.error("Error fetching zone data:", error);
@@ -222,10 +222,12 @@ export default function Request({ socketdata, deviceCommandText }) {
       commandtext: `setdigout 1 ${duration}`,
       vehicleReg: selectedVehicle?.vehicleReg,
       command: "",
-      createdDate: "",
+      createdDate:  moment(new Date())
+      .tz(session?.timezone)
+      .format("MM/DD/YYYY hh:mm:ss"),
       modifyDate: "",
       parameter: "",
-      deviceIMEI: "",
+      deviceIMEI: selectedVehicle?.deviceIMEI,
       status: "Pending",
     };
     if (selectedVehicle == null) {
@@ -321,10 +323,12 @@ export default function Request({ socketdata, deviceCommandText }) {
     let formvalues = {
       command: "",
       commandtext: commandText,
-      createdDate: "",
+      createdDate:moment(new Date())
+      .tz(session?.timezone)
+      .format("MM/DD/YYYY hh:mm:ss"),
       modifyDate: "",
       parameter: "",
-      deviceIMEI: "",
+      deviceIMEI:selectedVehicle.deviceIMEI,
       status: "Pending",
       vehicleReg: selectedVehicle?.vehicleReg,
     };

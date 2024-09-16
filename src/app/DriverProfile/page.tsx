@@ -471,7 +471,7 @@ export default function DriverProfile() {
         });
         setDriverData(response.filter((item: any) => item.isDeleted === false));
       }
-      // setLaoding(false);
+      
     } catch (error) {
       console.error("Error fetching zone data:", error);
     }

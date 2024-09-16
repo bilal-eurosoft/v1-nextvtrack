@@ -3,7 +3,8 @@ import { Events, Notifications } from "@/types/events";
 import { commandrequest } from "@/types/commandrequest";
 import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
- //var URL = "http://172.16.10.99:80"
+import { immobiliserequest } from "@/types/immobiliserequest";
+//  var URL = "http://172.16.10.47:80"
 var URL ="https://backend.vtracksolutions.com";
 
 
@@ -153,6 +154,62 @@ export async function portalGprsCommand({
   }
 }
 
+export async function ImmobiliseRequest({
+  token,
+  payload,
+}: {
+  token: string;
+  payload: immobiliserequest;
+}) {
+  try {
+    const response = await fetch(`${URL}/immobiliserequest`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
+
+
+export async function Verifyimmobiliserequest({
+  token,
+  payload,
+}: {
+  token: string;
+  payload: immobiliserequest;
+}) {
+  try {
+    const response = await fetch(`${URL}/verifyimmobiliserequest`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
 // export async function getGprsCommandLatest({
 //   token,
 // }: // payload,
@@ -398,6 +455,34 @@ export async function vehiclebyClientid({
     return [];
   }
 }
+export async function vehiclebyClientidbyimmobilising({
+  token,
+  clientId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(`${URL}/getimmobilisingVehicleByclientId`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"clientId\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
 
 export async function IgnitionReportByTrip({
   token,
@@ -568,7 +653,33 @@ export async function IgnitionReportByIdlingActivity({
     return [];
   }
 }
-
+export async function GprsCommandbyCliendId({
+  token,clientId
+}:{
+  token: string;
+  clientId: string;
+}){
+  try {
+    const response = await fetch(`${URL}/GprsCommandbyCliendId`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"clientId\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+  
+}
 export async function videoList({
   token,
   clientId,

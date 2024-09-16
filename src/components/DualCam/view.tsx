@@ -57,10 +57,10 @@ export default function DualCam() {
   const [toastId, setToastId] = useState<string | null>(null);
   const [singleImage, setSingleImage] = useState<any>();
   const [singleVideo, setSingleVideo] = useState<any>();
-  const [loading, setLaoding] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageVideo, setCurrentPageVideo] = useState(1);
-  const [input, setInput] = useState<any>("");
+  const [input, setInput] = useState<any>(1);
   const [activeTab1, setActiveTab1] = useState("View");
   const [filteredDataIsAvaialable, setfilteredDataIsAvaialable] =
     useState<boolean>(true);
@@ -334,7 +334,7 @@ export default function DualCam() {
       
         setFilteredRecords(response);
       }
-      //  setLaoding(false);
+      //  setLoading(false);
     } catch (error) {
       // selectedVehicle
       console.error("Error fetching  data:", error);
@@ -392,7 +392,7 @@ export default function DualCam() {
   };
 
   const handleClick = (tab: string) => {
-    setLaoding(true);
+    setLoading(true);
     setActiveTab1((prevTab) => (prevTab === tab ? "View" : tab));
   };
 
@@ -462,7 +462,7 @@ export default function DualCam() {
     }
   };
 
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(1);
 
   const handleClickGo = () => {
     const pageNumber = parseInt(inputValue);
@@ -575,6 +575,7 @@ export default function DualCam() {
   const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setInput(value)
     setCurrentPage(value);
   };
 
@@ -585,6 +586,7 @@ export default function DualCam() {
     event: React.ChangeEvent<unknown>,
     value: number
   ) => {
+
     setCurrentPageVideo(value);
   };
 
@@ -662,14 +664,14 @@ export default function DualCam() {
   };
 
   const options2 =
-    vehicleList.map((item: any) => ({
+    vehicleList?.map((item: any) => ({
       value: item.vehicleReg,
       label: item.vehicleReg,
     })) || [];
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      setLaoding(false);
+      setLoading(false);
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, [recordsVideo, records]);
@@ -1287,7 +1289,7 @@ export default function DualCam() {
                   */}
 
                   
-                  <div className="col-span-2 mt-2">
+                  <div className="col-span-2">
   <form>
     {/* Container for large screens (from 1024px upwards) */}
     <div className="hidden lg:grid lg:grid-cols-12 lg:gap-4 px-4 md:px-6 lg:px-10 items-center">
@@ -2193,19 +2195,21 @@ export default function DualCam() {
                                   <span className="text-sm">Go To</span>
                                   <input
                                     type="text"
+                                    
                                     className="w-14 border border-grayLight outline-green mx-2 px-2"
                                     onChange={(e)=>{
                                       let inputValues:any = e.target.value.match(/\d+/g);
                                         if(inputValues>0 && inputValue<totalCount){
-                                        setInput(e.target.value)
+                                        setInput(parseInt(e.target.value))
+                                        setCurrentPage(e.target.value)
                                       }else{
                                         setInput("")
                                       }
                                       }}
                                   />
                                   <span
-                                    className="text-labelColor text-sm cursor-pointer"
-                                    onClick={handleClickPagination}
+                                    className="text-labelColor text-sm"
+                                    
                                   >
                                     page &nbsp;&nbsp;
                                   </span>
@@ -2866,7 +2870,8 @@ export default function DualCam() {
                                   <Stack spacing={2}>
                                     <Pagination
                                       count={totalCountVideo}
-                                      // page={currentPage}
+                                      
+                                      page={currentPageVideo}
                                       onChange={handleChangeVideo}
                                       className="text-sm"
                                     />
@@ -2876,14 +2881,15 @@ export default function DualCam() {
                                   <span className="text-sm">Go To</span>
                                   <input
                                     type="text"
-                                    value={inputValue}
+                                    
                                     className="w-14 border border-grayLight outline-green mx-2 px-2"
                                     onChange={(
                                       e: React.ChangeEvent<HTMLInputElement>
                                     ) =>{
                                       let inputVideoValue=e.target.value.match(/\d+/g)
                                       if(inputVideoValue>0 && inputVideoValue<totalCount ){
-                                        setInputValue(e.target.value)
+                                        // setInput(parseInt(e.target.value))
+                                       setCurrentPageVideo(parseInt(e.target.value))
                                       }
                                       else{
                                 setInputValue("")
@@ -2891,8 +2897,8 @@ export default function DualCam() {
                                     }}
                                   />
                                   <span
-                                    className="text-labelColor text-sm cursor-pointer"
-                                    onClick={handleClickGo}
+                                    className="text-labelColor text-sm"
+                                    
                                   >
                                     page &nbsp;&nbsp;
                                   </span>

@@ -172,7 +172,7 @@ export default function DriverProfile() {
   const [selectVehicleNum, setSelectVehicleNum] = useState<any>({});
   const vehicleName = async () => {
     try {
-      // setLaoding(true);
+      
       if (session) {
         const response = await GetDriverDataByClientId({
           token: session?.accessToken,
@@ -185,7 +185,7 @@ export default function DriverProfile() {
           )
         );
       }
-      // setLaoding(false);
+      
     } catch (error) {
       console.error("Error fetching zone data:", error);
     }
@@ -194,7 +194,7 @@ export default function DriverProfile() {
   
   const AllAsignData = async () => {
     try {
-      // setLaoding(true);
+      
       if (session) {
         const response = await GetDriverDataAssignByClientId({
           token: session?.accessToken,
@@ -202,7 +202,7 @@ export default function DriverProfile() {
         });
         setgetAllAsignData(response);
       }
-      // setLaoding(false);
+      
     } catch (error) {
       console.error("Error fetching zone data:", error);
     }
@@ -213,7 +213,7 @@ export default function DriverProfile() {
 
   const vehicleNum = async () => {
     try {
-      // setLaoding(true);
+      
       if (session) {
         const response = await GetDriverforvehicel({
           token: session?.accessToken,
@@ -222,7 +222,7 @@ export default function DriverProfile() {
 
         setvehicleNum(response.data);
       }
-      // setLaoding(false);
+      
     } catch (error) {
       console.error("Error fetching zone data:", error);
     }

@@ -57,7 +57,7 @@ export default DualCam;
 //   const [openSecond, setOpenSecond] = React.useState(false);
 //   const [singleImage, setSingleImage] = useState<any>();
 //   const [singleVideo, setSingleVideo] = useState<any>();
-//   const [loading, setLaoding] = useState(false);
+
 //   const [currentPage, setCurrentPage] = useState(1);
 //   const [currentPageVideo, setCurrentPageVideo] = useState(1);
 //   const [input, setInput] = useState<any>("");
@@ -377,7 +377,7 @@ export default DualCam;
 //   useEffect(() => {
 //     const vehicleListData = async () => {
 //       try {
-//         setLaoding(true);
+
 //         if (session) {
 //           const response = await videoList({
 //             token: session?.accessToken,
@@ -386,7 +386,7 @@ export default DualCam;
 //           setPictureVideoDataOfVehicle(response);
 //           setFilteredRecords(response);
 //         }
-//         setLaoding(false);
+
 //       } catch (error) {selectedVehicle
 //         console.error("Error fetching zone data:", error);
 //       }

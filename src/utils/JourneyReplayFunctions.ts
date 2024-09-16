@@ -42,18 +42,46 @@ export function calculateZoomCenter(data: TravelHistoryData[]) {
 
   const centerLat = (minLat + maxLat) / 2;
   const centerLng = (minLng + maxLng) / 2;
+ 
 
-  const latZoom = Math.floor(Math.log2(360 / (maxLat - minLat)));
+
+  const latZoom = Math.floor(Math.log2(180 / (maxLat - minLat)));
   const lngZoom = Math.floor(Math.log2(360 / (maxLng - minLng)));
-
   let zoomlevel = Math.min(latZoom, lngZoom) + 1;
+  
   if (zoomlevel > 18) {
-    zoomlevel = 14;
-  } else if (zoomlevel >= 15) {
-    zoomlevel = 13;
+    zoomlevel = 18;
+  } 
+  else if (zoomlevel >= 7 && zoomlevel <= 17) {
+    zoomlevel = zoomlevel + 1;
   }
+    /* else if (zoomlevel == 15) {
+      zoomlevel = 16;
+    } 
+    else if (zoomlevel == 14) {
+      zoomlevel = 15;
+    } 
+    else if (zoomlevel == 13) {
+      zoomlevel = 14;
+    } 
+    else if (zoomlevel == 10 && ad > 51.2) {
+      zoomlevel = 11;
+    } 
+    else if (zoomlevel == 9) {
+      zoomlevel = 10.5;
+    }
+    else if (zoomlevel == 8) {
+      zoomlevel = 9.5;
+    } */
+  else {
+    zoomlevel
+  }
+ 
   return { zoomlevel, centerLat, centerLng };
 }
+
+
+  
 
 export function createMarkerIcon(angle: number | null): L.DivIcon {
   const rotation = angle || 0; // Use the angle from state or default to 0 degrees

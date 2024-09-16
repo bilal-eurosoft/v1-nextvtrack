@@ -12,6 +12,12 @@ export type DeviceAttach = {
   vehicleNo: string;
   vehicleReg: string;
   vehicleskipstep: number;
+  deviceIMEI:string;
+  deviceId:string;
+  dualCam:boolean;  
+  immobilising:boolean;
+  camStatus:string;
+  immStatus:string;
   __v: number;
   _id: string;
 };

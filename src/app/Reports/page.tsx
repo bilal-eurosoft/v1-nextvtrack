@@ -1501,10 +1501,8 @@ export default function Reports() {
                             )}
                             {header === "Address" && trip.OsmElement
                               ? `${
-                                  trip.OsmElement.display_name.split(",")[0]
-                                } ${
-                                  trip.OsmElement.display_name.split(",")[1]
-                                } ${trip.OsmElement.display_name.split(",")[2]}`
+                                  trip.OsmElement.display_name.split(",").slice(0,3)
+                                } `
                               : ""}
                             {}
                           </td>

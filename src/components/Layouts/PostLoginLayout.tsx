@@ -30,7 +30,7 @@ import {
   PopoverHandler,
   PopoverContent,
   Typography,
-  Tooltip,
+  Tooltip
 } from "@material-tailwind/react";
 import "./layout.css";
 import BlinkingTime from "../General/BlinkingTime";
@@ -40,39 +40,39 @@ import { stringify } from "querystring";
 const drawerWidth = 58;
 
 const Main = styled("main", {
-  shouldForwardProp: (prop) => prop !== "open",
+  shouldForwardProp: (prop) => prop !== "open"
 })(({ theme, open }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
+    duration: theme.transitions.duration.leavingScreen
   }),
   marginLeft: `-${drawerWidth}px`,
   ...(open && {
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
+      duration: theme.transitions.duration.enteringScreen
     }),
-    marginLeft: 0,
-  }),
+    marginLeft: 0
+  })
 }));
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
+  shouldForwardProp: (prop) => prop !== "open"
 })(({ theme, open }) => ({
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
+    duration: theme.transitions.duration.leavingScreen
   }),
   ...(open && {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: `${drawerWidth}px`,
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
+      duration: theme.transitions.duration.enteringScreen
+    })
+  })
 }));
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -81,11 +81,11 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
-  justifyContent: "flex-end",
+  justifyContent: "flex-end"
 }));
 
 export default function RootLayout({
-  children,
+  children
 }: {
   children: React.ReactNode;
 }) {
@@ -109,7 +109,7 @@ export default function RootLayout({
   };
 
   const triggers = {
-    onClick: handleOpenPopUp,
+    onClick: handleOpenPopUp
   };
   type MySessionData = {
     // Define the properties you expect in your session object
@@ -145,16 +145,15 @@ export default function RootLayout({
   //           })
   //         );
   //       } catch (error) {
-  
+
   //       }
   //     }
   //   };
 
-
   // const allzoneList = zoneList?.map((item) => {
   //   return item?.id;
   // });
-  
+
   const formatTime = (milliseconds: any) => {
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
@@ -193,9 +192,7 @@ export default function RootLayout({
 
           setFilterId(filteredIds?.id);
           // Use filteredIds as needed
-        } catch (error) {
-         
-        }
+        } catch (error) {}
       }
     };
 
@@ -245,7 +242,7 @@ export default function RootLayout({
                   stroke="currentColor"
                   style={{
                     color: pathname == "/liveTracking" ? "green" : "white",
-                    backgroundColor: pathname == "/liveTracking" ? "white" : "",
+                    backgroundColor: pathname == "/liveTracking" ? "white" : ""
                   }}
                 >
                   <path
@@ -287,8 +284,7 @@ export default function RootLayout({
                   strokeLinejoin="round"
                   style={{
                     color: pathname == "/journeyReplay" ? "green" : "white",
-                    backgroundColor:
-                      pathname == "/journeyReplay" ? "white" : "",
+                    backgroundColor: pathname == "/journeyReplay" ? "white" : ""
                   }}
                 >
                   {" "}
@@ -333,7 +329,7 @@ export default function RootLayout({
                         pathname == "/AddZone" ||
                         `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
                           ? "white"
-                          : "",
+                          : ""
                     }}
                   >
                     {" "}
@@ -348,58 +344,7 @@ export default function RootLayout({
                 </Tooltip>
               </Link>
             )}
-            {/* <Popover placement="right-start">
-              <Link href="/DualCam">
-                <Tooltip
-                  className="bg-white text-green shadow-lg rounded border-none"
-                  placement="right"
-                  content="Dual Camera"
-                >
-                  <PopoverHandler>
-                    <svg
-                      className="w-20 h-12 py-2  text-white-10  dark:text-white cursor-pointer"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      style={{
-                        color: pathname == "/DualCam" ? "green" : "white",
-                        backgroundColor: pathname == "/DualCam" ? "white" : "",
-                      }}
-                    >
-                      {" "}
-                      <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                      <circle cx="6" cy="6" r="2" />{" "}
-                      <circle cx="18" cy="18" r="2" />{" "}
-                      <path d="M11 6h5a2 2 0 0 1 2 2v8" />{" "}
-                      <polyline points="14 9 11 6 14 3" />{" "}
-                      <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />{" "}
-                      <polyline points="10 15 13 18 10 21" />
-                    </svg>
-                  </PopoverHandler>
-                </Tooltip>
-                <PopoverContent className="border-none  cursor-pointer bg-green">
-                  <span className=" w-full text-white">
-                    Get Image And Video
-                  </span>
-                  <br></br>
-                  <br></br>
-                  <span
-                    className=" w-full text-white"
-                    onClick={() => router.push("/DualCam")}
-                  >
-                    View Image And Video
-                  </span>
-                  <br></br>
-                </PopoverContent>
-              </Link>
-            </Popover> */}
 
-            {/* here new for camera 00 */}
             {(session?.userRole == "SuperAdmin" ||
               session?.userRole == "Admin") && (
               <div>
@@ -428,8 +373,7 @@ export default function RootLayout({
                         strokeLinejoin="round"
                         style={{
                           color: pathname == "/DualCam" ? "green" : "white",
-                          backgroundColor:
-                            pathname == "/DualCam" ? "white" : "",
+                          backgroundColor: pathname == "/DualCam" ? "white" : ""
                         }}
                       >
                         {" "}
@@ -446,115 +390,6 @@ export default function RootLayout({
                 )}
               </div>
             )}
-
-            {/* here camera end */}
-            {/* {(session?.userRole == "SuperAdmin" ||
-              session?.userRole == "Admin") && (
-              <div>
-                {session?.cameraProfile && (
-                  <Popover placement="right-start">
-                    <Tooltip
-                      className="bg-[#00B56C] text-white shadow-lg rounded border-none"
-                      placement="right"
-                      content="Camera"
-                    >
-                      <PopoverHandler>
-                        <svg
-                          className={`w-20 h-12 py-2  text-white-10  dark:text-white cursor-pointer
-                          ${
-                            pathname === "/DualCam"
-                              ? "border-r-2 border-#29303b"
-                              : "border-b-2"
-                          }`}
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          strokeWidth="2"
-                          stroke="currentColor"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          style={{
-                            color:
-                              pathname == "/DualCam" || pathname == "/DualCam"
-                                ? "green"
-                                : "white",
-                            backgroundColor:
-                              pathname == "/DualCam" || pathname == "/DualCam"
-                                ? "white"
-                                : "",
-                          }}
-                        >
-                          {" "}
-                          <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                          <circle cx="6" cy="6" r="2" />{" "}
-                          <circle cx="18" cy="18" r="2" />{" "}
-                          <path d="M11 6h5a2 2 0 0 1 2 2v8" />{" "}
-                          <polyline points="14 9 11 6 14 3" />{" "}
-                          <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />{" "}
-                          <polyline points="10 15 13 18 10 21" />
-                        </svg>
-                      </PopoverHandler>
-                    </Tooltip>
-                    <PopoverContent className="border-none cursor-pointer bg-green">
-                      <Link
-                        className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
-                        href="/DualCam"
-                        style={{
-                          color: pathname == "/DualCam" ? "black" : "white",
-                          backgroundColor:
-                            pathname == "/DualCam" ? "white" : "",
-                        }}
-                      >
-                        Get Image And Video
-                      </Link>
-                      <br></br>
-                      <br></br>
-
-                      <Link
-                        className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
-                        href="/DualCam"
-                      >
-                        View Image And Video
-                      </Link>
-                      <br></br>
-                    </PopoverContent>
-
-           
-                  </Popover>
-                )}
-              </div>
-            )} */}
-
-            {/* close camera */}
-            {/* <Link href="/DualCam">
-              <Tooltip
-                className="bg-white text-[#00B56C] shadow-lg rounded"
-                placement="right"
-                content="Dual Cam"
-              >
-                <svg
-                  className="w-20 h-12 py-2  text-[white]  text-white-10  dark:text-white"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  {" "}
-                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                  <circle cx="6" cy="6" r="2" />{" "}
-                  <circle cx="18" cy="18" r="2" />{" "}
-                  <path d="M11 6h5a2 2 0 0 1 2 2v8" />{" "}
-                  <polyline points="14 9 11 6 14 3" />{" "}
-                  <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />{" "}
-                  <polyline points="10 15 13 18 10 21" />
-                </svg>
-              </Tooltip>
-            </Link> */}
 
             <Link href="/Reports">
               <Tooltip
@@ -581,7 +416,7 @@ export default function RootLayout({
                   strokeLinejoin="round"
                   style={{
                     color: pathname == "/Reports" ? "green" : "white",
-                    backgroundColor: pathname == "/Reports" ? "white" : "",
+                    backgroundColor: pathname == "/Reports" ? "white" : ""
                   }}
                 >
                   <path d="M9 7V2.13a2.98 2.98 0 0 0-1.293.749L4.879 5.707A2.98 2.98 0 0 0 4.13 7H9Z" />
@@ -611,7 +446,7 @@ export default function RootLayout({
                   style={{
                     color: pathname === "/Notifications" ? "green" : "white",
                     backgroundColor:
-                      pathname === "/Notifications" ? "white" : "",
+                      pathname === "/Notifications" ? "white" : ""
                   }}
                 >
                   <path
@@ -669,7 +504,7 @@ export default function RootLayout({
                               pathname == "/DriverProfile" ||
                               pathname == "/ActiveDriver"
                                 ? "white"
-                                : "",
+                                : ""
                           }}
                         >
                           {" "}
@@ -691,7 +526,7 @@ export default function RootLayout({
                           color:
                             pathname == "/DriverProfile" ? "black" : "white",
                           backgroundColor:
-                            pathname == "/DriverProfile" ? "white" : "",
+                            pathname == "/DriverProfile" ? "white" : ""
                         }}
                       >
                         Driver Profile
@@ -738,7 +573,7 @@ export default function RootLayout({
                           color:
                             pathname == "/DriverAssign" ? "black" : "white",
                           backgroundColor:
-                            pathname == "/DriverAssign" ? "white" : "",
+                            pathname == "/DriverAssign" ? "white" : ""
                         }}
                       >
                         Assign Driver
@@ -749,6 +584,77 @@ export default function RootLayout({
 
                     {/* </Link> */}
                   </Popover>
+                )}
+              </div>
+            )}
+
+            {(session?.userRole == "SuperAdmin" ||
+              session?.userRole == "Admin") && (
+              <div>
+                {session?.immobilising && (
+                  <Link href="/Immobilize">
+                    <Tooltip
+                      className="bg-[#00B56C] text-white rounded shadow-lg"
+                      placement="right"
+                      content="Immobilize"
+                    >
+                     <svg
+ id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" 
+
+                        className={`w-20 h-14 py-3   text-[white]  text-white-10  dark:text-white  ${
+                          pathname == "/Immobilize"
+                            ? "border-r-2 #29303b"
+                            : "border-b-2"
+                        }`}
+                        // width="140px"
+                        // height="140px"
+                        // viewBox="0 0 121.92 73.9"
+                        viewBox="0 0 115 80"
+
+                        
+                        strokeWidth="5"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{
+                          color: pathname == "/Immobilize" ? "green" : "white",
+                          backgroundColor: pathname == "/Immobilize" ? "white" : ""
+                        }}
+                      >
+                        {/*                  
+                        <g id="SVGRepo_iconCarrier">
+                          {" "}
+                          <g>
+                            <path
+                              d="M64,48L64,48h-8V32h8c8.836,0,16-7.164,16-16S72.836,0,64,0c-8.837,0-16,7.164-16,16v8H32v-8c0-8.836-7.164-16
+ -16-16 S0,7.164,0,16s7.164,16,16,16h8v16h-8l0,0l0,0C7.164,48,0,55.164,0,64s7.164,16,16,16c8.837,0,16-7.164,16-16l0,0v-8h16v7
+ .98 c0,0.008-0.001,0.014-0.001,0.02c0,8.836,7.164,16,16,16s16-7.164,16-16S72.836,48.002,64,48z M64,8c4.418,0,8,3.582,8,8 s-3
+ .582,8-8,8h-8v-8C56,11.582,59.582,8,64,8z M8,16c0-4.418,3.582-8,8-8s8,3.582,8,8v8h-8C11.582,24,8,20.417,8,16z M16,72 c-4.418,
+ 0-8-3.582-8-8s3.582-8,8-8l0,0h8v8C24,68.418,20.418,72,16,72z M32,48V32h16v16H32z M64,72c-4.418,0-8-3.582-8-8l0,0v-8 h7.999c4.418,
+ 0,8,3.582,8,8S68.418,72,64,72z"
+                            ></path>
+                          </g>
+                        </g> */}
+                        {/* <defs>
+<style>.cls-1{fill:#fff;}</style>
+</defs> */}
+ <g>
+	<path class="st0" d="M67.9,0H28.3L14,15.7l-0.4,0.5h-7c0,0-2.1,0-2.5,2.7c-0.3,1.5,0.3,3,1.5,3.8c1.1,0,2.1,0.1,3.1,0.3
+		c1.6,0.3,1.2,1.6,1.2,1.6c-6.2,3.9-9.7,11.3-9.7,11.3L0,65l2.1,2.5h13.4l2.6-6.2h56.5V37c-0.2-1.8,1.2-3.4,3-3.6c0.1,0,0.3,0,0.4,0
+		V17l1.3-2.8L67.9,0z M11.3,40C7.2,40,4,38.2,4,36.1s3.3-3.8,7.3-3.8s7.3,1.7,7.3,3.8S15.3,40,11.3,40z M74.3,54.7
+		c0,1.7-1.4,3.2-3.1,3.2c0,0,0,0-0.1,0H23.5c-1.7,0-3.1-1.4-3.1-3.2l0,0v-0.6c0-1.7,1.4-3.2,3.1-3.2c0,0,0,0,0,0h47.6
+		c1.7,0,3.2,1.4,3.2,3.1c0,0,0,0,0,0L74.3,54.7z M77,19.2H18.6v-2.8l9.6-12.6h39.5L77,16V19.2z"/>
+	<path class="st0" d="M118.4,34.7V19.2c0,0-3-13.8-19.6-14c0,0-14.2-0.4-18.7,14l0.2,15.3c0,0-3,1-3.3,3.5v32.7
+		c0.1,1.8,1.5,3.1,3.3,3.2c3.1,0.2,38.2,0,38.2,0s3.6-0.8,3.5-4.3V37.3C121.9,37.3,121,34.5,118.4,34.7z M102,61h-5.4l0.8-7.5
+		c-1.2-0.6-2-1.8-2.1-3.2c0.3-2.2,2.4-3.7,4.6-3.3c1.7,0.3,3.1,1.6,3.3,3.3c0,1.4-0.8,2.6-2.1,3.2L102,61z M113.1,34.5H84.6V19.2
+		c0,0,2.4-9.8,14.8-10.2c0,0,11.6,0.8,13.8,9.3L113.1,34.5z"/>
+</g>
+
+                      </svg>
+ 
+                    </Tooltip>
+                  </Link>
                 )}
               </div>
             )}
@@ -830,7 +736,7 @@ export default function RootLayout({
                                 className="grid grid-cols-12 w-full"
                                 style={{
                                   display: "flex",
-                                  justifyContent: "center",
+                                  justifyContent: "center"
                                 }}
                               >
                                 <div className="col-span-9 ms-2 text-lg font-popins text-center text-black">
@@ -844,7 +750,7 @@ export default function RootLayout({
                               <div
                                 style={{
                                   display: "flex",
-                                  justifyContent: "center",
+                                  justifyContent: "center"
                                 }}
                                 className="py-2 font-popins font-semibold"
                               >
@@ -877,8 +783,8 @@ export default function RootLayout({
                       flexShrink: 0,
                       "& .MuiDrawer-paper": {
                         width: drawerWidth,
-                        boxSizing: "border-box",
-                      },
+                        boxSizing: "border-box"
+                      }
                     }}
                     anchor="left"
                     open={open}
@@ -910,7 +816,7 @@ export default function RootLayout({
                                 pathname == "/liveTracking" ? "green" : "white",
                               backgroundColor:
                                 pathname == "/liveTracking" ? "white" : "",
-                              border: pathname == "/liveTracking" ? "none" : "",
+                              border: pathname == "/liveTracking" ? "none" : ""
                             }}
                           >
                             <path
@@ -952,7 +858,7 @@ export default function RootLayout({
                                   ? "green"
                                   : "white",
                               backgroundColor:
-                                pathname == "/journeyReplay" ? "white" : "",
+                                pathname == "/journeyReplay" ? "white" : ""
                             }}
                           >
                             {" "}
@@ -999,7 +905,7 @@ export default function RootLayout({
                                   `EditZone?id=${filterId}` ==
                                     `EditZone?id=${pathName}`
                                     ? "none"
-                                    : "",
+                                    : ""
                               }}
                             >
                               {" "}
@@ -1020,50 +926,6 @@ export default function RootLayout({
                         </Link>
                       )}
 
-                      {/* <Popover placement="right-start">
-                        <Tooltip
-                          className="bg-white text-green shadow-lg rounded border-none"
-                          placement="right"
-                          content="Dual Camera"
-                        >
-                          <PopoverHandler>
-                            <svg
-                              className="w-14 h-12 py-2  text-[white]  text-white-10  dark:text-white cursor-pointer"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              strokeWidth="2"
-                              stroke="currentColor"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              {" "}
-                              <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                              <circle cx="6" cy="6" r="2" />{" "}
-                              <circle cx="18" cy="18" r="2" />{" "}
-                              <path d="M11 6h5a2 2 0 0 1 2 2v8" />{" "}
-                              <polyline points="14 9 11 6 14 3" />{" "}
-                              <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />{" "}
-                              <polyline points="10 15 13 18 10 21" />
-                            </svg>
-                          </PopoverHandler>
-                        </Tooltip>
-                        <PopoverContent className="border-none  cursor-pointer bg-green">
-                          <span className=" w-full text-white">
-                            Get Image And Video
-                          </span>
-                          <br></br>
-                          <br></br>
-                          <span
-                            className=" w-full text-white"
-                            onClick={() => router.push("/DualCam")}
-                          >
-                            View Image And Video
-                          </span>
-                          <br></br>
-                        </PopoverContent>
-                      </Popover> */}
                       {(session?.userRole == "SuperAdmin" ||
                         session?.userRole == "Admin") && (
                         <div>
@@ -1123,7 +985,7 @@ export default function RootLayout({
                               color: pathname == "/Reports" ? "green" : "white",
                               backgroundColor:
                                 pathname == "/Reports" ? "white" : "",
-                              border: pathname == "/Reports" ? "none" : "",
+                              border: pathname == "/Reports" ? "none" : ""
                             }}
                           >
                             <path d="M9 7V2.13a2.98 2.98 0 0 0-1.293.749L4.879 5.707A2.98 2.98 0 0 0 4.13 7H9Z" />
@@ -1162,7 +1024,41 @@ export default function RootLayout({
                           </svg>
                         </Tooltip>
                       </Link>
-
+                      {(session?.userRole == "SuperAdmin" ||
+                        session?.userRole == "Admin") && (
+                        <div>
+                          {session?.immobilising && (
+                            <Link href="/Immobilize">
+                              <Tooltip
+                                className="bg-[#00B56C] text-white shadow-lg rounded"
+                                placement="right"
+                                content="Camera"
+                              >
+                                <svg
+                                  className="w-14 h-12 py-2  text-[white]  text-white-10  dark:text-white cursor-pointer"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth="2"
+                                  stroke="currentColor"
+                                  fill="none"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  {" "}
+                                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                                  <circle cx="6" cy="6" r="2" />{" "}
+                                  <circle cx="18" cy="18" r="2" />{" "}
+                                  <path d="M11 6h5a2 2 0 0 1 2 2v8" />{" "}
+                                  <polyline points="14 9 11 6 14 3" />{" "}
+                                  <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />{" "}
+                                  <polyline points="10 15 13 18 10 21" />
+                                </svg>
+                              </Tooltip>
+                            </Link>
+                          )}
+                        </div>
+                      )}
                       <Popover placement="right-start">
                         <Tooltip
                           className="bg-white text-green shadow-lg rounded border-none"
