@@ -56,28 +56,28 @@ export default function Request({setgprsdataget}:any) {
             token: session.accessToken,
             clientId: session?.clientId
           });
-          // setVehicleList(Data.data);
+          setVehicleList(Data.data);
 
-                    const data = await getVehicleDataByClientId(session?.clientId)
-                    let parsedData = JSON.parse(
-                      data?.data?.Value
-                    )?.cacheList;
-                    let d = Data.data.map((i)=>{
-                      return( parsedData.map((j)=>{
-                        if(i.vehicleReg==j.vehicleReg){
-          return {
+                    // const data = await getVehicleDataByClientId(session?.clientId)
+                    // let parsedData = JSON.parse(
+                    //   data?.data?.Value
+                    // )?.cacheList;
+          //           let d = Data.data.map((i)=>{
+          //             return( parsedData.map((j)=>{
+          //               if(i.vehicleReg==j.vehicleReg){
+          // return {
 
-            vehicleReg:i?.vehicleReg,
-            dualCam:i?.dualCam,
-            immobilising:i?.immobilising,
-            camStatus:j.camStatus?.value,
-            immStatus:j.immStatus?.value,
-            deviceIMEI:i.deviceIMEI
-          }
-                        }
+          //   vehicleReg:i?.vehicleReg,
+          //   dualCam:i?.dualCam,
+          //   immobilising:i?.immobilising,
+          //   camStatus:j?.camStatus?.value,
+          //   immStatus:j?.immStatus?.value,
+          //   deviceIMEI:i.deviceIMEI
+          // }
+          //               }
 
-                      }))[0]
-                    })
+          //             }))[0]
+          //           })                  
                     
 
                     setVehicleList(d);
@@ -140,6 +140,7 @@ export default function Request({setgprsdataget}:any) {
     // localStorage.setItem("selectedVehicle", selectedVehicle?.vehicleReg);
     setSelectedVehicle(selectedVehicle || null);
   };
+  console.log(vehicleList)
   const options =
     vehicleList?.length > 0
       ? vehicleList?.map((item: any) => ({
@@ -268,7 +269,10 @@ export default function Request({setgprsdataget}:any) {
           <Select
             value={selectedOption}
             onChange={handleSelectChange}
-            options={options}
+            options={ vehicleList?.map((item: any) => ({
+              value: item?.vehicleReg,
+              label: item?.vehicleReg
+            }))}
             placeholder="Pick Vehicle"
             isClearable
             isSearchable
