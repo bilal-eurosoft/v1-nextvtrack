@@ -45,6 +45,8 @@ export default function Command() {
   };
   const [selectedVehiclelist, setSelectedVehiclelist] = useState<any>("");
   const [filteredRecords, setFilteredRecords] = useState([]);
+  const [filteredDataIsAvaialable, setfilteredDataIsAvaialable] =
+    useState<boolean>(true);
   const [gprsData, setGprsData] = useState([]);
 
   const handleVehicleChange = (e: any) => {
@@ -127,22 +129,18 @@ export default function Command() {
     e.preventDefault();
     setFromDate(null);
     setToDate(null);
-    
+
     if (selectedVehiclelist !== null && selectedVehiclelist !== "") {
-      
       const filteredWithVehicle = gprsData.filter(
         (record: any) => record.Label1 === selectedVehiclelist?.value
       );
       setFilteredRecords(filteredWithVehicle);
       setCurrentPage(1);
     } else {
-      
-
       setFilteredRecords(gprsData);
     }
   };
 
-  
   const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setInput(value);
@@ -157,7 +155,7 @@ export default function Command() {
             token: session.accessToken,
             clientId: session?.clientId
           });
-          
+
           setVehicleList(Data.data);
         }
       } catch (error) {
@@ -177,88 +175,81 @@ export default function Command() {
             token: session?.accessToken,
             clientId: session?.clientId
           });
-          let data:any =[]
-           response.map((i:any,index:any) => {
+          
+          let data: any = [];
+          response.map((i: any, index: any) => {
             let r: any = vehicleList.find((j) => {
               return j.deviceIMEI == i.deviceIMEI;
             });
+          
+
             if (r) {
               let { clientId, vehicleReg, Label1, dualCam, immobilising } = r;
               let devicestatus;
               if (dualCam && immobilising) {
                 let c = i.commandtext.split(" ");
-                if (c[0] == "setdigout" && c[1] == "2"&& i.status=="Pending") {
+                if (
+                  c[0] == "setdigout" &&
+                  c[1] == "2" &&
+                  i.status == "Pending"
+                ) {
                   // if(i.status=="Pending"){
-                    if(!i.commandResponse){
-
+                  if (!i.commandResponse) {
                     devicestatus = "Activation in process";
-                  }else{
+                  } else {
                     devicestatus = "Activated";
-                    
                   }
-                } else if (c[0] == "setdigout" && c[1] == "0"&& i.status=="Pending") {
-                  // if(i.status=="Pending"){
-
-                  //   devicestatus = "Deactivation in process";
-                  // }else{
-                  //   devicestatus = "Deactivated";
-                    
-                  // }
-                  if(!i.commandResponse){
-
+                } else if (
+                  c[0] == "setdigout" &&
+                  c[1] == "0" &&
+                  i.status == "Pending"
+                ) {
+                 
+                  if (!i.commandResponse) {
                     devicestatus = "Deactivation in process";
-                  }else{
+                  } else {
                     devicestatus = "Deactivated";
-                    
                   }
                 }
               } else if (immobilising) {
                 let c = i.commandtext.split(" ");
                 if (c[0] == "setdigout" && c[1] == "1") {
-                  // if(i.status=="Pending"){
-                    if(!i.commandResponse){
-
-                      devicestatus = "Activation in process";
-                    }else{
-                      devicestatus = "Activated";
-                    
+                
+                  if (!i.commandResponse) {
+                    devicestatus = "Activation in process";
+                  } else {
+                    devicestatus = "Activated";
                   }
-                  
                 } else if (c[0] == "setdigout" && c[1] == "0") {
-                  // if(i.status=="Pending"){
-                    if(!i.commandResponse){
-
-                      devicestatus = "Deactivation in process";
-                    }else{
-                      devicestatus = "Deactivated";
-                      
-                    }
+                 
+                  if (!i.commandResponse) {
+                    devicestatus = "Deactivation in process";
+                  } else {
+                    devicestatus = "Deactivated";
+                  }
                 }
               }
-              
-              if(devicestatus!=undefined){
-data.push(
 
-   {
-    ...i,
-    clientId,
-    vehicleReg,
-    Label1,
-    dualCam,
-    immobilising,
-    devicestatus
-  }
-)
+              if (devicestatus != undefined) {
+                data.push({
+                  ...i,
+                  clientId,
+                  vehicleReg,
+                  Label1,
+                  dualCam,
+                  immobilising,
+                  devicestatus
+                });
               }
-            } 
-            
-            if(index==response.length-1){
+            }
 
+            if (index == (response.length - 1)) {
               setGprsData(data);
+              
               setFilteredRecords(data);
               setLoading(false);
+              setfilteredDataIsAvaialable(true)
             }
-           
           });
         }
       } catch (error) {
@@ -266,18 +257,24 @@ data.push(
       }
     };
 
-    
-    if (vehicleList?.length > 0 && (filteredRecords?.length == 0 || loading || gprsdataget) ) {
+    // if (vehicleList?.length > 0 && (filteredRecords?.length == 0 || loading || gprsdataget) ) {
+    if (filteredRecords?.length == 0 || gprsData.length == 0) {
+      
       getGprsData();
-      setgprsdataget(false)
+      setgprsdataget(false);
     }
   }, [session]);
   const recordsPerPage = 8;
   const lastIndex = currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
   const records = filteredRecords.slice(firstIndex, lastIndex);
-  
+
   const totalCount: any = Math.ceil(filteredRecords?.length / recordsPerPage);
+ 
+ 
+ useEffect(()=>{
+ 
+ },[filteredRecords])
   // const options2 =
   //   vehicleList?.map((item: any) => ({
   //     value: item.vehicleReg,
@@ -297,16 +294,16 @@ data.push(
 
       <div className="tab-pane" id="">
         <div>
-         {/*  <div className="grid lg:grid-cols-5  mt-5  "> */}
-         <div className="grid gap-1 grid-cols-1 sm:grid-cols-1 md:grid-cols-7">
+          {/*  <div className="grid lg:grid-cols-5  mt-5  "> */}
+          <div className="grid gap-1 grid-cols-1 sm:grid-cols-1 md:grid-cols-7">
             <div
               className="col-span-1 gap-2 "
-             /*  style={{ marginRight: "50px", marginLeft: "20px" }} */
-             style={{  marginLeft: "16px" }}
+              /*  style={{ marginRight: "50px", marginLeft: "20px" }} */
+              style={{ marginLeft: "16px" }}
             >
               <Select
                 onChange={handleVehicleChange}
-                options={ vehicleList?.map((item: any) => ({
+                options={vehicleList?.map((item: any) => ({
                   value: item.vehicleReg,
                   label: item.vehicleReg
                 }))}
@@ -379,7 +376,6 @@ data.push(
                         maxDate={currenTDates}
                         autoOk
                         style={{ width: "90%" }}
-
                         inputProps={{ readOnly: true }}
                         InputProps={{
                           endAdornment: (
@@ -389,8 +385,7 @@ data.push(
                       />
                     </MuiPickersUtilsProvider>
                   </div>
-                        <div className="lg:col-span-2 flex items-center ">
-
+                  <div className="lg:col-span-2 flex items-center ">
                     <button
                       style={{ background: "none" }}
                       className="text-green text-2xl"
@@ -589,7 +584,7 @@ data.push(
                                       </TableCell> */}
                             </TableRow>
                           </TableHead>
-                          {records.length === 0 ? (
+                          {filteredDataIsAvaialable === false ? (
                             <TableRow>
                               <TableCell colSpan={4} align="center">
                                 <p
