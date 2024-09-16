@@ -269,7 +269,7 @@ export default function Request({setgprsdataget}:any) {
             value={selectedOption}
             onChange={handleSelectChange}
             options={options}
-            placeholder="Pick Vehicle 2"
+            placeholder="Pick Vehicle"
             isClearable
             isSearchable
             noOptionsMessage={() => "No options available"}
