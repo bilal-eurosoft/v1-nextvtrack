@@ -165,7 +165,7 @@ input[type="checkbox"]:hover {
   }
   .journey_replay_center_box {
     left: -1%;
-    right: 10%;
+   /*  right: 10%; */
   }
   .main_journey {
     height: 93vh !important;
@@ -331,8 +331,13 @@ input[type="checkbox"]:hover {
     height: 73vh;
     overflow-y: scroll;
   }
-  #map {
+  /* #map {
     height: 78vh;
+  } */
+  #map {
+    width: 100%;
+    height: 100vh; /* or a specific height if needed */
+    position: relative; /* Make sure it's not positioned off-screen */
   }
   .journey_replay_harsh_child {
     grid-column: 1 span;
@@ -396,7 +401,7 @@ input[type="checkbox"]:hover {
   #speed_meter {
     position: absolute;
     top: 34% !important;
-    left: 5%;
+    /* left: 5%; */
     right: 6% !important;
     display: flex;
     justify-content: end;
@@ -461,7 +466,7 @@ input[type="checkbox"]:hover {
   #speed_meter {
     position: absolute;
     top: 22%;
-    left: 5%;
+   /*  left: 5%; */
     right: 6% !important;
     display: flex;
     justify-content: end;
@@ -530,7 +535,7 @@ input[type="checkbox"]:hover {
   #speed_meter {
     position: absolute;
     top: 22%;
-    left: 5%;
+    /* left: 5%; */
     right: 6% !important;
     display: flex;
     justify-content: end;
@@ -610,7 +615,7 @@ input[type="checkbox"]:hover {
   #speed_meter {
     position: absolute;
     top: 33% !important;
-    left: 5%;
+    /* left: 5%; */
     right: 8% !important;
     display: flex;
     justify-content: end;
@@ -662,7 +667,7 @@ input[type="checkbox"]:hover {
   #speed_meter {
     position: absolute;
     top: 31% !important;
-    left: 5%;
+  /*   left: 5%; */
     right: 8% !important;
     display: flex;
     justify-content: end;
@@ -696,7 +701,7 @@ input[type="checkbox"]:hover {
 #speed_meter {
   position: absolute;
   top: 22%;
-  left: 5%;
+ /*  left: 5%; */
   right: 1%;
   display: flex;
   justify-content: end;

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DateFnsMomemtUtils from "@date-io/moment";
 import { DatePicker } from "@material-ui/pickers";
 import BlinkingTime from "@/components/General/BlinkingTime";
@@ -18,9 +18,12 @@ import Image from "next/image";
 import { Popup } from "react-leaflet";
 import harshIcon from "../../../public/Images/HarshBreak.png";
 import HarshAccelerationIcon from "../../../public/Images/HarshAccelerationIcon.png";
+import HarshCornerningIcon from "../../../public/harshcornering.png";
 import markerA from "../../../public/Images/marker-a.png";
 import markerB from "../../../public/Images/marker-b.png";
 import harshAcceleration from "../../../public/Images/brake-discs.png";
+
+import FocusIconNew from "../../../public/car-icon-vtrack.png";
 import { useSelector } from "react-redux";
 import Speedometer, {
   Background,
@@ -155,7 +158,7 @@ export default function JourneyReplayComp() {
   const [carMovementInterval, setCarMovementInterval] = useState<
     NodeJS.Timeout | undefined
   >(undefined);
-  const [speedFactor, setSpeedFactor] = useState<any>(1);
+  const [speedFactor, setSpeedFactor] = useState<any>(4);
   const [showZones, setShowZones] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isPauseColor, setIsPauseColor] = useState(false);
@@ -181,7 +184,8 @@ export default function JourneyReplayComp() {
   const [pausebtn, setPauseBtn] = useState(false);
   const [stopDetailsOpen, setStopDetailsOpen] = useState(false);
   const [activeTripColor, setactiveTripColor] = useState<any>("");
-  const [loadingMap, setLaodingMap] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [loadingMap, setloadingMap] = useState(false);
   const [expanded, setExpanded] = useState(null);
   const [searchJourney, setsearchJourney] = useState(true);
   const [seacrhLoading, setSearchLoading] = useState(true);
@@ -193,7 +197,9 @@ export default function JourneyReplayComp() {
   const [isPickerOpenFromDate, setIsPickerOpenFromDate] = useState(true);
   const [travelV2, setTravelV2] = useState(false);
   const [travelV3, setTravelV3] = useState(false);
+  const [userclick, setuserclick] = useState(false);
   const [stopWithSecond, setStopWithSecond] = useState([]);
+  
   const startdate = new Date();
   const enddate = new Date();
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
@@ -201,6 +207,8 @@ export default function JourneyReplayComp() {
   };
   const allData = useSelector((state) => state?.zone);  
   
+  const [hidediv, sethidediv]= useState(false);
+  const [hideicondiv, sethideicondiv]= useState(true);
   // useEffect(() => {
   //   setZoneList(allZones?.zone);
   // }, [allZones]);
@@ -209,33 +217,44 @@ export default function JourneyReplayComp() {
   const togglePicker = () => {
     setIsPickerOpen(!isPickerOpen);
   };
-  const SetViewOnClick = ({ coords }: { coords: any }) => {
-    if (isPaused) {
+  const SetViewOnClick = ({ coords, zoom  }: { coords: any, zoom: any }) => {
+    /* if (isPaused) {
       setMapcenterToFly(null);
       setzoomToFly(0);
-    }
 
+    } */
+   
     const map = useMap();
+    console.log("click" ,userclick , isPlaying)
+    if(userclick && isPlaying ){
+      return null
+    }
+   
     if (coords) {
       if (coords) {
         if (speedFactor == 2) {
-          map.setView(coords, 16);
+          map.setView(coords, 18);
         } else if (speedFactor == 1) {
-          map.setView(coords, 16);
+          map.setView(coords, 18);
         } else if (speedFactor == 4) {
-          map.setView(coords, 16);
+        
+          map.setView(coords, 18);
         } else if (speedFactor == 6) {
-          map.setView(coords, 14);
+          map.setView(coords, 18);
         } else {
-          map.setView(coords, 16);
+          map.setView(coords, 18);
         }
       }
     }
     return null;
   };
-
+ 
   const SetViewfly = ({ coords, zoom }: { coords: any; zoom: number }) => {
     const map = useMap();
+   // console.log("click" , selectedItemId);
+    if(selectedItemId){
+      return null
+    }
     if (coords && !Number.isNaN(coords[0]) && coords[0] != null) {
       map.flyTo(coords, zoom);
     }
@@ -245,7 +264,10 @@ export default function JourneyReplayComp() {
   const tick = () => {
     setIsPlaying(true);
     setIsPaused(false);
-    setSpeedFactor(1);
+    setIsChecked(false)
+    sethideicondiv(false)
+   // setSpeedFactor(4);
+   setuserclick(false)
     setPlayBtn(false);
     setStopBtn(true);
     setPauseBtn(true);
@@ -253,42 +275,47 @@ export default function JourneyReplayComp() {
     setIsPauseColor(false);
     setHarshPopUp(false);
     setAccHarshPopUp(false);
-
+/* 
     if (!carMovementInterval) {
       if (currentPositionIndex >= polylinedata.length) {
         setCurrentPositionIndex(0);
       }
-    }
+    } */
   };
 
   const pauseTick = async () => {
     setIsPlaying(false);
     setPauseBtn(false);
+    sethideicondiv(true)
+   // setSpeedFactor(4);
     setStopBtn(true);
     setPlayBtn(true);
     setstopVehicle(false);
     setIsPauseColor(true);
     setIsPaused(true);
+    setuserclick(false)
     setHarshPopUp(true);
     setAccHarshPopUp(true);
 
-    if (carMovementInterval) {
+    /* if (carMovementInterval) {
       clearInterval(carMovementInterval);
       setCarMovementInterval(undefined);
-    }
+    } */
 
-    if (carPosition && session) {
+    /* if (carPosition && session) {
       const Dataresponse = await Tripaddressresponse(
         carPosition?.lat,
         carPosition?.lng,
         session?.accessToken
       );
       setTripAddressData(Dataresponse);
-    }
+    } */
   };
 
   const stopTick = async () => {
+    setuserclick(false)
     setIsPlaying(false);
+    sethideicondiv(true)
     setIsPaused(false);
     setPlayBtn(true);
     setPauseBtn(false);
@@ -299,7 +326,15 @@ export default function JourneyReplayComp() {
     setAccHarshPopUp(true);
     setProgressWidth(0);
     if (polylinedata.length > 0) {
+     
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
+      const { zoomlevel, centerLat, centerLng } = calculateZoomCenter(
+        TravelHistoryresponse
+      );
+     
+      setMapcenterToFly([centerLat, centerLng]);
+      setzoomToFly(zoomlevel);
+     // setMapcenter([polylinedata[0][0], polylinedata[0][1]]);
     }
     setCurrentPositionIndex(0);
   };
@@ -308,6 +343,7 @@ export default function JourneyReplayComp() {
     if (isPlaying && !isPaused) {
       const totalSteps = TravelHistoryresponse.length - 1;
       let step = currentPositionIndex;
+    
 
       const currentData = TravelHistoryresponse[step];
       const nextData = TravelHistoryresponse[step + 1];
@@ -324,9 +360,11 @@ export default function JourneyReplayComp() {
         let numSteps;
         let stepSize: number;
         if (speedFactor == 2) {
+      
           numSteps = 190;
           stepSize = (1 / numSteps) * speedFactor * 0.9;
         } else if (speedFactor == 4) {
+       
           numSteps = 380;
           stepSize = (1 / numSteps) * speedFactor * 0.9;
         } else if (speedFactor == 6) {
@@ -340,10 +378,11 @@ export default function JourneyReplayComp() {
         let animationId: number;
 
         const updatePosition = () => {
+       
           if (progress < 1) {
             const interpolatedLatLng = new L.LatLng(
               currentLatLng.lat +
-                (nextLatLng.lat - currentLatLng.lat) * progress,
+                (nextLatLng.lat - currentLatLng.lat) * progress , 
               currentLatLng.lng +
                 (nextLatLng.lng - currentLatLng.lng) * progress
             );
@@ -394,21 +433,22 @@ export default function JourneyReplayComp() {
     currentPositionIndex,
     isPaused,
     TravelHistoryresponse,
-    speedFactor,
     stopVehicle,
   ]);
+
+
 
   useEffect(() => {
     if (polylinedata.length > 0) {
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
-      setMapcenter([polylinedata[0][0], polylinedata[0][1]]);
+     // setMapcenter([polylinedata[0][0], polylinedata[0][1]]);
     }
   }, [polylinedata]);
 
   useEffect(() => {
     const vehicleListData = async () => {
       try {
-        if (session?.userRole == "Admin" || session?.userRole == "SuperAmin") {
+        if (session?.userRole == "Admin" || session?.userRole == "SuperAdmin") {
           if (session) {
             if (allData?.vehicle.length <= 0) {
               const Data = await vehicleListByClientId({
@@ -468,6 +508,7 @@ export default function JourneyReplayComp() {
     })();
   }, []);
 
+
   useEffect(() => {
     const clientZoomSettings = clientsetting?.filter(
       (el) => el?.PropertDesc === "Zoom"
@@ -523,7 +564,7 @@ export default function JourneyReplayComp() {
     setPlayBtn(false);
     setStopBtn(false);
     setPauseBtn(false);
-    setLaodingMap(false);
+    setloadingMap(false);
     setIsPlaying(false);
     setCarPosition(null);
     setactiveTripColor("");
@@ -722,6 +763,7 @@ export default function JourneyReplayComp() {
               setDataResponse(response?.data);
 
               if (response.success === true) {
+              //  sethidediv(true)
                 toast.success(`${response.message}`, {
                   style: {
                     border: "1px solid #00B56C",
@@ -803,12 +845,16 @@ export default function JourneyReplayComp() {
   function getFormattedDate(date: any) {
     return date.toISOString().slice(0, 10);
   }
-
+//console.log("polyline", polylinedata.length, "loading", loadingMap);
   const handleDivClick = async (
     TripStart: TripsByBucket["TripStart"],
     TripEnd: TripsByBucket["TripEnd"],
     id: any
   ) => {
+  //  console.log("DSFDSdsds");
+  sethidediv(true)
+  setPolylinedata([])
+  setCarPosition(null)
     setlat(null);
     setlng(null);
     setPlayBtn(true);
@@ -832,7 +878,8 @@ export default function JourneyReplayComp() {
           toDateTime: `${TripEnd}`,
           id,
         };
-        setLaodingMap(false);
+       // setloadingMap(false);
+       setloadingMap(true);
         const TravelHistoryresponseapi = await toast.promise(
           TravelHistoryByBucketV2({
             token: session.accessToken,
@@ -990,18 +1037,20 @@ export default function JourneyReplayComp() {
         }
         setStopWithSecond(stopTimesArray);
         setTravelHistoryresponse(TravelHistoryresponseapi.data);
+        
       }
     } catch (error) {}
 
-    setLaodingMap(true);
+    setloadingMap(true);
   };
 
- 
+ //console.log("user", userclick);
   
   
   useEffect(() => {
+
     if (TravelHistoryresponse && TravelHistoryresponse.length > 0) {
-      setPolylinedata(
+        setPolylinedata(
         TravelHistoryresponse?.map((item: TravelHistoryData) => [
           item.lat,
           item.lng,
@@ -1014,6 +1063,7 @@ export default function JourneyReplayComp() {
       setMapcenterToFly([centerLat, centerLng]);
       setzoomToFly(zoomlevel);
     }
+
   }, [TravelHistoryresponse]);
 
   useEffect(() => {
@@ -1148,6 +1198,26 @@ export default function JourneyReplayComp() {
     const filterData = dataresponse?.find((items: any) => items.id === item.id);
     setactiveTripColor(filterData);
   };
+
+  const handleItemClick = (item) => {
+    
+   /*  if(selectedItemId){
+      setSelectedItemId(null)
+    }
+    handleClickStopCar(item);
+      setSelectedItemId(item.date); // Assume each item has a unique 'id'
+     */
+      handleClickStopCar(item);
+
+    // Toggle the selection of the item
+    if (item.date === selectedItemId) {
+      setSelectedItemId(null); // Deselect if already selected
+    } else {
+      setSelectedItemId(item.date); // Select new item
+    }
+  
+  };
+
 
   // const selectOption: Option[] = vehicleList?.map((item: any) => {
   //   return { value: item.vehicleReg, label: item.vehicleReg };
@@ -1302,7 +1372,81 @@ export default function JourneyReplayComp() {
     { value: "4", label: "4X" },
     { value: "6", label: "6X" },
   ];
+  const handleuserclick =()=>{
+   
+    setuserclick(true)
+  }
+ /*  useEffect(() => {
+    // Function to handle map events
+    console.log("Adfa");
+    const handleMapEvents = (map: L.Map) => {
+      console.log("Adf3243242a");
+      map.on('zoomend', handleuserclick);
+      map.on('moveend', handleuserclick);
+    };
 
+    // Initialize Leaflet map instance and add event listeners
+    const map = document.getElementById('map') 
+    console.log("sacfcde897889", map);
+    if (map) {
+      console.log("sacfcde897889", map);
+      handleMapEvents(L.map(map));
+    }
+
+    // Cleanup function to remove event listeners
+    return () => {
+      if (map) {
+        console.log("Adfa7789897889");
+        map.off('zoomend', handleuserclick);
+        map.off('moveend', handleuserclick);
+      }
+    };
+  }, [isPaused,isPlaying]);
+   */
+ /*  const mapRef = useRef(null);
+  
+  const MapEvents = () => {
+    const map = useMap();
+
+    useEffect(() => {
+      if (!map) return;
+
+      const handleZoomEnd = () => {
+        console.log("Zoom ended");
+        handleuserclick();
+      };
+
+      const handleMoveEnd = () => {
+        console.log("Move ended");
+        handleuserclick();
+      };
+
+      // Add event listeners
+      map.on('zoomstart', handleZoomEnd);
+      map.on('moveend', handleMoveEnd);
+
+      // Cleanup function to remove event listeners
+      return () => {
+        map.off('zoomstart', handleZoomEnd);
+        map.off('moveend', handleMoveEnd);
+      };
+    }, [map]);
+
+    return null;
+  }; */
+  const [isChecked, setIsChecked] = useState(false);
+
+
+const handleFocus =()=>{
+  setuserclick(false)
+  setIsHovered(false);
+ setIsHovered(false);
+}
+const [isHovered, setIsHovered] = useState(false);
+
+// Event handlers for hover
+const handleMouseEnter = () => setIsHovered(true);
+const handleMouseLeave = () => setIsHovered(false);
   return (
     <>
       <div className="main_journey">
@@ -1846,7 +1990,7 @@ export default function JourneyReplayComp() {
             </button> */}
           </div>
 
-          <div className="xl:col-span-3 lg:col-span-1 md:col-span-12 col-span-12 journey_replay_harsh">
+          {/* <div className="xl:col-span-3 lg:col-span-1 md:col-span-12 col-span-12 journey_replay_harsh">
             {" "}
           </div>
           {TravelHistoryresponse?.length > 0 && (
@@ -1868,6 +2012,8 @@ export default function JourneyReplayComp() {
               </div>
             </div>
           )}
+          
+
           <div className="xl:col-span-1  lg:col-span-2 md:col-span-1 col-span-6 mt-1 -ms-5 mb-3 journey_replay_harsh_acce">
             {TravelHistoryresponse?.filter((item: any) => {
               return (
@@ -1898,11 +2044,40 @@ export default function JourneyReplayComp() {
                 </div>
               </div>
             )}
+            {TravelHistoryresponse?.filter((item: any) => {
+              return (
+                item.vehicleEvents.filter(
+                  (items: any) => items.Event === "HarshCornering"
+                ).length > 0
+              );
+            }).length > 0 && (
+              <div className="grid grid-cols-12">
+                <div className="col-span-2">
+                  <Image
+                    src={HarshCornerningIcon}
+                    alt="harshIcon "
+                    className="h-6 journay_HarshAcceleration"
+                  />
+                </div>
+                <div className="col-span-10 text-sm font-semibold">
+                  Harsh Corn.. (x
+                  {TravelHistoryresponse.reduce((count, item) => {
+                    return (
+                      count +
+                      item.vehicleEvents.filter(
+                        (items: any) => items.Event === "HarshCornering"
+                      ).length
+                    );
+                  }, 0)}
+                  )
+                </div>
+              </div>
+            )}
 
             {TravelHistoryresponse?.filter((item: any) => {
               return (
                 item.vehicleEvents.filter(
-                  (items: any) => items.Event == "HarshBreak"
+                  (items: any) => items.Event == "HarshAcceleration"//"HarshBreak"
                 ).length > 0
               );
             }).length > 0 && (
@@ -1921,7 +2096,7 @@ export default function JourneyReplayComp() {
                       return (
                         count +
                         item.vehicleEvents.filter(
-                          (items: any) => items.Event === "HarshBreak"
+                          (items: any) => items.Event === "HarshAcceleration"
                         ).length
                       );
                     }, 0)}
@@ -1930,7 +2105,10 @@ export default function JourneyReplayComp() {
                 </div>
               </div>
             )}
+
+            
           </div>
+           */}
         </div>
         <div className="grid lg:grid-cols-5   md:grid-cols-12 sm:grid-cols-12 grid-cols-1 journey_sidebar">
           <div className="xl:col-span-1 lg:col-span-2 md:col-span-5 sm:col-span-12 col-span-4 trips_journey">
@@ -2456,33 +2634,43 @@ key={index}
             className="xl:col-span-4 lg:col-span-3 md:col-span-7 sm:col-span-12 col-span-4 journey_map"
             style={{ position: "relative" }}
           >
-            <div onClick={() => setMapcenterToFly(null)}>
-           
+     <div onClick={() => {
+  setMapcenterToFly(null);
+
+}}>
+  <div onClick={handleuserclick}>
+  
               {mapcenter !== null && (
                 <MapContainer
                   id="map"
+                
                   zoom={zoom}
                   center={mapcenter}
                   className="z-0 journey_map"
-                >
+                 >
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
                   />
+                      
 
-                  {loadingMap ? (
+                  {loadingMap  ? (
                     <Polyline
                       pathOptions={{ color: "red", weight: 6 }}
                       positions={polylinedata}
                     />
-                  ) : (
-                    ""
-                  )}
+                  ) : null}
                   {isPlaying ? (
-                    <SetViewOnClick coords={mapcenter} />
-                  ) : (
-                    <SetViewfly coords={mapcenterToFly} zoom={zoomToFly} />
-                  )}
+                    <SetViewOnClick coords={mapcenter} zoom={zoom}  />
+                  ) : isPaused ? (
+                    <SetViewOnClick coords={mapcenter}  zoom={zoom}/>
+                  )
+              :
+                 
+                (
+                  <SetViewfly coords={mapcenterToFly} zoom={zoomToFly} />
+                )
+                }
 
                   {showZones &&
                     zoneList.map(function (singleRecord) {
@@ -2641,225 +2829,297 @@ key={index}
                             ""
                           );
                         }
+                        if (items.Event === "HarshCornering") {
+                          return loadingMap ? (
+                            <Marker
+                              position={[item.lat, item.lng]}
+                              icon={
+                                new L.Icon({
+                                  iconUrl: HarshCornerningIcon.src,
+                                  iconSize: [30, 30],
+                                  iconAnchor: [16, 37],
+                                })
+                              }
+                            >
+                              {harshAccPopUp && (
+                                <Popup>Harsh Cornering</Popup>
+                              )}
+                            </Marker>
+                          ) : (
+                            ""
+                          );
+                        }
                       });
                     }
                   })}
+                 
+           
+
+
+                  
                 </MapContainer>
               )}
+            
+            </div>
+            </div>
+            {/* 
+            {isChecked && TravelHistoryresponse?.length > 0 && (
+    <div className="absolute top-0 right-0 p-4 bg-white rounded-lg shadow-lg">
+     
+      <div className="xl:col-span-1 lg:col-span-2 md:col-span-12 col-span-6 -mt-1 journey_replay_harsh_child">
+        <div className="grid grid-cols-12">
+          <div className="col-span-2">
+            <Image
+              src={markerA}
+              alt="startIcon"
+              className="h-6 journay_HarshAcceleration"
+            />
+            <Image src={markerB} alt="endIcon" className="h-6 mt-1 " />
+          </div>
+          <div className="col-span-10 text-sm font-semibold">
+            Location Start
+            <br />
+            <p className="mt-3">Location End</p>
+          </div>
+        </div>
+      </div>
+
+   
+      <div className="xl:col-span-1 lg:col-span-2 md:col-span-1 col-span-6 mt-1 -ms-5 mb-3 journey_replay_harsh_acce">
+        {TravelHistoryresponse?.filter((item) =>
+          item.vehicleEvents.some(
+            (event) => event.Event === "HarshAcceleration"
+          )
+        ).length > 0 && (
+          <div className="grid grid-cols-12">
+            <div className="col-span-2">
+              <Image
+                src={HarshAccelerationIcon}
+                alt="harshAccelerationIcon"
+                className="h-6 journay_HarshAcceleration"
+              />
+            </div>
+            <div className="col-span-10 text-sm font-semibold">
+              Harsh Acc.. (x
+              {TravelHistoryresponse.reduce((count, item) =>
+                count +
+                item.vehicleEvents.filter(
+                  (event) => event.Event === "HarshAcceleration"
+                ).length
+              , 0)}
+              )
+            </div>
+          </div>
+        )}
+
+        {TravelHistoryresponse?.filter((item) =>
+          item.vehicleEvents.some(
+            (event) => event.Event === "HarshCornering"
+          )
+        ).length > 0 && (
+          <div className="grid grid-cols-12">
+            <div className="col-span-2">
+              <Image
+                src={HarshCornerningIcon}
+                alt="harshCorneringIcon"
+                className="h-6 journay_HarshAcceleration"
+              />
+            </div>
+            <div className="col-span-10 text-sm font-semibold">
+              Harsh Corn.. (x
+              {TravelHistoryresponse.reduce((count, item) =>
+                count +
+                item.vehicleEvents.filter(
+                  (event) => event.Event === "HarshCornering"
+                ).length
+              , 0)}
+              )
+            </div>
+          </div>
+        )}
+
+        {TravelHistoryresponse?.filter((item) =>
+          item.vehicleEvents.some(
+            (event) => event.Event === "HarshBreak"
+          )
+        ).length > 0 && (
+          <div className="grid grid-cols-12">
+            <div className="col-span-2">
+              <Image
+                src={harshAcceleration}
+                alt="harshBreakIcon"
+                className="h-6 mt-1 journay_HarshAcceleration"
+              />
+            </div>
+            <div className="col-span-10 text-sm">
+              <p className="mt-2 font-semibold">
+                Harsh Break (x
+                {TravelHistoryresponse.reduce((count, item) =>
+                  count +
+                  item.vehicleEvents.filter(
+                    (event) => event.Event === "HarshBreak"
+                  ).length
+                , 0)}
+                )
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+            
+            
+            */}
+             {hidediv && ( 
+              <> 
+              <div >
+              
+           <div className="absolute flex items-start lg:top-4 lg:left-20 left-12 top-6 space-x-4">
+  <div className="xl:col-span-2 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6 stop_journey max-w-xs lg:max-w-sm">
+    <div
+      className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg rounded-md cursor-pointer"
+      onClick={() => stopDetailsOpen && handleShowDetails()}
+    >
+      <div className="lg:col-span-11 md:col-span-10 sm:col-span-10 col-span-11 stop_details_responsive">
+        <p className="text-white lg:px-2 ps-1 text-lg text_responsive mr-24">
+          Stop Details ({loadingMap ? stopWithSecond.length : ""})
+        </p>
+      </div>
+      <div className="col-span-1 mt-1 lg:-ms-2 md:-ms-1 -ms-2">
+        {getShowICon ? (
+          <svg
+            className="h-5 w-5 text-white"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        ) : (
+          <svg
+            className="h-5 w-5 text-white"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" />
+            <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
+            <path d="M4 16v2a2 2 0 0 0 2 2h2" />
+            <path d="M16 4h2a2 2 0 0 1 2 2v2" />
+            <path d="M16 20h2a2 2 0 0 0 2 -2v-2" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        )}
+      </div>
+    </div>
+    {getShowdetails && (
+      <div className={`bg-white overflow-y-scroll resposive_stop_details ${stopWithSecond.length > 1 ? "lg:h-60 md:h-60 sm:h-60 h-24" : ""}`}>
+        {stopWithSecond?.map((item) => {
+          let isActive = item.date === selectedItemId;
+          return loadingMap ? (
+            <div
+              key={item.date}
+              onClick={() => handleItemClick(item)}
+              className={`cursor-pointer ${isActive ? 'bg-[#e1f0e3]' : ''}`}
+            >
+              <p className="text-black font-popins px-2 py-2 text-sm">
+                <b>{item?.address?.display_name?.substring(0, 50)}</b>
+              </p>
+              <div className="grid grid-cols-12">
+                <div className="lg:col-span-1 md:col-span-2 sm:col-span-6 col-span-2"></div>
+                <div className="lg:col-span-8 md:col-span-8 sm:col-span-8 col-span-9 mx-2 text-center text-red text-bold px-1 w-full text-sm border-2 border-red stop_details_time">
+                  {item?.date?.slice(11, 19)}, {item?.time}
+                </div>
+              </div>
+              <br />
+              <hr className="text-gray" />
+            </div>
+          ) : null;
+        })}
+      </div>
+    )}
+  </div>   
+  <div onClick={handleFocus}
+      className="relative  cursor-pointer" 
+      onMouseEnter={handleMouseEnter} 
+      onMouseLeave={handleMouseLeave}
+    >
+      {isPlaying && userclick && (
+   
+        <>
+          <Image src={FocusIconNew} alt="buttonIcon" className="h-11 p-1 bg-green" style={{
+       borderRadius: '10px',
+      /*  borderColor: 'green', */
+       borderWidth: '0px',
+       width: '44px',
+       borderStyle: 'solid',
+       /* backgroundColor: 'bg-green', */
+      }} />
+
+          {isHovered && (
+          <>
+             <div className="absolute top-0 left-full ml-2 bg-green text-white p-2 rounded-md whitespace-nowrap">
+              Focus
             </div>
             
-            <div className="absolute lg:top-4 lg:left-20 lg:right-5 left-12 top-6 right-2 grid lg:grid-cols-10 md:grid-cols-10 sm:grid-cols-10 grid-cols-10 lg:mt-0 ">
-              <div className="xl:col-span-2 mr-5 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6 stop_journey">
-                <div
-                  className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg  rounded-md cursor-pointer"
-                  onClick={() => stopDetailsOpen && handleShowDetails()}
-                >
-                  <div className="lg:col-span-11  md:col-span-10 sm:col-span-10 col-span-11 stop_details_responsive">
-                    <p className="text-white lg:px-3 ps-1 text-lg text_responsive">
-                      Stop Details ({loadingMap ? stopWithSecond.length : ""})
-                    </p>
-                  </div>
-                  <div className="col-span-1 mt-1 lg:-ms-3 md:-ms-2 -ms-3">
-                    {getShowICon ? (
-                      <svg
-                        className="h-5 w-5 text-white"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        {" "}
-                        <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="h-5 w-5 text-white"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        // onClick={handleShowDetails}
-                      >
-                        {" "}
-                        <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                        <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />{" "}
-                        <path d="M4 16v2a2 2 0 0 0 2 2h2" />{" "}
-                        <path d="M16 4h2a2 2 0 0 1 2 2v2" />{" "}
-                        <path d="M16 20h2a2 2 0 0 0 2 -2v-2" />{" "}
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    )}
-                  </div>
-                </div>
+            
+        </> 
+          )}
+        </>
+     )}  
+    </div>
+</div>
+  </div> 
+  
 
-                {getShowdetails ? (
-                  <div className={`bg-white overflow-y-scroll resposive_stop_details ${stopWithSecond.length>1?"lg:h-60 md:h-60 sm:h-60 h-24":""}`}>
-                    {stopWithSecond?.map((item: any) => {
-                      return loadingMap ? (
-                        <div
-                          onClick={() => handleClickStopCar(item)}
-                          className="cursor-pointer"
-                        >
-                          <p className="text-black font-popins px-3 py-3 text-sm">
-                            <b>
-                              {item?.address?.display_name?.substring(0, 50)}
-                            </b>
-                          </p>
+{/* <div
+      className="grid grid-cols-1 absolute lg:top-100 xl:top-100 md:top-100 left-10 top-5  py-1 cursor-pointer"
+      onClick={handleFocus}
+      /* style={{
+        width: '100px', // Adjust width to make the div smaller
+        display: 'flex',
+        alignItems: 'center', // Center items vertically
+      }} //
+    >
+      <Image src={FocusIcon} alt="buttonIcon" className="h-8 w-8"  /> 
+      
+      {/* <svg
+        version="1.1"
+        id="Layer_1"
+        x="0px"
+        y="0px"
+        viewBox="0 0 74.4 73.9"
+        className="h-5 w-5 text-black" // Adjust size and color as needed
+        style={{ marginRight: '10px' }} // Space between icon and text
+      >
+        <g>
+          <path className="st0" d="M37.2,2.1c19.2,0,34.8,15.7,34.8,34.9c0,19.2-15.7,34.8-34.9,34.8c-19.2,0-34.8-15.7-34.8-34.9
+            C2.4,17.7,18,2.1,37.2,2.1z M37.2,65.5C53,65.5,65.7,52.7,65.8,37C65.8,21.2,53,8.4,37.2,8.4C21.4,8.4,8.7,21.2,8.6,36.9
+            C8.6,52.7,21.4,65.5,37.2,65.5z"/>
+          <path className="st0" d="M52.3,19.8C45.5,32.4,38.8,45,32.1,57.5c-0.1,0-0.1,0-0.2,0c-0.5-5.2-1.1-10.5-1.6-15.9
+            C25,41.1,19.7,40.6,14.5,40c0-0.1,0-0.1-0.1-0.2C27,33.1,39.6,26.4,52.1,19.7C52.2,19.7,52.2,19.8,52.3,19.8z"/>
+        </g>
+      </svg> //
+      
+     
+    </div>
+</div> */}
+            </>
+             )}
 
-                          <div className="grid grid-cols-12 ">
-                            <div className="lg:col-span-1 md:col-span-2 sm:col-span-6 col-span-2"></div>
-                            <div className="lg:col-span-8 md:col-span-8 sm:col-span-8 col-span-9  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time">
-                              {/* {getHour > 12 ? getHourPm : getHour} */}
-                              {item?.date?.slice(11, 19)}, {item?.time}
-                              {/* {period} */}
-                              {/* {moment(item?.date)
-                              date.format("hh:mm A");
-                            
-                                .format("HH:mm:ss A")} */}
-                            </div>
-                            {/* <br></br>
-                            <div className="lg:col-span-2 md:col-span-2 sm:col-span-6 col-span-2"></div>
-                            <div className="lg:col-span-9 md:col-span-8 sm:col-span-8 col-span-11  mx-2 text-center text-red text-bold px-1 w-full   text-sm border-2 border-red stop_details_time mt-3">
-                              Duration: {item?.time}
-                            </div> */}
-                          </div>
-                          <br></br>
-                          <hr className="text-gray"></hr>
-                        </div>
-                      ) : (
-                        ""
-                      );
-                    })}
-                    {/* {stops.map((item: any) => (
-                      <div key={item}>
-                        <p className="text-gray px-3 py-3 text-sm">
-                          {item.address}
-                          <br></br>
-                          {item.date}
-                        </p>
-                        <hr className="text-gray"></hr>
-                      </div>
-                    ))} */}
-                  </div>
-                ) : (
-                  ""
-                )}
-              </div>
-
-              <div
-                className="xl:col-span-7 lg:col-span-3 md:col-span-2 sm:col-span-2
-              col-span-1 "
-              ></div>
-
-              {/* <div className="grid grid-cols-1 absolute shadow-lg rounded-md lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">
-                <div className="col-span-1" style={{ color: "green" }}>
-                  <input
-                    type="checkbox"
-                    onClick={() => {
-                      setShowZones(!showZones);
-                    }}
-                    className="mx-2  mt-1"
-                    style={{ accentColor: "green" }}
-                  />
-                  <button className="text-labelColor font-popins text-sm font-bold">
-                    Show Zones
-                  </button>
-                </div>
-              </div> */}
-              
-              {/* {zoneList?.length > 0 ? (
-                <div
-                  className="grid grid-cols-1 absolute lg:top-10 xl:top-1 md:top-10 top-0 xl:right-10 lg:right-10 md:right-10 sm:right-10 right-1  bg-bgLight py-2 px-2 show_zone_journey_replay"
-                  style={{
-                    borderRadius: "10px",
-                    borderColor: "green",
-                    borderWidth: "3px",
-                    borderStyle: "solid",
-                  }}
-                >
-                  <div className="col-span-1" style={{ color: "green" }}>
-                    <input
-                      type="checkbox"
-                      onClick={() => {
-                        setShowZones(!showZones);
-                      }}
-                      className="mx-2 mt-1"
-                      style={{ accentColor: "green" }}
-                    />
-                    <button className="text-labelColor font-popins text-sm font-bold">
-                      Show Zones
-                    </button>
-                  </div>                  
-                  {showZones && (
-                    <>
-                      <div className="flex items-center mt-2 ml-2">
-                        <div className="lg:col-span-1">
-                          <svg
-                            className={`h-6 w-3 text-blue mr-2`}
-                            viewBox="0 0 24 24"
-                            fill="blue"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinejoin="round"
-                          >
-                            <circle cx="12" cy="12" r="10" />
-                          </svg>
-                        </div>
-                        <span className="text-sm text-labelColor">
-                          On/Off-site
-                        </span>
-                      </div>
-                      <div className="flex items-center mt-2 ml-2">
-                        <div className="lg:col-span-1">
-                          <svg
-                            className={`h-6 w-3 text-red mr-2`}
-                            viewBox="0 0 24 24"
-                            fill="red"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinejoin="round"
-                          >
-                            <circle cx="12" cy="12" r="10" />
-                          </svg>
-                        </div>
-                        <span className="text-sm text-labelColor">
-                          Restricted
-                        </span>
-                      </div>
-                      <div className="flex items-center mt-2 ml-2">
-                        <div className="lg:col-span-1">
-                          <svg
-                            className={`h-6 w-3 text-green mr-2`}
-                            viewBox="0 0 24 24"
-                            fill="green"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinejoin="round"
-                          >
-                            <circle cx="12" cy="12" r="10" />
-                          </svg>
-                        </div>
-                        <span className="text-sm text-labelColor">
-                          City Area
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </div>
-              ) : (
-                ""
-              )} */}
-            </div>
-            <div className="grid lg:grid-cols-10 grid-cols-10" id="speed_meter">
+<div className="grid lg:grid-cols-10 grid-cols-10" id="speed_meter">
               <div className="col-span-2  lg:w-52 md:w-44 sm:w-44 w-48 rounded-md ">
                 {isPlaying || isPaused ? (
                   <div>
@@ -2937,107 +3197,15 @@ key={index}
                 )}
               </div>
             </div>
-
+           {/*   {hidediv && (
             <div
-              // style={{
-              //   position: "absolute",
-              //   left: "0%",
-              //   right: "5%",
-              //   bottom: "0%",
-              // }}
-              className="absolute xl:left-56 lg:left-10 xl:right-20 lg:right-10 xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8  bottom-2  left-1 right-3
+          
+              className="absolute xl:left-56 lg:left-10 xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8  bottom-2  left-1 mr-48
               journey_replay_center_box
               "
             >
-              <div className="grid xl:grid-cols-7 lg:grid-cols-12 md:grid-12 grid-cols-12 lg:gap-5 gap-2 ">
-                <div className="xl:col-span-1 mt-5  lg:col-span-4 md:col-span-4 col-span-4">
-                  {/* <div className="bg-bgPlatBtn rounded-md">
-                    <div className="lg:text-xl text-white font-medium text-center  py-2 text-md mx-1">
-                      <BlinkingTime timezone={session?.timezone} />
-                    </div>
-
-                    <div className=" border-t border-white my-1 lg:w-32 mx-2"></div>
-                    <div className="  ms-1 pb-3">
-                      <Tooltip content="Pause" className="bg-black">
-                        <button
-                          onClick={() => pausebtn && pauseTick()}
-                          className={`${
-                            pausebtn ? "cursor-pointer" : "cursor-not-allowed"
-                          }`}
-                        >
-                          <svg
-                            className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6  mx-1"
-                            // style={{
-                            //   color: stopVehicle === true ? "gray" : "white",
-                            // }}
-                            style={{ color: isPauseColor ? "green" : "white" }}
-                            fill={isPauseColor ? "none" : "none"}
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            strokeWidth="2"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            {" "}
-                            <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                            <line x1="4" y1="4" x2="4" y2="20" />{" "}
-                            <line x1="20" y1="4" x2="20" y2="20" />{" "}
-                            <rect x="9" y="6" width="6" height="12" rx="2" />
-                          </svg>
-                        </button>
-                      </Tooltip>
-                      <Tooltip content="Play" className="bg-black">
-                        <button
-                          onClick={() => playbtn && tick()}
-                          className={`${
-                            playbtn ? "cursor-pointer" : "cursor-not-allowed"
-                          }`}
-                        >
-                          <svg
-                            className="h-5 w-5  lg:mx-2  md:mx-3 sm:mx-3 mx-1"
-                            viewBox="0 0 24 24"
-                            style={{ color: isPlaying ? "green" : "white" }}
-                            fill={isPlaying ? "green" : "white"}
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            {" "}
-                            <polygon points="5 3 19 12 5 21 5 3" />
-                          </svg>
-                        </button>
-                      </Tooltip>
-                      <Tooltip content="Stop" className="bg-black">
-                        <button
-                          onClick={() => stopbtn && stopTick()}
-                          className={`${
-                            stopbtn ? "cursor-pointer" : "cursor-not-allowed"
-                          }`}
-                        >
-                          <svg
-                            className="h-4 w-4 lg:mx-2 md:mx-3 sm:mx-3 mx-1"
-                            width="24"
-                            style={{ color: stopVehicle ? "green" : "white" }}
-                            fill={stopVehicle ? "green" : "white"}
-                            height="24"
-                            viewBox="0 0 24 24"
-                            strokeWidth="2"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            {" "}
-                            <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                            <rect x="4" y="4" width="16" height="16" rx="2" />
-                          </svg>
-                        </button>
-                      </Tooltip>
-                    </div>
-                  </div> */}
-                </div>
+              <div className="grid xl:grid-cols-3 lg:grid-cols-3 md:grid-3 grid-cols-3 lg:gap-3 gap-2 ">
+               
                 <div className="xl:col-span-4 lg:col-span-8 col-span-12  journey_replay_slider ">
                   <div className="grid lg:grid-cols-12 grid-cols-12 gap-1 lg:py-5 py-2 mt-8 pt-4 lg:pt-4 rounded-md  mx-2 px-5 bg-white space-x-4 ">
                     <div
@@ -3046,9 +3214,7 @@ key={index}
                     >
                       <Slider
                         value={currentPositionIndex}
-                        // defaultValue={progressWidth}
-                        // max={maxSliderValue}
-                        // min={minSliderValue}
+                  
                         onChange={handleChangeValueSlider}
                         color="secondary"
                         style={{
@@ -3057,16 +3223,7 @@ key={index}
                         }}
                         max={polylinedata.length}
                         disabled={isPlaying ? false : true}
-                        // style={{
-                        //   backgroundColor: "lightgreen",
-                        //   color: "red !important",
-                        //   height: "0.6vh",
-                        // }}
-                        // min={progressminvalue}
-                        // onChange={changeProgressOnClick}
-                        // max={progressmaxvalue}
-                        // value={progressVal || cursor}
-                        // className="replay-slider-inner"
+                       
                       />
                       <div
                         style={{ display: "flex", justifyContent: "center" }}
@@ -3075,7 +3232,7 @@ key={index}
                           <div className="col-span-5 ">
                             {isDynamicTime.TripStartTimeLabel}
                           </div>
-                          {/* <div className="col-span-3"></div> */}
+                 
                           <div className="col-span-6 play_pause_icon">
                             <Tooltip content="Pause" className="bg-black">
                               <button
@@ -3184,70 +3341,19 @@ key={index}
                           </div>
                         </div>
                       </div>
-                      {/* <div className="grid grid-cols-12 ">
-                        <div className="col-span-11">
-                          <p className="text-sm color-labelColor">
-                            {" "}
-                            {isDynamicTime.TripStartTimeLabel}
-                          </p>
-                        </div>
-                        <div className="col-span-1">
-                          <p className="text-sm color-labelColor text-start">
-                            {isDynamicTime.TripEndTimeLabel}
-                          </p>
-                        </div>
-                      </div> */}
+                    
                     </div>
 
                     <div className="lg:col-span-2 md:col-span-3 col-span-4 mt-2 select_journey_speed">
                       {isPlaying && (
-                        // <Select
-                        //   className="text-black  outline-green border h-8 w-16 border-grayLight px-1"
-                        //   value={speedFactor}
-                        //   onChange={(e) => setSpeedFactor(Number(e.value))}
-                        //   style={{
-                        //     color: getShowRadioButton ? "black" : "",
-                        //     paddingTop: getShowRadioButton ? "4%" : "2%",
-                        //     paddingLeft: getShowRadioButton ? "12%" : "3%",
-                        //     fontWeight: getShowRadioButton ? "bold" : "bold",
-                        //   }}
-                        // >
-                        //   <MenuItem
-                        //     className="hover:bg-green hover:text-white text-sm w-full"
-                        //     value={1}
-                        //     id="select_slider"
-                        //   >
-                        //     1x
-                        //   </MenuItem>
-                        //   <MenuItem
-                        //     className="hover:bg-green hover:text-white text-sm w-full"
-                        //     value={2}
-                        //     id="select_slider"
-                        //   >
-                        //     2x
-                        //   </MenuItem>
-                        //   <MenuItem
-                        //     className=" text-md w-full "
-                        //     value={4}
-                        //     id="select_slider"
-                        //   >
-                        //     4x{" "}
-                        //   </MenuItem>
-                        //   <MenuItem
-                        //     className="hover:bg-green hover:text-white text-sm w-full"
-                        //     value={6}
-                        //     id="select_slider"
-                        //   >
-                        //     6x
-                        //   </MenuItem>
-                        // </Select>
+                       
                         <Select
                           onChange={(e: any) => setSpeedFactor(Number(e.value))}
                           options={SpeedOption}
-                          placeholder="1x"
+                          placeholder="4x"
                           isSearchable={false}
                           className="rounded-md h-10 -mt-3 w-full outline-green border border-grayLight"
-                          defaultValue={SpeedOption[0]}
+                          defaultValue={SpeedOption[2]}
                           styles={{
                             control: (provided, state) => ({
                               ...provided,
@@ -3286,8 +3392,302 @@ key={index}
                 </div>
               </div>
             </div>
+            )} */}
+{hideicondiv && hidediv && (
+  <div
+    className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2 cursor-pointer"
+    onClick={() => setIsChecked(!isChecked)}
+    style={{
+      borderRadius: '10px',
+      borderColor: 'green',
+      borderWidth: '3px',
+      borderStyle: 'solid',
+      width: '160px', // Adjust width to make the div smaller
+      backgroundColor: 'white',
+      
+    }}
+  >
+    {/* Button and Checkbox */}
+    <div className="col-span-1" style={{ color: 'green' }}>
+      <button
+        className="text-labelColor font-popins text-xs font-bold ml-4" // Reduced font size and margin
+        style={{
+          width: '80%', // Make the button fill the container width
+          backgroundColor: 'white',
+        }}
+      >
+        Show Icon Details
+      </button>
+    </div>
+
+    {/* Modal Content */}
+    {isChecked && TravelHistoryresponse?.length > 0 && (
+      <div className="mt-2 ml-1">
+        {/* Location Start and End */}
+        <div className="grid grid-cols-12 gap-2 mb-3">
+          <div className="col-span-2 flex flex-col items-center mt-1">
+            <Image src={markerA} alt="startIcon" className="h-4 w-4 mb-1" /> {/* Smaller icon size */}
+            <Image src={markerB} alt="endIcon" className="h-4 w-4 mt-1" /> {/* Smaller icon size */}
+          </div>
+          <div className="col-span-10 text-xs font-semibold mt-1"> {/* Reduced font size */}
+            <p>Location start</p>
+            <p className="mt-2">Location End</p>
           </div>
         </div>
+
+        {/* Harsh Acceleration, Cornering, and Braking */}
+        <div className="space-y-2"> {/* Reduced spacing */}
+          {TravelHistoryresponse?.filter((item) =>
+            item.vehicleEvents.some(
+              (event) => event.Event === 'HarshAcceleration'
+            )
+          ).length > 0 && (
+            <div className="flex items-center gap-2">
+              <Image src={HarshAccelerationIcon} alt="harshAccelerationIcon" className="h-4 w-4" /> {/* Smaller icon size */}
+              <div
+                className="text-xs font-semibold"
+                style={{
+                  maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                Harsh Acceleration (x
+                {TravelHistoryresponse.reduce((count, item) =>
+                  count +
+                  item.vehicleEvents.filter(
+                    (event) => event.Event === 'HarshAcceleration'
+                  ).length
+                , 0)}
+                )
+              </div>
+            </div>
+          )}
+
+          {TravelHistoryresponse?.filter((item) =>
+            item.vehicleEvents.some(
+              (event) => event.Event === 'HarshCornering'
+            )
+          ).length > 0 && (
+            <div className="flex items-center gap-2">
+              <Image src={HarshCornerningIcon} alt="harshCorneringIcon" className="h-4 w-4" /> {/* Smaller icon size */}
+              <div
+                className="text-xs font-semibold"
+                style={{
+                  maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                Harsh Cornering (x
+                {TravelHistoryresponse.reduce((count, item) =>
+                  count +
+                  item.vehicleEvents.filter(
+                    (event) => event.Event === 'HarshCornering'
+                  ).length
+                , 0)}
+                )
+              </div>
+            </div>
+          )}
+
+          {TravelHistoryresponse?.filter((item) =>
+            item.vehicleEvents.some(
+              (event) => event.Event === 'HarshBreak'
+            )
+          ).length > 0 && (
+            <div className="flex items-center gap-2">
+              <Image src={harshAcceleration} alt="harshBrakingIcon" className="h-4 w-4" /> {/* Smaller icon size */}
+              <div
+                className="text-xs font-semibold"
+                style={{
+                  maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                Harsh Break (x
+                {TravelHistoryresponse.reduce((count, item) =>
+                  count +
+                  item.vehicleEvents.filter(
+                    (event) => event.Event === 'HarshBreak'
+                  ).length
+                , 0)}
+                )
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+  </div>
+)}
+
+
+
+{hidediv &&  ( 
+
+<div className="absolute xl:left-56  xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8 bottom-2 left-10  rounded-md  ml-0  2xl:ml-48">
+  <div className="grid lg:grid-cols-5 grid-cols-5 gap-1 lg:py-5 py-2 pt-4 lg:pt-4 rounded-md mx-2 px-5 bg-white space-x-4">
+    <div className="lg:col-span-4 md:col-span-4 col-span-4">
+      <Slider
+        value={currentPositionIndex}
+        onChange={handleChangeValueSlider}
+        color="secondary"
+        style={{
+          color: "#00B56C",
+          cursor: isPlaying ? "pointer" : "not-allowed",
+        }}
+        max={polylinedata.length}
+        disabled={!isPlaying}
+      />
+      <div className="flex justify-center">
+        <div className="grid grid-cols-6">
+          <div className="col-span-2">
+            {isDynamicTime.TripStartTimeLabel}
+          </div>
+          <div className="col-span-3 flex items-center justify-center space-x-2">
+            <Tooltip content="Pause" className="bg-black">
+              <button
+                onClick={() => pausebtn && pauseTick()}
+                className={`h-5 w-5 ${pausebtn ? "cursor-pointer" : "cursor-not-allowed"}`}
+              >
+                <svg
+                  className="h-5 w-5"
+                  style={{ color: isPauseColor ? "green" : "black" }}
+                  fill={isPauseColor ? "none" : "none"}
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" />
+                  <line x1="4" y1="4" x2="4" y2="20" />
+                  <line x1="20" y1="4" x2="20" y2="20" />
+                  <rect x="9" y="6" width="6" height="12" rx="2" />
+                </svg>
+              </button>
+            </Tooltip>
+            <Tooltip content="Play" className="bg-black">
+              <button
+                onClick={() => playbtn && tick()}
+                className={`h-5 w-5 ${playbtn ? "cursor-pointer" : "cursor-not-allowed"}`}
+              >
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  style={{ color: isPlaying ? "green" : "black" }}
+                  fill={isPlaying ? "green" : "black"}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+              </button>
+            </Tooltip>
+            <Tooltip content="Stop" className="bg-black">
+              <button
+                onClick={() => stopbtn && stopTick()}
+                className={`h-4 w-4 ${stopbtn ? "cursor-pointer" : "cursor-not-allowed"}`}
+              >
+                <svg
+                  className="h-4 w-4"
+                  width="24"
+                  style={{ color: stopVehicle ? "green" : "black" }}
+                  fill={stopVehicle ? "green" : "black"}
+                  height="24"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" />
+                  <rect x="4" y="4" width="16" height="16" rx="2" />
+                </svg>
+              </button>
+            </Tooltip>
+          </div>
+          <div className="col-span-1">
+            {isDynamicTime.TripEndTimeLabel}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div className="lg:col-span-1 md:col-span-1 col-span-1 mt-2">
+      {(isPlaying || isPaused) && (
+        <Select
+          onChange={(e: any) => setSpeedFactor(Number(e.value))}
+          options={SpeedOption}
+          placeholder="4X"
+          isSearchable={false}
+          className="rounded-md h-10 w-full outline-green border border-gray-300"
+          defaultValue={SpeedOption[2]}
+          styles={{
+            control: (provided, state) => ({
+              ...provided,
+              border: "none",
+              boxShadow: state.isFocused ? null : null,
+            }),
+            menu: (provided, state) => ({
+              ...provided,
+              zIndex: 9999,
+              position: "absolute",
+              top: "auto",
+              bottom: "100%",
+            }),
+            option: (provided, state) => ({
+              ...provided,
+              backgroundColor: state.isSelected
+                ? "#00B56C"
+                : state.isFocused
+                ? "white"
+                : "transparent",
+              color: state.isSelected
+                ? "white"
+                : state.isFocused
+                ? "black"
+                : "black",
+              "&:hover": {
+                backgroundColor: "#00B56C",
+                color: "white",
+              },
+            }),
+          }}
+        />
+      )}
+    </div>
+  </div>
+</div>
+
+
+)}
+{/* {isPlaying && userclick && (  */}
+
+
+    
+
+
+
+
+          </div>
+          
+        </div>
+        
         <Toaster position="top-center" reverseOrder={false} />
       </div>
     </>
