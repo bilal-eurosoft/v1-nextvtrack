@@ -225,7 +225,7 @@ export default function JourneyReplayComp() {
     } */
    
     const map = useMap();
-    console.log("click" ,userclick , isPlaying)
+    
     if(userclick && isPlaying ){
       return null
     }

@@ -48,6 +48,8 @@ export default function Command() {
   const [filteredDataIsAvaialable, setfilteredDataIsAvaialable] =
     useState<boolean>(true);
   const [gprsData, setGprsData] = useState([]);
+  const [gprs, setGprs] = useState([]);
+  
 
   const handleVehicleChange = (e: any) => {
     if (e == null) {
@@ -176,81 +178,82 @@ export default function Command() {
             clientId: session?.clientId
           });
           
-          let data: any = [];
-          response.map((i: any, index: any) => {
-            let r: any = vehicleList.find((j) => {
-              return j.deviceIMEI == i.deviceIMEI;
-            });
+          setGprs(response)
+          // let data: any = [];
+          // response.map((i: any, index: any) => {
+          //   let r: any = vehicleList.find((j) => {
+          //     return j.deviceIMEI == i.deviceIMEI;
+          //   });
           
 
-            if (r) {
-              let { clientId, vehicleReg, Label1, dualCam, immobilising } = r;
-              let devicestatus;
-              if (dualCam && immobilising) {
-                let c = i.commandtext.split(" ");
-                if (
-                  c[0] == "setdigout" &&
-                  c[1] == "2" &&
-                  i.status == "Pending"
-                ) {
-                  // if(i.status=="Pending"){
-                  if (!i.commandResponse) {
-                    devicestatus = "Activation in process";
-                  } else {
-                    devicestatus = "Activated";
-                  }
-                } else if (
-                  c[0] == "setdigout" &&
-                  c[1] == "0" &&
-                  i.status == "Pending"
-                ) {
+          //   if (r) {
+          //     let { clientId, vehicleReg, Label1, dualCam, immobilising } = r;
+          //     let devicestatus;
+          //     if (dualCam && immobilising) {
+          //       let c = i.commandtext.split(" ");
+          //       if (
+          //         c[0] == "setdigout" &&
+          //         c[1] == "2" &&
+          //         i.status == "Pending"
+          //       ) {
+          //         // if(i.status=="Pending"){
+          //         if (!i.commandResponse) {
+          //           devicestatus = "Activation in process";
+          //         } else {
+          //           devicestatus = "Activated";
+          //         }
+          //       } else if (
+          //         c[0] == "setdigout" &&
+          //         c[1] == "0" &&
+          //         i.status == "Pending"
+          //       ) {
                  
-                  if (!i.commandResponse) {
-                    devicestatus = "Deactivation in process";
-                  } else {
-                    devicestatus = "Deactivated";
-                  }
-                }
-              } else if (immobilising) {
-                let c = i.commandtext.split(" ");
-                if (c[0] == "setdigout" && c[1] == "1") {
+          //         if (!i.commandResponse) {
+          //           devicestatus = "Deactivation in process";
+          //         } else {
+          //           devicestatus = "Deactivated";
+          //         }
+          //       }
+          //     } else if (immobilising) {
+          //       let c = i.commandtext.split(" ");
+          //       if (c[0] == "setdigout" && c[1] == "1") {
                 
-                  if (!i.commandResponse) {
-                    devicestatus = "Activation in process";
-                  } else {
-                    devicestatus = "Activated";
-                  }
-                } else if (c[0] == "setdigout" && c[1] == "0") {
+          //         if (!i.commandResponse) {
+          //           devicestatus = "Activation in process";
+          //         } else {
+          //           devicestatus = "Activated";
+          //         }
+          //       } else if (c[0] == "setdigout" && c[1] == "0") {
                  
-                  if (!i.commandResponse) {
-                    devicestatus = "Deactivation in process";
-                  } else {
-                    devicestatus = "Deactivated";
-                  }
-                }
-              }
+          //         if (!i.commandResponse) {
+          //           devicestatus = "Deactivation in process";
+          //         } else {
+          //           devicestatus = "Deactivated";
+          //         }
+          //       }
+          //     }
 
-              if (devicestatus != undefined) {
-                data.push({
-                  ...i,
-                  clientId,
-                  vehicleReg,
-                  Label1,
-                  dualCam,
-                  immobilising,
-                  devicestatus
-                });
-              }
-            }
+          //     if (devicestatus != undefined) {
+          //       data.push({
+          //         ...i,
+          //         clientId,
+          //         vehicleReg,
+          //         Label1,
+          //         dualCam,
+          //         immobilising,
+          //         devicestatus
+          //       });
+          //     }
+          //   }
 
-            if (index == (response.length - 1)) {
-              setGprsData(data);
+          //   if (index == (response.length - 1)) {
+          //     setGprsData(data);
               
-              setFilteredRecords(data);
-              setLoading(false);
-              setfilteredDataIsAvaialable(true)
-            }
-          });
+          //     setFilteredRecords(data);
+          //     setLoading(false);
+          //     setfilteredDataIsAvaialable(true)
+          //   }
+          // });
         }
       } catch (error) {
         console.error("Error fetching  data:", error);
@@ -264,6 +267,83 @@ export default function Command() {
       setgprsdataget(false);
     }
   }, [session]);
+  useEffect(()=>{
+    let data: any = [];
+    gprs.map((i: any, index: any) => {
+      let r: any = vehicleList.find((j) => {
+        return j.deviceIMEI == i.deviceIMEI;
+      });
+    
+
+      if (r) {
+        let { clientId, vehicleReg, Label1, dualCam, immobilising } = r;
+        let devicestatus;
+        if (dualCam && immobilising) {
+          let c = i.commandtext.split(" ");
+          if (
+            c[0] == "setdigout" &&
+            c[1] == "2" &&
+            i.status == "Pending"
+          ) {
+            // if(i.status=="Pending"){
+            if (!i.commandResponse) {
+              devicestatus = "Activation in process";
+            } else {
+              devicestatus = "Activated";
+            }
+          } else if (
+            c[0] == "setdigout" &&
+            c[1] == "0" &&
+            i.status == "Pending"
+          ) {
+           
+            if (!i.commandResponse) {
+              devicestatus = "Deactivation in process";
+            } else {
+              devicestatus = "Deactivated";
+            }
+          }
+        } else if (immobilising) {
+          let c = i.commandtext.split(" ");
+          if (c[0] == "setdigout" && c[1] == "1") {
+          
+            if (!i.commandResponse) {
+              devicestatus = "Activation in process";
+            } else {
+              devicestatus = "Activated";
+            }
+          } else if (c[0] == "setdigout" && c[1] == "0") {
+           
+            if (!i.commandResponse) {
+              devicestatus = "Deactivation in process";
+            } else {
+              devicestatus = "Deactivated";
+            }
+          }
+        }
+
+        if (devicestatus != undefined) {
+          data.push({
+            ...i,
+            clientId,
+            vehicleReg,
+            Label1,
+            dualCam,
+            immobilising,
+            devicestatus
+          });
+        }
+      }
+
+      if (index == (gprs.length - 1)) {
+        setGprsData(data);
+        
+        setFilteredRecords(data);
+        setLoading(false);
+        setfilteredDataIsAvaialable(true)
+      }
+    });
+  },[gprs])
   const recordsPerPage = 8;
   const lastIndex = currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;

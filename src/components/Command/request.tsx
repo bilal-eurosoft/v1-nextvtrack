@@ -80,7 +80,7 @@ export default function Request({setgprsdataget}:any) {
           //           })                  
                     
 
-                    setVehicleList(d);
+                    // setVehicleList(d);
         }
       } catch (error) {
         console.error("Error fetching zone data:", error);
@@ -140,7 +140,6 @@ export default function Request({setgprsdataget}:any) {
     // localStorage.setItem("selectedVehicle", selectedVehicle?.vehicleReg);
     setSelectedVehicle(selectedVehicle || null);
   };
-  console.log(vehicleList)
   const options =
     vehicleList?.length > 0
       ? vehicleList?.map((item: any) => ({
