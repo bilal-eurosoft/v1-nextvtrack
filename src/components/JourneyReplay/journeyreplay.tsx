@@ -286,7 +286,8 @@ export default function JourneyReplayComp() {
   const pauseTick = async () => {
     setIsPlaying(false);
     setPauseBtn(false);
-    sethideicondiv(true)
+    sethideicondiv(false)
+    
    // setSpeedFactor(4);
     setStopBtn(true);
     setPlayBtn(true);

@@ -261,12 +261,12 @@ export default function Command() {
     };
 
     // if (vehicleList?.length > 0 && (filteredRecords?.length == 0 || loading || gprsdataget) ) {
-    if (filteredRecords?.length == 0 || gprsData.length == 0) {
+    if (filteredRecords?.length == 0 || gprsData.length == 0 || gprsdataget ) {
       
       getGprsData();
       setgprsdataget(false);
     }
-  }, [session]);
+  }, [session, gprsdataget]);
   useEffect(()=>{
     let data: any = [];
     gprs.map((i: any, index: any) => {
@@ -361,8 +361,44 @@ export default function Command() {
   //     label: item.vehicleReg
   //   })) || [];
 
+  const svgStyle = {
+    transition: 'transform 0.3s ease, fill 0.3s ease',
+};
+
+const handleMouseOver = (e: { currentTarget: { style: { transform: string; fill: string; }; }; }) => {
+    e.currentTarget.style.transform = 'scale(1.1)';
+    e.currentTarget.style.fill = '#000000'; // Change this to your desired hover color
+};
+
+const handleMouseOut = (e: { currentTarget: { style: { transform: string; fill: string; }; }; }) => {
+    e.currentTarget.style.transform = 'scale(1)';
+    e.currentTarget.style.fill = '#ffffff'; // Original color
+};
+
+const [isBlinking, setIsBlinking] = useState(false);
+
+const handleReload = () => {
+  
+  setIsBlinking(true);
+ 
+  
+  // Simulate data fetching or reloading here
+  setTimeout(() => {
+    setIsBlinking(false);
+    setgprsdataget(true)
+    // Fetch your data here
+  }, 500); // Duration matches the blinking effect
+};
+
+const blinkingStyle = {
+  visibility: isBlinking ? 'hidden' : 'visible',
+  transition: 'visibility 0.1s linear',
+};
+
+
+
   return (
-    <div>
+    <div >
       <hr className="text-white"></hr>
       <p className="bg-green px-4 py-1 text-white mb-5 font-bold text-center">
         Immobilizing Management
@@ -424,7 +460,7 @@ export default function Command() {
                 {/* <div className="hidden lg:grid lg:grid-cols-12 px-4 md:px-6 lg:px-10 items-center"> */}
                 <div className="hidden lg:grid lg:grid-cols-12 lg:gap-4 px-4 md:px-6 lg:px-10 items-center">
                   <div className="lg:col-span-4 flex flex-col">
-                    <label className="txt-green mb-1">From</label>
+                    <label className="text-green mb-1">From</label>
                     <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
                       <DatePicker
                         format="MM/dd/yyyy"
@@ -613,20 +649,39 @@ export default function Command() {
                 // <Loading />
                 <div className="grid grid-cols-1  gap-5 ">
                   <div className="col-span-1 shadow-lg w-full ">
-                    <div className="bg-green shadow-lg sticky top-0">
-                      <h1
-                        className="text-center text-xl text-white font-serif pb-2 pt-2"
-                        style={{ fontWeight: "900" }}
-                      >
-                        Immobilizing Data
-                      </h1>
-                    </div>
+                  <div className="bg-green shadow-lg sticky top-0 flex items-center justify-center" >
+  <h1
+    className="text-center text-xl text-white font-serif pb-2 pt-2 flex items-center"
+    style={{ fontWeight: "900", cursor: "pointer"} }
+    
+  >
+    Immobilizing Data
+
+      <svg onClick={handleReload}
+            style={svgStyle}
+            height="30px"
+            width="50px"
+            viewBox="-53.87 -53.87 597.44 597.44"
+            stroke="#ffffff"
+            strokeWidth="7.835168"
+            onMouseOver={handleMouseOver}
+            onMouseOut={handleMouseOut}
+        >
+            <g>
+                <path d="M468.999,227.774c-11.4,0-20.8,8.3-20.8,19.8c-1,74.9-44.2,142.6-110.3,178.9c-99.6,54.7-216,5.6-260.6-61l62.9,13.1 c10.4,2.1,21.8-4.2,23.9-15.6c2.1-10.4-4.2-21.8-15.6-23.9l-123.7-26c-7.2-1.7-26.1,3.5-23.9,22.9l15.6,124.8 c1,10.4,9.4,17.7,19.8,17.7c15.5,0,21.8-11.4,20.8-22.9l-7.3-60.9c101.1,121.3,229.4,104.4,306.8,69.3 c80.1-42.7,131.1-124.8,132.1-215.4C488.799,237.174,480.399,227.774,468.999,227.774z" />
+                <path d="M20.599,261.874c11.4,0,20.8-8.3,20.8-19.8c1-74.9,44.2-142.6,110.3-178.9c99.6-54.7,216-5.6,260.6,61l-62.9-13.1 c-10.4-2.1-21.8,4.2-23.9,15.6c-2.1,10.4,4.2,21.8,15.6,23.9l123.8,26c7.2,1.7,26.1-3.5,23.9-22.9l-15.6-124.8 c-1-10.4-9.4-17.7-19.8-17.7c-15.5,0-21.8,11.4-20.8,22.9l7.2,60.9c-101.1-121.2-229.4-104.4-306.8-69.2 c-80.1,42.6-131.1,124.8-132.2,215.3C0.799,252.574,9.199,261.874,20.599,261.874z" />
+            </g>
+        </svg>
+
+  </h1>
+   </div>
+
 
                     <TableContainer component={Paper}>
                       <div>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                           <TableHead className="sticky top-0   font-bold">
-                            <TableRow className=" text-white font-bold   ">
+                          <TableRow  style={blinkingStyle}>
                               <TableCell
                                 align="center"
                                 className="border-r border-green  font-popins font-bold "
@@ -655,17 +710,11 @@ export default function Command() {
                               >
                                 Status
                               </TableCell>
-                              {/* <TableCell
-                                        align="center"
-                                        className="border-r border-green text-center font-popins font-bold "
-                                        style={{ fontSize: "20px" }}
-                                      >
-                                        Action
-                                      </TableCell> */}
+                            
                             </TableRow>
                           </TableHead>
                           {filteredDataIsAvaialable === false ? (
-                            <TableRow>
+                            <TableRow style={blinkingStyle}>
                               <TableCell colSpan={4} align="center">
                                 <p
                                   className="mt-10 font-bold"
@@ -676,7 +725,7 @@ export default function Command() {
                               </TableCell>
                             </TableRow>
                           ) : (
-                            <TableBody>
+                            <TableBody style={blinkingStyle}>
                               {records.map((item: any, index: any) => {
                                 return (
                                   <TableRow
@@ -715,13 +764,9 @@ export default function Command() {
                                     >
                                       {
                                         item?.createdDate
-                                        // new Date(
-                                        //   item.createdDate
-                                        // ).toLocaleString("en-US", {
-                                        //   timeZone: session?.timezone
-                                        // })
+                                        
                                       }
-                                      {/* {item?.createdAt?.split(".")[0].split("T").join(" ")} */}
+                                    
                                     </TableCell>
                                     <TableCell
                                       align="center"
