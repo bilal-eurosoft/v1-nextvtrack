@@ -20,9 +20,6 @@ import moment from "moment";
 import { DeviceAttach } from "@/types/vehiclelistreports";
 import { Toaster, toast } from "react-hot-toast";
 import "./newstyle.css";
-import { List, ListItem, ListItemText, Collapse } from "@material-ui/core";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import DateFnsMomentUtils from "@date-io/date-fns";
 import EventIcon from "@material-ui/icons/Event";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
@@ -30,30 +27,26 @@ import Request from "./request";
 import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import logo from "../../../public/Images/loadinglogo.png";
 import { useSession } from "next-auth/react";
-import { set } from "date-fns";
+
 export default function Command() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [gprsdataget, setgprsdataget] = useState(false);
-
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [input, setInput] = useState<any>(1);
-  const [activeTab, setActiveTab] = useState("View");
-  const handleClick = (tab: string) => {
-    setLoading(true);
-    setActiveTab((prevTab) => (prevTab === tab ? "View" : tab));
-  };
   const [selectedVehiclelist, setSelectedVehiclelist] = useState<any>("");
   const [filteredRecords, setFilteredRecords] = useState([]);
   const [filteredDataIsAvaialable, setfilteredDataIsAvaialable] =
     useState<boolean>(true);
   const [gprsData, setGprsData] = useState([]);
   const [gprs, setGprs] = useState([]);
-  
+
 
   const handleVehicleChange = (e: any) => {
     if (e == null) {
       setFilteredRecords(gprsData);
+      setfilteredDataIsAvaialable(true)
+      setCurrentPage(1)
     }
     setSelectedVehiclelist(e);
   };
@@ -78,15 +71,7 @@ export default function Command() {
       toast.error("Please select Vehicle");
       return;
     }
-    // if (!fromDate) {
-    //   toast.error("Please select From Date");
-    //   return;
-    // }
 
-    // if (!toDate) {
-    //   toast.error("Please select To Date");
-    //   return;
-    // }
     if (fromDate && toDate) {
       const fromDateString = (fromDate as any).toISOString().split("T")[0];
       const toDateString = (toDate as any).toISOString().split("T")[0];
@@ -99,18 +84,18 @@ export default function Command() {
       if (selectedVehiclelist === null || selectedVehiclelist === "") {
         setFilteredRecords(filtered);
         setCurrentPage(1);
-        // if (filtered.length === 0) {
-        //   setfilteredDataIsAvaialable(false);
-        // }
+        if (filtered.length === 0) {
+          setfilteredDataIsAvaialable(false);
+        }
       } else {
         const filteredWithVehicle = filtered.filter(
           (record: any) => record.Label1 === selectedVehiclelist?.value
         );
         setFilteredRecords(filteredWithVehicle);
         setCurrentPage(1);
-        // if (filteredWithVehicle.length === 0) {
-        //   setfilteredDataIsAvaialable(false);
-        // }
+        if (filteredWithVehicle.length === 0) {
+          setfilteredDataIsAvaialable(false);
+        }
       }
     } else if (selectedVehiclelist !== null || selectedVehiclelist !== "") {
       const filteredWithVehicle = gprsData.filter(
@@ -119,9 +104,9 @@ export default function Command() {
 
       setFilteredRecords(filteredWithVehicle);
       setCurrentPage(1);
-      //   if (filteredWithVehicle.length === 0) {
-      //     setfilteredDataIsAvaialable(false);
-      //   }
+        if (filteredWithVehicle.length === 0) {
+          setfilteredDataIsAvaialable(false);
+        }
     }
     //   else {
     //     setFilteredRecords(filteredRecords);
@@ -136,9 +121,15 @@ export default function Command() {
       const filteredWithVehicle = gprsData.filter(
         (record: any) => record.Label1 === selectedVehiclelist?.value
       );
+      if(filteredWithVehicle.length>0){
+        setfilteredDataIsAvaialable(true)
+      }
       setFilteredRecords(filteredWithVehicle);
       setCurrentPage(1);
     } else {
+      if(gprsData.length>0){
+        setfilteredDataIsAvaialable(true)
+      }
       setFilteredRecords(gprsData);
     }
   };
@@ -177,83 +168,9 @@ export default function Command() {
             token: session?.accessToken,
             clientId: session?.clientId
           });
-          
-          setGprs(response)
-          // let data: any = [];
-          // response.map((i: any, index: any) => {
-          //   let r: any = vehicleList.find((j) => {
-          //     return j.deviceIMEI == i.deviceIMEI;
-          //   });
-          
 
-          //   if (r) {
-          //     let { clientId, vehicleReg, Label1, dualCam, immobilising } = r;
-          //     let devicestatus;
-          //     if (dualCam && immobilising) {
-          //       let c = i.commandtext.split(" ");
-          //       if (
-          //         c[0] == "setdigout" &&
-          //         c[1] == "2" &&
-          //         i.status == "Pending"
-          //       ) {
-          //         // if(i.status=="Pending"){
-          //         if (!i.commandResponse) {
-          //           devicestatus = "Activation in process";
-          //         } else {
-          //           devicestatus = "Activated";
-          //         }
-          //       } else if (
-          //         c[0] == "setdigout" &&
-          //         c[1] == "0" &&
-          //         i.status == "Pending"
-          //       ) {
-                 
-          //         if (!i.commandResponse) {
-          //           devicestatus = "Deactivation in process";
-          //         } else {
-          //           devicestatus = "Deactivated";
-          //         }
-          //       }
-          //     } else if (immobilising) {
-          //       let c = i.commandtext.split(" ");
-          //       if (c[0] == "setdigout" && c[1] == "1") {
-                
-          //         if (!i.commandResponse) {
-          //           devicestatus = "Activation in process";
-          //         } else {
-          //           devicestatus = "Activated";
-          //         }
-          //       } else if (c[0] == "setdigout" && c[1] == "0") {
-                 
-          //         if (!i.commandResponse) {
-          //           devicestatus = "Deactivation in process";
-          //         } else {
-          //           devicestatus = "Deactivated";
-          //         }
-          //       }
-          //     }
-
-          //     if (devicestatus != undefined) {
-          //       data.push({
-          //         ...i,
-          //         clientId,
-          //         vehicleReg,
-          //         Label1,
-          //         dualCam,
-          //         immobilising,
-          //         devicestatus
-          //       });
-          //     }
-          //   }
-
-          //   if (index == (response.length - 1)) {
-          //     setGprsData(data);
-              
-          //     setFilteredRecords(data);
-          //     setLoading(false);
-          //     setfilteredDataIsAvaialable(true)
-          //   }
-          // });
+          setGprs(response);
+        
         }
       } catch (error) {
         console.error("Error fetching  data:", error);
@@ -261,30 +178,24 @@ export default function Command() {
     };
 
     // if (vehicleList?.length > 0 && (filteredRecords?.length == 0 || loading || gprsdataget) ) {
-    if (filteredRecords?.length == 0 || gprsData.length == 0 || gprsdataget ) {
-      
+    if (filteredRecords?.length == 0 || gprsData.length == 0 || gprsdataget) {
       getGprsData();
       setgprsdataget(false);
     }
   }, [session, gprsdataget]);
-  useEffect(()=>{
+  useEffect(() => {
     let data: any = [];
     gprs.map((i: any, index: any) => {
       let r: any = vehicleList.find((j) => {
         return j.deviceIMEI == i.deviceIMEI;
       });
-    
 
       if (r) {
         let { clientId, vehicleReg, Label1, dualCam, immobilising } = r;
         let devicestatus;
         if (dualCam && immobilising) {
           let c = i.commandtext.split(" ");
-          if (
-            c[0] == "setdigout" &&
-            c[1] == "2" &&
-            i.status == "Pending"
-          ) {
+          if (c[0] == "setdigout" && c[1] == "2" && i.status == "Pending") {
             // if(i.status=="Pending"){
             if (!i.commandResponse) {
               devicestatus = "Activation in process";
@@ -296,7 +207,6 @@ export default function Command() {
             c[1] == "0" &&
             i.status == "Pending"
           ) {
-           
             if (!i.commandResponse) {
               devicestatus = "Deactivation in process";
             } else {
@@ -306,14 +216,12 @@ export default function Command() {
         } else if (immobilising) {
           let c = i.commandtext.split(" ");
           if (c[0] == "setdigout" && c[1] == "1") {
-          
             if (!i.commandResponse) {
               devicestatus = "Activation in process";
             } else {
               devicestatus = "Activated";
             }
           } else if (c[0] == "setdigout" && c[1] == "0") {
-           
             if (!i.commandResponse) {
               devicestatus = "Deactivation in process";
             } else {
@@ -335,70 +243,89 @@ export default function Command() {
         }
       }
 
-      if (index == (gprs.length - 1)) {
+      if (index == gprs.length - 1) {
         setGprsData(data);
+        setCurrentPage(1);
+
+        let filter=data
+        if (selectedVehiclelist !== null && selectedVehiclelist !== "") {
+          
+          filter = filter.filter(
+            (record: any) => record.Label1 === selectedVehiclelist?.value
+          );
+        }
+        if (fromDate && toDate) {
+          
+
+          const fromDateString = (fromDate as any).toISOString().split("T")[0];
+          const toDateString = (toDate as any).toISOString().split("T")[0];
+
+          filter = filter.filter((record: any) => {
+            const recordDate = (record.createdAt as any).split("T")[0];
+
+            return recordDate >= fromDateString && recordDate <= toDateString;
+          });
+        }
         
-        setFilteredRecords(data);
+        if (filter.length === 0) {
+          setfilteredDataIsAvaialable(false);
+        }
+        
+
+        
+        setFilteredRecords(filter);
         setLoading(false);
-        setfilteredDataIsAvaialable(true)
+        setfilteredDataIsAvaialable(true);
       }
     });
-  },[gprs])
+  }, [gprs]);
   const recordsPerPage = 8;
   const lastIndex = currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
   const records = filteredRecords.slice(firstIndex, lastIndex);
 
   const totalCount: any = Math.ceil(filteredRecords?.length / recordsPerPage);
- 
- 
- useEffect(()=>{
- 
- },[filteredRecords])
-  // const options2 =
-  //   vehicleList?.map((item: any) => ({
-  //     value: item.vehicleReg,
-  //     label: item.vehicleReg
-  //   })) || [];
+
+  // useEffect(() => {}, [filteredRecords]);
 
   const svgStyle = {
-    transition: 'transform 0.3s ease, fill 0.3s ease',
-};
+    transition: "transform 0.3s ease, fill 0.3s ease"
+  };
 
-const handleMouseOver = (e: { currentTarget: { style: { transform: string; fill: string; }; }; }) => {
-    e.currentTarget.style.transform = 'scale(1.1)';
-    e.currentTarget.style.fill = '#000000'; // Change this to your desired hover color
-};
+  const handleMouseOver = (e: {
+    currentTarget: { style: { transform: string; fill: string } };
+  }) => {
+    e.currentTarget.style.transform = "scale(1.1)";
+    e.currentTarget.style.fill = "#000000"; // Change this to your desired hover color
+  };
 
-const handleMouseOut = (e: { currentTarget: { style: { transform: string; fill: string; }; }; }) => {
-    e.currentTarget.style.transform = 'scale(1)';
-    e.currentTarget.style.fill = '#ffffff'; // Original color
-};
+  const handleMouseOut = (e: {
+    currentTarget: { style: { transform: string; fill: string } };
+  }) => {
+    e.currentTarget.style.transform = "scale(1)";
+    e.currentTarget.style.fill = "#ffffff"; // Original color
+  };
 
-const [isBlinking, setIsBlinking] = useState(false);
+  const [isBlinking, setIsBlinking] = useState(false);
 
-const handleReload = () => {
-  
-  setIsBlinking(true);
- 
-  
-  // Simulate data fetching or reloading here
-  setTimeout(() => {
-    setIsBlinking(false);
-    setgprsdataget(true)
-    // Fetch your data here
-  }, 500); // Duration matches the blinking effect
-};
+  const handleReload = () => {
+    setIsBlinking(true);
 
-const blinkingStyle = {
-  visibility: isBlinking ? 'hidden' : 'visible',
-  transition: 'visibility 0.1s linear',
-};
+    // Simulate data fetching or reloading here
+    setTimeout(() => {
+      setIsBlinking(false);
+      setgprsdataget(true);
+      // Fetch your data here
+    }, 500); // Duration matches the blinking effect
+  };
 
-
+  const blinkingStyle = {
+    visibility: isBlinking ? "hidden" : "visible",
+    transition: "visibility 0.1s linear"
+  };
 
   return (
-    <div >
+    <div>
       <hr className="text-white"></hr>
       <p className="bg-green px-4 py-1 text-white mb-5 font-bold text-center">
         Immobilizing Management
@@ -649,39 +576,36 @@ const blinkingStyle = {
                 // <Loading />
                 <div className="grid grid-cols-1  gap-5 ">
                   <div className="col-span-1 shadow-lg w-full ">
-                  <div className="bg-green shadow-lg sticky top-0 flex items-center justify-center" >
-  <h1
-    className="text-center text-xl text-white font-serif pb-2 pt-2 flex items-center"
-    style={{ fontWeight: "900", cursor: "pointer"} }
-    
-  >
-    Immobilizing Data
-
-      <svg onClick={handleReload}
-            style={svgStyle}
-            height="30px"
-            width="50px"
-            viewBox="-53.87 -53.87 597.44 597.44"
-            stroke="#ffffff"
-            strokeWidth="7.835168"
-            onMouseOver={handleMouseOver}
-            onMouseOut={handleMouseOut}
-        >
-            <g>
-                <path d="M468.999,227.774c-11.4,0-20.8,8.3-20.8,19.8c-1,74.9-44.2,142.6-110.3,178.9c-99.6,54.7-216,5.6-260.6-61l62.9,13.1 c10.4,2.1,21.8-4.2,23.9-15.6c2.1-10.4-4.2-21.8-15.6-23.9l-123.7-26c-7.2-1.7-26.1,3.5-23.9,22.9l15.6,124.8 c1,10.4,9.4,17.7,19.8,17.7c15.5,0,21.8-11.4,20.8-22.9l-7.3-60.9c101.1,121.3,229.4,104.4,306.8,69.3 c80.1-42.7,131.1-124.8,132.1-215.4C488.799,237.174,480.399,227.774,468.999,227.774z" />
-                <path d="M20.599,261.874c11.4,0,20.8-8.3,20.8-19.8c1-74.9,44.2-142.6,110.3-178.9c99.6-54.7,216-5.6,260.6,61l-62.9-13.1 c-10.4-2.1-21.8,4.2-23.9,15.6c-2.1,10.4,4.2,21.8,15.6,23.9l123.8,26c7.2,1.7,26.1-3.5,23.9-22.9l-15.6-124.8 c-1-10.4-9.4-17.7-19.8-17.7c-15.5,0-21.8,11.4-20.8,22.9l7.2,60.9c-101.1-121.2-229.4-104.4-306.8-69.2 c-80.1,42.6-131.1,124.8-132.2,215.3C0.799,252.574,9.199,261.874,20.599,261.874z" />
-            </g>
-        </svg>
-
-  </h1>
-   </div>
-
+                    <div className="bg-green shadow-lg sticky top-0 flex items-center justify-center">
+                      <h1
+                        className="text-center text-xl text-white font-serif pb-2 pt-2 flex items-center"
+                        style={{ fontWeight: "900", cursor: "pointer" }}
+                      >
+                        Immobilizing Data
+                        <svg
+                          onClick={handleReload}
+                          style={svgStyle}
+                          height="30px"
+                          width="50px"
+                          viewBox="-53.87 -53.87 597.44 597.44"
+                          stroke="#ffffff"
+                          strokeWidth="7.835168"
+                          onMouseOver={handleMouseOver}
+                          onMouseOut={handleMouseOut}
+                        >
+                          <g>
+                            <path d="M468.999,227.774c-11.4,0-20.8,8.3-20.8,19.8c-1,74.9-44.2,142.6-110.3,178.9c-99.6,54.7-216,5.6-260.6-61l62.9,13.1 c10.4,2.1,21.8-4.2,23.9-15.6c2.1-10.4-4.2-21.8-15.6-23.9l-123.7-26c-7.2-1.7-26.1,3.5-23.9,22.9l15.6,124.8 c1,10.4,9.4,17.7,19.8,17.7c15.5,0,21.8-11.4,20.8-22.9l-7.3-60.9c101.1,121.3,229.4,104.4,306.8,69.3 c80.1-42.7,131.1-124.8,132.1-215.4C488.799,237.174,480.399,227.774,468.999,227.774z" />
+                            <path d="M20.599,261.874c11.4,0,20.8-8.3,20.8-19.8c1-74.9,44.2-142.6,110.3-178.9c99.6-54.7,216-5.6,260.6,61l-62.9-13.1 c-10.4-2.1-21.8,4.2-23.9,15.6c-2.1,10.4,4.2,21.8,15.6,23.9l123.8,26c7.2,1.7,26.1-3.5,23.9-22.9l-15.6-124.8 c-1-10.4-9.4-17.7-19.8-17.7c-15.5,0-21.8,11.4-20.8,22.9l7.2,60.9c-101.1-121.2-229.4-104.4-306.8-69.2 c-80.1,42.6-131.1,124.8-132.2,215.3C0.799,252.574,9.199,261.874,20.599,261.874z" />
+                          </g>
+                        </svg>
+                      </h1>
+                    </div>
 
                     <TableContainer component={Paper}>
                       <div>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                           <TableHead className="sticky top-0   font-bold">
-                          <TableRow  style={blinkingStyle}>
+                            <TableRow style={blinkingStyle}>
                               <TableCell
                                 align="center"
                                 className="border-r border-green  font-popins font-bold "
@@ -710,7 +634,6 @@ const blinkingStyle = {
                               >
                                 Status
                               </TableCell>
-                            
                             </TableRow>
                           </TableHead>
                           {filteredDataIsAvaialable === false ? (
@@ -762,11 +685,7 @@ const blinkingStyle = {
                                         padding: "4px 8px"
                                       }}
                                     >
-                                      {
-                                        item?.createdDate
-                                        
-                                      }
-                                    
+                                      {item?.createdDate}
                                     </TableCell>
                                     <TableCell
                                       align="center"
@@ -802,6 +721,8 @@ const blinkingStyle = {
                             <Pagination
                               count={totalCount}
                               page={input}
+                              
+
                               onChange={handleChange}
                               className="text-sm"
                               // siblingCount={-totalCount}
@@ -816,12 +737,14 @@ const blinkingStyle = {
                             onChange={(e) => {
                               let inputValues: any =
                                 e.target.value.match(/\d+/g);
-                              if (inputValues > 0 && inputValues < totalCount) {
+                              
+                              if (inputValues > 0 && inputValues <= totalCount) {
                                 setInput(parseInt(e.target.value));
 
                                 setCurrentPage(e.target.value);
+                                
                               } else {
-                                setInput("");
+                                setInput(1);
                               }
                             }}
                           />
