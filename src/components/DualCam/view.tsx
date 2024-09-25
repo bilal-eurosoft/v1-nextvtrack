@@ -309,7 +309,7 @@ export default function DualCam() {
         toast.dismiss(toastId);
         setToastId(null);
     }
-    else  if ( socketdata.filetype == ".mp4" && socketdata.progress > 1 && socketdata.progress < 100) {
+    else  if ( socketdata.filetype == ".h265" && socketdata.progress > 1 && socketdata.progress < 100) {
       
         if (!toastId) {
           const id = toast.loading("Video Downloading", {
