@@ -1,5 +1,5 @@
 import { VehicleData } from "@/types/vehicle";
-import { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import { ActiveStatus } from "../General/ActiveStatus";
 import { useSession } from "next-auth/react";
 import { zonelistType } from "../../types/zoneType";
@@ -8,7 +8,10 @@ import { useSearchParams } from "next/navigation";
 import { fetchZone } from "@/lib/slices/zoneSlice";
 import { useSelector } from "react-redux";
 import "./index.css";
+import infoIcon from "../../../public/icon2.svg"
+import infoIcon2 from "../../../public/icon3.svg"
 import { duration } from "moment";
+import Image from "next/image";
 const LiveSidebar = ({
   carData,
   countMoving,
@@ -23,6 +26,9 @@ const LiveSidebar = ({
   setZoom,
   setShowZonePopUp,
   setShowZones,
+  setSelectedOdoVehicle,
+  selectedOdoVehicle,
+  setPosition,
 }: {
   carData: VehicleData[];
   countPause: Number;
@@ -37,6 +43,11 @@ const LiveSidebar = ({
   setZoom: any;
   setShowZonePopUp: any;
   setShowZones: any;
+  setSelectedOdoVehicle:any;
+  selectedOdoVehicle:any;
+  setPosition:any;
+
+
 }) => {
   const { data: session } = useSession();
   const moment = require("moment-timezone");
@@ -166,7 +177,7 @@ const LiveSidebar = ({
   //     duration: dataFilter,
   //   };
   // });
-  
+ 
   useEffect(() => {
     const zoneLatlog = zoneList?.map((item: any) => {
       if (item.zoneType == "Polygon") {
@@ -247,8 +258,26 @@ const LiveSidebar = ({
   //   duration.minutes()
   // )} minutes, ${Math.abs(duration.seconds())} seconds`;
 
+ 
+  const handleodometer = (item:any, e: any) => {
+   
+    const rect = e.currentTarget.getBoundingClientRect(); 
+ if(selectedOdoVehicle?.vehicleReg == item.vehicleReg){
+  setPosition({ top: 0, left: 0 });
+  setSelectedOdoVehicle(null)
+ }
+ else{
+  setSelectedOdoVehicle(item)
   
+ // setPosition({ top: e.clientY , left: e.clientX  });
+ setPosition({ top: rect.top, left: rect.left }); 
 
+ }
+
+  }
+
+
+const [srcimgindex, setsrcimgindex] = useState(null);
   return (
     <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-2  col-span-5 main_sider_bar">
       <div
@@ -357,116 +386,76 @@ const LiveSidebar = ({
       >
         {filteredData?.map((item: VehicleData, index: any) => {
           return (
-            <div key = {index}
-              style={{
-                backgroundColor: activeColor == item.vehicleId ? "#e1f0e3" : "",
-              }}
-              className="hover:bg-[#e1f0e3] cursor-pointer pt-2"
-            >
-              <div onClick={() => handleClickVehicle(item)} key={index}>
-                <div
-                  key={item?.IMEI}
-                  className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 md:space-x-4 text-center py-2"
-                >
-                  <div className="xl:col-span-6 lg:col-span-5  md:col-span-4 sm:col-span-6 col-span-4 status_car_btn">
-                    <div className=" font-popins font-semibold text-start w-full lg:text-2xl text-1xl">
-                      {item.vehicleStatus === "Parked" ? (
-                        <p className="text-[#CF000F] text-start">
-                          {item?.vehicleReg}
-                        </p>
-                      ) : item.vehicleStatus === "Moving" ? (
-                        <p className="text-green text-start">
-                          {item?.vehicleReg}
-                        </p>
-                      ) : (
-                        <p
-                          className={`
-                      ${
-                        item?.vehicleStatus === "Hybrid"
-                          ? "text-black"
-                          : !item?.vehicleStatus
-                          ? "text-[#CF000F] "
-                          : "text-yellow"
-                      }
-                    `}
-                        >
-                          {item?.vehicleReg}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <div
-                    className=" xl:col-span-2 lg:col-span-3 md:col-span-3 sm:col-span-3 col-span-3"
-                    // style={{
-                    //   display: "flex",
-                    //   justifyContent: "start",
-                    //   marginLeft: "-15%",
-                    // }}
-                    id="btn_left_margin"
-                  >
-                    <button
-                      className={`${
-                        item?.vehicleStatus === "Hybrid"
-                          ? "bg-white text-black"
-                          : item?.vehicleStatus === "Moving"
-                          ? "bg-green text-white font-bold"
-                          : item?.vehicleStatus === "Parked"
-                          ? "bg-[#CF000F]  text-white font-bold"
-                          : !item?.vehicleStatus
-                          ? "bg-[#CF000F]  text-white font-bold"
-                          : "bg-yellow text-white font-bold"
-                      } p-1 px-3 -mt-1 shadow-lg`}
-                    >
-                      {item?.vehicleStatus ? item?.vehicleStatus : "Parked"}
-                    </button>
-                  </div>
-                  <div
-                    className="xl:col-span-4 lg:col-span-4 col-span-5 mph_speed"
-                    // id="mph_left"
-                  >
-                    <div className="grid grid-cols-4">
-                      <div className="lg:col-span-3 md:col-span-3 col-span-2 font-bold">
-                        {item.gps.speedWithUnitDesc}
-                      </div>
-                      <div className="text-labelColor lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-1">
-                        {session?.timezone !== undefined ? (
-                          <ActiveStatus
-                            currentTime={new Date().toLocaleString("en-US", {
-                              timeZone: session.timezone,
-                            })}
-                            targetTime={item.timestamp}
-                            reg={item.vehicleReg}
-                          />
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="lg:text-start md:text-start sm:text-start text-center   mt-1  text-md font-bold text-labelColor">
-                  <h1 className="font-popins text-start"> {item.timestamp}</h1>
-
-                  {/* <p className="text-labelColor">{item.zone}</p> */}
-                  {/* <p> */}
-                  {item.DriverName &&
-                    (item?.vehicleStatus === "Moving" ||
-                      item?.vehicleStatus === "Pause") && (
-                      <p className="text-start">
-                        Driver Name: {item.DriverName.replace("undefine", "")}
+            <div key={index} style={{ backgroundColor: activeColor == item.vehicleId ? "#e1f0e3" : "" }} className="hover:bg-[#e1f0e3] cursor-pointer pt-2">
+            <div onClick={() => handleClickVehicle(item)} key={index}>
+              <div key={item?.IMEI} className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 md:space-x-4 text-center py-2">
+            
+                <div className="xl:col-span-6 lg:col-span-5 md:col-span-4 sm:col-span-6 col-span-4 status_car_btn">
+                  <div className="font-popins font-semibold text-start w-full lg:text-2xl text-1xl">
+                    {item.vehicleStatus === "Parked" ? (
+                      <p className="text-[#CF000F] text-start">{item?.vehicleReg}</p>
+                    ) : item.vehicleStatus === "Moving" ? (
+                      <p className="text-green text-start">{item?.vehicleReg}</p>
+                    ) : (
+                      <p className={`${item?.vehicleStatus === "Hybrid" ? "text-black" : !item?.vehicleStatus ? "text-[#CF000F]" : "text-yellow"}`}>
+                        {item?.vehicleReg}
                       </p>
                     )}
-                 
-                 
+                  </div>
+                </div>
+           
+                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3 sm:col-span-3 col-span-3" id="btn_left_margin">
+                  <button className={`${item?.vehicleStatus === "Hybrid" ? "bg-white text-black" : item?.vehicleStatus === "Moving" ? "bg-green text-white font-bold" : item?.vehicleStatus === "Parked" ? "bg-[#CF000F] text-white font-bold" : !item?.vehicleStatus ? "bg-[#CF000F] text-white font-bold" : "bg-yellow text-white font-bold"} p-1 px-3 -mt-1 shadow-lg`}>
+                    {item?.vehicleStatus ? item?.vehicleStatus : "Parked"}
+                  </button>
+                </div>
+           
+                <div className="xl:col-span-4 lg:col-span-4 col-span-5 mph_speed">
+                  <div className="grid grid-cols-4">
+                    <div className="lg:col-span-3 md:col-span-3 col-span-2 font-bold">{item.gps.speedWithUnitDesc}</div>
+                    <div className="text-labelColor lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-1">
+                      {session?.timezone !== undefined ? (
+                        <ActiveStatus
+                          currentTime={new Date().toLocaleString("en-US", { timeZone: session.timezone })}
+                          targetTime={item.timestamp}
+                          reg={item.vehicleReg}
+                        />
+                      ) : ""}
+                    </div>
+                  </div>
                 </div>
               </div>
-              <button className="border-b-2  border-green w-full text-end -mt-10">
-              
-                {/* {formattedTimes[index].duration !==
-                  "NaN hours, NaN minutes, NaN seconds" &&
-                  formattedTimes[index].duration} */}
-              </button>
+     
+            
+              <div className="flex justify-between items-center mt-1 text-md font-bold text-labelColor">
+                <h1 className="font-popins text-start">
+                  <span>{item.timestamp} </span>
+                </h1>
+                {item.odometer != null && (
+                <Image
+                  src={srcimgindex === index ? infoIcon2 : infoIcon}
+                  alt="Odometer Icon"
+                  onMouseEnter={() => setsrcimgindex(index)} // Change to hover image
+                  onMouseLeave={() => setsrcimgindex(null)} // Change back to default image
+                  className="h-10 w-10 hover:scale-110 cursor-pointer"
+                  data-tooltip-target="tooltip-right"
+                  data-tooltip-placement="right"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleodometer(item, e);
+                  }}
+                />
+              )}
+              </div>
+          
+              {item.DriverName && (item?.vehicleStatus === "Moving" || item?.vehicleStatus === "Pause") && (
+                <p className="text-start">Driver Name: {item.DriverName.replace("undefine", "")}</p>
+              )}
             </div>
+            <button className="border-b-2 border-green w-full text-end -mt-10"></button>
+          </div>
+          
+       
           );
         })}
       </div>

@@ -48,6 +48,7 @@ export type OSMData = {
 };
 
 export type VehicleData = {
+  odometer: Number;
   IMEI: string;
   gps: GPSData;
   OSM: OSMData;
