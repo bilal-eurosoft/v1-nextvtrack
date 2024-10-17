@@ -313,7 +313,7 @@ const LiveTracking = () => {
           unselectVehicles={unselectVehicles}
           setZoom={setZoom}
           setShowZones={setShowZones}
-          setShowZonePopUp={setShowZonePopUp}
+          // setShowZonePopUp={setShowZonePopUp}
           setSelectedOdoVehicle={setSelectedOdoVehicle}
           selectedOdoVehicle={selectedOdoVehicle}
           setPosition={setPosition}
