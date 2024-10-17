@@ -45,13 +45,19 @@ import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import Box from "@mui/material/Box";
 import { io, Socket } from "socket.io-client";
 import logo from "../../../public/Images/loadinglogo.png"
+import { redirect } from "next/navigation";
 
 
 export default function DualCam() {
   const [pictureVideoDataOfVehicle, setPictureVideoDataOfVehicle] = useState<
     pictureVideoDataOfVehicleT[]
   >([]);
-  const { data: session } = useSession();
+  const { data: session } = useSession();  
+ 
+if(!session?.cameraProfile){
+redirect("/liveTracking")
+}
+  
   const [open, setOpen] = React.useState(false);
   const [openSecond, setOpenSecond] = React.useState(false);
   const [toastId, setToastId] = useState<string | null>(null);
@@ -2922,3 +2928,5 @@ export default function DualCam() {
     </div>
   );
 }
+
+

@@ -2,8 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import DateFnsMomemtUtils from "@date-io/moment";
 import { DatePicker } from "@material-ui/pickers";
-import BlinkingTime from "@/components/General/BlinkingTime";
-import axios, { all } from "axios";
+import axios from "axios";
 import EventIcon from "@material-ui/icons/Event";
 import dynamic from "next/dynamic";
 import Accordion from "@mui/material/Accordion";
@@ -11,12 +10,10 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import moment from "moment-timezone";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import Image from "next/image";
 import { Popup } from "react-leaflet";
-import harshIcon from "../../../public/Images/HarshBreak.png";
 import HarshAccelerationIcon from "../../../public/Images/HarshAccelerationIcon.png";
 import HarshCornerningIcon from "../../../public/harshcornering.png";
 import markerA from "../../../public/Images/marker-a.png";
@@ -31,7 +28,6 @@ import Speedometer, {
   Needle,
   Progress,
   Marks,
-  Indicator,
 } from "react-speedometer";
 import {
   TravelHistoryByBucketV2,
@@ -44,14 +40,12 @@ import { useSession } from "next-auth/react";
 import { DeviceAttach } from "@/types/vehiclelistreports";
 import { zonelistType } from "@/types/zoneType";
 import { ClientSettings } from "@/types/clientSettings";
-import { replayreport } from "@/types/IgnitionReport";
 import TripsByBucket, { TravelHistoryData } from "@/types/TripsByBucket";
 import L, { LatLng, LatLngTuple, point } from "leaflet";
 import { Marker } from "react-leaflet/Marker";
 import { Toaster, toast } from "react-hot-toast";
 import { useMap } from "react-leaflet";
 import {
-  Tripaddressresponse,
   calculateZoomCenter,
   createMarkerIcon,
 } from "@/utils/JourneyReplayFunctions";
@@ -187,9 +181,9 @@ export default function JourneyReplayComp() {
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [loadingMap, setloadingMap] = useState(false);
   const [expanded, setExpanded] = useState(null);
-  const [searchJourney, setsearchJourney] = useState(true);
+  
   const [seacrhLoading, setSearchLoading] = useState(true);
-  const [fromDateInput, setFromDateInput] = useState(false);
+  
   const [harshPopUp, setHarshPopUp] = useState(true);
   const [harshAccPopUp, setAccHarshPopUp] = useState(true);
   const [addressTravelHistory, setAddressTravelHistory] = useState([]);
@@ -540,7 +534,7 @@ export default function JourneyReplayComp() {
 
   const handleCloseDateTime = () => {
     setShowRadioButton(false);
-    setFromDateInput(true);
+    
     setIgnitionreport((preData: any) => ({
       ...preData,
       fromDateTime: "",
@@ -674,8 +668,8 @@ export default function JourneyReplayComp() {
           if (isCustomPeriod) {
             newdata = {
               ...newdata,
-              fromDateTime: `${Ignitionreport.fromDateTime}T00:00:00Z`,
-              toDateTime: `${Ignitionreport.toDateTime}T23:59:59Z`,
+              fromDateTime: `${Ignitionreport.fromDateTime.split("T")[0]}T00:00:00Z`,
+              toDateTime: `${Ignitionreport.toDateTime.split("T")[0]}T23:59:59Z`,
             };
           } else {
             newdata = {
@@ -1170,7 +1164,7 @@ export default function JourneyReplayComp() {
     //   }));
 
     // }
-    setFromDateInput(false);
+    
     setCurrentDateDefaul(true);
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
@@ -1230,11 +1224,8 @@ export default function JourneyReplayComp() {
   //   const value = "yesterday";
   //   setSelectedOption(newValue);
   // };
-  const handleMenuClose = () => {
-    setIgnitionreport([]);
-  };
   const handleInputChangeSelect = (e: any) => {
-    setsearchJourney(false);
+    
     if (!e) {
       return setIgnitionreport((prevReport: any) => ({
         ...prevReport,
@@ -1248,7 +1239,7 @@ export default function JourneyReplayComp() {
       ["VehicleReg"]: value,
       ["label"]: label,
     }));
-    setFromDateInput(true);
+    
   };
 
   const handleInputChange: any = (e: any) => {
@@ -3026,7 +3017,7 @@ key={index}
     </div>
     {getShowdetails && (
       <div className={`bg-white overflow-y-scroll resposive_stop_details ${stopWithSecond.length > 1 ? "lg:h-60 md:h-60 sm:h-60 h-24" : ""}`}>
-        {stopWithSecond?.map((item) => {
+        {stopWithSecond?.map((item:any) => {
           let isActive = item.date === selectedItemId;
           return loadingMap ? (
             <div
@@ -3035,7 +3026,9 @@ key={index}
               className={`cursor-pointer ${isActive ? 'bg-[#e1f0e3]' : ''}`}
             >
               <p className="text-black font-popins px-2 py-2 text-sm">
-                <b>{item?.address?.display_name?.substring(0, 50)}</b>
+                {/* <b>{item?.address?.display_name?.substring(0, 50)}</b>
+                 */}
+                 <b>{item?.address?.display_name}</b>
               </p>
               <div className="grid grid-cols-12">
                 <div className="lg:col-span-1 md:col-span-2 sm:col-span-6 col-span-2"></div>

@@ -159,9 +159,14 @@ const style = {
   boxShadow: 24,
 };
 
+import { redirect } from "next/navigation";
 export default function DriverProfile() {
   const router = useRouter();
   const { data: session } = useSession();
+  
+if(!session?.driverProfile){
+  redirect("/liveTracking")
+  }
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [open, setOpen] = useState(false);

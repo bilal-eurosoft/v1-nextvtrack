@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import uniqueDataByIMEIAndLatestTimestamp from "@/utils/uniqueDataByIMEIAndLatestTimestamp";
-import { zonelistType } from "@/types/zoneType";
+// import { zonelistType } from "@/types/zoneType";
 import { VehicleData } from "@/types/vehicle";
 import { ClientSettings } from "@/types/clientSettings";
 import L, { LatLng } from "leaflet";
@@ -59,16 +59,18 @@ const LiveTracking = () => {
   }
   const carData = useRef<VehicleData[]>([]);
   const [clientSettings, setClientSettings] = useState<ClientSettings[]>([]);
-  const [zoneList, setZoneList] = useState<zonelistType[]>([]);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  // const [zoneList, setZoneList] = useState<zonelistType[]>([]);
   const [activeColor, setIsActiveColor] = useState<any>("");
   const [showAllVehicles, setshowAllVehicles] = useState(false);
-  const [isOnline, setIsOnline] = useState(false);
-  const [showZonePopUp, setShowZonePopUp] = useState(true);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  // const [showZonePopUp, setShowZonePopUp] = useState(true);
   const [isFirstTimeFetchedFromGraphQL, setIsFirstTimeFetchedFromGraphQL] =
     useState(false);
-  const [lastDataReceivedTimestamp, setLastDataReceivedTimestamp] = useState(
-    new Date()
-  );
+  // const [lastDataReceivedTimestamp, setLastDataReceivedTimestamp] = useState(
+  //   new Date()
+  // );
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleData | null>(
     null
   );
@@ -87,6 +89,7 @@ const LiveTracking = () => {
     (el) => el?.PropertDesc === "Zoom"
   )[0]?.PropertyValue;
   useEffect(() => {
+    // console.log("clientSetting",clientMapSettings)
     const regex = /lat:([^,]+),lng:([^}]+)/;
     if (clientMapSettings) {
       const match = clientMapSettings.match(regex);
@@ -101,26 +104,29 @@ const LiveTracking = () => {
     setZoom(zoomLevel);
   }, [clientMapSettings]);
   // This useEffect is responsible for checking internet connection in the browser.
-  useEffect(() => {
-    setIsOnline(navigator.onLine);
-    function onlineHandler() {
-      setIsOnline(true);
-    }
+  
+  // useEffect(() => {
     
-    function offlineHandler() {
-      setIsOnline(false);
-    }
-    // if (typeof window !== "undefined") {
-    //   window.addEventListener("online", onlineHandler);
-    //   window.addEventListener("offline", offlineHandler);
-    //   return () => {
-    //     window.removeEventListener("online", onlineHandler);
-    //     window.removeEventListener("offline", offlineHandler);
-    //   };
-    // }
-  }, []);
+  //   setIsOnline(navigator.onLine);
+  //   function onlineHandler() {
+  //     setIsOnline(true);
+  //   }
+    
+  //   function offlineHandler() {
+  //     setIsOnline(false);
+  //   }
+  //   // if (typeof window !== "undefined") {
+  //   //   window.addEventListener("online", onlineHandler);
+  //   //   window.addEventListener("offline", offlineHandler);
+  //   //   return () => {
+  //   //     window.removeEventListener("online", onlineHandler);
+  //   //     window.removeEventListener("offline", offlineHandler);
+  //   //   };
+  //   // }
+  // }, []);
 
   useEffect(() => {
+    // console.log("userVehicles")
     async function userVehicles() {
       if (session && session.userRole === "Controller") {
         const data = await getAllVehicleByUserId({
@@ -133,8 +139,11 @@ const LiveTracking = () => {
     userVehicles();
   }, []);
   const role = session?.userRole;
+  
   useEffect(() => {
+    
     (async function () {
+      // console.log("getVehicleDataByClientId")
       if (session?.clientId) {
         const clientVehicleData = await getVehicleDataByClientId(
           session?.clientId
@@ -158,7 +167,7 @@ const LiveTracking = () => {
           } else {
             carData.current = uniqueData;
           }
-
+// console.log("make setIsFirstTimeFetchedFromGraphQL is true")
           setIsFirstTimeFetchedFromGraphQL(true);
         }
         // const clientSettingData = await getClientSettingByClinetIdAndToken({
@@ -169,7 +178,7 @@ const LiveTracking = () => {
         setClientSettings(session?.clientSetting);
       }
     })();
-  }, [session, userVehicle]);
+  }, [ userVehicle]);
 
   // This useEffect is responsible for fetching data from the GraphQL Server.
   // Runs if:
@@ -177,18 +186,49 @@ const LiveTracking = () => {
 
   const fetchTimeoutGraphQL = 60 * 1000; //60 seconds
   useEffect(() => {
-    const dataFetchHandler = () => {
+    // console.log("dataFetchHandler",  isFirstTimeFetchedFromGraphQL,
+      // session?.clientId,
+      // lastDataReceivedTimestamp,
+      // fetchTimeoutGraphQL,)
+      
+      const dataFetchHandler = async() => {
+      // console.log(isFirstTimeFetchedFromGraphQL)
       // Does not run for the first time when page is loaded
       if (isFirstTimeFetchedFromGraphQL) {
-        const now = new Date();
-        const elapsedTimeInSeconds = Math.floor(
-          (now.getTime() - lastDataReceivedTimestamp.getTime()) / 1000
-        );
-        if (elapsedTimeInSeconds <= fetchTimeoutGraphQL) {
-          if (session?.clientId) {
-            getVehicleDataByClientId(session?.clientId);
+        // const now = new Date();
+        // const elapsedTimeInSeconds = Math.floor(
+          // (now.getTime() - lastDataReceivedTimestamp.getTime()) / 1000
+        // );
+        if (session?.clientId) {
+          // getVehicleDataByClientId(session?.clientId);
+          const clientVehicleData = await getVehicleDataByClientId(
+            session?.clientId
+          );
+  
+          if (clientVehicleData?.data?.Value) {
+            let parsedData = JSON.parse(
+              clientVehicleData?.data?.Value
+            )?.cacheList;
+            // call a filter function here to filter by IMEI and latest time stamp
+            let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
+            // carData.current = uniqueData;
+            let matchingVehicles;
+            if (role === "Controller") {
+              let vehicleIds = userVehicle.map((item: any) => item._id);
+              // Filter carData.current based on vehicleIds
+              matchingVehicles = uniqueData.filter((vehicle) =>
+                vehicleIds.includes(vehicle.vehicleId)
+              );
+              carData.current = matchingVehicles;
+            } else {
+              carData.current = uniqueData;
+            }
+  
+            setIsFirstTimeFetchedFromGraphQL(true);
           }
         }
+        // if (elapsedTimeInSeconds <= fetchTimeoutGraphQL) {
+        // }
       }
     };
     const interval = setInterval(dataFetchHandler, fetchTimeoutGraphQL); // Runs every fetchTimeoutGraphQL seconds
@@ -199,7 +239,7 @@ const LiveTracking = () => {
   }, [
     isFirstTimeFetchedFromGraphQL,
     session?.clientId,
-    lastDataReceivedTimestamp,
+    // lastDataReceivedTimestamp,
     fetchTimeoutGraphQL,
   ]);
 
@@ -236,7 +276,7 @@ const LiveTracking = () => {
 
             
 
-            setLastDataReceivedTimestamp(new Date());
+            // setLastDataReceivedTimestamp(new Date());
           }
         );
       } catch (err) {
@@ -269,7 +309,11 @@ const LiveTracking = () => {
           unselectVehicles={unselectVehicles}
           setZoom={setZoom}
           setShowZones={setShowZones}
-          setShowZonePopUp={setShowZonePopUp}
+          // setShowZonePopUp={setShowZonePopUp}
+          setSelectedOdoVehicle={setSelectedOdoVehicle}
+          selectedOdoVehicle={selectedOdoVehicle}
+          setPosition={setPosition}
+         
         />
         {carData?.current?.length !== 0 && (
           <LiveMap

@@ -21,7 +21,7 @@ const LiveSidebar = ({
   setunselectVehicles,
   unselectVehicles,
   setZoom,
-  setShowZonePopUp,
+  // setShowZonePopUp,
   setShowZones,
 }: {
   carData: VehicleData[];
@@ -35,7 +35,7 @@ const LiveSidebar = ({
   setunselectVehicles: any;
   unselectVehicles: any;
   setZoom: any;
-  setShowZonePopUp: any;
+  // setShowZonePopUp: any;
   setShowZones: any;
 }) => {
   const { data: session } = useSession();

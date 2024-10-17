@@ -30,9 +30,15 @@ import Request from "./request";
 import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import logo from "../../../public/Images/loadinglogo.png";
 import { useSession } from "next-auth/react";
-import { set } from "date-fns";
+import { redirect } from "next/navigation";
+
 export default function Command() {
   const { data: session } = useSession();
+
+  
+if(!session?.immobilising){
+  redirect("/liveTracking")
+  }
   const [loading, setLoading] = useState(false);
   const [gprsdataget, setgprsdataget] = useState(false);
 
