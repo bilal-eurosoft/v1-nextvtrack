@@ -7,11 +7,12 @@ import uniqueDataByIMEIAndLatestTimestamp from "@/utils/uniqueDataByIMEIAndLates
 import { VehicleData } from "@/types/vehicle";
 import { ClientSettings } from "@/types/clientSettings";
 import L, { LatLng } from "leaflet";
-
 import {
   getVehicleDataByClientId,
   getAllVehicleByUserId,
 } from "@/utils/API_CALLS";
+import { useSearchParams } from "next/navigation";
+
 import { useSession } from "next-auth/react";
 import { socket } from "@/utils/socket";
 import countCars from "@/utils/countCars";
@@ -61,7 +62,7 @@ const LiveTracking = () => {
   const [clientSettings, setClientSettings] = useState<ClientSettings[]>([]);
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
-  const [zoneList, setZoneList] = useState<zonelistType[]>([]);
+  // const [zoneList, setZoneList] = useState<zonelistType[]>([]);
   const [activeColor, setIsActiveColor] = useState<any>("");
   const [showAllVehicles, setshowAllVehicles] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -91,6 +92,8 @@ const LiveTracking = () => {
   const clientZoomSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Zoom"
   )[0]?.PropertyValue;
+  const searchParams = useSearchParams();
+  const fullparams = searchParams.get("screen");
   useEffect(() => {
     // console.log("clientSetting",clientMapSettings)
     const regex = /lat:([^,]+),lng:([^}]+)/;
@@ -107,9 +110,7 @@ const LiveTracking = () => {
     setZoom(zoomLevel);
   }, [clientMapSettings]);
   // This useEffect is responsible for checking internet connection in the browser.
-  
   // useEffect(() => {
-    
   //   setIsOnline(navigator.onLine);
   //   function onlineHandler() {
   //     setIsOnline(true);
@@ -186,8 +187,7 @@ const LiveTracking = () => {
   // This useEffect is responsible for fetching data from the GraphQL Server.
   // Runs if:
   // Data is not being recieved in last 60 seconds from socket.
-
-  const fetchTimeoutGraphQL = 60 * 1000; //60 seconds
+  const fetchTimeoutGraphQL = fullparams=="full" ?10 * 1000:60*1000; //60 seconds
   useEffect(() => {
     // console.log("dataFetchHandler",  isFirstTimeFetchedFromGraphQL,
       // session?.clientId,
@@ -248,7 +248,7 @@ const LiveTracking = () => {
 
   // This useEffect is responsible for getting the data from socket and updating it into the state.
   useEffect(() => {
-    if (isOnline && session?.clientId) {
+    if (isOnline && session?.clientId && fullparams!="full") {
       try {
         socket.io.opts.query = { clientId: session?.clientId };
         socket.connect();
