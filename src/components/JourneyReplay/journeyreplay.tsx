@@ -219,7 +219,7 @@ export default function JourneyReplayComp() {
     } */
    
     const map = useMap();
-    console.log("click" ,userclick , isPlaying)
+    
     if(userclick && isPlaying ){
       return null
     }
@@ -280,7 +280,8 @@ export default function JourneyReplayComp() {
   const pauseTick = async () => {
     setIsPlaying(false);
     setPauseBtn(false);
-    sethideicondiv(true)
+    sethideicondiv(false)
+    
    // setSpeedFactor(4);
     setStopBtn(true);
     setPlayBtn(true);

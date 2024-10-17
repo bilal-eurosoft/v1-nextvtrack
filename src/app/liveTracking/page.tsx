@@ -61,7 +61,7 @@ const LiveTracking = () => {
   const [clientSettings, setClientSettings] = useState<ClientSettings[]>([]);
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
-  // const [zoneList, setZoneList] = useState<zonelistType[]>([]);
+  const [zoneList, setZoneList] = useState<zonelistType[]>([]);
   const [activeColor, setIsActiveColor] = useState<any>("");
   const [showAllVehicles, setshowAllVehicles] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -72,6 +72,9 @@ const LiveTracking = () => {
   //   new Date()
   // );
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleData | null>(
+    null
+  );
+  const [selectedOdoVehicle, setSelectedOdoVehicle] = useState(
     null
   );
   const [userVehicle, setuserVehicle] = useState([]);
@@ -298,6 +301,7 @@ const LiveTracking = () => {
       <div className="grid lg:grid-cols-5 sm:grid-cols-5 md:grid-cols-5 grid-cols-1">
         <LiveSidebar
           carData={carData.current}
+          
           countMoving={countMoving}
           countPause={countPause}
           countParked={countParked}
@@ -309,7 +313,7 @@ const LiveTracking = () => {
           unselectVehicles={unselectVehicles}
           setZoom={setZoom}
           setShowZones={setShowZones}
-          // setShowZonePopUp={setShowZonePopUp}
+          setShowZonePopUp={setShowZonePopUp}
           setSelectedOdoVehicle={setSelectedOdoVehicle}
           selectedOdoVehicle={selectedOdoVehicle}
           setPosition={setPosition}
@@ -329,8 +333,9 @@ const LiveTracking = () => {
             zoom={zoom}
             setShowZones={setShowZones}
             showZones={showZones}
-            setShowZonePopUp={setShowZonePopUp}
-            showZonePopUp={showZonePopUp}
+            selectedOdoVehicle={selectedOdoVehicle}
+            position={position}
+          
           />
         )}
       </div>

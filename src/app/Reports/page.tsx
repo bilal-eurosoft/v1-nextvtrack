@@ -67,14 +67,14 @@ export default function Reports() {
       | "5"
       | "6"
       | "7"
-      | "EndTime"
+      | "End Time"
       | "streetCount"
       | "Final Location"
       | "Total Time"
       | "Start Date"
       | "Idling Point"
       | "Time Duration"
-      | "BeginingDateTime"
+      | "StartDateTime"
       | "Starting Location"
       | "TripStart"
       | "AvgSpeed"
@@ -87,7 +87,7 @@ export default function Reports() {
       | "event"
       | "date"
       | "Address"
-      | "BegginingTime"
+      | "Start Time"
       | "StartingPoint"
       | "TripEnd"
       | "Final Location "
@@ -112,7 +112,7 @@ export default function Reports() {
       | "3"
       | "4"
       | "5"
-      | "EndTime"
+      | "End Time"
       | "streetCount"
       | "Total Time"
       | "Final Location"
@@ -122,7 +122,7 @@ export default function Reports() {
       | "Idling Point"
       | "Time Duration"
       | "Starting Location"
-      | "BeginingDateTime"
+      | "StartDateTime"
       | "TripStart"
       | "AvgSpeed"
       | "Max Speed"
@@ -134,7 +134,7 @@ export default function Reports() {
       | "event"
       | "date"
       | "Address"
-      | "BegginingTime"
+      | "Start Time"
       | "StartingPoint"
       | "TripEnd"
       | "Final Location "
@@ -394,11 +394,12 @@ export default function Reports() {
 
               if (response.success === true) {
                 setTableShow(true);
+               
                 //  setIsFormSubmitted(true);
                 setTrisdata(response.data.tableData);
 
                 let newColumnHeaders: (
-                  | "BeginingDateTime"
+                  | "StartDateTime"
                   | "DriverName"
                   | "0"
                   | "1"
@@ -410,7 +411,7 @@ export default function Reports() {
                   | "7"
                   | "Start Date"
                   | "streetCount"
-                  | "EndTime"
+                  | "End Time"
                   | "Mileage"
                   | "Total Time"
                   | "Max Speed"
@@ -428,7 +429,7 @@ export default function Reports() {
                   | "event"
                   | "date"
                   | "Address"
-                  | "BegginingTime"
+                  | "Start Time"
                   | "StartingPoint"
                   | "TripEnd"
                   | "Final Location"
@@ -442,7 +443,7 @@ export default function Reports() {
                   | "Type"
                 )[] = [];
                 let custom1HeaderTitles: (
-                  | "BeginingDateTime"
+                  | "StartDateTime"
                   | "0"
                   | "1"
                   | "2"
@@ -453,7 +454,7 @@ export default function Reports() {
                   | "7"
                   | "Start Date"
                   | "streetCount"
-                  | "EndTime"
+                  | "End Time"
                   | "Mileage"
                   | "Total Time"
                   | "Max Speed"
@@ -471,7 +472,7 @@ export default function Reports() {
                   | "event"
                   | "date"
                   | "Address"
-                  | "BegginingTime"
+                  | "Start Time"
                   | "StartingPoint"
                   | "TripEnd"
                   | "Final Location"
@@ -510,9 +511,9 @@ export default function Reports() {
                 ) {
                   newColumnHeaders = ["0", "1", "2", "3", "4", "5", "6", "7"];
                   custom1HeaderTitles = [
-                    "BegginingTime",
+                    "Start Time",
                     "Starting Location",
-                    "EndTime",
+                    "End Time",
                     "Final Location",
                     "Total Time",
                     "Mileage",
@@ -560,7 +561,7 @@ export default function Reports() {
                 ) {
                   newColumnHeaders = ["0", "1", "2", "3", "4", "5", "6", "7"];
                   custom1HeaderTitles = [
-                    "BeginingDateTime",
+                    "StartDateTime",
                     "AvgSpeed",
                     "streetCount",
                     "Millage",
@@ -1479,7 +1480,7 @@ export default function Reports() {
                             {header === "TripStart" ||
                             header === "TripEnd" ||
                             header === "date" ||
-                            header === "BeginingDateTime" ||
+                            header === "StartDateTime" ||
                             header === "EndingDateTime" ? (
                               <>
                                 {moment(trip[dataKey]).format("MMM D, YYYY")}{" "}

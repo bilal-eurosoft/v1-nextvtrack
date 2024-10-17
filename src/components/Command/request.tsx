@@ -14,6 +14,7 @@ import Select from "react-select";
 import moment from "moment-timezone";
 import { DeviceAttach } from "@/types/vehiclelistreports";
 import { Toaster, toast } from "react-hot-toast";
+
 // import "./newstyle.css";
 import { Modal, Fade, Box } from "@mui/material";
 const modalStyles = {
@@ -56,31 +57,31 @@ export default function Request({setgprsdataget}:any) {
             token: session.accessToken,
             clientId: session?.clientId
           });
-          // setVehicleList(Data.data);
+          setVehicleList(Data.data);
 
-                    const data = await getVehicleDataByClientId(session?.clientId)
-                    let parsedData = JSON.parse(
-                      data?.data?.Value
-                    )?.cacheList;
-                    let d = Data.data.map((i)=>{
-                      return( parsedData.map((j)=>{
-                        if(i.vehicleReg==j.vehicleReg){
-          return {
+                    // const data = await getVehicleDataByClientId(session?.clientId)
+                    // let parsedData = JSON.parse(
+                    //   data?.data?.Value
+                    // )?.cacheList;
+          //           let d = Data.data.map((i)=>{
+          //             return( parsedData.map((j)=>{
+          //               if(i.vehicleReg==j.vehicleReg){
+          // return {
 
-            vehicleReg:i?.vehicleReg,
-            dualCam:i?.dualCam,
-            immobilising:i?.immobilising,
-            camStatus:j.camStatus?.value,
-            immStatus:j.immStatus?.value,
-            deviceIMEI:i.deviceIMEI
-          }
-                        }
+          //   vehicleReg:i?.vehicleReg,
+          //   dualCam:i?.dualCam,
+          //   immobilising:i?.immobilising,
+          //   camStatus:j?.camStatus?.value,
+          //   immStatus:j?.immStatus?.value,
+          //   deviceIMEI:i.deviceIMEI
+          // }
+          //               }
 
-                      }))[0]
-                    })
+          //             }))[0]
+          //           })                  
                     
 
-                    setVehicleList(d);
+                    // setVehicleList(d);
         }
       } catch (error) {
         console.error("Error fetching zone data:", error);
@@ -96,49 +97,56 @@ export default function Request({setgprsdataget}:any) {
   };
   const handleSelectChange = async (e: any) => {
     const selectedVehicleId = e;
-
-    const data = await getVehicleDataByClientId(session?.clientId);
-    let parsedData = JSON.parse(data?.data?.Value)?.cacheList;
-    let d = parsedData.filter((i) => {
-      return i.vehicleReg == selectedVehicleId?.value
-      // if (i.vehicleReg == selectedVehicleId?.value) {
-      //   return {
-      //     vehicleReg: i?.vehicleReg,         
-      //     camStatus: i.camStatus?.value,
-      //     immStatus: i.immStatus?.value
-      //   };
-      // }
-    })[0];
-    
-    const selectedVehicle = {
-      camStatus:d.camStatus?.value,
-      immStatus:d.immStatus?.value,
-// deviceIMEI:d.deviceIMEI,
-      ...vehicleList.find(
-        (vehicle) => vehicle.vehicleReg === selectedVehicleId?.value
+    if (selectedVehicleId) {
+      const data = await  toast.promise(
+        getVehicleDataByClientId(session?.clientId),
+        {
+          loading: "Please wait",
+          success: () => {
+            // No message to show on success, just return an empty string
+            return ""; 
+          },
+          error: () => {
+            // No message to show on error, just return an empty string
+            return ""; 
+          },
+        },
       )
-    };
-    
-    
-    if (selectedVehicle.dual && selectedVehicle.immobilising) {
-      if (selectedVehicle.immStatus == 0) {
-        setdeactivate(true);
-        setactivate(false);
-      } else {
-        setdeactivate(false);
-        setactivate(true);
+      toast.dismiss();
+      let parsedData = JSON.parse(data?.data?.Value)?.cacheList;
+      let d = parsedData.filter((i) => {
+        return i.vehicleReg == selectedVehicleId?.value;
+      })[0];
+      const selectedVehicle = {
+        camStatus: d?.camStatus?.value,
+        immStatus: d?.immStatus?.value,
+        ...vehicleList.find(
+          (vehicle) => vehicle.vehicleReg === selectedVehicleId?.value
+        )
+      };
+      if (selectedVehicle.dual && selectedVehicle.immobilising) {
+        if (selectedVehicle.immStatus == 0) {
+          setdeactivate(true);
+          setactivate(false);
+        } else {
+          setdeactivate(false);
+          setactivate(true);
+        }
+      } else if (selectedVehicle.immobilising) {
+        if (selectedVehicle.camStatus == 0) {
+          setdeactivate(true);
+          setactivate(false);
+        } else {
+          setdeactivate(false);
+          setactivate(true);
+        }
       }
-    } else if (selectedVehicle.immobilising) {
-      if (selectedVehicle.camStatus == 0) {
-        setdeactivate(true);
-        setactivate(false);
-      } else {
-        setdeactivate(false);
-        setactivate(true);
-      }
+      setSelectedVehicle(selectedVehicle || null);
+    } else {
+      setactivate(false);
+      setdeactivate(false);
+      setSelectedVehicle(null);
     }
-    // localStorage.setItem("selectedVehicle", selectedVehicle?.vehicleReg);
-    setSelectedVehicle(selectedVehicle || null);
   };
   const options =
     vehicleList?.length > 0
@@ -153,15 +161,38 @@ export default function Request({setgprsdataget}:any) {
       toast.error("Select vehicle first");
       return;
     }
-    const response = await ImmobiliseRequest({
+/*    /*  const response = await ImmobiliseRequest({
       token: session?.accessToken,
       payload: {
         clientId: session?.clientId,
         deviceIMEI: selectedVehicle?.deviceIMEI,
         vehicleReg: selectedVehicle?.vehicleReg
       }
-    });
-
+    }); */
+    const response = await  toast.promise(
+      ImmobiliseRequest({
+        token: session?.accessToken,
+        payload: {
+          clientId: session?.clientId,
+          deviceIMEI: selectedVehicle?.deviceIMEI,
+          vehicleReg: selectedVehicle?.vehicleReg
+        }
+      }),
+      {
+        loading: "Please wait",
+        success: () => {
+          // No message to show on success, just return an empty string
+          return ""; 
+        },
+        error: () => {
+          // No message to show on error, just return an empty string
+          return ""; 
+        },
+      },
+    )
+    toast.dismiss();
+    /* setStatus(statu);
+    setopen(true); */
     if (response.success) {
       setStatus(statu);
       setopen(true);
@@ -249,7 +280,9 @@ export default function Request({setgprsdataget}:any) {
       }
       setOtp("");
       setopen(false);
-      setSelectedVehicle("");
+      setactivate(false)
+      setdeactivate(false)
+      setSelectedVehicle("")
     } else {
       toast.error(response.message);
     }
@@ -259,16 +292,40 @@ export default function Request({setgprsdataget}:any) {
     options.find((option) => option.value === selectedVehicle?.vehicleReg) ||
     null;
 
+   /*  useEffect(() => {
+      if (open) {
+        document.body.style.filter = 'blur(5px)';
+        let a = document.getElementById("aaaa")
+        if(a){
+          console.log("object");
+          document.body.style.filter = 'none';
+        }
+      } else {
+        document.body.style.filter = 'none';
+      }
+  
+      return () => {
+        document.body.style.filter = 'none'; // Clean up on unmount
+      };
+    }, [open]);
+ */
+    const blurStyle = !open ? { filter: 'blur(5px)', pointerEvents: 'none' } : {};
+
   return (
+    <div > 
     <div className="p-4 bg-bgLight">
       {/* Container for responsive layout */}
-      <div className="grid gap-5 grid-cols-1 sm:grid-cols-1 md:grid-cols-7">
+ 
+      <div className="grid gap-5 grid-cols-1 sm:grid-cols-1 md:grid-cols-7 "  >
         {/* Vehicle Select */}
         <div className="">
           <Select
             value={selectedOption}
             onChange={handleSelectChange}
-            options={options}
+            options={ vehicleList?.map((item: any) => ({
+              value: item?.vehicleReg,
+              label: item?.vehicleReg
+            }))}
             placeholder="Pick Vehicle"
             isClearable
             isSearchable
@@ -300,45 +357,10 @@ export default function Request({setgprsdataget}:any) {
             }}
           />
         </div>
-        {/* <div className="col-span-1">
-          <Select
-            value={selectedcommand}
-            onChange={handlesetCommand}
-            options={options2}
-            placeholder="Pick Command"
-            isClearable
-            isSearchable
-            noOptionsMessage={() => "No Command available"}
-            className="rounded-md w-full outline-green border border-grayLight hover:border-green"
-            styles={{
-              control: (provided, state) => ({
-                ...provided,
-                border: "none",
-                boxShadow: state.isFocused ? null : null
-              }),
-              option: (provided, state) => ({
-                ...provided,
-                backgroundColor: state.isSelected
-                  ? "#00B56C"
-                  : state.isFocused
-                  ? "#E1F0E3"
-                  : "transparent",
-                color: state.isSelected
-                  ? "white"
-                  : state.isFocused
-                  ? "black"
-                  : "black",
-                "&:hover": {
-                  backgroundColor: "#E1F0E3",
-                  color: "black"
-                }
-              })
-            }}
-          />
-        </div> */}
+      
         <div className="col-span-2 ml-4">
           <button
-            className={`bg-green px-4 py-2 text-white ${
+            className={`bg-green px-4 py-2 text-white rounded-lg ${
               activate ? "opacity-50 cursor-not-allowed" : ""
             } `}
             onClick={() => {
@@ -349,7 +371,7 @@ export default function Request({setgprsdataget}:any) {
             Activate
           </button>
           <button
-            className={`bg-green px-4 py-2 ml-2 text-white ${
+            className={`bg-green px-4 py-2 ml-2 text-white rounded-lg ${
               deactivate ? "opacity-50 cursor-not-allowed" : ""
             }`}
             onClick={() => {
@@ -361,71 +383,99 @@ export default function Request({setgprsdataget}:any) {
           </button>
         </div>
       </div>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        // BackdropComponent={Backdrop}
-        // BackdropProps={{
-        //   timeout: 500,
-        //   style: {
-        //     backgroundColor:
-        //       "transparent",
-        //     filter: "blur(19px)",
-        //   },
-        // }}
-      >
-        <Fade in={open}>
-          <Box sx={modalStyles}>
-            <a
-              onClick={handleClose}
+
+     
+        {open && (
+        <div
+        id="aaaa"
+          style={{
+            display: 'flex',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'rgba(0, 0, 0, 0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 80,
+          }}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '12px',
+              padding: '20px',
+              width: '500px',
+              position: 'relative',
+            }}
+          >
+            {/* Modal Header */}
+         
+
+            {/* Modal Content */}
+            <div style={{ padding: '10px 0' }}>
+              <p style={{ color: '#1f2937' }}>
+                Enter the OTP received in your email address:
+              </p>
+              <input
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                style={{
+                  border: '1px solid #d1d5db',
+                  padding: '8px',
+                  width: '100%',
+                  borderRadius: '4px',
+                  marginTop: '8px',
+                }}
+              />
+            </div>
+
+            {/* Modal Footer */}
+            <div
               style={{
-                position: "absolute",
-                top: -10,
-                right: -10,
-                fontWeight: "bold",
-                fontSize: "16px",
-                width: "30px",
-                height: "30px",
-                backgroundColor: "red",
-                color: "white",
-                cursor: "pointer",
-                padding: "2px",
-                borderRadius: "50%",
-                textAlign: "center"
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '8px',
+                borderTop: '1px solid #e5e7eb',
+                paddingTop: '10px',
               }}
             >
-              X
-            </a>
-
-            <p className="text-green mb-5 font-bold text-center">
-              Enter Otp which you have received in your Email address
-            </p>
-            <input
-              type="text"
-              value={otp}
-              className="border border-grayLight w-full outline-green hover:border-green transition duration-700 ease-in-out "
-              onChange={(e: any) => setOtp(e.target.value)}
-            />
-            <div className="mt-6">
               <button
-                className={`bg-green px-4 py-2 pr-8 pl-8 text-white`}
+                type="button"
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #e5e7eb',
+                  background: 'red',
+                  color: 'white',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                }}
+                onClick={() => setopen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                style={{
+                  padding: '8px 12px',
+                  border: 'none',
+                  backgroundColor: '#38a169',
+                  color: 'white',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                }}
                 onClick={handleSubmit}
               >
-                {"  "}
-                OK
-                {"  "}
-              </button>
-              <button
-                className={`bg-red px-4 py-2 ml-4 text-white`}
-                onClick={handleClose}
-              >
-                Cancle
+                Submit
               </button>
             </div>
-          </Box>
-        </Fade>
-      </Modal>
+          </div>
+        </div>
+      )}
       <Toaster position="top-center" reverseOrder={false} />
+    </div>
     </div>
   );
 }

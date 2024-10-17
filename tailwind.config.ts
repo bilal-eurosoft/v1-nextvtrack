@@ -16,10 +16,12 @@
       },
       colors: {
         'green': "#00B56C",
+        'gray1': "#d8d8d8"
 
       },
       
     },
+    variants: {},
     plugins: [],
   }
   export default config

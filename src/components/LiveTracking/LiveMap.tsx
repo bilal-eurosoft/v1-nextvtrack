@@ -47,6 +47,10 @@ const DynamicCarMap = ({
   zoom,
   setShowZones,
   showZones,
+
+  selectedOdoVehicle,
+  position,
+  
 }: {
   carData: VehicleData[];
   clientSettings: ClientSettings[];
@@ -60,6 +64,10 @@ const DynamicCarMap = ({
   zoom: any;
   setShowZones: any;
   showZones: any;
+
+  selectedOdoVehicle:any;
+  position:any
+  
 }) => {
   const clientMapSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Map"
@@ -182,6 +190,7 @@ const DynamicCarMap = ({
                 className="bg-[#00B56C] text-white"
                 onClick={handleShowZone}
               ></button>
+                
               <LiveCars
                 carData={carData}
                 clientSettings={clientSettings}
@@ -194,6 +203,21 @@ const DynamicCarMap = ({
               />
             </MapContainer>
           )}
+{ selectedOdoVehicle != null  && ( 
+<div
+    className="absolute   left-2  bg-white border border-gray-300 p-2 rounded shadow-md"
+
+      style={{ position: 'absolute', top: position.top - 65, left: position.left - 390 }}
+  >
+    <div className="relative bottom-full left-1/2 transform -translate-x-1/2">
+    
+    </div>
+    <p style={{fontFamily:"Popins, sans-serif"}}> Total Odometer: {selectedOdoVehicle?.odometer} {session?.unit}</p>
+    
+    
+
+  </div>
+)}
 
 { selectedOdoVehicle != null  && ( 
 <div
