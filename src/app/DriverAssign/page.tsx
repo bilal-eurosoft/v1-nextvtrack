@@ -29,7 +29,6 @@ import { vehicleListByClientId } from "@/utils/API_CALLS";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import "./assign.css";
-
 import { InputLabel } from "@mui/material";
 interface Column {
   id: "name" | "code" | "population" | "size" | "density";
