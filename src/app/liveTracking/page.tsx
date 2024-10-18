@@ -75,9 +75,7 @@ const LiveTracking = () => {
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleData | null>(
     null
   );
-  const [selectedOdoVehicle, setSelectedOdoVehicle] = useState(
-    null
-  );
+  const [selectedOdoVehicle, setSelectedOdoVehicle] = useState(null);
   const [userVehicle, setuserVehicle] = useState([]);
   const [unselectVehicles, setunselectVehicles] = useState(false);
   const [zoom, setZoom] = useState(10);
@@ -95,7 +93,6 @@ const LiveTracking = () => {
   const searchParams = useSearchParams();
   const fullparams = searchParams.get("screen");
   useEffect(() => {
-    // console.log("clientSetting",clientMapSettings)
     const regex = /lat:([^,]+),lng:([^}]+)/;
     if (clientMapSettings) {
       const match = clientMapSettings.match(regex);
@@ -130,7 +127,6 @@ const LiveTracking = () => {
   // }, []);
 
   useEffect(() => {
-    // console.log("userVehicles")
     async function userVehicles() {
       if (session && session.userRole === "Controller") {
         const data = await getAllVehicleByUserId({
@@ -143,11 +139,11 @@ const LiveTracking = () => {
     userVehicles();
   }, []);
   const role = session?.userRole;
-  
+  const fetchTimeoutGraphQL = fullparams == "full" ? 10 * 1000 : 60 * 1000; //60 seconds
+
   useEffect(() => {
     
-    (async function () {
-      // console.log("getVehicleDataByClientId")
+    async function dataFetchHandler() {
       if (session?.clientId) {
         const clientVehicleData = await getVehicleDataByClientId(
           session?.clientId
@@ -171,84 +167,101 @@ const LiveTracking = () => {
           } else {
             carData.current = uniqueData;
           }
-// console.log("make setIsFirstTimeFetchedFromGraphQL is true")
-          setIsFirstTimeFetchedFromGraphQL(true);
+          
+          // setIsFirstTimeFetchedFromGraphQL(true);
         }
         // const clientSettingData = await getClientSettingByClinetIdAndToken({
         //   token: session?.accessToken,
         //   clientId: session?.clientId,
         // });
-
-        setClientSettings(session?.clientSetting);
+        if (clientSettings.length == 0) {
+          setClientSettings(session?.clientSetting);
+        }
       }
-    })();
-  }, [ userVehicle]);
+    }
+    dataFetchHandler();
+    // let interval:any;
+    
+    // if (!isFirstTimeFetchedFromGraphQL) {
+    
+    // } else {
+    
+    //   interval = setInterval(dataFetchHandler, fetchTimeoutGraphQL); // Runs every fetchTimeoutGraphQL seconds
 
+    // }
+    // return () => {
+    //   clearInterval(interval); // Clean up the interval on component unmount
+    // };
+  }, [isFirstTimeFetchedFromGraphQL
+    ]);
+
+    useEffect(()=>{
+  let interval = setInterval(()=>{    
+    setIsFirstTimeFetchedFromGraphQL(prev=>!prev)
+  }, fetchTimeoutGraphQL); // Runs every fetchTimeoutGraphQL seconds
+
+  return () => {
+    clearInterval(interval); // Clean up the interval on component unmount
+  };
+},[isOnline,
+  session?.clientId,userVehicle])
   // This useEffect is responsible for fetching data from the GraphQL Server.
   // Runs if:
   // Data is not being recieved in last 60 seconds from socket.
-  const fetchTimeoutGraphQL = fullparams=="full" ?10 * 1000:60*1000; //60 seconds
-  useEffect(() => {
-    // console.log("dataFetchHandler",  isFirstTimeFetchedFromGraphQL,
-      // session?.clientId,
-      // lastDataReceivedTimestamp,
-      // fetchTimeoutGraphQL,)
-      
-      const dataFetchHandler = async() => {
-      // console.log(isFirstTimeFetchedFromGraphQL)
-      // Does not run for the first time when page is loaded
-      if (isFirstTimeFetchedFromGraphQL) {
-        // const now = new Date();
-        // const elapsedTimeInSeconds = Math.floor(
-          // (now.getTime() - lastDataReceivedTimestamp.getTime()) / 1000
-        // );
-        if (session?.clientId) {
-          // getVehicleDataByClientId(session?.clientId);
-          const clientVehicleData = await getVehicleDataByClientId(
-            session?.clientId
-          );
-  
-          if (clientVehicleData?.data?.Value) {
-            let parsedData = JSON.parse(
-              clientVehicleData?.data?.Value
-            )?.cacheList;
-            // call a filter function here to filter by IMEI and latest time stamp
-            let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
-            // carData.current = uniqueData;
-            let matchingVehicles;
-            if (role === "Controller") {
-              let vehicleIds = userVehicle.map((item: any) => item._id);
-              // Filter carData.current based on vehicleIds
-              matchingVehicles = uniqueData.filter((vehicle) =>
-                vehicleIds.includes(vehicle.vehicleId)
-              );
-              carData.current = matchingVehicles;
-            } else {
-              carData.current = uniqueData;
-            }
-  
-            setIsFirstTimeFetchedFromGraphQL(true);
-          }
-        }
-        // if (elapsedTimeInSeconds <= fetchTimeoutGraphQL) {
-        // }
-      }
-    };
-    const interval = setInterval(dataFetchHandler, fetchTimeoutGraphQL); // Runs every fetchTimeoutGraphQL seconds
+  // useEffect(() => {
+  //   const dataFetchHandler = async () => {
+  //     // Does not run for the first time when page is loaded
+  //     if (isFirstTimeFetchedFromGraphQL) {
+  //       // const now = new Date();
+  //       // const elapsedTimeInSeconds = Math.floor(
+  //       // (now.getTime() - lastDataReceivedTimestamp.getTime()) / 1000
+  //       // );
+  //       if (session?.clientId) {
+  //         // getVehicleDataByClientId(session?.clientId);
+  //         const clientVehicleData = await getVehicleDataByClientId(
+  //           session?.clientId
+  //         );
 
-    return () => {
-      clearInterval(interval); // Clean up the interval on component unmount
-    };
-  }, [
-    isFirstTimeFetchedFromGraphQL,
-    session?.clientId,
-    // lastDataReceivedTimestamp,
-    fetchTimeoutGraphQL,
-  ]);
+  //         if (clientVehicleData?.data?.Value) {
+  //           let parsedData = JSON.parse(
+  //             clientVehicleData?.data?.Value
+  //           )?.cacheList;
+  //           // call a filter function here to filter by IMEI and latest time stamp
+  //           let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
+  //           // carData.current = uniqueData;
+  //           let matchingVehicles;
+  //           if (role === "Controller") {
+  //             let vehicleIds = userVehicle.map((item: any) => item._id);
+  //             // Filter carData.current based on vehicleIds
+  //             matchingVehicles = uniqueData.filter((vehicle) =>
+  //               vehicleIds.includes(vehicle.vehicleId)
+  //             );
+  //             carData.current = matchingVehicles;
+  //           } else {
+  //             carData.current = uniqueData;
+  //           }
+
+  //           setIsFirstTimeFetchedFromGraphQL(true);
+  //         }
+  //       }
+  //       // if (elapsedTimeInSeconds <= fetchTimeoutGraphQL) {
+  //       // }
+  //     }
+  //   };
+  //   const interval = setInterval(dataFetchHandler, fetchTimeoutGraphQL); // Runs every fetchTimeoutGraphQL seconds
+  //   return () => {
+  //     clearInterval(interval); // Clean up the interval on component unmount
+  //   };
+  // }, [
+  //   isFirstTimeFetchedFromGraphQL,
+  //   session?.clientId,
+  //   // lastDataReceivedTimestamp,
+  //   fetchTimeoutGraphQL
+  // ]);
 
   // This useEffect is responsible for getting the data from socket and updating it into the state.
   useEffect(() => {
-    if (isOnline && session?.clientId && fullparams!="full") {
+    if (isOnline && session?.clientId && fullparams != "full") {
       try {
         socket.io.opts.query = { clientId: session?.clientId };
         socket.connect();
@@ -277,13 +290,11 @@ const LiveTracking = () => {
             }
             // carData.current = uniqueData;
 
-            
-
             // setLastDataReceivedTimestamp(new Date());
           }
         );
       } catch (err) {
-        
+
       }
     }
     if (!isOnline) {
@@ -293,7 +304,8 @@ const LiveTracking = () => {
       socket.disconnect();
     };
   }, [isOnline, session?.clientId, userVehicle]);
-
+useEffect(()=>{  
+},[carData.current])
   const { countParked, countMoving, countPause } = countCars(carData?.current);
 
   return (
@@ -301,7 +313,6 @@ const LiveTracking = () => {
       <div className="grid lg:grid-cols-5 sm:grid-cols-5 md:grid-cols-5 grid-cols-1">
         <LiveSidebar
           carData={carData.current}
-          
           countMoving={countMoving}
           countPause={countPause}
           countParked={countParked}
@@ -317,7 +328,6 @@ const LiveTracking = () => {
           setSelectedOdoVehicle={setSelectedOdoVehicle}
           selectedOdoVehicle={selectedOdoVehicle}
           setPosition={setPosition}
-         
         />
         {carData?.current?.length !== 0 && (
           <LiveMap
@@ -335,7 +345,6 @@ const LiveTracking = () => {
             showZones={showZones}
             selectedOdoVehicle={selectedOdoVehicle}
             position={position}
-          
           />
         )}
       </div>
