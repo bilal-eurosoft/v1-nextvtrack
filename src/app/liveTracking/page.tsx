@@ -93,7 +93,7 @@ const LiveTracking = () => {
     userVehicles();
   }, []);
   const role = session?.userRole;
-  const fetchTimeoutGraphQL = fullparams == "full" ? 10 * 1000 : 60 * 1000; //60 seconds
+  const fetchTimeoutGraphQL = 60 * 1000; //60 seconds
 
   useEffect(() => {
     
@@ -219,7 +219,7 @@ const LiveTracking = () => {
 
   // This useEffect is responsible for getting the data from socket and updating it into the state.
   useEffect(() => {
-    if (isOnline && session?.clientId && fullparams != "full") {
+    if (isOnline && session?.clientId ) {
       try {
         socket.io.opts.query = { clientId: session?.clientId };
         socket.connect();
