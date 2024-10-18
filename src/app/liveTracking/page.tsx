@@ -32,7 +32,7 @@ const LiveTracking = () => {
   // const [zoneList, setZoneList] = useState<zonelistType[]>([]);
   const [activeColor, setIsActiveColor] = useState<any>("");
   const [showAllVehicles, setshowAllVehicles] = useState(false);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(false);
   // const [showZonePopUp, setShowZonePopUp] = useState(true);
   const [isFirstTimeFetchedFromGraphQL, setIsFirstTimeFetchedFromGraphQL] =
     useState(false);
@@ -42,7 +42,9 @@ const LiveTracking = () => {
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleData | null>(
     null
   );
-  const [selectedOdoVehicle, setSelectedOdoVehicle] = useState(null);
+  const [selectedOdoVehicle, setSelectedOdoVehicle] = useState(
+    null
+  );
   const [userVehicle, setuserVehicle] = useState([]);
   const [unselectVehicles, setunselectVehicles] = useState(false);
   const [zoom, setZoom] = useState(10);
@@ -74,24 +76,9 @@ const LiveTracking = () => {
     setZoom(zoomLevel);
   }, [clientMapSettings]);
   // This useEffect is responsible for checking internet connection in the browser.
-  // useEffect(() => {
-  //   setIsOnline(navigator.onLine);
-  //   function onlineHandler() {
-  //     setIsOnline(true);
-  //   }
-    
-  //   function offlineHandler() {
-  //     setIsOnline(false);
-  //   }
-  //   // if (typeof window !== "undefined") {
-  //   //   window.addEventListener("online", onlineHandler);
-  //   //   window.addEventListener("offline", offlineHandler);
-  //   //   return () => {
-  //   //     window.removeEventListener("online", onlineHandler);
-  //   //     window.removeEventListener("offline", offlineHandler);
-  //   //   };
-  //   // }
-  // }, []);
+  useEffect(() => {
+    setIsOnline(navigator.onLine);
+  }, []);
 
   useEffect(() => {
     async function userVehicles() {

@@ -20,9 +20,6 @@ import moment from "moment";
 import { DeviceAttach } from "@/types/vehiclelistreports";
 import { Toaster, toast } from "react-hot-toast";
 import "./newstyle.css";
-import { List, ListItem, ListItemText, Collapse } from "@material-ui/core";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import DateFnsMomentUtils from "@date-io/date-fns";
 import EventIcon from "@material-ui/icons/Event";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
@@ -41,25 +38,21 @@ if(!session?.immobilising){
   }
   const [loading, setLoading] = useState(false);
   const [gprsdataget, setgprsdataget] = useState(false);
-
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [input, setInput] = useState<any>(1);
-  const [activeTab, setActiveTab] = useState("View");
-  const handleClick = (tab: string) => {
-    setLoading(true);
-    setActiveTab((prevTab) => (prevTab === tab ? "View" : tab));
-  };
   const [selectedVehiclelist, setSelectedVehiclelist] = useState<any>("");
   const [filteredRecords, setFilteredRecords] = useState([]);
   const [filteredDataIsAvaialable, setfilteredDataIsAvaialable] =
     useState<boolean>(true);
   const [gprsData, setGprsData] = useState([]);
   const [gprs, setGprs] = useState([]);
-  
+
 
   const handleVehicleChange = (e: any) => {
     if (e == null) {
       setFilteredRecords(gprsData);
+      setfilteredDataIsAvaialable(true)
+      setCurrentPage(1)
     }
     setSelectedVehiclelist(e);
   };
@@ -84,15 +77,7 @@ if(!session?.immobilising){
       toast.error("Please select Vehicle");
       return;
     }
-    // if (!fromDate) {
-    //   toast.error("Please select From Date");
-    //   return;
-    // }
 
-    // if (!toDate) {
-    //   toast.error("Please select To Date");
-    //   return;
-    // }
     if (fromDate && toDate) {
       const fromDateString = (fromDate as any).toISOString().split("T")[0];
       const toDateString = (toDate as any).toISOString().split("T")[0];
@@ -105,18 +90,18 @@ if(!session?.immobilising){
       if (selectedVehiclelist === null || selectedVehiclelist === "") {
         setFilteredRecords(filtered);
         setCurrentPage(1);
-        // if (filtered.length === 0) {
-        //   setfilteredDataIsAvaialable(false);
-        // }
+        if (filtered.length === 0) {
+          setfilteredDataIsAvaialable(false);
+        }
       } else {
         const filteredWithVehicle = filtered.filter(
           (record: any) => record.Label1 === selectedVehiclelist?.value
         );
         setFilteredRecords(filteredWithVehicle);
         setCurrentPage(1);
-        // if (filteredWithVehicle.length === 0) {
-        //   setfilteredDataIsAvaialable(false);
-        // }
+        if (filteredWithVehicle.length === 0) {
+          setfilteredDataIsAvaialable(false);
+        }
       }
     } else if (selectedVehiclelist !== null || selectedVehiclelist !== "") {
       const filteredWithVehicle = gprsData.filter(
@@ -125,9 +110,9 @@ if(!session?.immobilising){
 
       setFilteredRecords(filteredWithVehicle);
       setCurrentPage(1);
-      //   if (filteredWithVehicle.length === 0) {
-      //     setfilteredDataIsAvaialable(false);
-      //   }
+        if (filteredWithVehicle.length === 0) {
+          setfilteredDataIsAvaialable(false);
+        }
     }
     //   else {
     //     setFilteredRecords(filteredRecords);
@@ -142,9 +127,15 @@ if(!session?.immobilising){
       const filteredWithVehicle = gprsData.filter(
         (record: any) => record.Label1 === selectedVehiclelist?.value
       );
+      if(filteredWithVehicle.length>0){
+        setfilteredDataIsAvaialable(true)
+      }
       setFilteredRecords(filteredWithVehicle);
       setCurrentPage(1);
     } else {
+      if(gprsData.length>0){
+        setfilteredDataIsAvaialable(true)
+      }
       setFilteredRecords(gprsData);
     }
   };
@@ -183,83 +174,9 @@ if(!session?.immobilising){
             token: session?.accessToken,
             clientId: session?.clientId
           });
-          
-          setGprs(response)
-          // let data: any = [];
-          // response.map((i: any, index: any) => {
-          //   let r: any = vehicleList.find((j) => {
-          //     return j.deviceIMEI == i.deviceIMEI;
-          //   });
-          
 
-          //   if (r) {
-          //     let { clientId, vehicleReg, Label1, dualCam, immobilising } = r;
-          //     let devicestatus;
-          //     if (dualCam && immobilising) {
-          //       let c = i.commandtext.split(" ");
-          //       if (
-          //         c[0] == "setdigout" &&
-          //         c[1] == "2" &&
-          //         i.status == "Pending"
-          //       ) {
-          //         // if(i.status=="Pending"){
-          //         if (!i.commandResponse) {
-          //           devicestatus = "Activation in process";
-          //         } else {
-          //           devicestatus = "Activated";
-          //         }
-          //       } else if (
-          //         c[0] == "setdigout" &&
-          //         c[1] == "0" &&
-          //         i.status == "Pending"
-          //       ) {
-                 
-          //         if (!i.commandResponse) {
-          //           devicestatus = "Deactivation in process";
-          //         } else {
-          //           devicestatus = "Deactivated";
-          //         }
-          //       }
-          //     } else if (immobilising) {
-          //       let c = i.commandtext.split(" ");
-          //       if (c[0] == "setdigout" && c[1] == "1") {
-                
-          //         if (!i.commandResponse) {
-          //           devicestatus = "Activation in process";
-          //         } else {
-          //           devicestatus = "Activated";
-          //         }
-          //       } else if (c[0] == "setdigout" && c[1] == "0") {
-                 
-          //         if (!i.commandResponse) {
-          //           devicestatus = "Deactivation in process";
-          //         } else {
-          //           devicestatus = "Deactivated";
-          //         }
-          //       }
-          //     }
-
-          //     if (devicestatus != undefined) {
-          //       data.push({
-          //         ...i,
-          //         clientId,
-          //         vehicleReg,
-          //         Label1,
-          //         dualCam,
-          //         immobilising,
-          //         devicestatus
-          //       });
-          //     }
-          //   }
-
-          //   if (index == (response.length - 1)) {
-          //     setGprsData(data);
-              
-          //     setFilteredRecords(data);
-          //     setLoading(false);
-          //     setfilteredDataIsAvaialable(true)
-          //   }
-          // });
+          setGprs(response);
+        
         }
       } catch (error) {
         console.error("Error fetching  data:", error);
@@ -267,19 +184,17 @@ if(!session?.immobilising){
     };
 
     // if (vehicleList?.length > 0 && (filteredRecords?.length == 0 || loading || gprsdataget) ) {
-    if (filteredRecords?.length == 0 || gprsData.length == 0 || gprsdataget ) {
-      
+    if (filteredRecords?.length == 0 || gprsData.length == 0 || gprsdataget) {
       getGprsData();
       setgprsdataget(false);
     }
   }, [session, gprsdataget]);
-  useEffect(()=>{
+  useEffect(() => {
     let data: any = [];
     gprs.map((i: any, index: any) => {
       let r: any = vehicleList.find((j) => {
         return j.deviceIMEI == i.deviceIMEI;
       });
-    
 
       if (r) {
         let { clientId, vehicleReg, Label1, dualCam, immobilising } = r;
@@ -302,7 +217,6 @@ if(!session?.immobilising){
             c[1] == "0" &&
             i.status == "Pending"
           ) {
-           
             if (!i.commandResponse) {
               devicestatus = "Deactivation in process";
             } else {
@@ -312,14 +226,12 @@ if(!session?.immobilising){
         } else if (immobilising) {
           let c = i.commandtext.split(" ");
           if (c[0] == "setdigout" && c[1] == "1") {
-          
             if (!i.commandResponse) {
               devicestatus = "Activation in process";
             } else {
               devicestatus = "Activated";
             }
           } else if (c[0] == "setdigout" && c[1] == "0") {
-           
             if (!i.commandResponse) {
               devicestatus = "Deactivation in process";
             } else {
@@ -343,10 +255,37 @@ if(!session?.immobilising){
 
       if (index == (gprs.length - 1)) {
         setGprsData(data);
+        setCurrentPage(1);
+
+        let filter=data
+        if (selectedVehiclelist !== null && selectedVehiclelist !== "") {
+          
+          filter = filter.filter(
+            (record: any) => record.Label1 === selectedVehiclelist?.value
+          );
+        }
+        if (fromDate && toDate) {
+          
+
+          const fromDateString = (fromDate as any).toISOString().split("T")[0];
+          const toDateString = (toDate as any).toISOString().split("T")[0];
+
+          filter = filter.filter((record: any) => {
+            const recordDate = (record.createdAt as any).split("T")[0];
+
+            return recordDate >= fromDateString && recordDate <= toDateString;
+          });
+        }
         
-        setFilteredRecords(data);
+        if (filter.length === 0) {
+          setfilteredDataIsAvaialable(false);
+        }
+        
+
+        
+        setFilteredRecords(filter);
         setLoading(false);
-        setfilteredDataIsAvaialable(true)
+        setfilteredDataIsAvaialable(true);
       }
     });
   },[gprs])
@@ -356,20 +295,12 @@ if(!session?.immobilising){
   const records = filteredRecords.slice(firstIndex, lastIndex);
 
   const totalCount: any = Math.ceil(filteredRecords?.length / recordsPerPage);
- 
- 
- useEffect(()=>{
- 
- },[filteredRecords])
-  // const options2 =
-  //   vehicleList?.map((item: any) => ({
-  //     value: item.vehicleReg,
-  //     label: item.vehicleReg
-  //   })) || [];
+
+  // useEffect(() => {}, [filteredRecords]);
 
   const svgStyle = {
-    transition: 'transform 0.3s ease, fill 0.3s ease',
-};
+    transition: "transform 0.3s ease, fill 0.3s ease"
+  };
 
 const handleMouseOver = (e: { currentTarget: { style: { transform: string; fill: string; }; }; }) => {
     e.currentTarget.style.transform = 'scale(1.1)';
@@ -384,10 +315,7 @@ const handleMouseOut = (e: { currentTarget: { style: { transform: string; fill: 
 const [isBlinking, setIsBlinking] = useState(false);
 
 const handleReload = () => {
-  
   setIsBlinking(true);
- 
-  
   // Simulate data fetching or reloading here
   setTimeout(() => {
     setIsBlinking(false);
@@ -688,7 +616,7 @@ const blinkingStyle = {
                       <div>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                           <TableHead className="sticky top-0   font-bold">
-                          <TableRow  style={blinkingStyle}>
+                            <TableRow style={blinkingStyle}>
                               <TableCell
                                 align="center"
                                 className="border-r border-green  font-popins font-bold "
@@ -823,12 +751,12 @@ const blinkingStyle = {
                             onChange={(e) => {
                               let inputValues: any =
                                 e.target.value.match(/\d+/g);
-                              if (inputValues > 0 && inputValues < totalCount) {
+                              if (inputValues > 0 && inputValues <= totalCount) {
                                 setInput(parseInt(e.target.value));
 
                                 setCurrentPage(e.target.value);
                               } else {
-                                setInput("");
+                                setInput(1);
                               }
                             }}
                           />
