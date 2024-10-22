@@ -615,7 +615,8 @@ export default function JourneyReplayComp() {
             .subtract(7, "days")
             .startOf("day")
             .tz(session?.timezone);
-          const oneday = moment().subtract(1, "day");
+          const oneday = moment().subtract(1, "day").endOf("day")
+          .tz(session?.timezone);
 
           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =

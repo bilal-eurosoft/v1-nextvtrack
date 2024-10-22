@@ -290,18 +290,28 @@ export default function Reports() {
           // Handle other periods if needed
         }
         if (period === "yesterday") {
-          const yesterday = moment().subtract(1, "day");
+          const yesterday = moment().subtract(1, "day").tz(session?.timezone);
           startDateTime =
             yesterday.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
             "Z";
           endDateTime =
             yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+          // const yesterday = moment().subtract(1, "day");
+          // startDateTime =
+          //   yesterday.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
+          //   "Z";
+          // endDateTime =
+          //   yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
         }
         if (period === "week") {
           
-          const startOfWeek = moment().subtract(7, "days").startOf("day");
-          
-          const oneday = moment().subtract(1, "day");
+        
+          const startOfWeek = moment()
+            .subtract(7, "days")
+            .startOf("day")
+            .tz(session?.timezone);
+          const oneday = moment().subtract(1, "day").endOf("day")
+          .tz(session?.timezone);
 
           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
           

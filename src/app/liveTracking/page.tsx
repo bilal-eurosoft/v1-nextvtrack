@@ -9,7 +9,6 @@ import {
   getVehicleDataByClientId,
   getAllVehicleByUserId,
 } from "@/utils/API_CALLS";
-import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { socket } from "@/utils/socket";
 import countCars from "@/utils/countCars";
@@ -59,8 +58,6 @@ const LiveTracking = () => {
   const clientZoomSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Zoom"
   )[0]?.PropertyValue;
-  const searchParams = useSearchParams();
-  const fullparams = searchParams.get("screen");
   useEffect(() => {
     const regex = /lat:([^,]+),lng:([^}]+)/;
     if (clientMapSettings) {
@@ -96,7 +93,6 @@ const LiveTracking = () => {
   const fetchTimeoutGraphQL = 60 * 1000; //60 seconds
 
   useEffect(() => {
-    
     async function dataFetchHandler() {
       if (session?.clientId) {
         const clientVehicleData = await getVehicleDataByClientId(
