@@ -24,7 +24,7 @@ const LiveSidebar = ({
   setunselectVehicles,
   unselectVehicles,
   setZoom,
-  setShowZonePopUp,
+  // setShowZonePopUp,
   setShowZones,
   setSelectedOdoVehicle,
   selectedOdoVehicle,
@@ -41,7 +41,7 @@ const LiveSidebar = ({
   setunselectVehicles: any;
   unselectVehicles: any;
   setZoom: any;
-  setShowZonePopUp: any;
+  // setShowZonePopUp: any;
   setShowZones: any;
   setSelectedOdoVehicle:any;
   selectedOdoVehicle:any;
@@ -448,8 +448,8 @@ const [srcimgindex, setsrcimgindex] = useState(null);
               )}
               </div>
           
-              {item.DriverName && (item?.vehicleStatus === "Moving" || item?.vehicleStatus === "Pause") && (
-                <p className="text-start">Driver Name: {item.DriverName.replace("undefine", "")}</p>
+              {item.DriverName && (item?.vehicleStatus === "Moving" || item?.vehicleStatus === "Pause") && (                
+                <p className="text-start font-bold">Driver Name: {item.DriverName.replace("undefine", "")}</p>
               )}
             </div>
             <button className="border-b-2 border-green w-full text-end -mt-10"></button>

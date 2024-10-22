@@ -130,6 +130,7 @@ const DynamicCarMap = ({
   const handleShowZone = () => {
     setShowZones(!showZones);
   };
+  let ododata = carData.filter((item)=> item.vehicleReg ==selectedOdoVehicle?.vehicleReg)[0]?.odometer
 
   return (
     <>
@@ -217,6 +218,23 @@ const DynamicCarMap = ({
 
   </div>
 )}
+
+{ selectedOdoVehicle != null  && ( 
+<div
+    className="absolute   left-2  bg-white border border-gray-300 p-2 rounded shadow-md"
+
+      style={{ position: 'absolute', top: position.top - 65, left: position.left - 390 }}
+  >
+    <div className="relative bottom-full left-1/2 transform -translate-x-1/2">
+    
+    </div>
+    <p style={{fontFamily:"Popins, sans-serif"}}> Total Odometer: {ododata} {session?.unit}</p>
+    
+    
+
+  </div>
+)}
+
 
           {/* <div className="grid grid-cols-1 absolute shadow-lg rounded-md lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">
             <div className="col-span-1" style={{ color: "green" }}>

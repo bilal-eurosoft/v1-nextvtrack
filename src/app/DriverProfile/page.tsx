@@ -43,8 +43,14 @@ const style = {
   boxShadow: 24,
 };
 
+import { redirect } from "next/navigation";
 export default function DriverProfile() {
   const { data: session } = useSession();
+
+  
+if(!session?.driverProfile){
+  redirect("/liveTracking")
+  }
   const [DriverData, setDriverData] = useState<pictureVideoDataOfVehicleT[]>(
     []
   );

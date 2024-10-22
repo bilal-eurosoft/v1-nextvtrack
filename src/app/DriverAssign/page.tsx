@@ -29,7 +29,6 @@ import { vehicleListByClientId } from "@/utils/API_CALLS";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import "./assign.css";
-import { el } from "date-fns/locale";
 import { InputLabel } from "@mui/material";
 interface Column {
   id: "name" | "code" | "population" | "size" | "density";
@@ -159,9 +158,14 @@ const style = {
   boxShadow: 24,
 };
 
+import { redirect } from "next/navigation";
 export default function DriverProfile() {
   const router = useRouter();
   const { data: session } = useSession();
+  
+if(!session?.driverProfile){
+  redirect("/liveTracking")
+  }
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [open, setOpen] = useState(false);
