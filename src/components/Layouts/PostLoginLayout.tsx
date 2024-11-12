@@ -22,9 +22,12 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import TimeCounter from "@/app/context/timer";
 import { usePathname, useSearchParams } from "next/navigation";
-import { getZoneListByClientId } from "@/utils/API_CALLS";
+import { getNotificationsData, getNotificationsDataByUserId, getZoneListByClientId } from "@/utils/API_CALLS";
 import { fetchZone } from "@/lib/slices/zoneSlice";
 import { useSelector } from "react-redux";
+
+import { FaBell } from 'react-icons/fa'; // Using React Icons for the bell icon
+
 import {
   Popover,
   PopoverHandler,
@@ -35,6 +38,7 @@ import {
 import "./layout.css";
 import BlinkingTime from "../General/BlinkingTime";
 import { stringify } from "querystring";
+import NotificationDropdown from "./notifications";
 // const inter = Inter({ subsets: ["latin"] });
 // Example import statement
 const drawerWidth = 58;
@@ -198,7 +202,159 @@ export default function RootLayout({
 
     filterZoneIds();
   }, [zoneList]);
+  
+  const [loading, setLoading] = useState(true); // Loading state
 
+  const BellButton = ({ toggleNotifications }) => {
+    const [hovered, setHovered] = useState(false); // Track hover state
+
+    return (
+      <div className="relative">
+        <button
+          onClick={toggleNotifications}
+          style={{
+            padding: '0.5rem',
+            backgroundColor: 'transparent',
+            color: 'white',
+            borderRadius: '9999px',
+            outline: 'none',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            cursor: 'pointer',
+            transition: 'transform 0.3s ease-in-out', // Smooth transition for animation
+            animation: hovered ? 'ringing 0.6s ease-in-out' : 'none', // Apply animation on hover only
+          }}
+          onMouseEnter={() => setHovered(true)} // Trigger hover state
+          onMouseLeave={() => setHovered(false)} // Reset hover state
+        >
+          <FaBell size={24} />
+        </button>
+  
+        <style>
+          {`
+            @keyframes ringing {
+              0%, 100% {
+                transform: translateX(0);
+              }
+              25% {
+                transform: translateX(-5px);
+              }
+              50% {
+                transform: translateX(5px);
+              }
+              75% {
+                transform: translateX(-5px);
+              }
+            }
+          `}
+        </style>
+      </div>
+    );
+  };
+
+  
+
+  const [showNotifications, setShowNotifications] = useState(false);
+  
+  const [notifications, setnotifications] = useState([]);
+ 
+
+  // Toggle the visibility of the notifications dropdown
+  const toggleNotifications = () => {
+    setShowNotifications((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (showNotifications) {
+      const fetchNotifications = async () => {
+        setLoading(true); // Set loading to true before the fetch starts
+        try {
+          if (session && session.userRole === "Admin") {
+            
+            const NotificationsData = await getNotificationsData({
+              token: session.accessToken,
+              clientId: session?.clientId,
+            });
+          
+console.log(NotificationsData.data);
+            
+            setnotifications(NotificationsData.data); // Assuming the response is an array of notifications
+         
+        
+          }
+          else {
+             
+            const NotificationsData = await getNotificationsDataByUserId({
+              token: session?.accessToken,
+              userId: session?.userId,
+            });
+           
+
+            
+            setnotifications(NotificationsData.data); // Assuming the response is an array of notifications
+        
+        
+          }
+        } catch (error) {
+          console.error('Error fetching notifications:', error);
+        } finally {
+          setLoading(false); // Set loading to false after the fetch is complete
+        }
+      };
+
+      fetchNotifications();
+    }
+  }, [showNotifications]);
+  
+ 
+
+ /*  const notifications = [
+    {
+      dateTime: "October 16 2024 07:50:00 PM",
+      event: "ignitionOn",
+      clientId: "",
+      title: "ignitionOn Alert",
+      description: `Your Vehicle AXF-398 (R) has Ignition On at October 16 2024 07:50:00 PM`
+      },
+      {
+        dateTime: "October 16 2024 07:50:00 PM",
+        event: "ignitionOff",
+        clientId: "",
+        title: "ignitionOff Alert",
+        description: `Your Vehicle AXF-398 (R) has Ignition Off at October 16 2024 07:50:00 PM`
+        },
+        {
+          dateTime: "October 16 2024 07:50:00 PM",
+          event: "geofenceEntered",
+          clientId: "",
+          title: "geofenceEntered Alert",
+          description: `Your Vehicle AXF-398 (R) has geofenceEntered at October 16 2024 07:50:00 PM`
+          },
+          {
+            dateTime: "October 16 2024 07:50:00 PM",
+            event: "geofenceLeft",
+            clientId: "",
+            title: "geofenceLeft Alert",
+            description: `Your Vehicle AXF-398 (R) has geofenceLeft at October 16 2024 07:50:00 PM`
+            },
+            {
+              dateTime: "October 16 2024 07:50:00 PM",
+              event: "harshacceleration",
+              clientId: "",
+              title: "harshacceleration Alert",
+              description: `Your Vehicle AXF-398 (R) has harshacceleration at October 16 2024 07:50:00 PM`
+              },
+              {
+                dateTime: "October 16 2024 07:50:00 PM",
+                event: "harshcorning",
+                clientId: "",
+                title: "harshcorning Alert",
+                description: `Your Vehicle AXF-398 (R) has harshcorning at October 16 2024 07:50:00 PM`
+                },
+  ]; */
+
+  
   return (
     // <div className={inter.className}>
     <div>
@@ -425,42 +581,47 @@ export default function RootLayout({
               </Tooltip>
             </Link>
             <Link href="/Notifications">
-              <Tooltip
-                className="bg-[#00B56C] text-white shadow-lg rounded"
-                placement="right"
-                content="Events and Notifications"
-              >
-                <svg
-                  className={`w-20 h-14 py-3 
-  text-white-10  dark:text-white  ${
-    pathname === "/Notifications"
-      ? "border-r-2 border-#29303b -my-1"
-      : "border-y-1 border-b-2"
-  }`}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{
-                    color: pathname === "/Notifications" ? "green" : "white",
-                    backgroundColor:
-                      pathname === "/Notifications" ? "white" : ""
-                  }}
-                >
-                  <path
-                    d="M9.5 19C8.89555 19 7.01237 19 5.61714 19C4.87375 19 4.39116 18.2177 4.72361 17.5528L5.57771 15.8446C5.85542 15.2892 6 14.6774 6 14.0564C6 13.2867 6 12.1434 6 11C6 9 7 5 12 5C17 5 18 9 18 11C18 12.1434 18 13.2867 18 14.0564C18 14.6774 18.1446 15.2892 18.4223 15.8446L19.2764 17.5528C19.6088 18.2177 19.1253 19 18.382 19H14.5M9.5 19C9.5 21 10.5 22 12 22C13.5 22 14.5 21 14.5 19M9.5 19C11.0621 19 14.5 19 14.5 19"
-                    stroke-linejoin="round"
-                  />
-                  <path
-                    d="M12 5V3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </Tooltip>
-            </Link>
+  <Tooltip
+    className="bg-[#00B56C] text-white shadow-lg rounded"
+    placement="right"
+    content="Notification Settings"
+  >
+    <svg
+      className={`w-20 h-14 py-3 text-white-10 dark:text-white ${
+        pathname === "/Notifications"
+          ? "border-r-2 border-#29303b -my-1"
+          : "border-y-1 border-b-2"
+      }`}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{
+        color: pathname === "/Notifications" ? "green" : "white",
+        backgroundColor:
+          pathname === "/Notifications" ? "white" : "",
+      }}
+    >
+      {/* Bell Icon */}
+      <path
+        d="M12 22C13.1046 22 14 21.1046 14 20C14 19.4477 13.5523 19 13 19H11C10.4477 19 10 19.4477 10 20C10 21.1046 10.8954 22 12 22ZM18 16V11C18 7.13401 15.866 4 12 4C8.13401 4 6 7.13401 6 11V16L4 18V19H20V18L18 16Z"
+      />
+      {/* Gear Icon next to Bell */}
+      <circle cx="17" cy="7" r="3" stroke="currentColor" strokeWidth="2" fill="none" />
+      <path
+        d="M17 4V3M17 10V11M14.5 7.5L13.7 6.7M19.5 7.5L20.3 6.7M14.5 9.5L13.7 10.3M19.5 9.5L20.3 10.3M15 3H19"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  </Tooltip>
+</Link>
+
+
+
 
             {(session?.userRole == "SuperAdmin" ||
               session?.userRole == "Admin") && (
@@ -1108,17 +1269,30 @@ export default function RootLayout({
                   </Drawer>
                 </Box>
               </div>
-              <div className=" grid lg:grid-cols-12 grid-cols-12  lg:gap-5  px-4  header_client_name">
-                <div className="lg:col-span-2 col-span-12 ">
-                  <p className="text-white lg:text-start md:text-start text-center font-popins lg:text-2xl md:text-xl sm:text-md ">
-                    {session?.clientName}
-                  </p>
-                </div>
-                <div className="lg:col-span-4  md:col-span-4 sm:col-span-10  col-span-12 lg:mx-0 md:mx-4 sm:mx-4 mx-4  lg:mt-2 flex items-center">
-                  <a className="  text-white text-center font-popins text-xl sm:text-md">
-                    <BlinkingTime timezone={session?.timezone} />
-                  </a>
-                </div>
+              <div className="grid lg:grid-cols-12 grid-cols-12 lg:gap-5 px-4 header_client_name">
+      {/* Client Name */}
+      <div className="lg:col-span-2 col-span-12">
+        <p className="text-white lg:text-start md:text-start text-center font-popins lg:text-2xl md:text-xl sm:text-md">
+          {session?.clientName}
+        </p>
+      </div>
+
+      {/* Time */}
+      <div className="lg:col-span-4 md:col-span-4 sm:col-span-10 col-span-12 lg:mx-0 md:mx-4 sm:mx-4 mx-4 lg:mt-2 flex items-center">
+        <a className="text-white text-center font-popins text-xl sm:text-md">
+          <BlinkingTime timezone={session?.timezone} />
+        </a>
+      </div>
+      {session?.PortalNotification && ( 
+      <div className="relative">
+     <BellButton toggleNotifications={toggleNotifications} />
+    
+      {showNotifications && (
+        <NotificationDropdown notifications={notifications} />
+      )}
+    </div>
+ 
+  )}
                 <div className="lg:col-span-2  md:col-span-1 sm:col-span-1 col-span-1  popup_mob_screen">
                   <Popover>
                     {/* <PopoverHandler {...triggers}>
@@ -1199,7 +1373,8 @@ export default function RootLayout({
                     </PopoverContent>
                   </Popover>
                 </div>
-              </div>
+                
+    </div>
             </nav>
             {children}
           </div>

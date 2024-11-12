@@ -26,5 +26,6 @@ declare module "next-auth" {
     ClientSettingsZoom: String;
     smsForCamera:Boolean;
     immobilising:Boolean;
+    PortalNotification:Boolean;
   }
 }
