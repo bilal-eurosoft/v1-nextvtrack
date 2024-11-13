@@ -280,10 +280,12 @@ export default function Notifications() {
                   Notification Pemission
                 </p>
               </TableCell>
-            
-              <TableCell align="center">
+            {
+              session?.PortalNotification&&
+              (<TableCell align="center">
                 <p className="text-lg text-white"> </p>
-              </TableCell>
+              </TableCell>)
+            }
               <TableCell align="center">
                 <p className="text-lg text-white"> </p>
               </TableCell>
