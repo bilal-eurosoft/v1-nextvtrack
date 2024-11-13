@@ -8,45 +8,58 @@ const NotificationDropdown = ({ notifications }) => {
         return {
           background: '#D1FAE5', // light green
           border: '#34D399', // dark green
-          color: '#00B56C', // text color
+          color: '#4CAF50', // green (text color for ignition on)
         };
       case 'ignitionOff':
         return {
-          background: '#FEE2E2', // light red
-          border: '#FCA5A5', // dark red
-          color: '#FF0000', // text color
+          background: '#E0E7FF', // light blue-gray
+          border: '#A5B4FC', // blue-gray border
+          color: '#3B82F6', // blue (text color for ignition off)
         };
-      case 'geofenceEntered':
+      case 'targetEnteredZone':
         return {
           background: '#E0F2FF', // light blue
           border: '#93C5FD', // blue
-          color: '#1E40AF', // text color
+          color: '#2196F3', // blue (text color for entered zone)
         };
-      case 'geofenceLeft':
+      case 'targetLeftZone':
         return {
-          background: '#FEF3C7', // light yellow
-          border: '#FBBF24', // yellow
-          color: '#B45309', // text color
+          background: '#FFFBEB', // very light yellow
+          border: '#FDE68A', // soft yellow
+          color: '#D97706', // dark yellow-orange (text color for left zone)
         };
-      case 'harshacceleration':
+      case 'harshBreak':
         return {
-          background: '#F9FAFB', // light gray
-          border: '#E5E7EB', // gray
-          color: '#6B7280', // text color
+          background: '#FFEBEE', // light pink
+          border: '#FFCDD2', // pink
+          color: '#FF5722', // orange-red (text color for harsh break)
         };
-      case 'harshcorning':
+      case 'harshAcceleration':
         return {
-          background: '#FEE2E2', // light red
-          border: '#FCA5A5', // dark red
-          color: '#FF0000', // text color
+          background: '#FFF7ED', // light orange
+          border: '#FFCC80', // orange
+          color: '#FF9800', // orange (text color for harsh acceleration)
+        };
+      case 'harshCornering':
+        return {
+          background: '#EDE7F6', // light purple
+          border: '#D1C4E9', // purple
+          color: '#673AB7', // deep purple (text color for harsh cornering)
+        };
+      case 'overSpeeding':
+        return {
+          background: '#FFEBEE', // light pink
+          border: '#EF9A9A', // red
+          color: '#F44336', // red (text color for overspeeding)
         };
       default:
         return {
           background: '#F9FAFB', // light gray (default)
           border: '#E5E7EB', // gray (default)
-          color: '#6B7280', // text color
+          color: '#6B7280', // gray (text color for default)
         };
     }
+    
   };
 
   useEffect(() => {
