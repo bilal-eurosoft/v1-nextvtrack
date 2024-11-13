@@ -45,24 +45,31 @@ export default function Notifications() {
     IgnitionOnPushNotification: false,
     IgnitionOnSMS: false,
     IgnitionOnEmail: false,
+    IgnitionOnPortal: false,
     IgnitionOffPushNotification: false,
     IgnitionOffSMS: false,
     IgnitionOffEmail: false,
+    IgnitionOffPortal: false,
     HarshBreakPushNotification: false,
     HarshBreakSMS: false,
     HarshBreakEmail: false,
+    HarshBreakPortal: false,
     HarshCorneringPushNotification: false,
     HarshCorneringSMS: false,
     HarshCorneringEmail: false,
+    HarshCorneringPortal: false,
     HarshAccelerationPushNotification: false,
     HarshAccelerationSMS: false,
     HarshAccelerationmail: false,
+    HarshAccelerationPortal: false,
     GeofenceNotification: false,
     GeofenceSMS: false,
     GeofenceEmail: false,
+    GeofencePortal: false,    
     OverSpeedNotification: false,
     OverSpeedSMS: false,
     OverSpeedEmail: false,
+    OverSpeedPortal: false
   });
 
   useEffect(() => {
@@ -95,48 +102,62 @@ export default function Notifications() {
             IgnitionOnPushNotification,
             IgnitionOnSMS,
             IgnitionOnEmail,
+            IgnitionOnPortal,
             IgnitionOffPushNotification,
             IgnitionOffSMS,
             IgnitionOffEmail,
+            IgnitionOffPortal,
             HarshBreakPushNotification,
             HarshBreakSMS,
             HarshBreakEmail,
+            HarshBreakPortal,
             HarshCorneringPushNotification,
             HarshCorneringSMS,
             HarshCorneringEmail,
+            HarshCorneringPortal,
             HarshAccelerationPushNotification,
             HarshAccelerationSMS,
             HarshAccelerationmail,
+            HarshAccelerationPortal,
             GeofenceNotification,
             GeofenceSMS,
             GeofenceEmail,
+            GeofencePortal,
             OverSpeedNotification,
             OverSpeedSMS,
             OverSpeedEmail,
+            OverSpeedPortal,
           } = response;
 
           const notifications = {
             IgnitionOnPushNotification,
             IgnitionOnSMS,
             IgnitionOnEmail,
+            IgnitionOnPortal,
             IgnitionOffPushNotification,
             IgnitionOffSMS,
             IgnitionOffEmail,
+            IgnitionOffPortal,
             HarshBreakPushNotification,
             HarshBreakSMS,
             HarshBreakEmail,
+            HarshBreakPortal,
             HarshCorneringPushNotification,
             HarshCorneringSMS,
             HarshCorneringEmail,
+            HarshCorneringPortal,
             HarshAccelerationPushNotification,
             HarshAccelerationSMS,
             HarshAccelerationmail,
+            HarshAccelerationPortal,
             GeofenceNotification,
             GeofenceSMS,
             GeofenceEmail,
+            GeofencePortal,
             OverSpeedNotification,
             OverSpeedSMS,
             OverSpeedEmail,
+            OverSpeedPortal,
           };
 
           setNotifications(notifications);
@@ -259,6 +280,10 @@ export default function Notifications() {
                   Notification Pemission
                 </p>
               </TableCell>
+            
+              <TableCell align="center">
+                <p className="text-lg text-white"> </p>
+              </TableCell>
               <TableCell align="center">
                 <p className="text-lg text-white"> </p>
               </TableCell>
@@ -286,6 +311,15 @@ export default function Notifications() {
                   Email
                 </p>
               </TableCell>
+              {
+                session?.PortalNotification&&(
+                  <TableCell align="right" id="border_bottom">
+                <p className="text-lg text-green mr-12 font-popins font-bold">
+                  Portal
+                </p>
+              </TableCell>
+                )
+              }
               {/* <TableCell align="right">Protein&nbsp;(g)</TableCell> */}
             </TableRow>
           </TableHead>
@@ -356,6 +390,21 @@ export default function Notifications() {
                   className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
                 />{" "}
               </TableCell>
+              {
+                session?.PortalNotification&&(
+                  <TableCell align="right" id="border_bottom">
+                  <input
+                    type="checkbox"
+                    name="IgnitionOnPortal"
+                    checked={notifications.IgnitionOnPortal}
+                    onChange={handleEventsPermissionChange}
+                    disabled={!eventsp.ignitionOn}
+                    style={{ accentColor: "green" }}
+                    className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
+                  />{" "}
+                </TableCell>
+                )}
+
             </TableRow>
 
             {/* second */}
@@ -421,6 +470,20 @@ export default function Notifications() {
                   className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
                 />
               </TableCell>
+              {
+                session?.PortalNotification&&(
+                  <TableCell align="right" id="border_bottom">
+                  <input
+                    type="checkbox"
+                    name="IgnitionOffPortal"
+                    checked={notifications.IgnitionOffPortal}
+                    onChange={handleEventsPermissionChange}
+                    disabled={!eventsp.ignitionOff}
+                    style={{ accentColor: "green" }}
+                    className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
+                  />{" "}
+                </TableCell>
+                )}
             </TableRow>
 
             {/* Thired */}
@@ -494,6 +557,21 @@ export default function Notifications() {
                   className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
                 />
               </TableCell>
+
+              {
+                session?.PortalNotification&&(
+                  <TableCell align="right" id="border_bottom">
+                  <input
+                    type="checkbox"
+                    name="GeofencePortal"
+                    checked={notifications.GeofencePortal}
+                    onChange={handleEventsPermissionChange}
+                    disabled={  !eventsp.targetEnteredZone && !eventsp.targetLeftZone}
+                    style={{ accentColor: "green" }}
+                    className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
+                  />{" "}
+                </TableCell>
+                )}
             </TableRow>
 
             {/* Fourth */}
@@ -559,6 +637,20 @@ export default function Notifications() {
                   className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
                 />
               </TableCell>
+              {
+                session?.PortalNotification&&(
+                  <TableCell align="right" id="border_bottom">
+                  <input
+                    type="checkbox"
+                    name="OverSpeedPortal"
+                    checked={notifications.OverSpeedPortal}
+                    onChange={handleEventsPermissionChange}
+                    disabled={!eventsp.overSpeeding}
+                    style={{ accentColor: "green" }}
+                    className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
+                  />{" "}
+                </TableCell>
+                )}
             </TableRow>
 
             {/* Five */}
@@ -624,6 +716,21 @@ export default function Notifications() {
                   className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
                 />{" "}
               </TableCell>
+              {
+                session?.PortalNotification&&(
+                  <TableCell align="right" id="border_bottom">
+                  <input
+                    type="checkbox"
+                    name="HarshBreakPortal"
+                    checked={notifications.HarshBreakPortal}
+                    onChange={handleEventsPermissionChange}
+                    disabled={!eventsp.harshBreak}
+
+                    style={{ accentColor: "green" }}
+                    className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
+                  />{" "}
+                </TableCell>
+                )}
             </TableRow>
 
             {/* six */}
@@ -689,6 +796,20 @@ export default function Notifications() {
                   className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
                 />{" "}
               </TableCell>
+              {
+                session?.PortalNotification&&(
+                  <TableCell align="right" id="border_bottom">
+                  <input
+                    type="checkbox"
+                    name="HarshCorneringPortal"
+                    checked={notifications.HarshCorneringPortal}
+                    onChange={handleEventsPermissionChange}
+                    disabled={!eventsp.harshCornering}
+                    style={{ accentColor: "green" }}
+                    className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
+                  />{" "}
+                </TableCell>
+                )}
             </TableRow>
 
             {/* Seven */}
@@ -754,6 +875,21 @@ export default function Notifications() {
                   className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600  mr-16"
                 />
               </TableCell>
+
+              {
+                session?.PortalNotification&&(
+                  <TableCell align="right" id="border_bottom">
+                  <input
+                    type="checkbox"
+                    name="HarshAccelerationPortal"
+                    checked={notifications.HarshAccelerationPortal}
+                    onChange={handleEventsPermissionChange}
+                    disabled={!eventsp.harshAcceleration}
+                    style={{ accentColor: "green" }}
+                    className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded  dark:focus:ring-green-600 dark:ring-offset-gray-800  dark:bg-gray-700 dark:border-gray-600 mr-16"
+                  />{" "}
+                </TableCell>
+                )}
             </TableRow>
           </TableBody>
         </Table>
