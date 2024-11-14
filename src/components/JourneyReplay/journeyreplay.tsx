@@ -183,7 +183,8 @@ export default function JourneyReplayComp() {
   const [expanded, setExpanded] = useState(null);
   
   const [seacrhLoading, setSearchLoading] = useState(true);
-  
+  const [minzoom, setminzoom] = useState(6);
+  const [maxzoom, setmaxzoom] = useState(18);
   const [harshPopUp, setHarshPopUp] = useState(true);
   const [harshAccPopUp, setAccHarshPopUp] = useState(true);
   const [addressTravelHistory, setAddressTravelHistory] = useState([]);
@@ -502,7 +503,21 @@ export default function JourneyReplayComp() {
       }
     })();
   }, []);
-
+  useEffect(()=>{
+    
+     const clientMinZoomSettings = session?.clientSetting?.filter(
+       (el) => el?.PropertDesc === "MinZoom"
+     )[0]?.PropertyValue;
+   
+     const minzoomLevel = clientMinZoomSettings ? parseInt(clientMinZoomSettings) : 5;
+   
+     setminzoom(minzoomLevel);
+     const clientMaxZoomSettings = session?.clientSetting?.filter(
+       (el) => el?.PropertDesc === "MaxZoom"
+     )[0]?.PropertyValue;
+     const maxzoomLevel = clientMaxZoomSettings ? parseInt(clientMaxZoomSettings) : 18;   
+     setmaxzoom(maxzoomLevel);
+   }, [clientsetting])
 
   useEffect(() => {
     const clientZoomSettings = clientsetting?.filter(
@@ -2634,12 +2649,13 @@ key={index}
   <div onClick={handleuserclick}>
   
               {mapcenter !== null && (
-                <MapContainer
-                  id="map"
-                
-                  zoom={zoom}
-                  center={mapcenter}
-                  className="z-0 journey_map"
+               <MapContainer
+               id="map"
+               zoom={zoom}
+               center={mapcenter}
+               className="z-0 journey_map"
+               minZoom={minzoom}
+           maxZoom={maxzoom}
                  >
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
