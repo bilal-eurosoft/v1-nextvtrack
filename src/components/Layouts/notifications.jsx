@@ -91,12 +91,24 @@ const NotificationDropdown = ({ notifications }) => {
     }
   }, []);
   return (
-    <div className="mt-4 absolute right-0 w-72 bg-white shadow-lg rounded-md px-2 pt-2 z-10">
+    <div className="mt-4 absolute right-0 w-72 bg-white shadow-lg rounded-md px-2 py-2 z-10">
       <div className="flex justify-between items-center p-1 border-b">
         <span className="font-semibold text-[#1F2937] text-center">Notifications</span>
         <span className="text-xs text-[#1F2937] font-semibold bg-[#FFFFFF] px-2 py-2 rounded-full absolute top-2 right-2">
           Total ({filteredNotifications.length})
         </span>
+      </div>
+      <div className="py-2">
+        <input
+          type="text"
+          placeholder="Search Notifications..."
+          className="text-sm p-[0.3rem] border-[2.8px] rounded-md w-full focus:outline-none"
+          style={{
+            borderColor: getBorderColor(),
+          }}
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
       </div>
       <div className="notification-scroll-container overflow-y-auto max-h-72 scroll-smooth">
         <div className="space-y-2">
@@ -115,7 +127,7 @@ const NotificationDropdown = ({ notifications }) => {
               const { background, border, color } = getEventStyle(notification.event);
               return (
                 <div
-                  className="py-2 border-l-4 rounded-lg mt-2 w-[255px]"
+                  className="p-2 border-l-4 rounded-lg  w-[255px]"
                   style={{
                     backgroundColor: background,
                     borderColor: border,
@@ -135,18 +147,7 @@ const NotificationDropdown = ({ notifications }) => {
           )}
         </div>
       </div>
-      <div className="py-2 mt-2 border-t">
-        <input
-          type="text"
-          placeholder="Search Notifications..."
-          className="text-sm p-[0.3rem] border-[2.8px] rounded-md w-full focus:outline-none"
-          style={{
-            borderColor: getBorderColor(),
-          }}
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-      </div>
+    
     </div>
   );
 };
