@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-const NotificationDropdown = ({ notifications }) => {
+const NotificationDropdown = ({ notifications,loading }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredNotifications, setFilteredNotifications] = useState(notifications);
   // Helper function to get colors based on event type
@@ -112,7 +112,19 @@ const NotificationDropdown = ({ notifications }) => {
       </div>
       <div className="notification-scroll-container overflow-y-auto max-h-72 scroll-smooth">
         <div className="space-y-2">
-          {filteredNotifications.length === 0 ? (
+          {
+            loading? (
+              <div
+                className="py-2 mt-2 text-center text-gray-500 animate-pulse"
+                style={{
+                  backgroundColor: '#F0F0F0',
+                  borderColor: '#D1D5DB',
+                }}
+              >
+                <p className="text-xl">Loading...</p>
+              </div>
+            ) :
+          filteredNotifications.length === 0 ? (
             <div
               className="py-2 mt-2 text-center text-gray-500 animate-pulse"
               style={{

@@ -203,7 +203,7 @@ export default function RootLayout({
     filterZoneIds();
   }, [zoneList]);
   
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(false); // Loading state
 
   const BellButton = ({ toggleNotifications }) => {
     const [hovered, setHovered] = useState(false); // Track hover state
@@ -277,7 +277,6 @@ export default function RootLayout({
               clientId: session?.clientId,
             });
           
-console.log(NotificationsData.data);
             
             setnotifications(NotificationsData.data); // Assuming the response is an array of notifications
          
@@ -1288,7 +1287,7 @@ console.log(NotificationsData.data);
      <BellButton toggleNotifications={toggleNotifications} />
     
       {showNotifications && (
-        <NotificationDropdown notifications={notifications} />
+        <NotificationDropdown notifications={notifications} loading={loading} />
       )}
     </div>
  
@@ -1373,8 +1372,7 @@ console.log(NotificationsData.data);
                     </PopoverContent>
                   </Popover>
                 </div>
-                
-    </div>
+              </div>
             </nav>
             {children}
           </div>
