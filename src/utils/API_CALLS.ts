@@ -55,6 +55,62 @@ export async function getClientSettingByClinetIdAndToken({
     return [];
   }
 }
+export async function getNotificationsData({
+  token,
+  clientId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(`${URL}/notifications`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"clientId\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
+
+export async function getNotificationsDataByUserId({
+  token,
+  userId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+   // console.log("object", clientId,token);
+    const response = await fetch(`${URL}/notifications`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"userId\":\"${userId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
 
 export async function vehicleListByClientId({
   token,

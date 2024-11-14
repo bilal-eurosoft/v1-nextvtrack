@@ -47,10 +47,10 @@ export default function Verification() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    const newformdata = {
-      ...formData,
-      clientId: session?.clientId,
-    };
+    // const newformdata = {
+    //   ...formData,
+    //   clientId: session?.clientId,
+    // };
     if (formData.password.length < 6 || inputConfirmPassword.length < 6) {
       toast.error("Password Max Lenght Is 6 Character");
     } else if (
@@ -65,7 +65,7 @@ export default function Verification() {
         const response = await toast.promise(
           forgetPasswordClientId({
             token: session?.accessToken,
-            newformdata: newformdata,
+            newformdata: formData,
           }),
           {
             loading: "Saving data...",
