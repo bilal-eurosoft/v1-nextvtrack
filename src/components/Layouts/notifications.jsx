@@ -156,8 +156,7 @@ const NotificationDropdown = ({ notifications,loading }) => {
                 </div>
               );
             })
-          )
-          }
+          )}
         </div>
       </div>
     

@@ -304,7 +304,56 @@ export default function RootLayout({
 
       fetchNotifications();
     }
-  }, [showNotifications]); 
+  }, [showNotifications]);
+  
+ 
+
+ /*  const notifications = [
+    {
+      dateTime: "October 16 2024 07:50:00 PM",
+      event: "ignitionOn",
+      clientId: "",
+      title: "ignitionOn Alert",
+      description: `Your Vehicle AXF-398 (R) has Ignition On at October 16 2024 07:50:00 PM`
+      },
+      {
+        dateTime: "October 16 2024 07:50:00 PM",
+        event: "ignitionOff",
+        clientId: "",
+        title: "ignitionOff Alert",
+        description: `Your Vehicle AXF-398 (R) has Ignition Off at October 16 2024 07:50:00 PM`
+        },
+        {
+          dateTime: "October 16 2024 07:50:00 PM",
+          event: "geofenceEntered",
+          clientId: "",
+          title: "geofenceEntered Alert",
+          description: `Your Vehicle AXF-398 (R) has geofenceEntered at October 16 2024 07:50:00 PM`
+          },
+          {
+            dateTime: "October 16 2024 07:50:00 PM",
+            event: "geofenceLeft",
+            clientId: "",
+            title: "geofenceLeft Alert",
+            description: `Your Vehicle AXF-398 (R) has geofenceLeft at October 16 2024 07:50:00 PM`
+            },
+            {
+              dateTime: "October 16 2024 07:50:00 PM",
+              event: "harshacceleration",
+              clientId: "",
+              title: "harshacceleration Alert",
+              description: `Your Vehicle AXF-398 (R) has harshacceleration at October 16 2024 07:50:00 PM`
+              },
+              {
+                dateTime: "October 16 2024 07:50:00 PM",
+                event: "harshcorning",
+                clientId: "",
+                title: "harshcorning Alert",
+                description: `Your Vehicle AXF-398 (R) has harshcorning at October 16 2024 07:50:00 PM`
+                },
+  ]; */
+
+  
   return (
     // <div className={inter.className}>
     <div>
@@ -570,6 +619,10 @@ export default function RootLayout({
     </svg>
   </Tooltip>
 </Link>
+
+
+
+
             {(session?.userRole == "SuperAdmin" ||
               session?.userRole == "Admin") && (
               <div>
@@ -730,23 +783,7 @@ export default function RootLayout({
                           backgroundColor: pathname == "/Immobilize" ? "white" : ""
                         }}
                       >
-                        {/*                  
-                        <g id="SVGRepo_iconCarrier">
-                          {" "}
-                          <g>
-                            <path
-                              d="M64,48L64,48h-8V32h8c8.836,0,16-7.164,16-16S72.836,0,64,0c-8.837,0-16,7.164-16,16v8H32v-8c0-8.836-7.164-16
- -16-16 S0,7.164,0,16s7.164,16,16,16h8v16h-8l0,0l0,0C7.164,48,0,55.164,0,64s7.164,16,16,16c8.837,0,16-7.164,16-16l0,0v-8h16v7
- .98 c0,0.008-0.001,0.014-0.001,0.02c0,8.836,7.164,16,16,16s16-7.164,16-16S72.836,48.002,64,48z M64,8c4.418,0,8,3.582,8,8 s-3
- .582,8-8,8h-8v-8C56,11.582,59.582,8,64,8z M8,16c0-4.418,3.582-8,8-8s8,3.582,8,8v8h-8C11.582,24,8,20.417,8,16z M16,72 c-4.418,
- 0-8-3.582-8-8s3.582-8,8-8l0,0h8v8C24,68.418,20.418,72,16,72z M32,48V32h16v16H32z M64,72c-4.418,0-8-3.582-8-8l0,0v-8 h7.999c4.418,
- 0,8,3.582,8,8S68.418,72,64,72z"
-                            ></path>
-                          </g>
-                        </g> */}
-                        {/* <defs>
-<style>.cls-1{fill:#fff;}</style>
-</defs> */}
+                       
  <g>
 	<path class="st0" d="M67.9,0H28.3L14,15.7l-0.4,0.5h-7c0,0-2.1,0-2.5,2.7c-0.3,1.5,0.3,3,1.5,3.8c1.1,0,2.1,0.1,3.1,0.3
 		c1.6,0.3,1.2,1.6,1.2,1.6c-6.2,3.9-9.7,11.3-9.7,11.3L0,65l2.1,2.5h13.4l2.6-6.2h56.5V37c-0.2-1.8,1.2-3.4,3-3.6c0.1,0,0.3,0,0.4,0
@@ -766,6 +803,50 @@ export default function RootLayout({
                 )}
               </div>
             )}
+
+{(session?.userRole == "SuperAdmin" ||
+              session?.userRole == "Admin") && (
+              <div>
+                {session?.ServiceHistory && (
+                  <Link href="/ServiceHistory">
+                    <Tooltip
+                      className="bg-[#00B56C] text-white rounded shadow-lg"
+                      placement="right"
+                      content="Service History"
+                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" 
+                     className={`
+                    
+                      py-2 text-[white]  text-white-10  dark:text-white  ${
+                      pathname == "/ServiceHistory"
+                        ? "border-r-2 #29303b"
+                        : "border-b-2"
+                    }`}
+                    width="80px"
+                    height="60px"
+                    // viewBox="0 0 121.92 73.9"
+                    viewBox="0 0 120 130"
+
+                    
+                    style={{
+                      color: pathname == "/ServiceHistory" ? "green" : "white",
+                      backgroundColor: pathname == "/ServiceHistory" ? "white" : ""
+                    }}
+                    
+                    ><path stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"  fill={pathname == "/ServiceHistory" ? "green" : "white" } d="M73.379 128H52.467l-1.352-16.366a48.135 48.135 0 0 1-13.309-5.93l-11.994 10.248-14.77-14.922 10.493-12.529a49.108 49.108 0 0 1-5.263-13.731L.618 73.453.62 52.372l16.198-1.365a49.203 49.203 0 0 1 5.889-13.468l-10.145-12.11 14.777-14.917 12.407 10.605a48.115 48.115 0 0 1 13.569-5.301L54.62 0h20.91l1.355 16.368a48.236 48.236 0 0 1 13.309 5.931l11.994-10.253 14.773 14.922-10.496 12.528a49.235 49.235 0 0 1 5.262 13.734l15.656 1.318-.002 21.082-16.199 1.362a49.137 49.137 0 0 1-5.889 13.469l10.145 12.109-14.775 14.925-12.41-10.609a48.228 48.228 0 0 1-13.568 5.299L73.379 128zm-17.229-4h13.545l1.25-15.146 1.49-.286a44.336 44.336 0 0 0 14.973-5.837l1.242-.768 11.785 10.074 9.596-9.692-9.721-11.604.84-1.248a45.216 45.216 0 0 0 6.498-14.837l.334-1.409 15.398-1.295.002-13.727-15.002-1.263-.281-1.496a45.296 45.296 0 0 0-5.783-15.14l-.742-1.224 9.98-11.911-9.594-9.69-11.482 9.816-1.266-.869a44.339 44.339 0 0 0-14.676-6.557l-1.402-.34L71.848 4H58.303l-1.25 15.146-1.491.286a44.212 44.212 0 0 0-14.971 5.839l-1.242.769-11.784-10.073-9.597 9.688 9.72 11.603-.839 1.248a45.278 45.278 0 0 0-6.498 14.838l-.335 1.408L4.62 56.048l-.002 13.727 15 1.262.281 1.495a45.164 45.164 0 0 0 5.786 15.135l.743 1.224-9.979 11.915 9.592 9.691 11.481-9.812 1.265.869a44.274 44.274 0 0 0 14.676 6.555l1.403.34L56.15 124z"/>
+                    <path  stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round" fill={pathname == "/ServiceHistory" ? "green" : "white" }  d="M92.74 69.898a29.488 29.488 0 0 1-7.967 14.981c-5.498 5.554-12.807 8.611-20.579 8.611a28.864 28.864 0 0 1-15.906-4.774l18.629-18.818H92.74m4.414-3.897H65.293L42.417 89.109c6.026 5.354 13.679 8.279 21.777 8.279 8.821 0 17.112-3.467 23.347-9.767 5.781-5.837 9.15-13.446 9.613-21.62zM70.242 35.204c11.012 2.298 19.646 10.771 22.254 21.829H70.242V35.204m-3.896-4.449V60.93h30.717c-1.475-16.414-14.424-29.141-30.717-30.175zM57.339 35.182v26.04L39.12 79.625a29.914 29.914 0 0 1-4.379-15.587c.001-13.798 9.634-25.729 22.598-28.856m3.898-4.572c-16.949 1.47-30.393 16.021-30.395 33.428 0 7.966 2.757 15.555 7.807 21.603l22.588-22.815V30.61z"/></svg>
+                    </Tooltip>
+                  </Link>
+                )}
+              </div>
+            )}
+
           </div>
 
           <hr></hr>
@@ -1219,23 +1300,7 @@ export default function RootLayout({
                           backgroundColor: pathname == "/Immobilize" ? "white" : ""
                         }}
                       >
-                        {/*                  
-                        <g id="SVGRepo_iconCarrier">
-                          {" "}
-                          <g>
-                            <path
-                              d="M64,48L64,48h-8V32h8c8.836,0,16-7.164,16-16S72.836,0,64,0c-8.837,0-16,7.164-16,16v8H32v-8c0-8.836-7.164-16
- -16-16 S0,7.164,0,16s7.164,16,16,16h8v16h-8l0,0l0,0C7.164,48,0,55.164,0,64s7.164,16,16,16c8.837,0,16-7.164,16-16l0,0v-8h16v7
- .98 c0,0.008-0.001,0.014-0.001,0.02c0,8.836,7.164,16,16,16s16-7.164,16-16S72.836,48.002,64,48z M64,8c4.418,0,8,3.582,8,8 s-3
- .582,8-8,8h-8v-8C56,11.582,59.582,8,64,8z M8,16c0-4.418,3.582-8,8-8s8,3.582,8,8v8h-8C11.582,24,8,20.417,8,16z M16,72 c-4.418,
- 0-8-3.582-8-8s3.582-8,8-8l0,0h8v8C24,68.418,20.418,72,16,72z M32,48V32h16v16H32z M64,72c-4.418,0-8-3.582-8-8l0,0v-8 h7.999c4.418,
- 0,8,3.582,8,8S68.418,72,64,72z"
-                            ></path>
-                          </g>
-                        </g> */}
-                        {/* <defs>
-<style>.cls-1{fill:#fff;}</style>
-</defs> */}
+                       
  <g>
 	<path class="st0" d="M67.9,0H28.3L14,15.7l-0.4,0.5h-7c0,0-2.1,0-2.5,2.7c-0.3,1.5,0.3,3,1.5,3.8c1.1,0,2.1,0.1,3.1,0.3
 		c1.6,0.3,1.2,1.6,1.2,1.6c-6.2,3.9-9.7,11.3-9.7,11.3L0,65l2.1,2.5h13.4l2.6-6.2h56.5V37c-0.2-1.8,1.2-3.4,3-3.6c0.1,0,0.3,0,0.4,0
@@ -1254,6 +1319,49 @@ export default function RootLayout({
                           )}
                         </div>
                       )}
+                      
+{(session?.userRole == "SuperAdmin" ||
+              session?.userRole == "Admin") && (
+              <div>
+                {session?.ServiceHistory && (
+                  <Link href="/ServiceHistory">
+                    <Tooltip
+                      className="bg-[#00B56C] text-white rounded shadow-lg"
+                      placement="right"
+                      content="Service History"
+                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" 
+                     className={`
+                    
+                      py-2 text-[white]  text-white-10  dark:text-white  ${
+                      pathname == "/ServiceHistory"
+                        ? "border-r-2 #29303b"
+                        : "border-b-2"
+                    }`}
+                    width="60px"
+                    height="60px"
+                    // viewBox="0 0 121.92 73.9"
+                    viewBox="0 0 120 130"
+
+                    
+                    style={{
+                      // color: pathname == "/ServiceHistory" ? "green" : "white",
+                      backgroundColor: pathname == "/ServiceHistory" ? "white" : ""
+                    }}
+                    
+                    ><path stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"  fill={pathname == "/ServiceHistory" ? "green" : "white" } d="M73.379 128H52.467l-1.352-16.366a48.135 48.135 0 0 1-13.309-5.93l-11.994 10.248-14.77-14.922 10.493-12.529a49.108 49.108 0 0 1-5.263-13.731L.618 73.453.62 52.372l16.198-1.365a49.203 49.203 0 0 1 5.889-13.468l-10.145-12.11 14.777-14.917 12.407 10.605a48.115 48.115 0 0 1 13.569-5.301L54.62 0h20.91l1.355 16.368a48.236 48.236 0 0 1 13.309 5.931l11.994-10.253 14.773 14.922-10.496 12.528a49.235 49.235 0 0 1 5.262 13.734l15.656 1.318-.002 21.082-16.199 1.362a49.137 49.137 0 0 1-5.889 13.469l10.145 12.109-14.775 14.925-12.41-10.609a48.228 48.228 0 0 1-13.568 5.299L73.379 128zm-17.229-4h13.545l1.25-15.146 1.49-.286a44.336 44.336 0 0 0 14.973-5.837l1.242-.768 11.785 10.074 9.596-9.692-9.721-11.604.84-1.248a45.216 45.216 0 0 0 6.498-14.837l.334-1.409 15.398-1.295.002-13.727-15.002-1.263-.281-1.496a45.296 45.296 0 0 0-5.783-15.14l-.742-1.224 9.98-11.911-9.594-9.69-11.482 9.816-1.266-.869a44.339 44.339 0 0 0-14.676-6.557l-1.402-.34L71.848 4H58.303l-1.25 15.146-1.491.286a44.212 44.212 0 0 0-14.971 5.839l-1.242.769-11.784-10.073-9.597 9.688 9.72 11.603-.839 1.248a45.278 45.278 0 0 0-6.498 14.838l-.335 1.408L4.62 56.048l-.002 13.727 15 1.262.281 1.495a45.164 45.164 0 0 0 5.786 15.135l.743 1.224-9.979 11.915 9.592 9.691 11.481-9.812 1.265.869a44.274 44.274 0 0 0 14.676 6.555l1.403.34L56.15 124z"/>
+                    <path  stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round" fill={pathname == "/ServiceHistory" ? "green" : "white" }  d="M92.74 69.898a29.488 29.488 0 0 1-7.967 14.981c-5.498 5.554-12.807 8.611-20.579 8.611a28.864 28.864 0 0 1-15.906-4.774l18.629-18.818H92.74m4.414-3.897H65.293L42.417 89.109c6.026 5.354 13.679 8.279 21.777 8.279 8.821 0 17.112-3.467 23.347-9.767 5.781-5.837 9.15-13.446 9.613-21.62zM70.242 35.204c11.012 2.298 19.646 10.771 22.254 21.829H70.242V35.204m-3.896-4.449V60.93h30.717c-1.475-16.414-14.424-29.141-30.717-30.175zM57.339 35.182v26.04L39.12 79.625a29.914 29.914 0 0 1-4.379-15.587c.001-13.798 9.634-25.729 22.598-28.856m3.898-4.572c-16.949 1.47-30.393 16.021-30.395 33.428 0 7.966 2.757 15.555 7.807 21.603l22.588-22.815V30.61z"/></svg>
+                    </Tooltip>
+                  </Link>
+                )}
+              </div>
+            )}
                     </List>
                     <Divider />
                   </Drawer>

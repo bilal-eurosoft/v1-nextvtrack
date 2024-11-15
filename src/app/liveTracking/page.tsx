@@ -215,7 +215,7 @@ const LiveTracking = () => {
 
   // This useEffect is responsible for getting the data from socket and updating it into the state.
   useEffect(() => {
-    if (isOnline && session?.clientId) {
+    if (isOnline && session?.clientId ) {
       try {
         socket.io.opts.query = { clientId: session?.clientId };
         socket.connect();
@@ -252,7 +252,7 @@ const LiveTracking = () => {
           }
         );
       } catch (err) {
-        
+
       }
     }
     if (!isOnline) {
@@ -262,8 +262,10 @@ const LiveTracking = () => {
       socket.disconnect();
     };
   }, [isOnline, session?.clientId, userVehicle]);
-useEffect(()=>{
-  carData.current =updatedData   
+useEffect(()=>{  
+  
+  carData.current =updatedData 
+  
 },[carData.current])
   const { countParked, countMoving, countPause } = countCars(carData?.current);
 

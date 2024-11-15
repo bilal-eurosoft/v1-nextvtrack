@@ -19,6 +19,7 @@ import HarshCornerningIcon from "../../../public/harshcornering.png";
 import markerA from "../../../public/Images/marker-a.png";
 import markerB from "../../../public/Images/marker-b.png";
 import harshAcceleration from "../../../public/Images/brake-discs.png";
+
 import FocusIconNew from "../../../public/car-icon-vtrack.png";
 import { useSelector } from "react-redux";
 import Speedometer, {

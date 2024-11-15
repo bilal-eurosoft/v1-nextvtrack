@@ -674,7 +674,8 @@ if(!session?.driverProfile){
                     id="table_head"
                     className="font-popins  font-bold text-black"
                   >
-                    First Name
+                    Title
+                    
                   </TableCell>
                   {/* <TableCell align="center" colSpan={2}>
                   Middle Name
@@ -685,7 +686,17 @@ if(!session?.driverProfile){
                     id="table_head"
                     className="font-popins  font-bold text-black"
                   >
-                    Last Name
+                  </TableCell>
+                  Vehicle Reg
+                  <TableCell
+                    align="center"
+                    colSpan={2}
+                    id="table_head"
+                    className="font-popins  font-bold text-black"
+                  >
+                    Service Type
+                    
+                    
                   </TableCell>
                   <TableCell
                     align="center"
@@ -693,15 +704,7 @@ if(!session?.driverProfile){
                     id="table_head"
                     className="font-popins  font-bold text-black"
                   >
-                    Driver ID
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    colSpan={2}
-                    id="table_head"
-                    className="font-popins  font-bold text-black"
-                  >
-                    Driver Contact
+                  Recursive
                   </TableCell>
                   <TableCell
                     align="center"

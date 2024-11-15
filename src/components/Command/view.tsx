@@ -329,8 +329,10 @@ const blinkingStyle = {
   transition: 'visibility 0.1s linear',
 };
 
+
+
   return (
-    <div>
+    <div >
       <hr className="text-white"></hr>
       <p className="bg-green px-4 py-1 text-white mb-5 font-bold text-center">
         Immobilizing Management
@@ -643,6 +645,7 @@ const blinkingStyle = {
                               >
                                 Status
                               </TableCell>
+                            
                             </TableRow>
                           </TableHead>
                           {filteredDataIsAvaialable === false ? (
@@ -734,8 +737,6 @@ const blinkingStyle = {
                             <Pagination
                               count={totalCount}
                               page={input}
-                              
-
                               onChange={handleChange}
                               className="text-sm"
                               // siblingCount={-totalCount}
