@@ -96,6 +96,7 @@ export default function Verification() {
         );
 
         toast.success("Password Successfully Updated");
+        router.push("/signin");
         setFormData({
           password: "",
         });
@@ -106,7 +107,6 @@ export default function Verification() {
         });
       }
     }
-    router.push("/signin");
   };
 
   useEffect(() => {

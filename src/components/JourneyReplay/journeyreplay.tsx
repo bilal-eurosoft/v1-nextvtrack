@@ -19,7 +19,6 @@ import HarshCornerningIcon from "../../../public/harshcornering.png";
 import markerA from "../../../public/Images/marker-a.png";
 import markerB from "../../../public/Images/marker-b.png";
 import harshAcceleration from "../../../public/Images/brake-discs.png";
-
 import FocusIconNew from "../../../public/car-icon-vtrack.png";
 import { useSelector } from "react-redux";
 import Speedometer, {
@@ -183,7 +182,7 @@ export default function JourneyReplayComp() {
   const [expanded, setExpanded] = useState(null);
   
   const [seacrhLoading, setSearchLoading] = useState(true);
-  const [minzoom, setminzoom] = useState(6);
+  const [minzoom, setminzoom] = useState(1);
   const [maxzoom, setmaxzoom] = useState(18);
   const [harshPopUp, setHarshPopUp] = useState(true);
   const [harshAccPopUp, setAccHarshPopUp] = useState(true);
@@ -509,7 +508,7 @@ export default function JourneyReplayComp() {
        (el) => el?.PropertDesc === "MinZoom"
      )[0]?.PropertyValue;
    
-     const minzoomLevel = clientMinZoomSettings ? parseInt(clientMinZoomSettings) : 5;
+     const minzoomLevel = clientMinZoomSettings ? parseInt(clientMinZoomSettings) : 1;
    
      setminzoom(minzoomLevel);
      const clientMaxZoomSettings = session?.clientSetting?.filter(

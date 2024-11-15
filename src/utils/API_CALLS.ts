@@ -55,8 +55,6 @@ export async function getClientSettingByClinetIdAndToken({
     return [];
   }
 }
-
-
 export async function getNotificationsData({
   token,
   clientId,
@@ -65,7 +63,6 @@ export async function getNotificationsData({
   clientId: string;
 }) {
   try {
-   // console.log("object", clientId,token);
     const response = await fetch(`${URL}/notifications`, {
       headers: {
         accept: "application/json, text/plain, */*",

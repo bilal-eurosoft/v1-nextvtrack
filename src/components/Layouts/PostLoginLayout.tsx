@@ -304,56 +304,7 @@ export default function RootLayout({
 
       fetchNotifications();
     }
-  }, [showNotifications]);
-  
- 
-
- /*  const notifications = [
-    {
-      dateTime: "October 16 2024 07:50:00 PM",
-      event: "ignitionOn",
-      clientId: "",
-      title: "ignitionOn Alert",
-      description: `Your Vehicle AXF-398 (R) has Ignition On at October 16 2024 07:50:00 PM`
-      },
-      {
-        dateTime: "October 16 2024 07:50:00 PM",
-        event: "ignitionOff",
-        clientId: "",
-        title: "ignitionOff Alert",
-        description: `Your Vehicle AXF-398 (R) has Ignition Off at October 16 2024 07:50:00 PM`
-        },
-        {
-          dateTime: "October 16 2024 07:50:00 PM",
-          event: "geofenceEntered",
-          clientId: "",
-          title: "geofenceEntered Alert",
-          description: `Your Vehicle AXF-398 (R) has geofenceEntered at October 16 2024 07:50:00 PM`
-          },
-          {
-            dateTime: "October 16 2024 07:50:00 PM",
-            event: "geofenceLeft",
-            clientId: "",
-            title: "geofenceLeft Alert",
-            description: `Your Vehicle AXF-398 (R) has geofenceLeft at October 16 2024 07:50:00 PM`
-            },
-            {
-              dateTime: "October 16 2024 07:50:00 PM",
-              event: "harshacceleration",
-              clientId: "",
-              title: "harshacceleration Alert",
-              description: `Your Vehicle AXF-398 (R) has harshacceleration at October 16 2024 07:50:00 PM`
-              },
-              {
-                dateTime: "October 16 2024 07:50:00 PM",
-                event: "harshcorning",
-                clientId: "",
-                title: "harshcorning Alert",
-                description: `Your Vehicle AXF-398 (R) has harshcorning at October 16 2024 07:50:00 PM`
-                },
-  ]; */
-
-  
+  }, [showNotifications]); 
   return (
     // <div className={inter.className}>
     <div>
@@ -619,10 +570,6 @@ export default function RootLayout({
     </svg>
   </Tooltip>
 </Link>
-
-
-
-
             {(session?.userRole == "SuperAdmin" ||
               session?.userRole == "Admin") && (
               <div>
@@ -819,61 +766,6 @@ export default function RootLayout({
                 )}
               </div>
             )}
-
-{(session?.userRole == "SuperAdmin" ||
-              session?.userRole == "Admin") && (
-              <div>
-                {session?.ServiceHistory && (
-                  <Link href="/ServiceHistory">
-                    <Tooltip
-                      className="bg-[#00B56C] text-white rounded shadow-lg"
-                      placement="right"
-                      content="ServiceHistory"
-                    >
-                     <svg
- id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" 
-
-                        className={`w-20 h-14 py-3   text-[white]  text-white-10  dark:text-white  ${
-                          pathname == "/ServiceHistory"
-                            ? "border-r-2 #29303b"
-                            : "border-b-2"
-                        }`}
-                        // width="140px"
-                        // height="140px"
-                        // viewBox="0 0 121.92 73.9"
-                        viewBox="0 0 115 80"
-
-                        
-                        strokeWidth="5"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        style={{
-                          color: pathname == "/ServiceHistory" ? "green" : "white",
-                          backgroundColor: pathname == "/ServiceHistory" ? "white" : ""
-                        }}
-                      >
- <g>
-	<path class="st0" d="M67.9,0H28.3L14,15.7l-0.4,0.5h-7c0,0-2.1,0-2.5,2.7c-0.3,1.5,0.3,3,1.5,3.8c1.1,0,2.1,0.1,3.1,0.3
-		c1.6,0.3,1.2,1.6,1.2,1.6c-6.2,3.9-9.7,11.3-9.7,11.3L0,65l2.1,2.5h13.4l2.6-6.2h56.5V37c-0.2-1.8,1.2-3.4,3-3.6c0.1,0,0.3,0,0.4,0
-		V17l1.3-2.8L67.9,0z M11.3,40C7.2,40,4,38.2,4,36.1s3.3-3.8,7.3-3.8s7.3,1.7,7.3,3.8S15.3,40,11.3,40z M74.3,54.7
-		c0,1.7-1.4,3.2-3.1,3.2c0,0,0,0-0.1,0H23.5c-1.7,0-3.1-1.4-3.1-3.2l0,0v-0.6c0-1.7,1.4-3.2,3.1-3.2c0,0,0,0,0,0h47.6
-		c1.7,0,3.2,1.4,3.2,3.1c0,0,0,0,0,0L74.3,54.7z M77,19.2H18.6v-2.8l9.6-12.6h39.5L77,16V19.2z"/>
-	<path class="st0" d="M118.4,34.7V19.2c0,0-3-13.8-19.6-14c0,0-14.2-0.4-18.7,14l0.2,15.3c0,0-3,1-3.3,3.5v32.7
-		c0.1,1.8,1.5,3.1,3.3,3.2c3.1,0.2,38.2,0,38.2,0s3.6-0.8,3.5-4.3V37.3C121.9,37.3,121,34.5,118.4,34.7z M102,61h-5.4l0.8-7.5
-		c-1.2-0.6-2-1.8-2.1-3.2c0.3-2.2,2.4-3.7,4.6-3.3c1.7,0.3,3.1,1.6,3.3,3.3c0,1.4-0.8,2.6-2.1,3.2L102,61z M113.1,34.5H84.6V19.2
-		c0,0,2.4-9.8,14.8-10.2c0,0,11.6,0.8,13.8,9.3L113.1,34.5z"/>
-</g>
-
-                      </svg>
- 
-                    </Tooltip>
-                  </Link>
-                )}
-              </div>
-            )}
-
           </div>
 
           <hr></hr>

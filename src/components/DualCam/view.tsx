@@ -2927,5 +2927,3 @@ redirect("/liveTracking")
     </div>
   );
 }
-
-
