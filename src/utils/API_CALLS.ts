@@ -181,7 +181,7 @@ export async function handleServiceHistoryRequest({
     }
 
     // Perform the request
-    const response = await fetch('http://172.16.10.47/serviceHistory', fetchOptions);
+    const response = await fetch( `${URL}/serviceHistory`, fetchOptions);
 
     // Handle non-2xx status codes
     if (!response.ok) {
