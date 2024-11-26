@@ -1,5 +1,16 @@
+.MuiPickersDatePickerRoot-toolbar {
+  align-items: flex-start !important;
+  flex-direction: column !important;
+  background-color: #00b56c !important;
+}
+
+.MuiPickersDay-daySelected {
+  color: #fff !important;
+  font-weight: 500 !important;
+  background-color: #00b56c !important;
+}
+
 .MuiOutlinedInput-notchedOutline {
-  /* border-width: 1px !important; */
   border-color: #d3d3d3 !important;
   outline: #00b56c;
 }
@@ -12,105 +23,56 @@
 .Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: #00b56c !important;
 }
+
+.MuiFormHelperText-root.Mui-error {
+  color: #2f2b2b;
+  display: none;
+}
+
 ::-webkit-scrollbar {
   width: 10px;
+  background-color: rgb(227, 224, 224);
 }
 
 ::-webkit-scrollbar-thumb {
   background: #29303b;
   border-radius: 7px;
 }
-#table_head {
-  font-size: 18px;
+.MuiInput-underline:after {
+  right: 0;
+  bottom: 0;
+  content: "";
+  position: absolute;
+  transform: scaleX(0);
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+  border-bottom: 1px solid #8a8c94 !important;
+  pointer-events: none;
 }
 
-.popup_style {
-  width: 40%;
+.MuiButton-label {
+  color: #00b56c !important;
 }
-.main_driver {
-  height: 93vh;
-  /* background-color: rgb(21, 17, 17); */
-}
-
-.drivers_text {
-  height: 4vh;
-  border-top: 2px solid white !important;
-}
-
-.drivers_add_popup {
-  height: 6vh;
-}
-.table_driver_profile {
-  height: 77vh;
-  /* overflow-y: scroll; */
-}
-.table_pagination {
-  height: 6vh;
-}
-
-@media (max-width: 1000px) and (min-width: 750px) {
-  .main_driver {
-    height: 85vh;
-    /* background-color: rgb(21, 17, 17); */
-  }
-  .drivers_text {
-    height: 4vh;
-    border-top: 2px solid white !important;
-  }
-  .drivers_add_popup {
-    height: 6vh;
-  }
-  .table_driver_profile {
-    height: 67vh;
-    /* overflow-y: scroll; */
-  }
-  .table_pagination {
-    height: 7vh;
-  }
-}
-
-@media (max-width: 750px) {
-  .main_driver {
-    height: auto;
-    /* background-color: rgb(21, 17, 17); */
-  }
-  .drivers_text {
-    height: auto;
-    border-top: 2px solid white !important;
-  }
-  .drivers_add_popup {
-    height: auto;
-  }
-  .table_driver_profile {
-    height: 50vh;
-    /* overflow-y: scroll; */
-  }
-  .table_pagination {
-    height: 7vh;
-  }
-  #table_head {
-    font-size: 16px;
-  }
-}
-@media (max-width: 1200px) and (min-width: 810px) {
-  .popup_style {
-    width: 65%;
-  }
-}
-.assign_driver_hover:hover {
+.MuiPickersToolbar-toolbar {
   background-color: #00b56c !important;
-  color: white !important;
+}
+.MuiPickersClockPointer-pointer { 
+  background-color: #00b56c !important;
 }
 
-@media (max-width: 800px) and (min-width: 510px) {
-  .popup_style {
-    width: 80%;
-  }
+.MuiPickersClock-pin {  
+  background-color: #00b56c !important;
 }
 
-@media (max-width: 500px) {
-  .popup_style {
-    width: 90%;
-    margin-top: 30%;
-  }
+.MuiPickersClockPointer-pointer .MuiPickersClockPointer-thumb {
+  top: -21px;
+  left: -15px;
+  width: 4px;
+  border: 14px solid #00b56c;
+  height: 4px;
+  position: absolute;
+  box-sizing: content-box;
+  border-radius: 100%;
+}
+.MuiFormControl-root {
+margin-right: 6px;
 }
