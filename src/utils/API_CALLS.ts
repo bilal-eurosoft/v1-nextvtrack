@@ -4,8 +4,147 @@ import { commandrequest } from "@/types/commandrequest";
 import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
 import { immobiliserequest } from "@/types/immobiliserequest";
+import uniqueDataByIMEIAndLatestTimestamp from "./uniqueDataByIMEIAndLatestTimestamp";
 //  var URL = "http://172.16.10.47:80"
 var URL ="https://backend.vtracksolutions.com";
+
+export async function getVehicleDataByClientId(clientId: string) {
+  try {
+    const response = await fetch(
+      `https://socketio.vtracksolutions.com:1102/${clientId}`,
+      {
+        method: "GET",
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
+
+export async function getVehicleDataByClientIdForOdometer(clientId: string) {
+  try {
+    const response = await fetch(
+      `https://socketio.vtracksolutions.com:1102/${clientId}`,
+      {
+        method: "GET",
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+   //  data?.data?.Value
+      let parsedData = JSON.parse(
+        data?.data?.Value
+      )?.cacheList;
+      // call a filter function here to filter by IMEI and latest time stamp
+      let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
+console.log("redis", uniqueData);
+    return uniqueData;
+  } catch (error) {
+    
+    return [];
+  }
+}
+
+export async function getClientSettingByClinetIdAndToken({
+  token,
+  clientId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(`${URL}/SettingByClientId`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"ClientId\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
+export async function getNotificationsData({
+  token,
+  clientId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+    const response = await fetch(`${URL}/notifications`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"clientId\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
+
+export async function getNotificationsDataByUserId({
+  token,
+  userId,
+}: {
+  token: string;
+  clientId: string;
+}) {
+  try {
+   // console.log("object", clientId,token);
+    const response = await fetch(`${URL}/notifications`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: `{\"userId\":\"${userId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
+
+type ApiMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
+interface ApiRequestParams {
+  token: string;
+  method: ApiMethod;
+  body?: Record<string, any>; // Optional for methods like GET
+}
 
 export async function handleServiceHistoryRequest({
   token,
@@ -67,138 +206,6 @@ export async function handleServiceHistoryRequest({
 }
 
 
-export async function getVehicleDataByClientIdForOdometer(clientId: string) {
-  try {
-    const response = await fetch(
-      `https://socketio.vtracksolutions.com:1102/${clientId}`,
-      {
-        method: "GET",
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-   //  data?.data?.Value
-      let parsedData = JSON.parse(
-        data?.data?.Value
-      )?.cacheList;
-      // call a filter function here to filter by IMEI and latest time stamp
-      let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
-console.log("redis", uniqueData);
-    return uniqueData;
-  } catch (error) {
-    
-    return [];
-  }
-}
-
-export async function getVehicleDataByClientId(clientId: string) {
-  try {
-    const response = await fetch(
-      `https://socketio.vtracksolutions.com:1102/${clientId}`,
-      {
-        method: "GET",
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    
-    return [];
-  }
-}
-
-export async function getClientSettingByClinetIdAndToken({
-  token,
-  clientId,
-}: {
-  token: string;
-  clientId: string;
-}) {
-  try {
-    const response = await fetch(`${URL}/SettingByClientId`, {
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: `{\"ClientId\":\"${clientId}\"}`,
-      method: "POST",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    
-    return [];
-  }
-}
-
-
-export async function getNotificationsData({
-  token,
-  clientId,
-}: {
-  token: string;
-  clientId: string;
-}) {
-  try {
-   // console.log("object", clientId,token);
-    const response = await fetch(`${URL}/notifications`, {
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: `{\"clientId\":\"${clientId}\"}`,
-      method: "POST",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    
-    return [];
-  }
-}
-
-export async function getNotificationsDataByUserId({
-  token,
-  userId,
-}: {
-  token: string;
-  clientId: string;
-}) {
-  try {
-   // console.log("object", clientId,token);
-    const response = await fetch(`${URL}/notifications`, {
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: `{\"userId\":\"${userId}\"}`,
-      method: "POST",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    
-    return [];
-  }
-}
 
 export async function vehicleListByClientId({
   token,
