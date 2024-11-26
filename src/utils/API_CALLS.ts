@@ -7,6 +7,91 @@ import { immobiliserequest } from "@/types/immobiliserequest";
 //  var URL = "http://172.16.10.47:80"
 var URL ="https://backend.vtracksolutions.com";
 
+export async function handleServiceHistoryRequest({
+  token,
+  method,
+  body,
+}: ApiRequestParams) {
+  try {
+    // Set up the request headers
+    const headers = {
+      accept: "application/json, text/plain, */*",
+      authorization: `Bearer ${token}`,
+      "content-type": "application/json",
+    };
+
+    // Prepare the fetch options
+    const fetchOptions: RequestInit = {
+      method,
+      headers,
+    };
+
+    // Add body only for methods that need it (POST, PUT, DELETE)
+    if (body && (method === 'POST' || method === 'PUT')) {
+      fetchOptions.body = JSON.stringify(body);
+    }
+    if ( method === 'DELETE') {
+  
+      fetchOptions.body = JSON.stringify(body);
+    }
+    
+    // Handle GET method separately, no body is required
+    if (method === 'GET') {
+      // For GET requests, we just send the token as part of the headers.
+      delete fetchOptions.body;
+    }
+
+    // Perform the request
+    const response = await fetch('http://172.16.10.47/serviceHistory', fetchOptions);
+
+    // Handle non-2xx status codes
+    if (!response.ok) {
+      throw new Error(`Failed to fetch data from the API. Status: ${response.status}`);
+    }
+
+    // Parse JSON response body
+    const data = await response.json();
+
+    // For GET requests, we return the data (example: 'data' field is the key you want to extract)
+    if (method === 'GET') {
+      return data.data;
+    }
+
+    // For POST, PUT, DELETE, return the response data
+    return data;
+
+  } catch (error) {
+    console.error('Error occurred while fetching service history:', error);
+    return null; // Or you can return an empty array if preferred
+  }
+}
+
+
+export async function getVehicleDataByClientIdForOdometer(clientId: string) {
+  try {
+    const response = await fetch(
+      `https://socketio.vtracksolutions.com:1102/${clientId}`,
+      {
+        method: "GET",
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+   //  data?.data?.Value
+      let parsedData = JSON.parse(
+        data?.data?.Value
+      )?.cacheList;
+      // call a filter function here to filter by IMEI and latest time stamp
+      let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
+console.log("redis", uniqueData);
+    return uniqueData;
+  } catch (error) {
+    
+    return [];
+  }
+}
 
 export async function getVehicleDataByClientId(clientId: string) {
   try {
