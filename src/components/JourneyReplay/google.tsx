@@ -120,13 +120,16 @@ const MapComponent = ({
         }
     }, [zoomToFly])
 
-    useEffect(() => {
+    //     useEffect(() => { console.log("1")
+    // console.log(carPosition)
+    //         if (mapRef.current && coordsforgoogle) {
+    //             console.log("-0-0-0")
+    //             mapRef.current.panTo(coordsforgoogle);
+    //             // mapRef.current.setView(coordsforgoogle,14)
+    //             mapRef.current.setZoom(13)
+    //         }
 
-        if (mapRef.current && coordsforgoogle) {
-            mapRef.current.panTo(coordsforgoogle);
-        }
-
-    }, [coordsforgoogle])
+    //     }, [carPosition])
     useEffect(() => {
         if (mapRef.current) {
             mapRef.current.setZoom(zoom)
@@ -137,42 +140,42 @@ const MapComponent = ({
             mapRef.current.panTo({ lat: mapcenterToFly[0], lng: mapcenterToFly[1] });
         }
     }, [mapcenterToFly])
-    useEffect(() => {
-        if (mapRef.current) {
+    // useEffect(() => { console.log("6")
+    //     if (mapRef.current) {
 
 
-            if (!isPaused && !isPlaying) {
+    //         if (!isPaused && !isPlaying) {
 
 
-                if (zoomToFly) {
+    //             if (zoomToFly) {
 
 
 
-                    mapRef.current.panTo({ lat: mapcenterToFly[0], lng: mapcenterToFly[1] });
+    //                 mapRef.current.panTo({ lat: mapcenterToFly[0], lng: mapcenterToFly[1] });
 
-                } else {
-
-
-                    mapRef.current.setZoom(zoom)
-
-                }
-            } else {
-
-                mapRef.current.panTo(carPosition);
+    //             } else {
 
 
-                mapRef.current.setZoom(18)
+    //                 mapRef.current.setZoom(zoom)
 
-            }
-        }
-    }, [
+    //             }
+    //         } else {
 
-    ])
+    //             // mapRef.current.panTo(carPosition);
+
+
+    //             // mapRef.current.setZoom(13)
+
+    //         }
+    //     }
+    // }, [
+
+    // ])
     // const [googleLoaded, setGoogleLoaded] = useState(false);
-    // const { isLoaded } = useLoadScript({
+    // = useLoadScript({
     //     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
     // });
-    // useEffect(() => {
+    // useEffect(() => { console.log("1")
     //     if (isLoaded && window.google) {
     //         setGoogleLoaded(true);
     //     }
@@ -184,9 +187,10 @@ const MapComponent = ({
             <GoogleMap
                 clickableIcons={false}
                 mapContainerStyle={containerStyle}
-                // className="journey_map"
                 center={mapCenter}
                 zoom={zoom}
+                // center={((isPaused ||isPlaying)&& !userclick)?  carPosition: mapCenter}
+                // zoom={(isPaused ||isPlaying)?18: zoom}
                 onLoad={onLoad}
                 // onClick={handleClick}
                 // onDragStart={handleDragStart} // Track drag interaction        
@@ -199,8 +203,6 @@ const MapComponent = ({
                     maxZoom,
                     minZoom
                 }}
-            // onDragEnd={handleMoveEnd}
-            // onZoomChanged={handleZoomEnd}        
             >
                 {loadingMap ? (
                     <Polyline

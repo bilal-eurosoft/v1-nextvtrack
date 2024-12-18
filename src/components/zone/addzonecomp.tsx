@@ -5,8 +5,8 @@ import "leaflet-draw/dist/leaflet.draw.css"; */
 import dynamic from "next/dynamic"; // Import dynamic from Next.js
 import { useSession } from "next-auth/react";
 import {
-  GoogleMap, LoadScript,
-  InfoWindow,
+  GoogleMap, useLoadScript,LoadScript,
+  // InfoWindow,
   DrawingManager
 } from '@react-google-maps/api';
 import { ClientSettings } from "@/types/clientSettings";
@@ -97,34 +97,42 @@ export default function AddZoneComp() {
     return null;
   }
   const dispatch = useDispatch();
+  
+// //   const { isLoaded } = useLoadScript({
+// //     googleMapsApiKey: GOOGLE_MAPS_API_KEY, libraries
+// // });
+  
+// const { isLoaded }  =useGoogleMaps();
+
   useEffect(() => {
     (async function () {
       if (session) {
-        if (session) {
-          const mapObject = session?.clientSetting.find(
-            (obj: { PropertDesc: string }) => obj.PropertDesc === "Map"
-          );
-          // Get the PropertyValue from the found object
-          const centervalue = mapObject ? mapObject.PropertyValue : null;
-          if (centervalue) {
-            const match = centervalue.match(/\{lat:([^,]+),lng:([^}]+)\}/);
-            if (match) {
-              const lat = parseFloat(match[1]);
-              const lng = parseFloat(match[2]);
 
-              if (!isNaN(lat) && !isNaN(lng)) {
-                setMapcenter([lat, lng]);
-              }
+        const mapObject = session?.clientSetting.find(
+          (obj: { PropertDesc: string }) => obj.PropertDesc === "Map"
+        );
+        // Get the PropertyValue from the found object
+        const centervalue = mapObject ? mapObject.PropertyValue : null;
+        if (centervalue) {
+          const match = centervalue.match(/\{lat:([^,]+),lng:([^}]+)\}/);
+          if (match) {
+            const lat = parseFloat(match[1]);
+            const lng = parseFloat(match[2]);
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+              setMapcenter([lat, lng]);
             }
           }
-          setClientsetting(session?.clientSetting);
         }
+        setClientsetting(session?.clientSetting); 
+        
       }
     })();
     return () => {
       // Cleanup map instance
       if (mapRef.current) {
         mapRef.current = null;
+        delete window.google;
       }
     };
   }, []);
@@ -166,10 +174,19 @@ export default function AddZoneComp() {
   }, [polygondata, circleData]);
 
   const handlePolygonSave = (coordinates: [number, number][]) => {
-    const zoneCoords = coordinates.slice(0, -1).map(([lat, lng]) => ({
-      latitude: lat,
-      longitude: lng
-    }));
+    let zoneCoords:any;
+    if(session.MapType=="Google"){
+      zoneCoords = coordinates.map(([lat, lng]) => ({
+        latitude: lat,
+        longitude: lng
+      }));
+    }else{
+
+      zoneCoords = coordinates.slice(0, -1).map(([lat, lng]) => ({
+        latitude: lat,
+        longitude: lng
+      }));
+    }
 
     if (drawShape == true) {
       const formattedCoordinate: [number, number][] = zoneCoords.map(

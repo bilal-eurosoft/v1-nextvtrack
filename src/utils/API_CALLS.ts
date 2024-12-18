@@ -75,7 +75,7 @@ export async function getalluserview(userId: string,token:string ) {
     return [];
   }
 }
-export async function getallattributes(userId: string,token:string ) {
+export async function getallattributes(token:string ) {
   try {
     const response = await fetch(
       `${URL}/attributes`,

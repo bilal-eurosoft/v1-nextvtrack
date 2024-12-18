@@ -185,7 +185,7 @@ export default function JourneyReplayComp() {
   const [seacrhLoading, setSearchLoading] = useState(true);
   const [minzoom, setminzoom] = useState(1);
   const [maxzoom, setmaxzoom] = useState(18);
-  const [harshPopUp, setHarshPopUp] = useState(false);
+  const [harshPopUp, setHarshPopUp] = useState(true);
 
   const [addressTravelHistory, setAddressTravelHistory] = useState([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -226,21 +226,19 @@ export default function JourneyReplayComp() {
     }
 
     if (coords) {
-      if (coords) {
-        if (speedFactor == 2) {
-          map.setView(coords, 18);
-        } else if (speedFactor == 1) {
-          map.setView(coords, 18);
-        } else if (speedFactor == 4) {
+      if (speedFactor == 2) {
+        map.setView(coords, 18);
+      } else if (speedFactor == 1) {
+        map.setView(coords, 18);
+      } else if (speedFactor == 4) {
 
-          map.setView(coords, 18);
-        } else if (speedFactor == 6) {
-          map.setView(coords, 18);
-        } else {
-          map.setView(coords, 18);
-        }
-        setcoordsforgoogle(coords)
+        map.setView(coords, 18);
+      } else if (speedFactor == 6) {
+        map.setView(coords, 18);
+      } else {
+        map.setView(coords, 18);
       }
+      setcoordsforgoogle(coords)
     }
     return null;
   };
@@ -765,39 +763,11 @@ export default function JourneyReplayComp() {
     setLoading(false);
   };
 
-  function formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }
-
-
-  const handleClickClear = () => {
-    setPolylinedata([]);
-    setCarPosition(null);
-    setTravelHistoryresponse([]);
-    setIsPlaying(false);
-    setClearMapData(false);
-    setIsDynamicTime("");
-    setstops([]);
-    setPlayBtn(false);
-    setStopBtn(false);
-    setPauseBtn(false);
-    setactiveTripColor("");
-    setProgressWidth(0);
-    if (polylinedata.length > 0) {
-      setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
-    }
-    setCurrentPositionIndex(0);
-  };
   const handleClick = () => {
     setShowRadioButton(!getShowRadioButton);
   };
 
-  function getFormattedDate(date: any) {
-    return date.toISOString().slice(0, 10);
-  }
+
 
   const handleDivClick = async (
     TripStart: TripsByBucket["TripStart"],
@@ -1014,54 +984,6 @@ export default function JourneyReplayComp() {
 
   }, [TravelHistoryresponse]);
 
-  // useEffect(() => {
-  //   (async function () {
-  //     let unit: string;
-  //     if (session?.unit == "Mile") {
-  //       unit = "Mph";
-  //     } else {
-  //       unit = "Kph";
-  //     }
-  //     const stopPoints = TravelHistoryresponse?.filter((x) => {
-  //       return x.speed === `0 ${unit}`;
-  //     });
-
-  //     const stopDetailsArray: StopAddressData[] = [];
-
-  //     for (const point of stopPoints) {
-  //       const { lat, lng } = point;
-  //       try {
-  //         if (!point.address) {
-  //           if (session) {
-  //             const Data = await getCurrentAddress({
-  //               token: session.accessToken,
-  //               lat: lat,
-  //               lon: lng,
-  //             });
-
-  //             stopDetailsArray.push(Data);
-  //           }
-  //         } else {
-  //           stopDetailsArray.push(point?.address);
-  //         }
-  //       } catch (error) { }
-  //     }
-
-  //     const seen: Record<string | number, boolean> = {};
-
-  //     const uniqueStopDetailsArray = stopDetailsArray.filter((item) => {
-  //       const key = item.place_id;
-  //       if (!seen[key]) {
-  //         seen[key] = true;
-  //         return true;
-  //       }
-  //       return false;
-  //     });
-
-  //     setStopDetails(uniqueStopDetailsArray);
-  //   })();
-  // }, [TravelHistoryresponse]);
-  // const item = TravelHistoryresponse[currentPositionIndex];
   const getSpeedAndDistance = () => {
     if (
       currentPositionIndex >= 0 &&
@@ -1103,8 +1025,7 @@ export default function JourneyReplayComp() {
       [fieldName]: newDate?.toISOString(),
     }));
   };
-  // const timeZone =  "Australia/Sydney"
-  //     const currenTDates = moment.tz(timeZone).toDate();
+
   const currenTDates = new Date();
 
   const isCurrentDate = (date: any) => {
@@ -1149,7 +1070,7 @@ export default function JourneyReplayComp() {
     }
     const { value, label } = e;
     
-    setvehicleType(vehicleList?.data.find((i)=>{return i.vehicleReg==value})?.vehicleType)
+    setvehicleType(vehicleList?.data.find((i) => { return i.vehicleReg == value })?.vehicleType)
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
       ["VehicleReg"]: value,
@@ -2472,301 +2393,301 @@ export default function JourneyReplayComp() {
                     <p className="bg-bgPlatBtn text-white mt-3 px-2 py-3 rounded-md">
                       {TripAddressData}
                     </p> */}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {hideicondiv && hidediv && (
+              <div
+                className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2 cursor-pointer"
+                onClick={() => setIsChecked(!isChecked)}
+                style={{
+                  borderRadius: '10px',
+                  borderColor: 'green',
+                  borderWidth: '3px',
+                  borderStyle: 'solid',
+                  width: '160px', // Adjust width to make the div smaller
+                  backgroundColor: 'white',
+
+                }}
+              >
+                {/* Button and Checkbox */}
+                <div className="col-span-1" style={{ color: 'green' }}>
+                  <button
+                    className="text-labelColor font-popins text-xs font-bold ml-4" // Reduced font size and margin
+                    style={{
+                      width: '80%', // Make the button fill the container width
+                      backgroundColor: 'white',
+                    }}
+                  >
+                    Show Icon Details
+                  </button>
+                </div>
+
+                {/* Modal Content */}
+                {isChecked && TravelHistoryresponse?.length > 0 && (
+                  <div className="mt-2 ml-1">
+                    {/* Location Start and End */}
+                    <div className="grid grid-cols-12 gap-2 mb-3">
+                      <div className="col-span-2 flex flex-col items-center mt-1">
+                        <Image src={markerA} alt="startIcon" className="h-4 w-4 mb-1" /> {/* Smaller icon size */}
+                        <Image src={markerB} alt="endIcon" className="h-4 w-4 mt-1" /> {/* Smaller icon size */}
+                      </div>
+                      <div className="col-span-10 text-xs font-semibold mt-1"> {/* Reduced font size */}
+                        <p>Location start</p>
+                        <p className="mt-2">Location End</p>
+                      </div>
                     </div>
-                  )}
+
+                    {/* Harsh Acceleration, Cornering, and Braking */}
+                    <div className="space-y-2"> {/* Reduced spacing */}
+                      {TravelHistoryresponse?.filter((item) =>
+                        item.vehicleEvents.some(
+                          (event) => event.Event === 'HarshAcceleration'
+                        )
+                      ).length > 0 && (
+                          <div className="flex items-center gap-2">
+                            <Image src={HarshAccelerationIcon} alt="harshAccelerationIcon" className="h-4 w-4" /> {/* Smaller icon size */}
+                            <div
+                              className="text-xs font-semibold"
+                              style={{
+                                maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              Harsh Acceleration (x
+                              {TravelHistoryresponse.reduce((count, item) =>
+                                count +
+                                item.vehicleEvents.filter(
+                                  (event) => event.Event === 'HarshAcceleration'
+                                ).length
+                                , 0)}
+                              )
+                            </div>
+                          </div>
+                        )}
+
+                      {TravelHistoryresponse?.filter((item) =>
+                        item.vehicleEvents.some(
+                          (event) => event.Event === 'HarshCornering'
+                        )
+                      ).length > 0 && (
+                          <div className="flex items-center gap-2">
+                            <Image src={HarshCornerningIcon} alt="harshCorneringIcon" className="h-4 w-4" /> {/* Smaller icon size */}
+                            <div
+                              className="text-xs font-semibold"
+                              style={{
+                                maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              Harsh Cornering (x
+                              {TravelHistoryresponse.reduce((count, item) =>
+                                count +
+                                item.vehicleEvents.filter(
+                                  (event) => event.Event === 'HarshCornering'
+                                ).length
+                                , 0)}
+                              )
+                            </div>
+                          </div>
+                        )}
+
+                      {TravelHistoryresponse?.filter((item) =>
+                        item.vehicleEvents.some(
+                          (event) => event.Event === 'HarshBreak'
+                        )
+                      ).length > 0 && (
+                          <div className="flex items-center gap-2">
+                            <Image src={harshAcceleration} alt="harshBrakingIcon" className="h-4 w-4" /> {/* Smaller icon size */}
+                            <div
+                              className="text-xs font-semibold"
+                              style={{
+                                maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              Harsh Break (x
+                              {TravelHistoryresponse.reduce((count, item) =>
+                                count +
+                                item.vehicleEvents.filter(
+                                  (event) => event.Event === 'HarshBreak'
+                                ).length
+                                , 0)}
+                              )
+                            </div>
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+
+
+            {hidediv && (
+
+              <div className="absolute xl:left-56  xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8 bottom-2 left-10  rounded-md  ml-0  2xl:ml-48">
+                <div className="grid lg:grid-cols-5 grid-cols-5 gap-1 lg:py-5 py-2 pt-4 lg:pt-4 rounded-md mx-2 px-5 bg-white space-x-4">
+                  <div className="lg:col-span-4 md:col-span-4 col-span-4">
+                    <Slider
+                      value={currentPositionIndex}
+                      onChange={handleChangeValueSlider}
+                      color="secondary"
+                      style={{
+                        color: "#00B56C",
+                        cursor: isPlaying ? "pointer" : "not-allowed",
+                      }}
+                      max={polylinedata.length}
+                      disabled={!isPlaying}
+                    />
+                    <div className="flex justify-center">
+                      <div className="grid grid-cols-6">
+                        <div className="col-span-2">
+                          {isDynamicTime.TripStartTimeLabel}
+                        </div>
+                        <div className="col-span-3 flex items-center justify-center space-x-2">
+                          <Tooltip content="Pause" className="bg-black">
+                            <button
+                              onClick={() => pausebtn && pauseTick()}
+                              className={`h-5 w-5 ${pausebtn ? "cursor-pointer" : "cursor-not-allowed"}`}
+                            >
+                              <svg
+                                className="h-5 w-5"
+                                style={{ color: isPauseColor ? "green" : "black" }}
+                                fill={isPauseColor ? "none" : "none"}
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                strokeWidth="2"
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path stroke="none" d="M0 0h24v24H0z" />
+                                <line x1="4" y1="4" x2="4" y2="20" />
+                                <line x1="20" y1="4" x2="20" y2="20" />
+                                <rect x="9" y="6" width="6" height="12" rx="2" />
+                              </svg>
+                            </button>
+                          </Tooltip>
+                          <Tooltip content="Play" className="bg-black">
+                            <button
+                              onClick={() => playbtn && tick()}
+                              className={`h-5 w-5 ${playbtn ? "cursor-pointer" : "cursor-not-allowed"}`}
+                            >
+                              <svg
+                                className="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                style={{ color: isPlaying ? "green" : "black" }}
+                                fill={isPlaying ? "green" : "black"}
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <polygon points="5 3 19 12 5 21 5 3" />
+                              </svg>
+                            </button>
+                          </Tooltip>
+                          <Tooltip content="Stop" className="bg-black">
+                            <button
+                              onClick={() => stopbtn && stopTick()}
+                              className={`h-4 w-4 ${stopbtn ? "cursor-pointer" : "cursor-not-allowed"}`}
+                            >
+                              <svg
+                                className="h-4 w-4"
+                                width="24"
+                                style={{ color: stopVehicle ? "green" : "black" }}
+                                fill={stopVehicle ? "green" : "black"}
+                                height="24"
+                                viewBox="0 0 24 24"
+                                strokeWidth="2"
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path stroke="none" d="M0 0h24v24H0z" />
+                                <rect x="4" y="4" width="16" height="16" rx="2" />
+                              </svg>
+                            </button>
+                          </Tooltip>
+                        </div>
+                        <div className="col-span-1">
+                          {isDynamicTime.TripEndTimeLabel}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="lg:col-span-1 md:col-span-1 col-span-1 mt-2">
+                    {(isPlaying || isPaused) && (
+                      <Select
+                        onChange={(e: any) => setSpeedFactor(Number(e.value))}
+                        options={SpeedOption}
+                        placeholder="4X"
+                        isSearchable={false}
+                        className="rounded-md h-10 w-full outline-green border border-gray-300"
+                        defaultValue={SpeedOption[2]}
+                        styles={{
+                          control: (provided, state) => ({
+                            ...provided,
+                            border: "none",
+                            boxShadow: state.isFocused ? null : null,
+                          }),
+                          menu: (provided, state) => ({
+                            ...provided,
+                            zIndex: 9999,
+                            position: "absolute",
+                            top: "auto",
+                            bottom: "100%",
+                          }),
+                          option: (provided, state) => ({
+                            ...provided,
+                            backgroundColor: state.isSelected
+                              ? "#00B56C"
+                              : state.isFocused
+                                ? "white"
+                                : "transparent",
+                            color: state.isSelected
+                              ? "white"
+                              : state.isFocused
+                                ? "black"
+                                : "black",
+                            "&:hover": {
+                              backgroundColor: "#00B56C",
+                              color: "white",
+                            },
+                          }),
+                        }}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {hideicondiv && hidediv && (
-                <div
-                  className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2 cursor-pointer"
-                  onClick={() => setIsChecked(!isChecked)}
-                  style={{
-                    borderRadius: '10px',
-                    borderColor: 'green',
-                    borderWidth: '3px',
-                    borderStyle: 'solid',
-                    width: '160px', // Adjust width to make the div smaller
-                    backgroundColor: 'white',
 
-                  }}
-                >
-                  {/* Button and Checkbox */}
-                  <div className="col-span-1" style={{ color: 'green' }}>
-                    <button
-                      className="text-labelColor font-popins text-xs font-bold ml-4" // Reduced font size and margin
-                      style={{
-                        width: '80%', // Make the button fill the container width
-                        backgroundColor: 'white',
-                      }}
-                    >
-                      Show Icon Details
-                    </button>
-                  </div>
-
-                  {/* Modal Content */}
-                  {isChecked && TravelHistoryresponse?.length > 0 && (
-                    <div className="mt-2 ml-1">
-                      {/* Location Start and End */}
-                      <div className="grid grid-cols-12 gap-2 mb-3">
-                        <div className="col-span-2 flex flex-col items-center mt-1">
-                          <Image src={markerA} alt="startIcon" className="h-4 w-4 mb-1" /> {/* Smaller icon size */}
-                          <Image src={markerB} alt="endIcon" className="h-4 w-4 mt-1" /> {/* Smaller icon size */}
-                        </div>
-                        <div className="col-span-10 text-xs font-semibold mt-1"> {/* Reduced font size */}
-                          <p>Location start</p>
-                          <p className="mt-2">Location End</p>
-                        </div>
-                      </div>
-
-                      {/* Harsh Acceleration, Cornering, and Braking */}
-                      <div className="space-y-2"> {/* Reduced spacing */}
-                        {TravelHistoryresponse?.filter((item) =>
-                          item.vehicleEvents.some(
-                            (event) => event.Event === 'HarshAcceleration'
-                          )
-                        ).length > 0 && (
-                            <div className="flex items-center gap-2">
-                              <Image src={HarshAccelerationIcon} alt="harshAccelerationIcon" className="h-4 w-4" /> {/* Smaller icon size */}
-                              <div
-                                className="text-xs font-semibold"
-                                style={{
-                                  maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
-                                  display: '-webkit-box',
-                                  WebkitLineClamp: 2,
-                                  WebkitBoxOrient: 'vertical',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                }}
-                              >
-                                Harsh Acceleration (x
-                                {TravelHistoryresponse.reduce((count, item) =>
-                                  count +
-                                  item.vehicleEvents.filter(
-                                    (event) => event.Event === 'HarshAcceleration'
-                                  ).length
-                                  , 0)}
-                                )
-                              </div>
-                            </div>
-                          )}
-
-                        {TravelHistoryresponse?.filter((item) =>
-                          item.vehicleEvents.some(
-                            (event) => event.Event === 'HarshCornering'
-                          )
-                        ).length > 0 && (
-                            <div className="flex items-center gap-2">
-                              <Image src={HarshCornerningIcon} alt="harshCorneringIcon" className="h-4 w-4" /> {/* Smaller icon size */}
-                              <div
-                                className="text-xs font-semibold"
-                                style={{
-                                  maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
-                                  display: '-webkit-box',
-                                  WebkitLineClamp: 2,
-                                  WebkitBoxOrient: 'vertical',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                }}
-                              >
-                                Harsh Cornering (x
-                                {TravelHistoryresponse.reduce((count, item) =>
-                                  count +
-                                  item.vehicleEvents.filter(
-                                    (event) => event.Event === 'HarshCornering'
-                                  ).length
-                                  , 0)}
-                                )
-                              </div>
-                            </div>
-                          )}
-
-                        {TravelHistoryresponse?.filter((item) =>
-                          item.vehicleEvents.some(
-                            (event) => event.Event === 'HarshBreak'
-                          )
-                        ).length > 0 && (
-                            <div className="flex items-center gap-2">
-                              <Image src={harshAcceleration} alt="harshBrakingIcon" className="h-4 w-4" /> {/* Smaller icon size */}
-                              <div
-                                className="text-xs font-semibold"
-                                style={{
-                                  maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
-                                  display: '-webkit-box',
-                                  WebkitLineClamp: 2,
-                                  WebkitBoxOrient: 'vertical',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                }}
-                              >
-                                Harsh Break (x
-                                {TravelHistoryresponse.reduce((count, item) =>
-                                  count +
-                                  item.vehicleEvents.filter(
-                                    (event) => event.Event === 'HarshBreak'
-                                  ).length
-                                  , 0)}
-                                )
-                              </div>
-                            </div>
-                          )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-
-
-              {hidediv && (
-
-                <div className="absolute xl:left-56  xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8 bottom-2 left-10  rounded-md  ml-0  2xl:ml-48">
-                  <div className="grid lg:grid-cols-5 grid-cols-5 gap-1 lg:py-5 py-2 pt-4 lg:pt-4 rounded-md mx-2 px-5 bg-white space-x-4">
-                    <div className="lg:col-span-4 md:col-span-4 col-span-4">
-                      <Slider
-                        value={currentPositionIndex}
-                        onChange={handleChangeValueSlider}
-                        color="secondary"
-                        style={{
-                          color: "#00B56C",
-                          cursor: isPlaying ? "pointer" : "not-allowed",
-                        }}
-                        max={polylinedata.length}
-                        disabled={!isPlaying}
-                      />
-                      <div className="flex justify-center">
-                        <div className="grid grid-cols-6">
-                          <div className="col-span-2">
-                            {isDynamicTime.TripStartTimeLabel}
-                          </div>
-                          <div className="col-span-3 flex items-center justify-center space-x-2">
-                            <Tooltip content="Pause" className="bg-black">
-                              <button
-                                onClick={() => pausebtn && pauseTick()}
-                                className={`h-5 w-5 ${pausebtn ? "cursor-pointer" : "cursor-not-allowed"}`}
-                              >
-                                <svg
-                                  className="h-5 w-5"
-                                  style={{ color: isPauseColor ? "green" : "black" }}
-                                  fill={isPauseColor ? "none" : "none"}
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="2"
-                                  stroke="currentColor"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <path stroke="none" d="M0 0h24v24H0z" />
-                                  <line x1="4" y1="4" x2="4" y2="20" />
-                                  <line x1="20" y1="4" x2="20" y2="20" />
-                                  <rect x="9" y="6" width="6" height="12" rx="2" />
-                                </svg>
-                              </button>
-                            </Tooltip>
-                            <Tooltip content="Play" className="bg-black">
-                              <button
-                                onClick={() => playbtn && tick()}
-                                className={`h-5 w-5 ${playbtn ? "cursor-pointer" : "cursor-not-allowed"}`}
-                              >
-                                <svg
-                                  className="h-5 w-5"
-                                  viewBox="0 0 24 24"
-                                  style={{ color: isPlaying ? "green" : "black" }}
-                                  fill={isPlaying ? "green" : "black"}
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <polygon points="5 3 19 12 5 21 5 3" />
-                                </svg>
-                              </button>
-                            </Tooltip>
-                            <Tooltip content="Stop" className="bg-black">
-                              <button
-                                onClick={() => stopbtn && stopTick()}
-                                className={`h-4 w-4 ${stopbtn ? "cursor-pointer" : "cursor-not-allowed"}`}
-                              >
-                                <svg
-                                  className="h-4 w-4"
-                                  width="24"
-                                  style={{ color: stopVehicle ? "green" : "black" }}
-                                  fill={stopVehicle ? "green" : "black"}
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="2"
-                                  stroke="currentColor"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <path stroke="none" d="M0 0h24v24H0z" />
-                                  <rect x="4" y="4" width="16" height="16" rx="2" />
-                                </svg>
-                              </button>
-                            </Tooltip>
-                          </div>
-                          <div className="col-span-1">
-                            {isDynamicTime.TripEndTimeLabel}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="lg:col-span-1 md:col-span-1 col-span-1 mt-2">
-                      {(isPlaying || isPaused) && (
-                        <Select
-                          onChange={(e: any) => setSpeedFactor(Number(e.value))}
-                          options={SpeedOption}
-                          placeholder="4X"
-                          isSearchable={false}
-                          className="rounded-md h-10 w-full outline-green border border-gray-300"
-                          defaultValue={SpeedOption[2]}
-                          styles={{
-                            control: (provided, state) => ({
-                              ...provided,
-                              border: "none",
-                              boxShadow: state.isFocused ? null : null,
-                            }),
-                            menu: (provided, state) => ({
-                              ...provided,
-                              zIndex: 9999,
-                              position: "absolute",
-                              top: "auto",
-                              bottom: "100%",
-                            }),
-                            option: (provided, state) => ({
-                              ...provided,
-                              backgroundColor: state.isSelected
-                                ? "#00B56C"
-                                : state.isFocused
-                                  ? "white"
-                                  : "transparent",
-                              color: state.isSelected
-                                ? "white"
-                                : state.isFocused
-                                  ? "black"
-                                  : "black",
-                              "&:hover": {
-                                backgroundColor: "#00B56C",
-                                color: "white",
-                              },
-                            }),
-                          }}
-                        />
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-
-              )}
-
-            </div>
+            )}
 
           </div>
 
-          <Toaster position="top-center" reverseOrder={false} />
         </div>
-      </>
-      );
+
+        <Toaster position="top-center" reverseOrder={false} />
+      </div>
+    </>
+  );
 }

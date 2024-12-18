@@ -72,7 +72,7 @@ const LiveCars = ({
           );
 
           const bounds = L.latLngBounds(positions);
-          var zoom;
+          var zoom1;
           var center: LatLng | undefined;
           if (bounds.isValid()) {
             center = bounds.getCenter();
@@ -92,16 +92,16 @@ const LiveCars = ({
             const latZoom = Math.floor(Math.log2(360 / (0.5 * latDistance)));
             const lngZoom = Math.floor(Math.log2(360 / (0.5 * lngDistance)));
 
-            zoom = Math.min(latZoom, lngZoom);
+            zoom1 = Math.min(latZoom, lngZoom);
             //setZoom(zoom)
           } else {
             center = L.latLng(0, 0); // You may adjust the default center as per your needs
-            zoom = 11; //
+            zoom1 = 11; //
           }
 
 
           setSelectedVehicle(false);
-          map.flyTo(center, zoom);
+          map.flyTo(center, zoom1);
         }
       }
     }

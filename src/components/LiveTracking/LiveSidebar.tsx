@@ -80,13 +80,10 @@ const LiveSidebar = ({
   useEffect(()=>{    
     (async function () {
       if(session?.defaultView == false){
-        const data =  await getalluserview(session.userId, session.accessToken)            
+        const data =  await getalluserview(session?.userId, session?.accessToken)            
         setallattributes(data.data)
         }
-        const data = await getallattributes({
-          token: session.accessToken,
-          userId: session.userId,
-        });
+        const data = await getallattributes(session?.accessToken);
         setAllfields(data.data);
         
     

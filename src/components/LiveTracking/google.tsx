@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  GoogleMap, LoadScript,useLoadScript ,
+  GoogleMap, LoadScript, useLoadScript,
   InfoWindow,
 } from '@react-google-maps/api';
 import { VehicleData } from '@/types/vehicle';
@@ -57,7 +57,7 @@ const MapComponent = ({
   const [circleRefs, setCircleRefs] = useState([]);
   const [polygonRefs, setPolygonRefs] = useState([]);
   
-  const handleCircleClick = (name, center) => {
+  const handleCircleClick = (name: any, center: any) => {
     if (selectedZone == name) {
       setSelectedZone(null);
       setInfoWindowPosition(null);
@@ -77,7 +77,7 @@ const MapComponent = ({
     }
   };
   // const [isUserInteracting, setIsUserInteracting] = useState(false);
-  const [mapCenter, setMapCenter] = useState({ lat: mapCoordinates?mapCoordinates[0]:0, lng: mapCoordinates?mapCoordinates[1]:0 });
+  const [mapCenter, setMapCenter] = useState();
   // const handleMoveEnd = (event: any) => {
   //   // setIsMapDragged(true);
   //   setIsUserInteracting(true); // User is interacting with the map
@@ -115,7 +115,7 @@ const MapComponent = ({
     const response = await fetch(filepath);
     return await response.text();
   }
-  
+
   useEffect(() => {
     async function setdata() {
       setcarstop(await loadSVG(stopcar.src))
@@ -128,8 +128,13 @@ const MapComponent = ({
       setbikeidle(await loadSVG(idlebike.src))
     }
     setdata()
-    return () => {      
-      if (mapRef.current) {      
+
+    if (mapCoordinates?.length > 0) {
+
+      setMapCenter({ lat: mapCoordinates[0], lng: mapCoordinates[1] })
+    }
+    return () => {
+      if (mapRef.current) {
         mapRef.current = null;
         delete window.google;
       }
@@ -137,7 +142,7 @@ const MapComponent = ({
   }, [])
   // const [mapRef, setMapRef] = useState(null);  
   const mapRef = useRef(null);
-  const onLoad = (map) => {    
+  const onLoad = (map) => {
     mapRef.current = map
   };
   const selectedVehicleCurrentData = useRef<VehicleData | null>(null);
@@ -181,7 +186,7 @@ const MapComponent = ({
           var center: LatLng | undefined;
           if (bounds.isValid()) {
             center = bounds.getCenter();
-            
+
             const lats = carData.map((data) => data.gps.latitude);
             const lngs = carData.map((data) => data.gps.longitude);
 
@@ -209,8 +214,8 @@ const MapComponent = ({
           mapRef.current.panTo(center);
           mapRef.current.setZoom(zoom)
         }
-      }else if(mapCoordinates.length>0){        
-        setMapCenter({lat:mapCoordinates[0], lng:mapCoordinates[1]})        
+      } else if (mapCoordinates.length > 0) {
+        setMapCenter({ lat: mapCoordinates[0], lng: mapCoordinates[1] })
       }
     }
   }, [carData, selectedVehicle, mapRef.current, mapCoordinates, zoom]);
@@ -327,18 +332,20 @@ const MapComponent = ({
       // anchor: [20, 20]
     }
   };
-  const [googleLoaded, setGoogleLoaded] = useState(false);
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: GOOGLE_MAPS_API_KEY,    
-  });
-  useEffect(() => {
-    if (isLoaded && window.google) {
-      setGoogleLoaded(true);
-    }
-  }, [isLoaded]);
-  if (!googleLoaded) return <div>Loading...</div>;
+  // const [googleLoaded, setGoogleLoaded] = useState(false);
+  // const { isLoaded } = useLoadScript({
+  //   googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+  // });
+  // const { isLoaded }  =useGoogleMaps();
+  // if (!isLoaded) return null; // Wait until the API is loaded
+  // useEffect(() => {
+  //   if (isLoaded && window.google) {
+  //     setGoogleLoaded(true);
+  //   }
+  // }, [isLoaded]);
+  // if (!googleLoaded) return <div>Loading...</div>;
   return (
-    // <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+    <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
       <GoogleMap
         clickableIcons={false}
         mapContainerStyle={containerStyle}
@@ -407,14 +414,14 @@ const MapComponent = ({
         })}
 
         {showZones && selectedZone && infoWindowPosition && (
-          <InfoWindow position={infoWindowPosition} onCloseClick={() => setSelectedZone(null)}>
+          <InfoWindow position={infoWindowPosition} >
             <div>
               <p>{selectedZone}</p>
             </div>
           </InfoWindow>
         )}
       </GoogleMap>
-    // </LoadScript>
+    </LoadScript>
   );
 };
 export default MapComponent;

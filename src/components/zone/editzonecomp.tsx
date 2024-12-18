@@ -159,6 +159,7 @@ export default function EditZoneComp() {
         circleRef.current?.setMap(null)
         polygonRef.current?.setMap(null)
         mapRef.current = null
+        delete window.google;
       }
     };
   }, []);
