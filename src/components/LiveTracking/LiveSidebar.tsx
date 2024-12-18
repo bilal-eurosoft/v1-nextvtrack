@@ -534,7 +534,7 @@ const [srcimgindex, setsrcimgindex] = useState(null);
       const value = getNestedValue(item, attribute.key);
 
       // Check if the current attribute is the one requiring calculation
-      if (attribute.key === "gpsStatus") {
+      if (attribute.key === "gpsStatus" && allattributes.find((i)=>{return i.vehicleId==item.vehicleId})?.attributes.find((j)=>{return j.key=="gpsStatus"})?.allow) {
         // Only show this field if gpsStatus is true
         const targetTimeDate = new Date(item.targetTime);
         const currentTimeDate = new Date(item.currentTime);
