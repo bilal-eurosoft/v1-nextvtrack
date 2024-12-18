@@ -429,13 +429,13 @@ export default function ServiceHistory() {
     }
   }; */
 
-  const opendeleteModal = (serviceId: string) => {
+  // const opendeleteModal = (serviceId: string) => {
    
-    setIsModalOpen(true);
-    setserviceType("Delete");
-    setSelectedServiceId(serviceId);
+  //   setIsModalOpen(true);
+  //   setserviceType("Delete");
+  //   setSelectedServiceId(serviceId);
    
-  };
+  // };
 
 
   const handleInputChangeSelect = (selectedOption: any) => {
@@ -602,7 +602,9 @@ export default function ServiceHistory() {
   }
   
   return (
+
     <div className="bg-[#F7FAFC] pt-[1.5px]">
+      
       <p className="bg-[#00B56C] px-4 py-1 text-center text-2xl sm:text-xl text-white font-bold">
     Service History
   </p>
@@ -679,8 +681,7 @@ export default function ServiceHistory() {
          
         
 
-       {/* Table */}
-{/* Table */}
+       
 <div className={`relative ${isModalOpen ? "backdrop-blur-sm" : ""}`}>
   <div
     className={`bg-white shadow-md rounded-lg ${
@@ -775,53 +776,12 @@ export default function ServiceHistory() {
                     </span>
                   </td>
                 )}
-{/* 
- <td className="px-2 py-1 relative text-left">
-                    <span
-                      className="text-[#E53E3E] underline group cursor-pointer"
-                      onClick={() => openConfirmationModal(service._id)}
-                    >
-                      {service.status.charAt(0).toUpperCase() +
-                        service.status.slice(1)}
-
-                      <div className="absolute left-0 top-full mt-2 hidden group-hover:block z-20">
-                        <div className="text-xs font-semibold bg-[#D1FAE5] text-[#E53E3E] p-2 rounded-md mb-1 text-left">
-                          Click to update the status
-                        </div>
-                      </div>
-                    </span>
-                  </td>
-                )}
-
-                <td className="px-2 py-1 text-left">
-                  <div className="flex gap-2 justify-start">
-                    <button
-                      onClick={() => openUpdateModal(service)}
-                      className="bg-green text-white px-3 py-1 rounded-lg hover:shadow-lg"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => opendeleteModal(service._id)}
-                      className="bg-[#E53E3E] text-white px-3 py-1 rounded-lg hover:shadow-lg"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
-  </div>
+                </tr>))
+              )}
+</tbody>
+</table>
 </div>
 
-
-
-
-        {/* Modal for adding/updating service */}
         {modalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg w-96">
@@ -1206,5 +1166,9 @@ export default function ServiceHistory() {
   )}
       </div>
     </div>
+    </div>
+    </div>
+
+
   );
 }
