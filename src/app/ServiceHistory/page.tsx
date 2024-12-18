@@ -367,7 +367,6 @@ export default function ServiceHistory() {
       setTimeValue(null)
       setModalOpen(false);
     } catch (error) {
-
       toast.error("An error occurred while saving the service.");
     }
   };
@@ -440,7 +439,6 @@ export default function ServiceHistory() {
 
 
   const handleInputChangeSelect = (selectedOption: any) => {
-
     let singleVehicle: any;
     if (selectedOption?.value) {
       singleVehicle = vehicleList.find(
@@ -602,14 +600,6 @@ export default function ServiceHistory() {
   if (currentPage > totalPages) {
     setCurrentPage(totalPages); // If the current page exceeds the total pages, reset to the last page
   }
-
-  const [showPopup, setShowPopup] = useState(false);
-  
-  // Handle the popup click (to update status)
-  const handlePopupClick = () => {
- 
-    setShowPopup(false);
-  };
   
   return (
     <div className="bg-[#F7FAFC] pt-[1.5px]">
@@ -694,14 +684,14 @@ export default function ServiceHistory() {
 <div className={`relative ${isModalOpen ? "backdrop-blur-sm" : ""}`}>
   <div
     className={`bg-white shadow-md rounded-lg ${
-      rowsPerPage > 15 ? "overflow-y-auto max-h-[780px] relative" : ""
+      rowsPerPage > 10 ? "overflow-y-auto max-h-[680px] relative" : ""
     }`}
   >
-    <div className={``}> {/* Enable horizontal scrolling */}
+    <div className="overflow-x-auto"> {/* Enable horizontal scrolling */}
       <table className="min-w-full table-auto">
         <thead
           className={`bg-[#E2E8F0] ${
-            rowsPerPage > 15 ? "sticky top-0 z-10" : ""
+            rowsPerPage > 10 ? "sticky top-0 z-10" : ""
           }`}
         >
           <tr>
@@ -764,7 +754,7 @@ export default function ServiceHistory() {
                 )}
 
                 {service.status === "complete" ? (
-                  <td className="px-2 py-1 text-left ">
+                  <td className="px-2 py-1 text-left">
                     {service.status.charAt(0).toUpperCase() +
                       service.status.slice(1)}
                   </td>
@@ -794,16 +784,15 @@ export default function ServiceHistory() {
                       {service.status.charAt(0).toUpperCase() +
                         service.status.slice(1)}
 
-                      <div className="absolute left-0 top-full  hidden group-hover:block z-20">
+                      <div className="absolute left-0 top-full mt-2 hidden group-hover:block z-20">
                         <div className="text-xs font-semibold bg-[#D1FAE5] text-[#E53E3E] p-2 rounded-md mb-1 text-left">
                           Click to update the status
                         </div>
                       </div>
                     </span>
                   </td>
+                )}
 
-
-*/}
                 <td className="px-2 py-1 text-left">
                   <div className="flex gap-2 justify-start">
                     <button
@@ -1124,9 +1113,9 @@ export default function ServiceHistory() {
           value={rowsPerPage}
           onChange={handleRowsPerPageChange}
         >
-          <option value={5}>5</option>
           <option value={10}>10</option>
-          <option value={15}>15</option>
+          <option value={20}>20</option>
+          <option value={50}>50</option>
         </select>
       </div>
 

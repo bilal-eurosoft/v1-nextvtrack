@@ -639,10 +639,6 @@ export default function RootLayout({
     </svg>
   </Tooltip>
 </Link>
-
-
-
-
             {(session?.userRole == "SuperAdmin" ||
               session?.userRole == "Admin") && (
               <div>
@@ -803,7 +799,6 @@ export default function RootLayout({
                           backgroundColor: pathname == "/Immobilize" ? "white" : ""
                         }}
                       >
-                       
  <g>
 	<path class="st0" d="M67.9,0H28.3L14,15.7l-0.4,0.5h-7c0,0-2.1,0-2.5,2.7c-0.3,1.5,0.3,3,1.5,3.8c1.1,0,2.1,0.1,3.1,0.3
 		c1.6,0.3,1.2,1.6,1.2,1.6c-6.2,3.9-9.7,11.3-9.7,11.3L0,65l2.1,2.5h13.4l2.6-6.2h56.5V37c-0.2-1.8,1.2-3.4,3-3.6c0.1,0,0.3,0,0.4,0
@@ -1358,7 +1353,6 @@ export default function RootLayout({
                           backgroundColor: pathname == "/Immobilize" ? "white" : ""
                         }}
                       >
-                       
  <g>
 	<path class="st0" d="M67.9,0H28.3L14,15.7l-0.4,0.5h-7c0,0-2.1,0-2.5,2.7c-0.3,1.5,0.3,3,1.5,3.8c1.1,0,2.1,0.1,3.1,0.3
 		c1.6,0.3,1.2,1.6,1.2,1.6c-6.2,3.9-9.7,11.3-9.7,11.3L0,65l2.1,2.5h13.4l2.6-6.2h56.5V37c-0.2-1.8,1.2-3.4,3-3.6c0.1,0,0.3,0,0.4,0
@@ -1390,7 +1384,7 @@ export default function RootLayout({
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className={`w-14 h-14 py-2 text-white-10 dark:text-white ${pathname == "/ServiceHistory" ? "border-b-2 mr-[1.5px] border-green-500" : "border-b-2  border-white"}`}
+        className={`py-2 text-white-10 dark:text-white ${pathname == "/ServiceHistory" ? "border-b-2 mr-[1.5px] border-green-500" : "border-b-2  border-white"}`}
         width="80px"
         height="50px"
         viewBox="0 0 512 512"

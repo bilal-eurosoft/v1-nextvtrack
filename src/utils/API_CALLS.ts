@@ -8,7 +8,6 @@ import uniqueDataByIMEIAndLatestTimestamp from "./uniqueDataByIMEIAndLatestTimes
 //  var URL = "http://172.16.10.47:80"
 var URL ="https://backend.vtracksolutions.com";
 
-
 export async function getVehicleDataByClientId(clientId: string) {
   try {
     const response = await fetch(
@@ -47,7 +46,6 @@ export async function getVehicleDataByClientIdForOdometer(clientId: string) {
       )?.cacheList;
       // call a filter function here to filter by IMEI and latest time stamp
       let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
-
     return uniqueData;
   } catch (error) {
     

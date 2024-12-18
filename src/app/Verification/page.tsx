@@ -97,7 +97,6 @@ export default function Verification() {
 
         toast.success("Password Successfully Updated");
     router.push("/signin");
-
         setFormData({
           password: "",
         });
