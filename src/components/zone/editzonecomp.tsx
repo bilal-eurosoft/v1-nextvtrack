@@ -573,12 +573,12 @@ export default function EditZoneComp() {
     });
   };
 
-if(session?.MapType=="Google"){
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: GOOGLE_MAPS_API_KEY,    
-  });
-  if (!isLoaded) return <div>Loading...</div>;
-}
+// if(session?.MapType=="Google"){
+//   const { isLoaded } = useLoadScript({
+//     googleMapsApiKey: GOOGLE_MAPS_API_KEY,    
+//   });
+//   if (!isLoaded) return <div>Loading...</div>;
+// }
 
   return (
     <>
@@ -838,6 +838,7 @@ if(session?.MapType=="Google"){
                     (
                       <div className="edit_zone_map_main">
 
+                        <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={libraries} >
                           <GoogleMap
                             clickableIcons={false}
                             mapContainerStyle={containerStyle}
@@ -864,8 +865,7 @@ if(session?.MapType=="Google"){
                               }}
                             />
                           </GoogleMap>
-                        {/* <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={libraries} >
-                        </LoadScript> */}
+                        </LoadScript>
                       </div>
                     ) : (
                       <MapContainer

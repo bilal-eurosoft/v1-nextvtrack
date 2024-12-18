@@ -529,26 +529,22 @@ const [srcimgindex, setsrcimgindex] = useState(null);
         }
         return obj;
       };
-      console.log(item)
+      
 
       const value = getNestedValue(item, attribute.key);
 
       // Check if the current attribute is the one requiring calculation
       if (attribute.key === "gpsStatus") {
         // Only show this field if gpsStatus is true
-        if (item.gpsStatus) {
-          const targetTimeDate = new Date(item.targetTime);
-          const currentTimeDate = new Date(item.currentTime);
-          const timeDiffMinutes = Math.abs(targetTimeDate.getTime() - currentTimeDate.getTime()) / (1000 * 60);
-          const newDivColor = timeDiffMinutes > 120 ? false : true;
-console.log("object", newDivColor);
-          return (
-            <p key={attribute.key} style={{ fontSize: "15px" }}>
-              <strong>{attribute.label}:</strong> {newDivColor ? "On": "Off"}
-            </p>
-          );
-        }
-        return null; // Don't show the field if gpsStatus is false
+        const targetTimeDate = new Date(item.targetTime);
+        const currentTimeDate = new Date(item.currentTime);
+        const timeDiffMinutes = Math.abs(targetTimeDate.getTime() - currentTimeDate.getTime()) / (1000 * 60);
+        const newDivColor = timeDiffMinutes > 120 ? false : true;
+        return (
+          <p key={attribute.key} style={{ fontSize: "15px" }}>
+            <strong>{attribute.label}:</strong> {newDivColor ? "On": "Off"}
+          </p>
+        );                
       }
 
       // Render other attributes

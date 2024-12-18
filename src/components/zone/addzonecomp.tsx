@@ -863,6 +863,7 @@ export default function AddZoneComp() {
                   (
                     <div className="edit_zone_map_main">
 
+                      <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={libraries}>
                         <GoogleMap
                           clickableIcons={false}
                           mapContainerStyle={containerStyle}
@@ -890,8 +891,7 @@ export default function AddZoneComp() {
                           />
                           
                         </GoogleMap>
-                      {/* <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={libraries}>
-                      </LoadScript> */}
+                      </LoadScript>
                     </div>
                   ) : (
                     <MapContainer
