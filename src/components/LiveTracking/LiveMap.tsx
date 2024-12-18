@@ -11,11 +11,14 @@ import { useSession } from "next-auth/react";
 // import { getZoneListByClientId } from "@/utils/API_CALLS";
 import { fetchZone } from "@/lib/slices/zoneSlice";
 import { useSelector } from "react-redux";
-import { Marker, Popup, Tooltip } from "react-leaflet";
 import L, { LatLng } from "leaflet";
 import { useSearchParams } from "next/navigation";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import GoogleLiveMap from './google'
+import {
+  Popup, 
+} from "react-leaflet";
 const MapContainer = dynamic(
   () => import("react-leaflet").then((module) => module.MapContainer),
   { ssr: false }
@@ -69,16 +72,16 @@ const DynamicCarMap = ({
   position:any
   
 }) => {
-  const clientMapSettings = clientSettings?.filter(
-    (el) => el?.PropertDesc === "Map"
-  )[0]?.PropertyValue;
+  // const clientMapSettings = clientSettings?.filter(
+  //   (el) => el?.PropertDesc === "Map"
+  // )[0]?.PropertyValue;
   const searchParams = useSearchParams();
 
   const fullparams = searchParams.get("screen");
 
-  const clientZoomSettings = clientSettings?.filter(
-    (el) => el?.PropertDesc === "Zoom"
-  )[0]?.PropertyValue;
+  // const clientZoomSettings = clientSettings?.filter(
+  //   (el) => el?.PropertDesc === "Zoom"
+  // )[0]?.PropertyValue;
   /*  let mapCoordinates: [number, number] = [0, 0]; */
   const { data: session } = useSession();
 
@@ -132,11 +135,48 @@ const DynamicCarMap = ({
   };
   let ododata = carData.filter((item)=> item.vehicleReg ==selectedOdoVehicle?.vehicleReg)[0]?.odometer
 
+  // const googleMapsApiKey = 'AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo'
+ //const googleTileLayerUrl =`https://maps.googleapis.com/maps/api/timezone/json?location=39.6034810,-119.6822510&timestamp=1331161200&key=AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo`
+//  const googleTileLayerUrl = `https://{s}.googleapis.com/maps/vt?lyrs=m&x={x}&y={y}&z={z}&`
+//  const containerStyle = {
+  // width: '100%',
+  // height: fullparams === 'full' ? '100vh' : '400px',
+// };
+/* const googleStaticUrl = (center, zoom, size) => {
+  return `https://maps.googleapis.com/maps/api/staticmap?key=${googleMapsApiKey}&center=${center}&zoom=${zoom}&size=${size}&maptype=roadmap`;
+}; */
+
+/* const googleTileUrl = (lat, lng, zoom) => {
+  
+  return `https://tile.googleapis.com/v1/2dtiles/${lat}/${lng}/${zoom}?key=${googleMapsApiKey}`;
+}; */
+// const googleStaticUrl = (center, zoom, size) => {
+//   return `https://maps.googleapis.com/maps/api/staticmap?center=${center}&zoom=${zoom}&size=${size}&key=${googleMapsApiKey}`;
+// };
+// const googleMapsUrl = 'https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}&key=AIzaSyCM7TdphvF8v3jMCN4uWlD0zFMb7SemNFw';
+
   return (
     <>
       <div className="xl:col-span-4 lg:col-span-3  md:col-span-3  sm:col-span-3 col-span-4 main_map">
         <div className="relative" onClick={handleClear}>
-          {mapCoordinates !== null && zoom !== null && (
+    
+        {session?.MapType == "Google" ? (
+<GoogleLiveMap 
+ carData={carData}
+//  clientSettings={clientSettings}
+ selectedVehicle={selectedVehicle}
+ setSelectedVehicle={setSelectedVehicle}
+ showAllVehicles={showAllVehicles}
+ setunselectVehicles={setunselectVehicles}
+ unselectVehicles={unselectVehicles}
+ mapCoordinates={mapCoordinates}  
+zoom={zoom}
+showZones={showZones}
+zoneList={zoneList}
+/>
+        ) : (
+<>
+{mapCoordinates !== null && zoom !== null && (
             <MapContainer
               id="maps"
               key={zoom}
@@ -146,9 +186,22 @@ const DynamicCarMap = ({
               zoom={zoom}
             >
               <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url={"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"}
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
               />
+                {/* <LayersControl position="bottomleft">
+          <LayersControl.BaseLayer  name="OpenStreetMap">
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          </LayersControl.BaseLayer>
+
+          <LayersControl.BaseLayer checked name="Google Maps">
+            <TileLayer
+               url={`https://maps.googleapis.com/maps/api/timezone/json?location=${mapCoordinates[0]},${mapCoordinates[1]}&key=AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo`}
+              url={`https://maps.googleapis.com/maps/api/js?key=AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo`}
+              
+            />
+          </LayersControl.BaseLayer>
+          </LayersControl> */}
 
               {showZones &&
                 zoneList.map((singleRecord: any) => {
@@ -200,9 +253,12 @@ const DynamicCarMap = ({
                 showAllVehicles={showAllVehicles}
                 setunselectVehicles={setunselectVehicles}
                 unselectVehicles={unselectVehicles}
+                zoom={zoom}
               />
             </MapContainer>
           )}
+</>
+        )}          
 { selectedOdoVehicle != null  && ( 
 <div
     className="absolute   left-2  bg-white border border-gray-300 p-2 rounded shadow-md"
@@ -236,21 +292,7 @@ const DynamicCarMap = ({
 )}
 
 
-          {/* <div className="grid grid-cols-1 absolute shadow-lg rounded-md lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">
-            <div className="col-span-1" style={{ color: "green" }}>
-              <input
-                type="checkbox"
-                onClick={() => {
-                  setShowZones(!showZones);
-                }}
-                className="mx-2  mt-1"
-                style={{ accentColor: "green" }}
-              />
-              <button className="text-labelColor font-popins text-sm font-bold">
-                Show Zones
-              </button>
-            </div>
-          </div> */}
+         
           {zoneList !== null && zoneList?.length > 0 && (
             <div
               className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2"

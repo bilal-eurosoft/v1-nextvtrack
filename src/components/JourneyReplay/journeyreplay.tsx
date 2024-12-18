@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import DateFnsMomemtUtils from "@date-io/moment";
 import { DatePicker } from "@material-ui/pickers";
 import axios from "axios";
@@ -19,7 +19,6 @@ import HarshCornerningIcon from "../../../public/harshcornering.png";
 import markerA from "../../../public/Images/marker-a.png";
 import markerB from "../../../public/Images/marker-b.png";
 import harshAcceleration from "../../../public/Images/brake-discs.png";
-
 import FocusIconNew from "../../../public/car-icon-vtrack.png";
 import { useSelector } from "react-redux";
 import Speedometer, {
@@ -34,7 +33,7 @@ import {
   TripsByBucketAndVehicle,
   getAllVehicleByUserId,
   getCurrentAddress,
-  vehicleListByClientId,  
+  vehicleListByClientId,
 } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { DeviceAttach } from "@/types/vehiclelistreports";
@@ -58,11 +57,11 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
+import GoogleLiveMap from './google'
 
 import MenuItem from "@mui/material/MenuItem";
 import { makeStyles } from "@mui/styles";
 import Slider from "@mui/material/Slider";
-import car_icon from "../../../public/Images/journey_car_icon.png";
 import Select from "react-select";
 import "./index.css";
 
@@ -137,6 +136,7 @@ export default function JourneyReplayComp() {
   const [zoomToFly, setzoomToFly] = useState(10);
   const [zoom, setzoom] = useState(10);
   const [polylinedata, setPolylinedata] = useState<[number, number][]>([]);
+  const [vehicleType,setvehicleType] = useState("Car")
   const [Ignitionreport, setIgnitionreport] = useState<any>({
     TimeZone: session?.timezone || "",
     VehicleReg: "",
@@ -153,11 +153,11 @@ export default function JourneyReplayComp() {
     NodeJS.Timeout | undefined
   >(undefined);
   const [speedFactor, setSpeedFactor] = useState<any>(4);
-  const [showZones, setShowZones] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [coordsforgoogle,setcoordsforgoogle] = useState(null)
   const [isPauseColor, setIsPauseColor] = useState(false);
-  const [TripAddressData, setTripAddressData] = useState("");
-  const [stopDetails, setStopDetails] = useState<StopAddressData[]>([]);
+  // const [TripAddressData, setTripAddressData] = useState("");
+  // const [stopDetails, setStopDetails] = useState<StopAddressData[]>([]);
   const [progressWidth, setProgressWidth] = useState<any>(0);
   const [getShowRadioButton, setShowRadioButton] = useState(false);
   const [getShowdetails, setShowDetails] = useState(false);
@@ -166,7 +166,7 @@ export default function JourneyReplayComp() {
   const [getCheckedInput, setCheckedInput] = useState<any>(false);
   const [currentDate, setCurrentDate] = useState("");
   const [currentDateDefault, setCurrentDateDefaul] = useState(false);
-  const [currentToDateDefault, setCurrentToDateDefaul] = useState(false);
+  // const [currentToDateDefault, setCurrentToDateDefaul] = useState(false);
   const [isDynamicTime, setIsDynamicTime] = useState<any>([]);
   const [stopVehicle, setstopVehicle] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -181,29 +181,29 @@ export default function JourneyReplayComp() {
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [loadingMap, setloadingMap] = useState(false);
   const [expanded, setExpanded] = useState(null);
-  
+
   const [seacrhLoading, setSearchLoading] = useState(true);
   const [minzoom, setminzoom] = useState(1);
   const [maxzoom, setmaxzoom] = useState(18);
-  const [harshPopUp, setHarshPopUp] = useState(true);
-  const [harshAccPopUp, setAccHarshPopUp] = useState(true);
+  const [harshPopUp, setHarshPopUp] = useState(false);
+
   const [addressTravelHistory, setAddressTravelHistory] = useState([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [isPickerOpenFromDate, setIsPickerOpenFromDate] = useState(true);
+  // const [isPickerOpenFromDate, setIsPickerOpenFromDate] = useState(true);
   const [travelV2, setTravelV2] = useState(false);
-  const [travelV3, setTravelV3] = useState(false);
+  // const [travelV3, setTravelV3] = useState(false);
   const [userclick, setuserclick] = useState(false);
   const [stopWithSecond, setStopWithSecond] = useState([]);
-  
+
   const startdate = new Date();
   const enddate = new Date();
   const handleChange = (panel: any) => (event: any, isExpanded: any) => {
     setExpanded(isExpanded ? panel : null);
   };
-  const allData = useSelector((state) => state?.zone);  
-  
-  const [hidediv, sethidediv]= useState(false);
-  const [hideicondiv, sethideicondiv]= useState(true);
+  const allData = useSelector((state) => state?.zone);
+
+  const [hidediv, sethidediv] = useState(false);
+  const [hideicondiv, sethideicondiv] = useState(true);
   // useEffect(() => {
   //   setZoneList(allZones?.zone);
   // }, [allZones]);
@@ -212,19 +212,19 @@ export default function JourneyReplayComp() {
   const togglePicker = () => {
     setIsPickerOpen(!isPickerOpen);
   };
-  const SetViewOnClick = ({ coords, zoom  }: { coords: any, zoom: any }) => {
+  const SetViewOnClick = ({ coords, zoom }: { coords: any, zoom: any }) => {
     /* if (isPaused) {
       setMapcenterToFly(null);
       setzoomToFly(0);
 
     } */
-   
+
     const map = useMap();
-    
-    if(userclick && isPlaying ){
+
+    if (userclick && isPlaying) {
       return null
     }
-   
+
     if (coords) {
       if (coords) {
         if (speedFactor == 2) {
@@ -232,22 +232,23 @@ export default function JourneyReplayComp() {
         } else if (speedFactor == 1) {
           map.setView(coords, 18);
         } else if (speedFactor == 4) {
-        
+
           map.setView(coords, 18);
         } else if (speedFactor == 6) {
           map.setView(coords, 18);
         } else {
           map.setView(coords, 18);
         }
+        setcoordsforgoogle(coords)
       }
     }
     return null;
   };
- 
+
   const SetViewfly = ({ coords, zoom }: { coords: any; zoom: number }) => {
     const map = useMap();
-   // console.log("click" , selectedItemId);
-    if(selectedItemId){
+
+    if (selectedItemId) {
       return null
     }
     if (coords && !Number.isNaN(coords[0]) && coords[0] != null) {
@@ -261,29 +262,29 @@ export default function JourneyReplayComp() {
     setIsPaused(false);
     setIsChecked(false)
     sethideicondiv(false)
-   // setSpeedFactor(4);
-   setuserclick(false)
+    // setSpeedFactor(4);
+    setuserclick(false)
     setPlayBtn(false);
     setStopBtn(true);
     setPauseBtn(true);
     setstopVehicle(false);
     setIsPauseColor(false);
     setHarshPopUp(false);
-    setAccHarshPopUp(false);
-/* 
-    if (!carMovementInterval) {
-      if (currentPositionIndex >= polylinedata.length) {
-        setCurrentPositionIndex(0);
-      }
-    } */
+
+    /* 
+        if (!carMovementInterval) {
+          if (currentPositionIndex >= polylinedata.length) {
+            setCurrentPositionIndex(0);
+          }
+        } */
   };
 
   const pauseTick = async () => {
     setIsPlaying(false);
     setPauseBtn(false);
     sethideicondiv(false)
-    
-   // setSpeedFactor(4);
+
+    // setSpeedFactor(4);
     setStopBtn(true);
     setPlayBtn(true);
     setstopVehicle(false);
@@ -291,7 +292,6 @@ export default function JourneyReplayComp() {
     setIsPaused(true);
     setuserclick(false)
     setHarshPopUp(true);
-    setAccHarshPopUp(true);
 
     /* if (carMovementInterval) {
       clearInterval(carMovementInterval);
@@ -319,18 +319,20 @@ export default function JourneyReplayComp() {
     setStopBtn(false);
     setstopVehicle(true);
     setHarshPopUp(true);
-    setAccHarshPopUp(true);
+
     setProgressWidth(0);
     if (polylinedata.length > 0) {
-     
+
+
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
+
       const { zoomlevel, centerLat, centerLng } = calculateZoomCenter(
         TravelHistoryresponse
       );
-     
+
       setMapcenterToFly([centerLat, centerLng]);
       setzoomToFly(zoomlevel);
-     // setMapcenter([polylinedata[0][0], polylinedata[0][1]]);
+      // setMapcenter([polylinedata[0][0], polylinedata[0][1]]);
     }
     setCurrentPositionIndex(0);
   };
@@ -339,7 +341,7 @@ export default function JourneyReplayComp() {
     if (isPlaying && !isPaused) {
       const totalSteps = TravelHistoryresponse.length - 1;
       let step = currentPositionIndex;
-    
+
 
       const currentData = TravelHistoryresponse[step];
       const nextData = TravelHistoryresponse[step + 1];
@@ -356,11 +358,11 @@ export default function JourneyReplayComp() {
         let numSteps;
         let stepSize: number;
         if (speedFactor == 2) {
-      
+
           numSteps = 190;
           stepSize = (1 / numSteps) * speedFactor * 0.9;
         } else if (speedFactor == 4) {
-       
+
           numSteps = 380;
           stepSize = (1 / numSteps) * speedFactor * 0.9;
         } else if (speedFactor == 6) {
@@ -374,13 +376,13 @@ export default function JourneyReplayComp() {
         let animationId: number;
 
         const updatePosition = () => {
-       
+
           if (progress < 1) {
             const interpolatedLatLng = new L.LatLng(
               currentLatLng.lat +
-                (nextLatLng.lat - currentLatLng.lat) * progress , 
+              (nextLatLng.lat - currentLatLng.lat) * progress,
               currentLatLng.lng +
-                (nextLatLng.lng - currentLatLng.lng) * progress
+              (nextLatLng.lng - currentLatLng.lng) * progress
             );
 
             setMapcenter([interpolatedLatLng.lat, interpolatedLatLng.lng]);
@@ -388,6 +390,7 @@ export default function JourneyReplayComp() {
 
             animationId = requestAnimationFrame(updatePosition);
             setCarPosition(interpolatedLatLng);
+
             const newProgress = Math.round(
               ((currentPositionIndex + 1.8) / totalObjects) * 100
             );
@@ -436,8 +439,8 @@ export default function JourneyReplayComp() {
 
   useEffect(() => {
     if (polylinedata.length > 0) {
+
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
-     // setMapcenter([polylinedata[0][0], polylinedata[0][1]]);
     }
   }, [polylinedata]);
 
@@ -464,7 +467,7 @@ export default function JourneyReplayComp() {
             setVehicleList(data);
           }
         }
-      } catch (error) {}
+      } catch (error) { }
     };
     vehicleListData();
 
@@ -503,21 +506,21 @@ export default function JourneyReplayComp() {
       }
     })();
   }, []);
-  useEffect(()=>{
-    
-     const clientMinZoomSettings = session?.clientSetting?.filter(
-       (el) => el?.PropertDesc === "MinZoom"
-     )[0]?.PropertyValue;
-   
-     const minzoomLevel = clientMinZoomSettings ? parseInt(clientMinZoomSettings) : 1;
-   
-     setminzoom(minzoomLevel);
-     const clientMaxZoomSettings = session?.clientSetting?.filter(
-       (el) => el?.PropertDesc === "MaxZoom"
-     )[0]?.PropertyValue;
-     const maxzoomLevel = clientMaxZoomSettings ? parseInt(clientMaxZoomSettings) : 18;   
-     setmaxzoom(maxzoomLevel);
-   }, [clientsetting])
+  useEffect(() => {
+
+    const clientMinZoomSettings = session?.clientSetting?.filter(
+      (el) => el?.PropertDesc === "MinZoom"
+    )[0]?.PropertyValue;
+
+    const minzoomLevel = clientMinZoomSettings ? parseInt(clientMinZoomSettings) : 1;
+
+    setminzoom(minzoomLevel);
+    const clientMaxZoomSettings = session?.clientSetting?.filter(
+      (el) => el?.PropertDesc === "MaxZoom"
+    )[0]?.PropertyValue;
+    const maxzoomLevel = clientMaxZoomSettings ? parseInt(clientMaxZoomSettings) : 18;
+    setmaxzoom(maxzoomLevel);
+  }, [clientsetting])
 
   useEffect(() => {
     const clientZoomSettings = clientsetting?.filter(
@@ -550,7 +553,7 @@ export default function JourneyReplayComp() {
 
   const handleCloseDateTime = () => {
     setShowRadioButton(false);
-    
+
     setIgnitionreport((preData: any) => ({
       ...preData,
       fromDateTime: "",
@@ -564,7 +567,7 @@ export default function JourneyReplayComp() {
     .slice(0, 10)}TO${timeOnly}`;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setTravelV3(false);
+    // setTravelV3(false);
     setTravelV2(true);
     setIsDynamicTime("");
     setlat("");
@@ -631,7 +634,7 @@ export default function JourneyReplayComp() {
             .startOf("day")
             .tz(session?.timezone);
           const oneday = moment().subtract(1, "day").endOf("day")
-          .tz(session?.timezone);
+         .tz(session?.timezone);
 
           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
@@ -648,40 +651,6 @@ export default function JourneyReplayComp() {
           let newdata = {
             ...Ignitionreport,
           };
-          // const timestart: string = "00:00:00";
-          // const timeend: string = "23:59:59";
-          // const currentDayOfWeek = new Date().getDay();
-          // const currentDay = new Date().getDay();
-          // const daysUntilMonday =
-          //   currentDayOfWeek === currentDay ? 7 : currentDayOfWeek - 1;
-          // const fromDateTime = new Date();
-          // fromDateTime.setDate(fromDateTime.getDate() - daysUntilMonday);
-          // const toDateTime = new Date(fromDateTime);
-          // toDateTime.setDate(toDateTime.getDate() + 6);
-          // const formattedFromDateTime = formatDate(fromDateTime);
-          // const formattedToDateTime = formatDate(toDateTime);
-          // if (isCustomPeriod) {
-          //   newdata = {
-          //     ...newdata,
-          //     fromDateTime: `${
-          //       weekData ? formattedFromDateTime : Ignitionreport.fromDateTime
-          //     }T${timestart}Z`,
-          //     toDateTime: `${
-          //       weekData ? formattedToDateTime : Ignitionreport.toDateTime
-          //     }T${timeend}Z`,
-          //   };
-          // } else {
-          //   newdata = {
-          //     ...newdata,
-          //     fromDateTime: `${
-          //       weekData ? formattedFromDateTime : currentDate
-          //     }T${timestart}Z`,
-          //     toDateTime: `${
-          //       weekData ? formattedToDateTime : currentDate
-          //     }T${timeend}Z`,
-          //   };
-          // }
-
           if (isCustomPeriod) {
             newdata = {
               ...newdata,
@@ -698,8 +667,7 @@ export default function JourneyReplayComp() {
               clientId: session?.clientId,
               fromDateTime: startDateTime,
               toDateTime: endDateTime,
-              // fromDateTime: "2024-02-01T00:00:00Z",
-              // toDateTime: "2024-02-01T23:59:59Z",
+
             };
           }
           const fromDate: any = new Date(Ignitionreport?.fromDateTime);
@@ -707,19 +675,7 @@ export default function JourneyReplayComp() {
 
           const differenceMs = toDate - fromDate;
           const differenceDays = differenceMs / (1000 * 60 * 60 * 24);
-          // setIgnitionreport(newdata);
-          // if (
-          //   Ignitionreport.period == "today" ||
-          //   Ignitionreport.period == "yesterday"
-          // ) {
-          //   setTimeout(() => setweekDataGrouped(false), 1000);
-          // }
-          // if (
-          //   Ignitionreport.period == "week" ||
-          //   Ignitionreport.period == "custom"
-          // ) {
-          //   setTimeout(() => setweekDataGrouped(true), 3000);
-          // }
+
           if (differenceDays > 5 || differenceDays < 0) {
             toast.error("please Select 0nly Five Days");
           } else {
@@ -774,7 +730,7 @@ export default function JourneyReplayComp() {
               setDataResponse(response?.data);
 
               if (response.success === true) {
-              //  sethidediv(true)
+                //  sethidediv(true)
                 toast.success(`${response.message}`, {
                   style: {
                     border: "1px solid #00B56C",
@@ -800,7 +756,7 @@ export default function JourneyReplayComp() {
                   },
                 });
               }
-            } catch (error) {}
+            } catch (error) { }
           }
         }
       }
@@ -816,20 +772,6 @@ export default function JourneyReplayComp() {
     return `${year}-${month}-${day}`;
   }
 
-  // var stopPoints = [];
-  // const result = TravelHistoryresponse.map((item) => {
-  //   if (item.speed === "0 Kph") return item;
-  // });
-
-  // if (TravelHistoryresponse.speed == "KM") {
-  //   stopPoints = res.data
-  //     .filter((x: any) => x.speed == "0 Kph")
-  //     .sort((x) => x.date);
-  // } else {
-  //   stopPoints = res.data
-  //     .filter((x: any) => x.speed == "0 Mph")
-  //     .sort((x) => x.date);
-  // }
 
   const handleClickClear = () => {
     setPolylinedata([]);
@@ -856,16 +798,16 @@ export default function JourneyReplayComp() {
   function getFormattedDate(date: any) {
     return date.toISOString().slice(0, 10);
   }
-//console.log("polyline", polylinedata.length, "loading", loadingMap);
+
   const handleDivClick = async (
     TripStart: TripsByBucket["TripStart"],
     TripEnd: TripsByBucket["TripEnd"],
     id: any
   ) => {
-  //  console.log("DSFDSdsds");
-  sethidediv(true)
-  setPolylinedata([])
-  setCarPosition(null)
+
+    sethidediv(true)
+    setPolylinedata([])
+    setCarPosition(null)
     setlat(null);
     setlng(null);
     setPlayBtn(true);
@@ -889,8 +831,8 @@ export default function JourneyReplayComp() {
           toDateTime: `${TripEnd}`,
           id,
         };
-       // setloadingMap(false);
-       setloadingMap(true);
+        // setloadingMap(false);
+        setloadingMap(true);
         const TravelHistoryresponseapi = await toast.promise(
           TravelHistoryByBucketV2({
             token: session.accessToken,
@@ -923,11 +865,7 @@ export default function JourneyReplayComp() {
             },
           }
         );
-        // if (session?.unit == "Mile") {
-        //   unit = "Mph";
-        // } else {
-        //   unit = "Kph";
-        // }
+
         var stopPoints = [];
         if (session?.unit == "KM") {
           stopPoints = TravelHistoryresponseapi.data
@@ -938,9 +876,7 @@ export default function JourneyReplayComp() {
             .filter((x: any) => x.speed == "0 Mph")
             .sort((x: any) => x.date);
         }
-        // displayName = TravelHistoryresponse.map((item) => {
-        //   return item?.address?.display_name;
-        // });
+
         var addresses: any = [];
         if (TravelHistoryresponse)
           stopPoints.map(async function (singlePoint: any) {
@@ -1032,9 +968,8 @@ export default function JourneyReplayComp() {
             const seconds = timeDiffInSeconds % 60;
 
             // Construct the formatted string
-            const formattedTime = ` ${
-              minutes > 0 ? minutes + "m" : ""
-            } ${seconds}s`;
+            const formattedTime = ` ${minutes > 0 ? minutes + "m" : ""
+              } ${seconds}s`;
 
             // Display the time difference
             stopTimesArray.push({
@@ -1046,22 +981,24 @@ export default function JourneyReplayComp() {
             });
           }
         }
-        setStopWithSecond(stopTimesArray);
         setTravelHistoryresponse(TravelHistoryresponseapi.data);
-        
+        setStopWithSecond(stopTimesArray);
+
       }
-    } catch (error) {}
+    } catch (error) {
+
+    }
 
     setloadingMap(true);
   };
 
- //console.log("user", userclick);
-  
-  
+
+
+
   useEffect(() => {
 
     if (TravelHistoryresponse && TravelHistoryresponse.length > 0) {
-        setPolylinedata(
+      setPolylinedata(
         TravelHistoryresponse?.map((item: TravelHistoryData) => [
           item.lat,
           item.lng,
@@ -1077,53 +1014,53 @@ export default function JourneyReplayComp() {
 
   }, [TravelHistoryresponse]);
 
-  useEffect(() => {
-    (async function () {
-      let unit: string;
-      if (session?.unit == "Mile") {
-        unit = "Mph";
-      } else {
-        unit = "Kph";
-      }
-      const stopPoints = TravelHistoryresponse?.filter((x) => {
-        return x.speed === `0 ${unit}`;
-      });
+  // useEffect(() => {
+  //   (async function () {
+  //     let unit: string;
+  //     if (session?.unit == "Mile") {
+  //       unit = "Mph";
+  //     } else {
+  //       unit = "Kph";
+  //     }
+  //     const stopPoints = TravelHistoryresponse?.filter((x) => {
+  //       return x.speed === `0 ${unit}`;
+  //     });
 
-      const stopDetailsArray: StopAddressData[] = [];
+  //     const stopDetailsArray: StopAddressData[] = [];
 
-      for (const point of stopPoints) {
-        const { lat, lng } = point;
-        try {
-          if (!point.address) {
-            if (session) {
-              const Data = await getCurrentAddress({
-                token: session.accessToken,
-                lat: lat,
-                lon: lng,
-              });
+  //     for (const point of stopPoints) {
+  //       const { lat, lng } = point;
+  //       try {
+  //         if (!point.address) {
+  //           if (session) {
+  //             const Data = await getCurrentAddress({
+  //               token: session.accessToken,
+  //               lat: lat,
+  //               lon: lng,
+  //             });
 
-              stopDetailsArray.push(Data);
-            }
-          } else {
-            stopDetailsArray.push(point?.address);
-          }
-        } catch (error) {}
-      }
+  //             stopDetailsArray.push(Data);
+  //           }
+  //         } else {
+  //           stopDetailsArray.push(point?.address);
+  //         }
+  //       } catch (error) { }
+  //     }
 
-      const seen: Record<string | number, boolean> = {};
+  //     const seen: Record<string | number, boolean> = {};
 
-      const uniqueStopDetailsArray = stopDetailsArray.filter((item) => {
-        const key = item.place_id;
-        if (!seen[key]) {
-          seen[key] = true;
-          return true;
-        }
-        return false;
-      });
+  //     const uniqueStopDetailsArray = stopDetailsArray.filter((item) => {
+  //       const key = item.place_id;
+  //       if (!seen[key]) {
+  //         seen[key] = true;
+  //         return true;
+  //       }
+  //       return false;
+  //     });
 
-      setStopDetails(uniqueStopDetailsArray);
-    })();
-  }, [TravelHistoryresponse]);
+  //     setStopDetails(uniqueStopDetailsArray);
+  //   })();
+  // }, [TravelHistoryresponse]);
   // const item = TravelHistoryresponse[currentPositionIndex];
   const getSpeedAndDistance = () => {
     if (
@@ -1149,13 +1086,6 @@ export default function JourneyReplayComp() {
     return 0;
   };
 
-  const handleZoneClick = () => {
-    if (showZones == false) {
-      setShowZones(true);
-    } else {
-      setShowZones(false);
-    }
-  };
   const handleShowDetails = () => {
     setShowDetails(!getShowdetails);
     setShowIcon(!getShowICon);
@@ -1164,24 +1094,9 @@ export default function JourneyReplayComp() {
     setCheckedInput(!getCheckedInput);
   };
 
-  // const handleCustomDateChange = (fieldName: string, date: any) => {
-  //   setCurrentDateDefaul(true);
-  //   setIgnitionreport((prevReport: any) => ({
-  //     ...prevReport,
-  //     [fieldName]: date,
-  //   }));
-  // };
 
   const handleDateChange = (fieldName: string, newDate: any) => {
-    // if (newDate && moment(newDate, 'MM/DD/yyyy', true).isValid()) {
-    //   const formattedDate = moment(newDate, 'MM/DD/yyyy').toDate()
-    //   setIgnitionreport((prevReport: any) => ({
-    //     ...prevReport,
-    //     [fieldName]: formattedDate?.toISOString(),
-    //   }));
 
-    // }
-    
     setCurrentDateDefaul(true);
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
@@ -1211,14 +1126,8 @@ export default function JourneyReplayComp() {
   };
 
   const handleItemClick = (item) => {
-    
-   /*  if(selectedItemId){
-      setSelectedItemId(null)
-    }
+
     handleClickStopCar(item);
-      setSelectedItemId(item.date); // Assume each item has a unique 'id'
-     */
-      handleClickStopCar(item);
 
     // Toggle the selection of the item
     if (item.date === selectedItemId) {
@@ -1226,21 +1135,9 @@ export default function JourneyReplayComp() {
     } else {
       setSelectedItemId(item.date); // Select new item
     }
-  
+
   };
 
-
-  // const selectOption: Option[] = vehicleList?.map((item: any) => {
-  //   return { value: item.vehicleReg, label: item.vehicleReg };
-  // });
-
-  // const [selectedOption, setSelectedOption] = useState<any>(null);
-
-  // const handleSelectChange = (newValue: any, actionMeta: any) => {
-  //   const name = "period";
-  //   const value = "yesterday";
-  //   setSelectedOption(newValue);
-  // };
   const handleInputChangeSelect = (e: any) => {
     
     if (!e) {
@@ -1251,23 +1148,19 @@ export default function JourneyReplayComp() {
       }));
     }
     const { value, label } = e;
+    
+    setvehicleType(vehicleList?.data.find((i)=>{return i.vehicleReg==value})?.vehicleType)
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
       ["VehicleReg"]: value,
       ["label"]: label,
     }));
-    
+
   };
 
   const handleInputChange: any = (e: any) => {
     setClearMapData(false);
-    // if (e.target == undefined) {
-    //   const { name, value } = e;
-    //   setIgnitionreport((prevReport: any) => ({
-    //     ...prevReport,
-    //     ["VehicleReg"]: value,
-    //   }));
-    // } else {
+
     const { name, value } = e.target;
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
@@ -1313,31 +1206,10 @@ export default function JourneyReplayComp() {
     }
   };
   const handleChangeValueSlider = (value: any) => {
-    // if (TravelHistoryresponse.length > 100) {
-    //   setCurrentPositionIndex(value.target.value + currentPositionIndex);
-    // } else {
+
     setCurrentPositionIndex(value.target.value);
   };
-  // const groupedData: any = {};
-  // dataresponse?.forEach((item: any) => {
-  //   if (!groupedData[item.TripStartDateLabel]) {
-  //     groupedData[date] = [];
-  //   }
-  //   groupedData[date].push(item);
-  // });
 
-  // const renderGroupedData = () => {
-  //   return Object.keys(groupedData).map((date) => (
-  //     <div key={date}>
-  //       <h2>{date}</h2>
-  //       <ul>
-  //         {groupedData[date].map((item: any, index: any) => (
-  //           <li key={index}>{item.TripStartDateLabel}</li>
-  //         ))}
-  //       </ul>
-  //     </div>
-  //   ));
-  // };
   function getDayName(date: any) {
     const days = [
       "Sunday",
@@ -1380,123 +1252,37 @@ export default function JourneyReplayComp() {
     { value: "4", label: "4X" },
     { value: "6", label: "6X" },
   ];
-  const handleuserclick =()=>{
-   
+  const handleuserclick = () => {
+
     setuserclick(true)
   }
- /*  useEffect(() => {
-    // Function to handle map events
-    console.log("Adfa");
-    const handleMapEvents = (map: L.Map) => {
-      console.log("Adf3243242a");
-      map.on('zoomend', handleuserclick);
-      map.on('moveend', handleuserclick);
-    };
 
-    // Initialize Leaflet map instance and add event listeners
-    const map = document.getElementById('map') 
-    console.log("sacfcde897889", map);
-    if (map) {
-      console.log("sacfcde897889", map);
-      handleMapEvents(L.map(map));
-    }
-
-    // Cleanup function to remove event listeners
-    return () => {
-      if (map) {
-        console.log("Adfa7789897889");
-        map.off('zoomend', handleuserclick);
-        map.off('moveend', handleuserclick);
-      }
-    };
-  }, [isPaused,isPlaying]);
-   */
- /*  const mapRef = useRef(null);
-  
-  const MapEvents = () => {
-    const map = useMap();
-
-    useEffect(() => {
-      if (!map) return;
-
-      const handleZoomEnd = () => {
-        console.log("Zoom ended");
-        handleuserclick();
-      };
-
-      const handleMoveEnd = () => {
-        console.log("Move ended");
-        handleuserclick();
-      };
-
-      // Add event listeners
-      map.on('zoomstart', handleZoomEnd);
-      map.on('moveend', handleMoveEnd);
-
-      // Cleanup function to remove event listeners
-      return () => {
-        map.off('zoomstart', handleZoomEnd);
-        map.off('moveend', handleMoveEnd);
-      };
-    }, [map]);
-
-    return null;
-  }; */
   const [isChecked, setIsChecked] = useState(false);
 
+  const [isHovered, setIsHovered] = useState(false);
 
-const handleFocus =()=>{
-  setuserclick(false)
-  setIsHovered(false);
- setIsHovered(false);
-}
-const [isHovered, setIsHovered] = useState(false);
+  const handleFocus = () => {
+    setuserclick(false)
+    setIsHovered(false);
+  }
 
-// Event handlers for hover
-const handleMouseEnter = () => setIsHovered(true);
-const handleMouseLeave = () => setIsHovered(false);
+  // Event handlers for hover
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => setIsHovered(false);
   return (
     <>
       <div className="main_journey">
         <p className="bg-green px-4 py-1 border-t  text-center text-2xl text-white font-bold journey_heading">
           Journey Replay
         </p>
-        {/* {groupedData?.map((item: any) => {
-          return <div>{item?.EndingPoint}</div>;
-        })} */}
-
-        {/* {renderGroupedData()} */}
-        {/* <div>
-          {dataresponse?.map((item: any) => {
-            return (
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                >
-                  <Typography>{item?.TripStart}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography>{item.TotalDistance}</Typography>
-                </AccordionDetails>
-              </Accordion>
-            );
-          })}
-        </div> */}
-        {/* <p className="bg-[#00B56C] px-4 py-1 text-white">JourneyReplay</p> */}
         <div
           className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-2
          lg:px-4 text-start  bg-bgLight select_box_journey"
         >
           <div
-            className="xl:col-span-1 lg:col-span-2 md:col-span-3   col-span-12
-            select_box_column 
-          "
-            // style={{ gridColumnEnd: "span 1.5" }}
+            className="xl:col-span-1 lg:col-span-2 md:col-span-3 col-span-12 select_box_column"
           >
             <Select
-              // value={Ignitionreport}
               onChange={handleInputChangeSelect}
               options={options}
               placeholder="Pick Vehicle"
@@ -1515,13 +1301,13 @@ const handleMouseLeave = () => setIsHovered(false);
                   backgroundColor: state.isSelected
                     ? "#00B56C"
                     : state.isFocused
-                    ? "#e1f0e3"
-                    : "transparent",
+                      ? "#e1f0e3"
+                      : "transparent",
                   color: state.isSelected
                     ? "white"
                     : state.isFocused
-                    ? "black"
-                    : "black",
+                      ? "black"
+                      : "black",
                   "&:hover": {
                     backgroundColor: "#e1f0e3",
                     color: "black",
@@ -1529,118 +1315,12 @@ const handleMouseLeave = () => setIsHovered(false);
                 }),
               }}
             />
-
-            {/* <select
-              id="select_box"
-              className="   h-8 text-gray  w-full  outline-green border border-grayLight px-1 hover:border-green"
-              onChange={handleInputChange}
-              name="VehicleReg"
-              value={Ignitionreport.VehicleReg}
-            >
-              <option value="" disabled selected hidden>
-                Select Vehicle
-              </option>
-              {vehicleList.map((item: DeviceAttach) => (
-                <option key={item.id}>{item.vehicleReg}</option>
-              ))}
-            </select> */}
-
-            {/* <Select
-              onChange={handleInputChange}
-              name="VehicleReg"
-              className="Select_box"
-              options={selectOption}
-              value={selectedOption}
-              theme={(theme) => ({
-                ...theme,
-                borderRadius: 0,
-
-                colors: {
-                  ...theme.colors,
-
-                  primary25: "#00B56C",
-                  primary: "gray",
-                },
-              })}
-            /> */}
-            {/* <FormControl sx={{ m: 1, minWidth: 120 }}> */}
-            {/* <Select
-              value={Ignitionreport.VehicleReg}
-              onChange={handleInputChange}
-              MenuProps={MenuProps}
-              disabled={loading}
-              name="VehicleReg"
-              id="select_box_journey"
-              displayEmpty
-              className={`h-8 text-black font-popins font-bold w-full outline-green  ${
-                getShowRadioButton
-                  ? " text-black font-popins font-extrabold"
-                  : " text-black font-popins  "
-              }`}
-              style={{
-                color: getShowRadioButton ? "black" : "",
-                paddingTop: getShowRadioButton ? "4%" : "2%",
-                paddingLeft: getShowRadioButton ? "6%" : "3%",
-                fontWeight: getShowRadioButton ? "bold" : "bold",
-              }}
-            >
-              <MenuItem value="" disabled selected hidden className="text-sm">
-                Select Vehicle
-              </MenuItem>
-              {vehicleList?.data?.map((item: DeviceAttach) => (
-                <MenuItem
-                  // className=" w-full text-start font-semibold "
-                  key={item.id}
-                  value={item.vehicleReg}
-                  id="bg_hover_select_vehicle"
-                >
-                  {item.vehicleReg}
-                </MenuItem>
-              ))}
-            </Select> */}
-
-            {/* <Select
-              value={Ignitionreport.VehicleReg}
-              onChange={handleInputChange}
-              MenuProps={MenuProps}
-              disabled={loading}
-              options={options}
-              isClearable
-              isSearchable  
-              name="VehicleReg"
-              id="select_box_journey"
-              displayEmpty
-              className={`h-8 text-black font-popins font-bold w-full outline-green  ${
-                getShowRadioButton
-                  ? " text-black font-popins font-extrabold"
-                  : " text-black font-popins  "
-              }`}
-              style={{
-                color: getShowRadioButton ? "black" : "",
-                paddingTop: getShowRadioButton ? "4%" : "2%",
-                paddingLeft: getShowRadioButton ? "6%" : "3%",
-                fontWeight: getShowRadioButton ? "bold" : "bold",
-              }}
-            > */}
           </div>
-          {/* <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
-            <KeyboardDatePicker
-              format="MM/DD/yyyy"
-              value={Ignitionreport.fromDateTime}
-              onChange={(newDate: any) =>
-                handleDateChange("fromDateTime", newDate)
-              }
-              variant="inline"
-              maxDate={currenTDates}
-              autoOk
-            />
-          </MuiPickersUtilsProvider> */}
           <div className="xl:col-span-3 lg:col-span-4 md:col-span-6 col-span-12 days_select">
             {getShowRadioButton ? (
               <div className="grid lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-12  -mt-2  grid-cols-12  xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2 flex justify-center ">
                 <div
                   className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0  "
-                  // onClick={togglePickerFromDate}
                 >
                   <label className="text-green">From</label>
                   <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
@@ -1715,7 +1395,7 @@ const handleMouseLeave = () => setIsHovered(false);
             ) : (
               <div
                 className="grid xl:grid-cols-11 lg:grid-cols-12  md:grid-cols-12 grid-cols-12 -mt-2 "
-                // style={{ display: "flex", justifyContent: "start" }}
+              // style={{ display: "flex", justifyContent: "start" }}
               >
                 <div
                   className="xl:col-span-2 lg:col-span-3  md:col-span-3 sm:col-span-2 col-span-4 period_select"
@@ -1792,110 +1472,26 @@ const handleMouseLeave = () => setIsHovered(false);
                   </label>
                 </div>
               </div>
-              // responsive code
-              // <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-1">
-              //   <div>
-              //     <label className="text-sm text-gray">
-              //       <input
-              //         type="radio"
-              //         className="w-5 form-radio"
-              //         name="period"
-              //         disabled={loading}
-              //         value="today"
-              //         checked={Ignitionreport.period === "today"}
-              //         onChange={handleInputChange}
-              //       />
-              //       &nbsp;Today
-              //     </label>
-              //   </div>
 
-              //   <div>
-              //     <label className="text-sm text-gray">
-              //       <input
-              //         type="radio"
-              //         className="w-5 form-radio text-green"
-              //         name="period"
-              //         disabled={loading}
-              //         value="yesterday"
-              //         checked={Ignitionreport.period === "yesterday"}
-              //         onChange={handleInputChange}
-              //       />
-              //       &nbsp;Yesterday
-              //     </label>
-              //   </div>
-
-              //   <div>
-              //     <label className="text-sm text-gray">
-              //       <input
-              //         type="radio"
-              //         className="w-5 form-radio"
-              //         name="period"
-              //         disabled={loading}
-              //         value="week"
-              //         checked={Ignitionreport.period === "week"}
-              //         onChange={handleInputChange}
-              //       />
-              //       &nbsp;Week
-              //     </label>
-              //   </div>
-
-              //   <div>
-              //     <label className="text-sm text-gray">
-              //       <input
-              //         type="radio"
-              //         className="w-5 form-radio"
-              //         disabled={loading}
-              //         name="period"
-              //         value="custom"
-              //         checked={Ignitionreport.period === "custom"}
-              //         onChange={handleInputChange}
-              //         onClick={handleClick}
-              //       />
-              //       &nbsp;Custom
-              //     </label>
-              //   </div>
-              // </div>
             )}
           </div>
           <div className="xl:col-span-1 lg:col-span-1 md:col-span-1 col-span-12 text-white font-bold flex justify-center items-center mt-2 journey_replay_search">
-            {/* {clearMapData ? (
-              <button
-                onClick={handleClickClear}
-                className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
-                ${
-                  (Ignitionreport.VehicleReg &&
-                    Ignitionreport.period === "today") ||
-                  (Ignitionreport.VehicleReg &&
-                    Ignitionreport.period === "yesterday") ||
-                  (Ignitionreport.VehicleReg &&
-                    Ignitionreport.period === "week") ||
-                  (Ignitionreport.VehicleReg &&
-                    Ignitionreport.period === "custom")
-                    ? ""
-                    : "opacity-50 cursor-not-allowed"
-                }`}
-              >
-                Search
-              </button>
-            ) : (           
-            )} */}
             <div
               onClick={(e) => seacrhLoading && handleSubmit(e)}
               className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    search_btn_journey
-                    ${
-                      (Ignitionreport?.VehicleReg &&
-                        Ignitionreport?.period === "today") ||
-                      (Ignitionreport?.VehicleReg &&
-                        Ignitionreport?.period === "yesterday") ||
-                      (Ignitionreport?.VehicleReg &&
-                        Ignitionreport?.period === "week") ||
-                      (Ignitionreport?.VehicleReg &&
-                        Ignitionreport?.period === "custom" &&
-                        Ignitionreport?.toDateTime &&
-                        Ignitionreport?.fromDateTime)
-                        ? ""
-                        : "opacity-50 cursor-not-allowed"
-                    }`}
+                    ${(Ignitionreport?.VehicleReg &&
+                  Ignitionreport?.period === "today") ||
+                  (Ignitionreport?.VehicleReg &&
+                    Ignitionreport?.period === "yesterday") ||
+                  (Ignitionreport?.VehicleReg &&
+                    Ignitionreport?.period === "week") ||
+                  (Ignitionreport?.VehicleReg &&
+                    Ignitionreport?.period === "custom" &&
+                    Ignitionreport?.toDateTime &&
+                    Ignitionreport?.fromDateTime)
+                  ? ""
+                  : "opacity-50 cursor-not-allowed"
+                }`}
               style={{ display: "flex", alignItems: "center" }}
             >
               <div className="col-span-3">
@@ -1920,206 +1516,11 @@ const handleMouseLeave = () => setIsHovered(false);
                 <button>Search</button>
               </div>
             </div>
-            {/* <button
-              style={{
-                marginLeft: "40%",
-                backgroundColor: "green",
-                color: "white",
-              }}
-              onClick={() =>
-                handleDivClickTwo(
-                  "2024-06-20T00:00:00.000",
-                  "2024-06-20T23:59:59.999"
-                )
-              }
-            >
-              SEARCH
-            </button> */}
-            {/* <div
-              onClick={handleSubmitTwo}
-              className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    search_btn_journey
-                    ${
-                      (Ignitionreport?.VehicleReg &&
-                        Ignitionreport?.period === "today") ||
-                      (Ignitionreport?.VehicleReg &&
-                        Ignitionreport?.period === "yesterday") ||
-                      (Ignitionreport?.VehicleReg &&
-                        Ignitionreport?.period === "week") ||
-                      (Ignitionreport?.VehicleReg &&
-                        Ignitionreport?.period === "custom" &&
-                        Ignitionreport?.toDateTime &&
-                        Ignitionreport?.fromDateTime)
-                        ? ""
-                        : "opacity-50 cursor-not-allowed"
-                    }`}
-              style={{ display: "flex", alignItems: "center" }}
-            >
-              <div className="col-span-3">
-                <svg
-                  className="lg:h-18 lg:w-10 md:h-12 md:w-12 sm:h-10 sm:w-10 h-12 w-12 py-3 px-2  text-white"
-                  // width="24"
-                  // height="24"
-                  viewBox="0 0 24 24"
-                  strokeWidth="4"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  {" "}
-                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                  <circle cx="10" cy="10" r="7" />{" "}
-                  <line x1="21" y1="21" x2="15" y2="15" />
-                </svg>
-              </div>
-              <div className="lg:col-span-8 md:col-span-8">
-                <button>SearchS</button>
-              </div>
-            </div> */}
-            {/* <button
-              onClick={handleSubmit}
-              className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
-                        ${
-                          (Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "today") ||
-                          (Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "yesterday") ||
-                          (Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "week") ||
-                          (Ignitionreport.VehicleReg &&
-                            Ignitionreport.period === "custom" &&
-                            Ignitionreport.toDateTime &&
-                            Ignitionreport.fromDateTime)
-                            ? ""
-                            : "opacity-50 cursor-not-allowed"
-                        }`}
-            >
-              Search
-            </button> */}
           </div>
-
-          {/* <div className="xl:col-span-3 lg:col-span-1 md:col-span-12 col-span-12 journey_replay_harsh">
-            {" "}
-          </div>
-          {TravelHistoryresponse?.length > 0 && (
-            <div className="xl:col-span-1 lg:col-span-2  md:col-span-12 col-span-6  -mt-1 journey_replay_harsh_child  ">
-              <div className="grid grid-cols-12  ">
-                <div className="col-span-2">
-                  <Image
-                    src={markerA}
-                    alt="harshIcon"
-                    className="h-6 journay_HarshAcceleration"
-                  />
-                  <Image src={markerB} alt="harshIcon" className="h-6 mt-1 " />
-                </div>
-                <div className="col-span-10 text-sm font-semibold">
-                  location Start
-                  <br></br>
-                  <p className="mt-3">Location End</p>
-                </div>
-              </div>
-            </div>
-          )}
-          
-
-          <div className="xl:col-span-1  lg:col-span-2 md:col-span-1 col-span-6 mt-1 -ms-5 mb-3 journey_replay_harsh_acce">
-            {TravelHistoryresponse?.filter((item: any) => {
-              return (
-                item.vehicleEvents.filter(
-                  (items: any) => items.Event === "HarshAcceleration"
-                ).length > 0
-              );
-            }).length > 0 && (
-              <div className="grid grid-cols-12">
-                <div className="col-span-2">
-                  <Image
-                    src={HarshAccelerationIcon}
-                    alt="harshIcon "
-                    className="h-6 journay_HarshAcceleration"
-                  />
-                </div>
-                <div className="col-span-10 text-sm font-semibold">
-                  Harsh Acc.. (x
-                  {TravelHistoryresponse.reduce((count, item) => {
-                    return (
-                      count +
-                      item.vehicleEvents.filter(
-                        (items: any) => items.Event === "HarshAcceleration"
-                      ).length
-                    );
-                  }, 0)}
-                  )
-                </div>
-              </div>
-            )}
-            {TravelHistoryresponse?.filter((item: any) => {
-              return (
-                item.vehicleEvents.filter(
-                  (items: any) => items.Event === "HarshCornering"
-                ).length > 0
-              );
-            }).length > 0 && (
-              <div className="grid grid-cols-12">
-                <div className="col-span-2">
-                  <Image
-                    src={HarshCornerningIcon}
-                    alt="harshIcon "
-                    className="h-6 journay_HarshAcceleration"
-                  />
-                </div>
-                <div className="col-span-10 text-sm font-semibold">
-                  Harsh Corn.. (x
-                  {TravelHistoryresponse.reduce((count, item) => {
-                    return (
-                      count +
-                      item.vehicleEvents.filter(
-                        (items: any) => items.Event === "HarshCornering"
-                      ).length
-                    );
-                  }, 0)}
-                  )
-                </div>
-              </div>
-            )}
-
-            {TravelHistoryresponse?.filter((item: any) => {
-              return (
-                item.vehicleEvents.filter(
-                  (items: any) => items.Event == "HarshAcceleration"//"HarshBreak"
-                ).length > 0
-              );
-            }).length > 0 && (
-              <div className="grid grid-cols-12">
-                <div className="col-span-2">
-                  <Image
-                    src={harshAcceleration}
-                    alt="harshIcon"
-                    className="h-6 mt-1 journay_HarshAcceleration"
-                  />
-                </div>
-                <div className="col-span-10 text-sm">
-                  <p className="mt-2 font-semibold">
-                    Harsh Break (x
-                    {TravelHistoryresponse.reduce((count, item) => {
-                      return (
-                        count +
-                        item.vehicleEvents.filter(
-                          (items: any) => items.Event === "HarshAcceleration"
-                        ).length
-                      );
-                    }, 0)}
-                    )
-                  </p>
-                </div>
-              </div>
-            )}
-
-            
-          </div>
-           */}
         </div>
+
         <div className="grid lg:grid-cols-5   md:grid-cols-12 sm:grid-cols-12 grid-cols-1 journey_sidebar">
-          <div className="xl:col-span-1 lg:col-span-2 md:col-span-5 sm:col-span-12 col-span-4 trips_journey">
+          <div className="xl:col-span-1 lg:col-span-1 md:col-span-5 sm:col-span-12 col-span-4 trips_journey">
             <p className="bg-green px-4 py-1 text-white font-semibold journey_sidebar_text flex items-center">
               Trips ({dataresponse?.length})
             </p>
@@ -2129,73 +1530,73 @@ const handleMouseLeave = () => setIsHovered(false);
             >
               {weekDataGrouped == true
                 ? Object.entries(groupedData).map(
-                    ([date, items]: any, index) => (
-                      <div key={date}>
-                        <ul>
-                          <div>
-                            <Accordion
-                              className="cursor-pointer"
-                              expanded={expanded === `panel${index}`}
-                              onChange={handleChange(`panel${index}`)}
+                  ([date, items]: any, index) => (
+                    <div key={date}>
+                      <ul>
+                        <div>
+                          <Accordion
+                            className="cursor-pointer"
+                            expanded={expanded === `panel${index}`}
+                            onChange={handleChange(`panel${index}`)}
+                          >
+                            <AccordionSummary
+                              expandIcon={<ExpandMoreIcon />}
+                              aria-controls="panel1a-content"
+                              id="panel1a-header"
+                              style={{
+                                paddingLeft: getShowRadioButton ? "5%" : "5%",
+                                paddingRight: getShowRadioButton
+                                  ? "5%"
+                                  : "5%",
+                                borderBottom: "1px solid gray",
+                                width: "100%",
+                                paddingTop: "2%",
+                                paddingBottom: "2%",
+                              }}
                             >
-                              <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls="panel1a-content"
-                                id="panel1a-header"
-                                style={{
-                                  paddingLeft: getShowRadioButton ? "5%" : "5%",
-                                  paddingRight: getShowRadioButton
-                                    ? "5%"
-                                    : "5%",
-                                  borderBottom: "1px solid gray",
-                                  width: "100%",
-                                  paddingTop: "2%",
-                                  paddingBottom: "2%",
-                                }}
-                              >
-                                {/* <b>
+                              {/* <b>
                                     {date} &nbsp;&nbsp; {items.day}
                                     &nbsp;&nbsp; &nbsp;&nbsp; (x
                                     {items.count}){" "}
                                   </b> */}
-                                <div className="grid grid-cols-12 space-x-3 justify-center text-green font-semibold">
-                                  <div className="col-span-5 w-full text-start">
-                                    <p>{date}</p>
-                                  </div>
-                                  <div className="col-span-5 w-full text-start">
-                                    <p>{items.day}</p>
-                                  </div>
-                                  <div className="col-span-1 w-full text-center">
-                                    <p>x{items.count}</p>
-                                  </div>
+                              <div className="grid grid-cols-12 space-x-3 justify-center text-green font-semibold">
+                                <div className="col-span-5 w-full text-start">
+                                  <p>{date}</p>
                                 </div>
-                              </AccordionSummary>
-                              {items?.trips?.map((item: any, index: any) => (
-                                <AccordionDetails
-                                  key={index}
-                                  onClick={() =>
-                                    handleDivClick(
-                                      item.fromDateTime,
-                                      item.toDateTime,
-                                      item.id
-                                    )
-                                  }
-                                  className="border-b hover:bg-[#e1f0e3]"
-                                  style={{
-                                    backgroundColor:
-                                      activeTripColor.id === item.id
-                                        ? "#e1f0e3"
-                                        : "",
-                                  }}
-                                >
-                                  <Typography>
-                                    <div
-                                      className="py-5 cursor-pointer"
-                                      onClick={() => handleGetItem(item, index)}
-                                    >
-                                      <div className="grid grid-cols-12 space-x-4 ">
-                                        <div className="col-span-1">
-                                          {/* <svg
+                                <div className="col-span-5 w-full text-start">
+                                  <p>{items.day}</p>
+                                </div>
+                                <div className="col-span-1 w-full text-center">
+                                  <p>x{items.count}</p>
+                                </div>
+                              </div>
+                            </AccordionSummary>
+                            {items?.trips?.map((item: any, index: any) => (
+                              <AccordionDetails
+                                key={index}
+                                onClick={() =>
+                                  handleDivClick(
+                                    item.fromDateTime,
+                                    item.toDateTime,
+                                    item.id
+                                  )
+                                }
+                                className="border-b hover:bg-[#e1f0e3]"
+                                style={{
+                                  backgroundColor:
+                                    activeTripColor.id === item.id
+                                      ? "#e1f0e3"
+                                      : "",
+                                }}
+                              >
+                                <Typography>
+                                  <div
+                                    className="py-5 cursor-pointer"
+                                    onClick={() => handleGetItem(item, index)}
+                                  >
+                                    <div className="grid grid-cols-12 space-x-4 ">
+                                      <div className="col-span-1">
+                                        {/* <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className="h-10 w-10 text-green "
                                             width="24"
@@ -2216,204 +1617,204 @@ const handleMouseLeave = () => setIsHovered(false);
                                               d="M488 224c-3-5-32.61-17.79-32.61-17.79c5.15-2.66 8.67-3.21 8.67-14.21c0-12-.06-16-8.06-16h-27.14c-.11-.24-.23-.49-.34-.74c-17.52-38.26-19.87-47.93-46-60.95C347.47 96.88 281.76 96 256 96s-91.47.88-126.49 18.31c-26.16 13-25.51 19.69-46 60.95c0 .11-.21.4-.4.74H55.94c-7.94 0-8 4-8 16c0 11 3.52 11.55 8.67 14.21C56.61 206.21 28 220 24 224s-8 32-8 80s4 96 4 96h11.94c0 14 2.06 16 8.06 16h80c6 0 8-2 8-16h256c0 14 2 16 8 16h82c4 0 6-3 6-16h12s4-49 4-96s-5-75-8-80m-362.74 44.94A516.94 516.94 0 0 1 70.42 272c-20.42 0-21.12 1.31-22.56-11.44a72.16 72.16 0 0 1 .51-17.51L49 240h3c12 0 23.27.51 44.55 6.78a98 98 0 0 1 30.09 15.06C131 265 132 268 132 268Zm247.16 72L368 352H144s.39-.61-5-11.18c-4-7.82 1-12.82 8.91-15.66C163.23 319.64 208 304 256 304s93.66 13.48 108.5 21.16C370 328 376.83 330 372.42 341Zm-257-136.53a96.23 96.23 0 0 1-9.7.07c2.61-4.64 4.06-9.81 6.61-15.21c8-17 17.15-36.24 33.44-44.35c23.54-11.72 72.33-17 110.23-17s86.69 5.24 110.23 17c16.29 8.11 25.4 27.36 33.44 44.35c2.57 5.45 4 10.66 6.68 15.33c-2 .11-4.3 0-9.79-.19Zm347.72 56.11C461 273 463 272 441.58 272a516.94 516.94 0 0 1-54.84-3.06c-2.85-.51-3.66-5.32-1.38-7.1a93.84 93.84 0 0 1 30.09-15.06c21.28-6.27 33.26-7.11 45.09-6.69a3.22 3.22 0 0 1 3.09 3a70.18 70.18 0 0 1-.49 17.47Z"
                                             />
                                           </svg> */}
-                                          <svg
-                                            fill="#00b576"
-                                            // className="h-10 w-10 text-green "
-                                            height="50"
-                                            width="40"
-                                            viewBox="0 -43.92 122.88 122.88"
-                                            version="1.1"
-                                            id="Layer_1"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            xmlnsXlink="http://www.w3.org/1999/xlink"
-                                            style={{
-                                              filter:
-                                                "drop-shadow(1px 2px 2px #000000)",
-                                              marginTop: "-0.8rem",
-                                            }}
-                                            xmlSpace="preserve"
-                                            transform="matrix(1, 0, 0, 1, 0, 0)"
-                                            stroke="#00b576"
-                                          >
-                                            <g
-                                              id="SVGRepo_bgCarrier"
-                                              strokeWidth="0"
-                                            />
-                                            <g
-                                              id="SVGRepo_tracerCarrier"
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                            />
-                                            <g id="SVGRepo_iconCarrier">
-                                              {/* <style type="text/css">.st0{fill-rule:evenodd;clip-rule:evenodd;}</style> */}
-                                              <g>
-                                                <path
-                                                  className="st0"
-                                                  d="M99.42,13.57c5.93,0,10.73,4.8,10.73,10.73c0,5.93-4.8,10.73-10.73,10.73s-10.73-4.8-10.73-10.73 C88.69,18.37,93.49,13.57,99.42,13.57L99.42,13.57z M79.05,5c-0.59,1.27-1.06,2.69-1.42,4.23c-0.82,2.57,0.39,3.11,3.19,2.06 c2.06-1.23,4.12-2.47,6.18-3.7c1.05-0.74,1.55-1.47,1.38-2.19c-0.34-1.42-3.08-2.16-5.33-2.6C80.19,2.23,80.39,2.11,79.05,5 L79.05,5z M23.86,19.31c2.75,0,4.99,2.23,4.99,4.99c0,2.75-2.23,4.99-4.99,4.99c-2.75,0-4.99-2.23-4.99-4.99 C18.87,21.54,21.1,19.31,23.86,19.31L23.86,19.31z M99.42,19.31c2.75,0,4.99,2.23,4.99,4.99c0,2.75-2.23,4.99-4.99,4.99 c-2.75,0-4.99-2.23-4.99-4.99C94.43,21.54,96.66,19.31,99.42,19.31L99.42,19.31z M46.14,12.5c2.77-2.97,5.97-4.9,9.67-6.76 c8.1-4.08,13.06-3.58,21.66-3.58l-2.89,7.5c-1.21,1.6-2.58,2.73-4.66,2.84H46.14L46.14,12.5z M23.86,13.57 c5.93,0,10.73,4.8,10.73,10.73c0,5.93-4.8,10.73-10.73,10.73s-10.73-4.8-10.73-10.73C13.13,18.37,17.93,13.57,23.86,13.57 L23.86,13.57z M40.82,10.3c3.52-2.19,7.35-4.15,11.59-5.82c12.91-5.09,22.78-6,36.32-1.9c4.08,1.55,8.16,3.1,12.24,4.06 c4.03,0.96,21.48,1.88,21.91,4.81l-4.31,5.15c1.57,1.36,2.85,3.03,3.32,5.64c-0.13,1.61-0.57,2.96-1.33,4.04 c-1.29,1.85-5.07,3.76-7.11,2.67c-0.65-0.35-1.02-1.05-1.01-2.24c0.06-23.9-28.79-21.18-26.62,2.82H35.48 C44.8,5.49,5.04,5.4,12.1,28.7C9.62,31.38,3.77,27.34,0,18.75c1.03-1.02,2.16-1.99,3.42-2.89c-0.06-0.05,0.06,0.19-0.15-0.17 c-0.21-0.36,0.51-1.87,1.99-2.74C13.02,8.4,31.73,8.52,40.82,10.3L40.82,10.3z"
-                                                />
-                                              </g>
+                                        <svg
+                                          fill="#00b576"
+                                          // className="h-10 w-10 text-green "
+                                          height="50"
+                                          width="40"
+                                          viewBox="0 -43.92 122.88 122.88"
+                                          version="1.1"
+                                          id="Layer_1"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          xmlnsXlink="http://www.w3.org/1999/xlink"
+                                          style={{
+                                            filter:
+                                              "drop-shadow(1px 2px 2px #000000)",
+                                            marginTop: "-0.8rem",
+                                          }}
+                                          xmlSpace="preserve"
+                                          transform="matrix(1, 0, 0, 1, 0, 0)"
+                                          stroke="#00b576"
+                                        >
+                                          <g
+                                            id="SVGRepo_bgCarrier"
+                                            strokeWidth="0"
+                                          />
+                                          <g
+                                            id="SVGRepo_tracerCarrier"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          />
+                                          <g id="SVGRepo_iconCarrier">
+                                            {/* <style type="text/css">.st0{fill-rule:evenodd;clip-rule:evenodd;}</style> */}
+                                            <g>
+                                              <path
+                                                className="st0"
+                                                d="M99.42,13.57c5.93,0,10.73,4.8,10.73,10.73c0,5.93-4.8,10.73-10.73,10.73s-10.73-4.8-10.73-10.73 C88.69,18.37,93.49,13.57,99.42,13.57L99.42,13.57z M79.05,5c-0.59,1.27-1.06,2.69-1.42,4.23c-0.82,2.57,0.39,3.11,3.19,2.06 c2.06-1.23,4.12-2.47,6.18-3.7c1.05-0.74,1.55-1.47,1.38-2.19c-0.34-1.42-3.08-2.16-5.33-2.6C80.19,2.23,80.39,2.11,79.05,5 L79.05,5z M23.86,19.31c2.75,0,4.99,2.23,4.99,4.99c0,2.75-2.23,4.99-4.99,4.99c-2.75,0-4.99-2.23-4.99-4.99 C18.87,21.54,21.1,19.31,23.86,19.31L23.86,19.31z M99.42,19.31c2.75,0,4.99,2.23,4.99,4.99c0,2.75-2.23,4.99-4.99,4.99 c-2.75,0-4.99-2.23-4.99-4.99C94.43,21.54,96.66,19.31,99.42,19.31L99.42,19.31z M46.14,12.5c2.77-2.97,5.97-4.9,9.67-6.76 c8.1-4.08,13.06-3.58,21.66-3.58l-2.89,7.5c-1.21,1.6-2.58,2.73-4.66,2.84H46.14L46.14,12.5z M23.86,13.57 c5.93,0,10.73,4.8,10.73,10.73c0,5.93-4.8,10.73-10.73,10.73s-10.73-4.8-10.73-10.73C13.13,18.37,17.93,13.57,23.86,13.57 L23.86,13.57z M40.82,10.3c3.52-2.19,7.35-4.15,11.59-5.82c12.91-5.09,22.78-6,36.32-1.9c4.08,1.55,8.16,3.1,12.24,4.06 c4.03,0.96,21.48,1.88,21.91,4.81l-4.31,5.15c1.57,1.36,2.85,3.03,3.32,5.64c-0.13,1.61-0.57,2.96-1.33,4.04 c-1.29,1.85-5.07,3.76-7.11,2.67c-0.65-0.35-1.02-1.05-1.01-2.24c0.06-23.9-28.79-21.18-26.62,2.82H35.48 C44.8,5.49,5.04,5.4,12.1,28.7C9.62,31.38,3.77,27.34,0,18.75c1.03-1.02,2.16-1.99,3.42-2.89c-0.06-0.05,0.06,0.19-0.15-0.17 c-0.21-0.36,0.51-1.87,1.99-2.74C13.02,8.4,31.73,8.52,40.82,10.3L40.82,10.3z"
+                                              />
                                             </g>
-                                          </svg>
-                                        </div>
-                                        <div className="col-span-10 ">
-                                          <p className="text-start text-md   text-black font-popins font-semibold">
-                                            Duration: {item.TripDurationHr}{" "}
-                                            Hour(s) {item.TripDurationMins}{" "}
-                                            Minute(s)
-                                          </p>
-                                          <p className=" text-green text-start font-popins font-semibold text-sm">
-                                            {" "}
-                                            Distance: {item.TotalDistance}
-                                            {item?.DriverName && (
-                                              <div>
-                                                <p style={{ display: "flex" }}>
-                                                  <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    width="20"
-                                                    height="20"
-                                                    style={{
-                                                      filter:
-                                                        "drop-shadow(1px 2px 2px #000000)",
-                                                      marginRight: "0.5%",
-                                                    }}
-                                                    viewBox="0 0 24 24"
-                                                  >
-                                                    <path
-                                                      fill="currentColor"
-                                                      d="M12 12q-1.65 0-2.825-1.175T8 8q0-1.65 1.175-2.825T12 4q1.65 0 2.825 1.175T16 8q0 1.65-1.175 2.825T12 12m-8 8v-2.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13q1.65 0 3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2V20z"
-                                                    />
-                                                  </svg>
-                                                  {item?.DriverName}
-                                                </p>
-                                              </div>
-                                            )}
-                                          </p>
-                                        </div>
+                                          </g>
+                                        </svg>
                                       </div>
-
-                                      <div className="grid grid-cols-12 gap-10 mt-5">
-                                        <div className="col-span-1">
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="h-8 w-8 text-green"
-                                            viewBox="0 0 512 512"
-                                            style={{
-                                              filter:
-                                                "drop-shadow(1px 2px 2px #000000)",
-                                            }}
-                                          >
-                                            <circle
-                                              cx="256"
-                                              cy="192"
-                                              r="32"
-                                              // fill="currentColor"
-                                            />
-                                            <path
-                                              fill="currentColor"
-                                              d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
-                                            />
-                                          </svg>
-                                          <div className=" border-l-2 h-10 border-green  mx-4 my-3"></div>
-                                        </div>
-                                        <div className="col-span-8 ">
-                                          <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
-                                            <p className="text-green ">
-                                              {" "}
-                                              Location Start:
-                                            </p>{" "}
-                                            <p className="text-black text-sm font-popins">
-                                              {item.StartingPoint}
-                                            </p>
-                                          </p>
-                                          <p className=" text-black text-start font-semibold text-sm font-popins">
-                                            {" "}
-                                            Trip Start:{" "}
-                                            {item.TripStartDateLabel} &nbsp;
-                                            {item.TripStartTimeLabel}
-                                          </p>
-                                        </div>
-                                      </div>
-
-                                      <div className="grid grid-cols-12 gap-10">
-                                        <div className="col-span-1">
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="h-8 w-8 text-green"
-                                            viewBox="0 0 512 512"
-                                            style={{
-                                              filter:
-                                                "drop-shadow(1px 2px 2px #000000)",
-                                            }}
-                                          >
-                                            <circle
-                                              cx="256"
-                                              cy="192"
-                                              r="32"
-                                              // fill="currentColor"
-                                            />
-                                            <path
-                                              fill="currentColor"
-                                              d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
-                                            />
-                                          </svg>
-                                        </div>
-                                        <div className="col-span-8 ">
-                                          <div className="text-start font-bold text-md text-labelColor">
-                                            <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
-                                              <span className="text-green">
-                                                {" "}
-                                                Location End:
-                                              </span>{" "}
-                                              <br></br>
-                                              <p className="text-black text-sm font-popins">
-                                                {" "}
-                                                {item.EndingPoint}
+                                      <div className="col-span-10 ">
+                                        <p className="text-start text-md   text-black font-popins font-semibold">
+                                          Duration: {item.TripDurationHr}{" "}
+                                          Hour(s) {item.TripDurationMins}{" "}
+                                          Minute(s)
+                                        </p>
+                                        <p className=" text-green text-start font-popins font-semibold text-sm">
+                                          {" "}
+                                          Distance: {item.TotalDistance}
+                                          {item?.DriverName && (
+                                            <div>
+                                              <p style={{ display: "flex" }}>
+                                                <svg
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                  width="20"
+                                                  height="20"
+                                                  style={{
+                                                    filter:
+                                                      "drop-shadow(1px 2px 2px #000000)",
+                                                    marginRight: "0.5%",
+                                                  }}
+                                                  viewBox="0 0 24 24"
+                                                >
+                                                  <path
+                                                    fill="currentColor"
+                                                    d="M12 12q-1.65 0-2.825-1.175T8 8q0-1.65 1.175-2.825T12 4q1.65 0 2.825 1.175T16 8q0 1.65-1.175 2.825T12 12m-8 8v-2.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13q1.65 0 3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2V20z"
+                                                  />
+                                                </svg>
+                                                {item?.DriverName}
                                               </p>
-                                            </p>
-                                          </div>
-                                          <p className=" text-black text-start font-semibold text-sm">
-                                            {" "}
-                                            Trip End:{
-                                              item.TripEndDateLabel
-                                            }{" "}
-                                            &nbsp;
-                                            {item.TripEndTimeLabel}
-                                          </p>
-                                        </div>
+                                            </div>
+                                          )}
+                                        </p>
                                       </div>
                                     </div>
-                                  </Typography>
-                                </AccordionDetails>
-                              ))}
-                            </Accordion>
-                          </div>
-                        </ul>
-                      </div>
-                    )
+
+                                    <div className="grid grid-cols-12 gap-10 mt-5">
+                                      <div className="col-span-1">
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          className="h-8 w-8 text-green"
+                                          viewBox="0 0 512 512"
+                                          style={{
+                                            filter:
+                                              "drop-shadow(1px 2px 2px #000000)",
+                                          }}
+                                        >
+                                          <circle
+                                            cx="256"
+                                            cy="192"
+                                            r="32"
+                                          // fill="currentColor"
+                                          />
+                                          <path
+                                            fill="currentColor"
+                                            d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
+                                          />
+                                        </svg>
+                                        <div className=" border-l-2 h-10 border-green  mx-4 my-3"></div>
+                                      </div>
+                                      <div className="col-span-8 ">
+                                        <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
+                                          <p className="text-green ">
+                                            {" "}
+                                            Location Start:
+                                          </p>{" "}
+                                          <p className="text-black text-sm font-popins">
+                                            {item.StartingPoint}
+                                          </p>
+                                        </p>
+                                        <p className=" text-black text-start font-semibold text-sm font-popins">
+                                          {" "}
+                                          Trip Start:{" "}
+                                          {item.TripStartDateLabel} &nbsp;
+                                          {item.TripStartTimeLabel}
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-12 gap-10">
+                                      <div className="col-span-1">
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          className="h-8 w-8 text-green"
+                                          viewBox="0 0 512 512"
+                                          style={{
+                                            filter:
+                                              "drop-shadow(1px 2px 2px #000000)",
+                                          }}
+                                        >
+                                          <circle
+                                            cx="256"
+                                            cy="192"
+                                            r="32"
+                                          // fill="currentColor"
+                                          />
+                                          <path
+                                            fill="currentColor"
+                                            d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <div className="col-span-8 ">
+                                        <div className="text-start font-bold text-md text-labelColor">
+                                          <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
+                                            <span className="text-green">
+                                              {" "}
+                                              Location End:
+                                            </span>{" "}
+                                            <br></br>
+                                            <p className="text-black text-sm font-popins">
+                                              {" "}
+                                              {item.EndingPoint}
+                                            </p>
+                                          </p>
+                                        </div>
+                                        <p className=" text-black text-start font-semibold text-sm">
+                                          {" "}
+                                          Trip End:{
+                                            item.TripEndDateLabel
+                                          }{" "}
+                                          &nbsp;
+                                          {item.TripEndTimeLabel}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </Typography>
+                              </AccordionDetails>
+                            ))}
+                          </Accordion>
+                        </div>
+                      </ul>
+                    </div>
                   )
+                )
                 : dataresponse?.map((item: TripsByBucket, index: number) => (
-                    <button
-key={index}
+                  <button
+                    key={index}
                     onClick={() => {
-                        travelV2 &&
-                          handleDivClick(
-                            item.fromDateTime,
-                            item.toDateTime,
-                            item.id
-                          );
+                      travelV2 &&
+                        handleDivClick(
+                          item.fromDateTime,
+                          item.toDateTime,
+                          item.id
+                        );
+                    }}
+                  >
+                    <div
+                      className="py-5 hover:bg-[#e1f0e3] px-5 cursor-pointer border-b"
+                      onClick={() => handleGetItem(item, index)}
+                      style={{
+                        backgroundColor:
+                          activeTripColor.id === item.id ? "#e1f0e3" : "",
                       }}
                     >
-                      <div
-                        className="py-5 hover:bg-[#e1f0e3] px-5 cursor-pointer border-b"
-                        onClick={() => handleGetItem(item, index)}
-                        style={{
-                          backgroundColor:
-                            activeTripColor.id === item.id ? "#e1f0e3" : "",
-                        }}
-                      >
-                        <div className="grid grid-cols-12 space-x-3">
-                          <div className="col-span-1">
-                            {/* <svg
+                      <div className="grid grid-cols-12 space-x-3">
+                        <div className="col-span-1">
+                          {/* <svg
                               className="h-8 w-8 text-green"
                               width="24"
                               height="24"
@@ -2431,7 +1832,7 @@ key={index}
                               <path d="M5 17h-2 v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" />
                             </svg> */}
 
-                            {/* <svg
+                          {/* <svg
                               xmlns="http://www.w3.org/2000/svg"
                               className="h-10 w-10 text-green "
                               width="24"
@@ -2447,655 +1848,534 @@ key={index}
                                 d="M488 224c-3-5-32.61-17.79-32.61-17.79c5.15-2.66 8.67-3.21 8.67-14.21c0-12-.06-16-8.06-16h-27.14c-.11-.24-.23-.49-.34-.74c-17.52-38.26-19.87-47.93-46-60.95C347.47 96.88 281.76 96 256 96s-91.47.88-126.49 18.31c-26.16 13-25.51 19.69-46 60.95c0 .11-.21.4-.4.74H55.94c-7.94 0-8 4-8 16c0 11 3.52 11.55 8.67 14.21C56.61 206.21 28 220 24 224s-8 32-8 80s4 96 4 96h11.94c0 14 2.06 16 8.06 16h80c6 0 8-2 8-16h256c0 14 2 16 8 16h82c4 0 6-3 6-16h12s4-49 4-96s-5-75-8-80m-362.74 44.94A516.94 516.94 0 0 1 70.42 272c-20.42 0-21.12 1.31-22.56-11.44a72.16 72.16 0 0 1 .51-17.51L49 240h3c12 0 23.27.51 44.55 6.78a98 98 0 0 1 30.09 15.06C131 265 132 268 132 268Zm247.16 72L368 352H144s.39-.61-5-11.18c-4-7.82 1-12.82 8.91-15.66C163.23 319.64 208 304 256 304s93.66 13.48 108.5 21.16C370 328 376.83 330 372.42 341Zm-257-136.53a96.23 96.23 0 0 1-9.7.07c2.61-4.64 4.06-9.81 6.61-15.21c8-17 17.15-36.24 33.44-44.35c23.54-11.72 72.33-17 110.23-17s86.69 5.24 110.23 17c16.29 8.11 25.4 27.36 33.44 44.35c2.57 5.45 4 10.66 6.68 15.33c-2 .11-4.3 0-9.79-.19Zm347.72 56.11C461 273 463 272 441.58 272a516.94 516.94 0 0 1-54.84-3.06c-2.85-.51-3.66-5.32-1.38-7.1a93.84 93.84 0 0 1 30.09-15.06c21.28-6.27 33.26-7.11 45.09-6.69a3.22 3.22 0 0 1 3.09 3a70.18 70.18 0 0 1-.49 17.47Z"
                               />
                             </svg> */}
-                            <svg
-                              fill="#00b576"
-                              // className="h-10 w-10 text-green "
-                              height="50"
-                              width="45"
-                              viewBox="0 -43.92 122.88 122.88"
-                              version="1.1"
-                              id="Layer_1"
-                              xmlns="http://www.w3.org/2000/svg"
-                              xmlnsXlink="http://www.w3.org/1999/xlink"
-                              style={{
-                                filter: "drop-shadow(1px 2px 2px #000000)",
-                                marginTop: "-0.8rem",
-                              }}
-                              xmlSpace="preserve"
-                              transform="matrix(1, 0, 0, 1, 0, 0)"
-                              stroke="#00b576"
-                            >
-                              <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-                              <g
-                                id="SVGRepo_tracerCarrier"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <g id="SVGRepo_iconCarrier">
-                                {/* <style type="text/css">.st0{fill-rule:evenodd;clip-rule:evenodd;}</style> */}
-                                <g>
-                                  <path
-                                    className="st0"
-                                    d="M99.42,13.57c5.93,0,10.73,4.8,10.73,10.73c0,5.93-4.8,10.73-10.73,10.73s-10.73-4.8-10.73-10.73 C88.69,18.37,93.49,13.57,99.42,13.57L99.42,13.57z M79.05,5c-0.59,1.27-1.06,2.69-1.42,4.23c-0.82,2.57,0.39,3.11,3.19,2.06 c2.06-1.23,4.12-2.47,6.18-3.7c1.05-0.74,1.55-1.47,1.38-2.19c-0.34-1.42-3.08-2.16-5.33-2.6C80.19,2.23,80.39,2.11,79.05,5 L79.05,5z M23.86,19.31c2.75,0,4.99,2.23,4.99,4.99c0,2.75-2.23,4.99-4.99,4.99c-2.75,0-4.99-2.23-4.99-4.99 C18.87,21.54,21.1,19.31,23.86,19.31L23.86,19.31z M99.42,19.31c2.75,0,4.99,2.23,4.99,4.99c0,2.75-2.23,4.99-4.99,4.99 c-2.75,0-4.99-2.23-4.99-4.99C94.43,21.54,96.66,19.31,99.42,19.31L99.42,19.31z M46.14,12.5c2.77-2.97,5.97-4.9,9.67-6.76 c8.1-4.08,13.06-3.58,21.66-3.58l-2.89,7.5c-1.21,1.6-2.58,2.73-4.66,2.84H46.14L46.14,12.5z M23.86,13.57 c5.93,0,10.73,4.8,10.73,10.73c0,5.93-4.8,10.73-10.73,10.73s-10.73-4.8-10.73-10.73C13.13,18.37,17.93,13.57,23.86,13.57 L23.86,13.57z M40.82,10.3c3.52-2.19,7.35-4.15,11.59-5.82c12.91-5.09,22.78-6,36.32-1.9c4.08,1.55,8.16,3.1,12.24,4.06 c4.03,0.96,21.48,1.88,21.91,4.81l-4.31,5.15c1.57,1.36,2.85,3.03,3.32,5.64c-0.13,1.61-0.57,2.96-1.33,4.04 c-1.29,1.85-5.07,3.76-7.11,2.67c-0.65-0.35-1.02-1.05-1.01-2.24c0.06-23.9-28.79-21.18-26.62,2.82H35.48 C44.8,5.49,5.04,5.4,12.1,28.7C9.62,31.38,3.77,27.34,0,18.75c1.03-1.02,2.16-1.99,3.42-2.89c-0.06-0.05,0.06,0.19-0.15-0.17 c-0.21-0.36,0.51-1.87,1.99-2.74C13.02,8.4,31.73,8.52,40.82,10.3L40.82,10.3z"
-                                  />
-                                </g>
+                          <svg
+                            fill="#00b576"
+                            // className="h-10 w-10 text-green "
+                            height="50"
+                            width="45"
+                            viewBox="0 -43.92 122.88 122.88"
+                            version="1.1"
+                            id="Layer_1"
+                            xmlns="http://www.w3.org/2000/svg"
+                            xmlnsXlink="http://www.w3.org/1999/xlink"
+                            style={{
+                              filter: "drop-shadow(1px 2px 2px #000000)",
+                              marginTop: "-0.8rem",
+                            }}
+                            xmlSpace="preserve"
+                            transform="matrix(1, 0, 0, 1, 0, 0)"
+                            stroke="#00b576"
+                          >
+                            <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+                            <g
+                              id="SVGRepo_tracerCarrier"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <g id="SVGRepo_iconCarrier">
+                              {/* <style type="text/css">.st0{fill-rule:evenodd;clip-rule:evenodd;}</style> */}
+                              <g>
+                                <path
+                                  className="st0"
+                                  d="M99.42,13.57c5.93,0,10.73,4.8,10.73,10.73c0,5.93-4.8,10.73-10.73,10.73s-10.73-4.8-10.73-10.73 C88.69,18.37,93.49,13.57,99.42,13.57L99.42,13.57z M79.05,5c-0.59,1.27-1.06,2.69-1.42,4.23c-0.82,2.57,0.39,3.11,3.19,2.06 c2.06-1.23,4.12-2.47,6.18-3.7c1.05-0.74,1.55-1.47,1.38-2.19c-0.34-1.42-3.08-2.16-5.33-2.6C80.19,2.23,80.39,2.11,79.05,5 L79.05,5z M23.86,19.31c2.75,0,4.99,2.23,4.99,4.99c0,2.75-2.23,4.99-4.99,4.99c-2.75,0-4.99-2.23-4.99-4.99 C18.87,21.54,21.1,19.31,23.86,19.31L23.86,19.31z M99.42,19.31c2.75,0,4.99,2.23,4.99,4.99c0,2.75-2.23,4.99-4.99,4.99 c-2.75,0-4.99-2.23-4.99-4.99C94.43,21.54,96.66,19.31,99.42,19.31L99.42,19.31z M46.14,12.5c2.77-2.97,5.97-4.9,9.67-6.76 c8.1-4.08,13.06-3.58,21.66-3.58l-2.89,7.5c-1.21,1.6-2.58,2.73-4.66,2.84H46.14L46.14,12.5z M23.86,13.57 c5.93,0,10.73,4.8,10.73,10.73c0,5.93-4.8,10.73-10.73,10.73s-10.73-4.8-10.73-10.73C13.13,18.37,17.93,13.57,23.86,13.57 L23.86,13.57z M40.82,10.3c3.52-2.19,7.35-4.15,11.59-5.82c12.91-5.09,22.78-6,36.32-1.9c4.08,1.55,8.16,3.1,12.24,4.06 c4.03,0.96,21.48,1.88,21.91,4.81l-4.31,5.15c1.57,1.36,2.85,3.03,3.32,5.64c-0.13,1.61-0.57,2.96-1.33,4.04 c-1.29,1.85-5.07,3.76-7.11,2.67c-0.65-0.35-1.02-1.05-1.01-2.24c0.06-23.9-28.79-21.18-26.62,2.82H35.48 C44.8,5.49,5.04,5.4,12.1,28.7C9.62,31.38,3.77,27.34,0,18.75c1.03-1.02,2.16-1.99,3.42-2.89c-0.06-0.05,0.06,0.19-0.15-0.17 c-0.21-0.36,0.51-1.87,1.99-2.74C13.02,8.4,31.73,8.52,40.82,10.3L40.82,10.3z"
+                                />
                               </g>
-                            </svg>
-                          </div>
-                          <div className="col-span-10 ">
-                            <p className="text-start text-md   text-black font-popins font-semibold">
-                              Duration: {item.TripDurationHr} Hour(s){" "}
-                              {item.TripDurationMins} Minute(s)
-                            </p>
-                            <p className=" text-green text-start font-popins font-semibold text-sm">
-                              {" "}
-                              Distance: {item.TotalDistance}
-                              {item?.DriverName && (
-                                <div>
-                                  <p style={{ display: "flex" }}>
-                                    {" "}
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      width="20"
-                                      height="20"
-                                      style={{
-                                        filter:
-                                          "drop-shadow(1px 2px 2px #000000)",
-                                        marginRight: "0.5%",
-                                      }}
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path
-                                        fill="currentColor"
-                                        d="M12 12q-1.65 0-2.825-1.175T8 8q0-1.65 1.175-2.825T12 4q1.65 0 2.825 1.175T16 8q0 1.65-1.175 2.825T12 12m-8 8v-2.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13q1.65 0 3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2V20z"
-                                      />
-                                    </svg>
-                                    {item?.DriverName}
-                                  </p>
-                                </div>
-                              )}
-                            </p>
-                          </div>
+                            </g>
+                          </svg>
                         </div>
-
-                        <div className="grid grid-cols-12 gap-10 mt-5">
-                          <div className="col-span-1">
-                            {/* <svg
-                              className="h-8 w-8 text-green"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                            </svg> */}
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-8 w-8 text-green"
-                              viewBox="0 0 512 512"
-                              style={{
-                                filter: "drop-shadow(1px 2px 2px #000000)",
-                              }}
-                            >
-                              <circle
-                                cx="256"
-                                cy="192"
-                                r="32"
-                                // fill="currentColor"
-                              />
-                              <path
-                                fill="currentColor"
-                                d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
-                              />
-                            </svg>
-                            <div className=" border-l-2 h-10 border-green  mx-4 my-3"></div>
-                          </div>
-                          <div className="col-span-8 ">
-                            <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
-                              <p className="text-green "> Location Start:</p>{" "}
-                              {/* <br></br>{" "} */}
-                              <p className="text-black text-sm font-popins">
-                                {item.StartingPoint}
-                              </p>
-                            </p>
-                            <p className=" text-black font-popins text-start font-semibold text-sm lg:mr-0 md:mr-10">
-                              {" "}
-                              Trip Start: {item.TripStartDateLabel} &nbsp;
-                              {item.TripStartTimeLabel}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-12 gap-10">
-                          <div className="col-span-1">
-                            {/* <svg
-                              className="h-8 w-8 text-green"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                            </svg> */}
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-8 w-8 text-green"
-                              viewBox="0 0 512 512"
-                              style={{
-                                filter: "drop-shadow(1px 2px 2px #000000)",
-                              }}
-                            >
-                              <circle
-                                cx="256"
-                                cy="192"
-                                r="32"
-                                // fill="currentColor"
-                              />
-                              <path
-                                fill="currentColor"
-                                d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
-                              />
-                            </svg>
-                          </div>
-                          <div className="col-span-8 ">
-                            <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
-                              <span className="text-green"> Location End:</span>{" "}
-                              <br></br>
-                              <p className="text-black text-sm font-popins">
-                                {" "}
-                                {item.EndingPoint}
-                              </p>
-                            </p>
-                            <p className=" text-black  lg:mr-0 md:mr-10 text-start font-bold text-sm">
-                              {" "}
-                              Trip End:{item.TripEndDateLabel} &nbsp;
-                              {item.TripEndTimeLabel}
-                            </p>
-                          </div>
+                        <div className="col-span-10 ">
+                          <p className="text-start text-md   text-black font-popins font-semibold">
+                            Duration: {item.TripDurationHr} Hour(s){" "}
+                            {item.TripDurationMins} Minute(s)
+                          </p>
+                          <p className=" text-green text-start font-popins font-semibold text-sm">
+                            {" "}
+                            Distance: {item.TotalDistance}
+                            {item?.DriverName && (
+                              <div>
+                                <p style={{ display: "flex" }}>
+                                  {" "}
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="20"
+                                    height="20"
+                                    style={{
+                                      filter:
+                                        "drop-shadow(1px 2px 2px #000000)",
+                                      marginRight: "0.5%",
+                                    }}
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      fill="currentColor"
+                                      d="M12 12q-1.65 0-2.825-1.175T8 8q0-1.65 1.175-2.825T12 4q1.65 0 2.825 1.175T16 8q0 1.65-1.175 2.825T12 12m-8 8v-2.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13q1.65 0 3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2V20z"
+                                    />
+                                  </svg>
+                                  {item?.DriverName}
+                                </p>
+                              </div>
+                            )}
+                          </p>
                         </div>
                       </div>
-                    </button>
-                  ))}
+
+                      <div className="grid grid-cols-12 gap-10 mt-5">
+                        <div className="col-span-1">
+                          {/* <svg
+                              className="h-8 w-8 text-green"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg> */}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-8 w-8 text-green"
+                            viewBox="0 0 512 512"
+                            style={{
+                              filter: "drop-shadow(1px 2px 2px #000000)",
+                            }}
+                          >
+                            <circle
+                              cx="256"
+                              cy="192"
+                              r="32"
+                            // fill="currentColor"
+                            />
+                            <path
+                              fill="currentColor"
+                              d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
+                            />
+                          </svg>
+                          <div className=" border-l-2 h-10 border-green  mx-4 my-3"></div>
+                        </div>
+                        <div className="col-span-8 ">
+                          <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
+                            <p className="text-green "> Location Start:</p>{" "}
+                            {/* <br></br>{" "} */}
+                            <p className="text-black text-sm font-popins">
+                              {item.StartingPoint}
+                            </p>
+                          </p>
+                          <p className=" text-black font-popins text-start font-semibold text-sm lg:mr-0 md:mr-10">
+                            {" "}
+                            Trip Start: {item.TripStartDateLabel} &nbsp;
+                            {item.TripStartTimeLabel}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-12 gap-10">
+                        <div className="col-span-1">
+                          {/* <svg
+                              className="h-8 w-8 text-green"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg> */}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-8 w-8 text-green"
+                            viewBox="0 0 512 512"
+                            style={{
+                              filter: "drop-shadow(1px 2px 2px #000000)",
+                            }}
+                          >
+                            <circle
+                              cx="256"
+                              cy="192"
+                              r="32"
+                            // fill="currentColor"
+                            />
+                            <path
+                              fill="currentColor"
+                              d="M256 32c-88.22 0-160 68.65-160 153c0 40.17 18.31 93.59 54.42 158.78c29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0 0 51.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153m0 224a64 64 0 1 1 64-64a64.07 64.07 0 0 1-64 64"
+                            />
+                          </svg>
+                        </div>
+                        <div className="col-span-8 ">
+                          <p className="text-start font-popins font-semibold text-md lg:mr-0 md:mr-10  text-labelColor">
+                            <span className="text-green"> Location End:</span>{" "}
+                            <br></br>
+                            <p className="text-black text-sm font-popins">
+                              {" "}
+                              {item.EndingPoint}
+                            </p>
+                          </p>
+                          <p className=" text-black  lg:mr-0 md:mr-10 text-start font-bold text-sm">
+                            {" "}
+                            Trip End:{item.TripEndDateLabel} &nbsp;
+                            {item.TripEndTimeLabel}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
             </div>
           </div>
-          <div
-            className="xl:col-span-4 lg:col-span-3 md:col-span-7 sm:col-span-12 col-span-4 journey_map"
+
+          <div className="xl:col-span-4 lg:col-span-4 md:col-span-7 sm:col-span-12 col-span-4 journey_map"
             style={{ position: "relative" }}
           >
-     <div onClick={() => {
-  setMapcenterToFly(null);
-
-}}>
-  <div onClick={handleuserclick}>
-  
-              {mapcenter !== null && (
-               <MapContainer
-               id="map"
-               zoom={zoom}
-               center={mapcenter}
-               className="z-0 journey_map"
-               minZoom={minzoom}
-           maxZoom={maxzoom}
-                 >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
-                  />
-                      
-
-                  {loadingMap  ? (
-                    <Polyline
-                      pathOptions={{ color: "red", weight: 6 }}
-                      positions={polylinedata}
-                    />
-                  ) : null}
-                  {isPlaying ? (
-                    <SetViewOnClick coords={mapcenter} zoom={zoom}  />
-                  ) : isPaused ? (
-                    <SetViewOnClick coords={mapcenter}  zoom={zoom}/>
-                  )
-              :
-                 
-                (
-                  <SetViewfly coords={mapcenterToFly} zoom={zoomToFly} />
-                )
-                }
-
-                  {showZones &&
-                    zoneList.map(function (singleRecord) {
-                      const isRestrictedArea =
-                        singleRecord.GeoFenceType === "Restricted-Area"; // && session?.clickToCall === true;
-                      const isCityArea =
-                        singleRecord.GeoFenceType === "City-Area"; // && session?.clickToCall === true;
-
-                      return singleRecord.zoneType == "Circle" ? (
-                        <>
-                          <Circle
-                            center={[
-                              Number(singleRecord.centerPoints.split(",")[0]),
-                              Number(singleRecord.centerPoints.split(",")[1]),
-                            ]}
-                            radius={Number(singleRecord.latlngCordinates)}
-                            color={
-                              isCityArea
-                                ? "green"
-                                : isRestrictedArea
-                                ? "red"
-                                : "blue"
-                            }
-                          >
-                            <Popup>{singleRecord.zoneName}</Popup>
-                          </Circle>
-                        </>
-                      ) : (
-                        // <Polygon
-                        //   positions={JSON.parse(singleRecord.latlngCordinates)}
-                        // />
-                        <Polygon
-                          key={singleRecord.zoneName}
-                          positions={JSON.parse(singleRecord.latlngCordinates)}
-                          color={
-                            isCityArea
-                              ? "green"
-                              : isRestrictedArea
-                              ? "red"
-                              : "blue"
-                          }
-                        >
-                          <Popup>{singleRecord.zoneName}</Popup>
-                        </Polygon>
-                      );
-                    })}
-
-                  {loadingMap
-                    ? carPosition && (
-                        <Marker
-                          position={carPosition}
-                          icon={createMarkerIcon(getCurrentAngle())}
-                        ></Marker>
-                      )
-                    : ""}
-
-                  {lat && lng && (
-                    <Marker
-                      position={[lat, lng]}
-                      icon={
-                        new L.Icon({
-                          iconUrl:
-                            "https://img.icons8.com/fluency/48/000000/stop-sign.png",
-                          iconAnchor: [22, 47],
-                          popupAnchor: [1, -34],
-                        })
-                      }
-                    ></Marker>
-                  )}
-                  {TravelHistoryresponse?.length > 0 && (
-                    <div>
-                      {loadingMap ? (
-                        <Marker
-                          position={[
-                            TravelHistoryresponse[0].lat,
-                            TravelHistoryresponse[0].lng,
-                          ]}
-                          icon={
-                            new L.Icon({
-                              iconUrl:
-                                "https://img.icons8.com/fluent/48/000000/marker-a.png",
-                              iconAnchor: [22, 47],
-                              popupAnchor: [1, -34],
-                            })
-                          }
-                        ></Marker>
-                      ) : (
-                        ""
-                      )}
-
-                      {loadingMap ? (
-                        <Marker
-                          position={[
-                            TravelHistoryresponse[
-                              TravelHistoryresponse?.length - 1
-                            ].lat,
-                            TravelHistoryresponse[
-                              TravelHistoryresponse?.length - 1
-                            ].lng,
-                          ]}
-                          icon={
-                            new L.Icon({
-                              iconUrl:
-                                "https://img.icons8.com/fluent/48/000000/marker-b.png",
-                              iconAnchor: [22, 47],
-                              popupAnchor: [1, -34],
-                            })
-                          }
-                        ></Marker>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  )}
-
-                  {TravelHistoryresponse?.map((item) => {
-                    if (item.vehicleEvents.length > 0) {
-                      return item.vehicleEvents.map((items) => {
-                        if (items.Event === "HarshBreak") {
-                          return loadingMap ? (
-                            <Marker
-                              position={[item.lat, item.lng]}
-                              icon={
-                                new L.Icon({
-                                  iconUrl:
-                                    "https://img.icons8.com/color/48/000000/brake-discs.png",
-                                  iconSize: [40, 40],
-                                  iconAnchor: [16, 37],
-                                })
-                              }
-                            >
-                              {harshPopUp && <Popup>Harsh Break</Popup>}
-                            </Marker>
-                          ) : (
-                            ""
-                          );
-                        }
-                        if (items.Event === "HarshAcceleration") {
-                          return loadingMap ? (
-                            <Marker
-                              position={[item.lat, item.lng]}
-                              icon={
-                                new L.Icon({
-                                  iconUrl:
-                                    "https://img.icons8.com/nolan/64/speed-up.png",
-                                  iconSize: [30, 30],
-                                  iconAnchor: [16, 37],
-                                })
-                              }
-                            >
-                              {harshAccPopUp && (
-                                <Popup>Harsh Acceleration</Popup>
-                              )}
-                            </Marker>
-                          ) : (
-                            ""
-                          );
-                        }
-                        if (items.Event === "HarshCornering") {
-                          return loadingMap ? (
-                            <Marker
-                              position={[item.lat, item.lng]}
-                              icon={
-                                new L.Icon({
-                                  iconUrl: HarshCornerningIcon.src,
-                                  iconSize: [30, 30],
-                                  iconAnchor: [16, 37],
-                                })
-                              }
-                            >
-                              {harshAccPopUp && (
-                                <Popup>Harsh Cornering</Popup>
-                              )}
-                            </Marker>
-                          ) : (
-                            ""
-                          );
-                        }
-                      });
-                    }
-                  })}
-                 
-           
-
-
-                  
-                </MapContainer>
-              )}
-            
-            </div>
-            </div>
-            {/* 
-            {isChecked && TravelHistoryresponse?.length > 0 && (
-    <div className="absolute top-0 right-0 p-4 bg-white rounded-lg shadow-lg">
-     
-      <div className="xl:col-span-1 lg:col-span-2 md:col-span-12 col-span-6 -mt-1 journey_replay_harsh_child">
-        <div className="grid grid-cols-12">
-          <div className="col-span-2">
-            <Image
-              src={markerA}
-              alt="startIcon"
-              className="h-6 journay_HarshAcceleration"
-            />
-            <Image src={markerB} alt="endIcon" className="h-6 mt-1 " />
-          </div>
-          <div className="col-span-10 text-sm font-semibold">
-            Location Start
-            <br />
-            <p className="mt-3">Location End</p>
-          </div>
-        </div>
-      </div>
-
-   
-      <div className="xl:col-span-1 lg:col-span-2 md:col-span-1 col-span-6 mt-1 -ms-5 mb-3 journey_replay_harsh_acce">
-        {TravelHistoryresponse?.filter((item) =>
-          item.vehicleEvents.some(
-            (event) => event.Event === "HarshAcceleration"
-          )
-        ).length > 0 && (
-          <div className="grid grid-cols-12">
-            <div className="col-span-2">
-              <Image
-                src={HarshAccelerationIcon}
-                alt="harshAccelerationIcon"
-                className="h-6 journay_HarshAcceleration"
-              />
-            </div>
-            <div className="col-span-10 text-sm font-semibold">
-              Harsh Acc.. (x
-              {TravelHistoryresponse.reduce((count, item) =>
-                count +
-                item.vehicleEvents.filter(
-                  (event) => event.Event === "HarshAcceleration"
-                ).length
-              , 0)}
-              )
-            </div>
-          </div>
-        )}
-
-        {TravelHistoryresponse?.filter((item) =>
-          item.vehicleEvents.some(
-            (event) => event.Event === "HarshCornering"
-          )
-        ).length > 0 && (
-          <div className="grid grid-cols-12">
-            <div className="col-span-2">
-              <Image
-                src={HarshCornerningIcon}
-                alt="harshCorneringIcon"
-                className="h-6 journay_HarshAcceleration"
-              />
-            </div>
-            <div className="col-span-10 text-sm font-semibold">
-              Harsh Corn.. (x
-              {TravelHistoryresponse.reduce((count, item) =>
-                count +
-                item.vehicleEvents.filter(
-                  (event) => event.Event === "HarshCornering"
-                ).length
-              , 0)}
-              )
-            </div>
-          </div>
-        )}
-
-        {TravelHistoryresponse?.filter((item) =>
-          item.vehicleEvents.some(
-            (event) => event.Event === "HarshBreak"
-          )
-        ).length > 0 && (
-          <div className="grid grid-cols-12">
-            <div className="col-span-2">
-              <Image
-                src={harshAcceleration}
-                alt="harshBreakIcon"
-                className="h-6 mt-1 journay_HarshAcceleration"
-              />
-            </div>
-            <div className="col-span-10 text-sm">
-              <p className="mt-2 font-semibold">
-                Harsh Break (x
-                {TravelHistoryresponse.reduce((count, item) =>
-                  count +
-                  item.vehicleEvents.filter(
-                    (event) => event.Event === "HarshBreak"
-                  ).length
-                , 0)}
-                )
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  )}
-            
-            
-            */}
-             {hidediv && ( 
-              <> 
-              <div >
-              
-           <div className="absolute flex items-start lg:top-4 lg:left-20 left-12 top-6 space-x-4">
-  <div className="xl:col-span-2 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6 stop_journey max-w-xs lg:max-w-sm">
-    <div
-      className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg rounded-md cursor-pointer"
-      onClick={() => stopDetailsOpen && handleShowDetails()}
-    >
-      <div className="lg:col-span-11 md:col-span-10 sm:col-span-10 col-span-11 stop_details_responsive">
-        <p className="text-white lg:px-2 ps-1 text-lg text_responsive mr-24">
-          Stop Details ({loadingMap ? stopWithSecond.length : ""})
-        </p>
-      </div>
-      <div className="col-span-1 mt-1 lg:-ms-2 md:-ms-1 -ms-2">
-        {getShowICon ? (
-          <svg
-            className="h-5 w-5 text-white"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-            stroke="currentColor"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-        ) : (
-          <svg
-            className="h-5 w-5 text-white"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-            stroke="currentColor"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" />
-            <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
-            <path d="M4 16v2a2 2 0 0 0 2 2h2" />
-            <path d="M16 4h2a2 2 0 0 1 2 2v2" />
-            <path d="M16 20h2a2 2 0 0 0 2 -2v-2" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
-        )}
-      </div>
-    </div>
-    {getShowdetails && (
-      <div className={`bg-white overflow-y-scroll resposive_stop_details ${stopWithSecond.length > 1 ? "lg:h-60 md:h-60 sm:h-60 h-24" : ""}`}>
-        {stopWithSecond?.map((item:any) => {
-          let isActive = item.date === selectedItemId;
-          return loadingMap ? (
-            <div
-              key={item.date}
-              onClick={() => handleItemClick(item)}
-              className={`cursor-pointer ${isActive ? 'bg-[#e1f0e3]' : ''}`}
+            <div onClick={() => {
+              setMapcenterToFly(null);
+            }}
+              className="relative"
             >
-              <p className="text-black font-popins px-2 py-2 text-sm">
-                {/* <b>{item?.address?.display_name?.substring(0, 50)}</b>
+              <div onClick={handleuserclick}>
+                {mapcenter !== null && (
+                  session?.MapType == "Google" ?
+                    (
+                     <div className="journey_map">
+                       <GoogleLiveMap
+                         polylinedata={polylinedata.map((item) => {
+                           return { lat: item[0], lng: item[1] }
+                         })}
+                         TravelHistoryresponse={TravelHistoryresponse}
+                         loadingMap={loadingMap}
+                         mapcenter={mapcenter}
+                         minZoom={minzoom}
+                         maxZoom={maxzoom}
+                         zoom={zoom}
+                         carPosition={carPosition}
+                         getCurrentAngle={getCurrentAngle}                        
+                         zoomToFly={zoomToFly}
+                         mapcenterToFly={mapcenterToFly}
+                         isPlaying={isPlaying}
+                         isPaused={isPaused}
+                         coordsforgoogle={coordsforgoogle}
+                         vehicleType={vehicleType}
+                         lat={lat}
+                         lng={lng}
+                       />
+                      </div>
+
+                        
+                        ) :
+                        (
+
+                        <MapContainer
+                          id="map"
+                          zoom={zoom}
+                          center={mapcenter}
+                          className="z-0 journey_map"
+                          minZoom={minzoom}
+                          maxZoom={maxzoom}
+                        >
+                          <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
+                          />
+
+
+                          {loadingMap ? (
+                            <Polyline
+                              pathOptions={{ color: "red", weight: 6 }}
+                              positions={polylinedata}
+                            />
+                          ) : null}
+                          {isPlaying ? (
+                            <SetViewOnClick coords={mapcenter} zoom={zoom} />
+                          ) : isPaused ? (
+                            <SetViewOnClick coords={mapcenter} zoom={zoom} />
+                          )
+                            :
+
+                            (
+                              <SetViewfly coords={mapcenterToFly} zoom={zoomToFly} />
+                            )
+                          }
+                          {loadingMap
+                            ? carPosition && (
+                              <Marker
+                                position={carPosition}
+                                icon={createMarkerIcon(getCurrentAngle())}
+                              ></Marker>
+                            )
+                            : ""}
+
+                          {lat && lng && (
+                            <Marker
+                              position={[lat, lng]}
+                              icon={
+                                new L.Icon({
+                                  iconUrl:
+                                    "https://img.icons8.com/fluency/48/000000/stop-sign.png",
+                                  iconAnchor: [22, 47],
+                                  popupAnchor: [1, -34],
+                                })
+                              }
+                            ></Marker>
+                          )}
+                          {TravelHistoryresponse?.length > 0 && (
+                            <div>
+                              {loadingMap ? (
+                                <Marker
+                                  position={[
+                                    TravelHistoryresponse[0].lat,
+                                    TravelHistoryresponse[0].lng,
+                                  ]}
+                                  icon={
+                                    new L.Icon({
+                                      iconUrl:
+                                        "https://img.icons8.com/fluent/48/000000/marker-a.png",
+                                      iconAnchor: [22, 47],
+                                      popupAnchor: [1, -34],
+                                    })
+                                  }
+                                ></Marker>
+                              ) : (
+                                ""
+                              )}
+
+                              {loadingMap ? (
+                                <Marker
+                                  position={[
+                                    TravelHistoryresponse[
+                                      TravelHistoryresponse?.length - 1
+                                    ].lat,
+                                    TravelHistoryresponse[
+                                      TravelHistoryresponse?.length - 1
+                                    ].lng,
+                                  ]}
+                                  icon={
+                                    new L.Icon({
+                                      iconUrl:
+                                        "https://img.icons8.com/fluent/48/000000/marker-b.png",
+                                      iconAnchor: [22, 47],
+                                      popupAnchor: [1, -34],
+                                    })
+                                  }
+                                ></Marker>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          )}
+
+                          {TravelHistoryresponse?.map((item) => {
+                            if (item.vehicleEvents.length > 0) {
+                              return item.vehicleEvents.map((items) => {
+                                if (items.Event === "HarshBreak") {
+                                  return loadingMap ? (
+                                    <Marker
+                                      position={[item.lat, item.lng]}
+                                      icon={
+                                        new L.Icon({
+                                          iconUrl:
+                                            "https://img.icons8.com/color/48/000000/brake-discs.png",
+                                          iconSize: [40, 40],
+                                          iconAnchor: [16, 37],
+                                        })
+                                      }
+                                    >
+                                      {harshPopUp && <Popup>Harsh Break</Popup>}
+                                    </Marker>
+                                  ) : (
+                                    ""
+                                  );
+                                }
+                                if (items.Event === "HarshAcceleration") {
+                                  return loadingMap ? (
+                                    <Marker
+                                      position={[item.lat, item.lng]}
+                                      icon={
+                                        new L.Icon({
+                                          iconUrl:
+                                            "https://img.icons8.com/nolan/64/speed-up.png",
+                                          iconSize: [30, 30],
+                                          iconAnchor: [16, 37],
+                                        })
+                                      }
+                                    >
+                                      {harshPopUp && (
+                                        <Popup>Harsh Acceleration</Popup>
+                                      )}
+                                    </Marker>
+                                  ) : (
+                                    ""
+                                  );
+                                }
+                                if (items.Event === "HarshCornering") {
+                                  return loadingMap ? (
+                                    <Marker
+                                      position={[item.lat, item.lng]}
+                                      icon={
+                                        new L.Icon({
+                                          iconUrl: HarshCornerningIcon.src,
+                                          iconSize: [30, 30],
+                                          iconAnchor: [16, 37],
+                                        })
+                                      }
+                                    >
+                                      {harshPopUp && (
+                                        <Popup>Harsh Cornering</Popup>
+                                      )}
+                                    </Marker>
+                                  ) : (
+                                    ""
+                                  );
+                                }
+                              });
+                            }
+                          })}
+
+
+
+
+
+
+                        </MapContainer>
+
+                        )
+                )}
+
+                      </div>
+
+            </div>
+
+              {hidediv && (
+                <>
+                  <div >
+
+                    <div className="absolute flex items-start lg:top-4 lg:left-20 left-12 top-6 space-x-4">
+                      <div className="xl:col-span-2 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6 stop_journey max-w-xs lg:max-w-sm">
+                        <div
+                          className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg rounded-md cursor-pointer"
+                          onClick={() => stopDetailsOpen && handleShowDetails()}
+                        >
+                          <div className="lg:col-span-11 md:col-span-10 sm:col-span-10 col-span-11 stop_details_responsive">
+                            <p className="text-white lg:px-2 ps-1 text-lg text_responsive mr-24">
+                              Stop Details ({loadingMap ? stopWithSecond.length : ""})
+                            </p>
+                          </div>
+                          <div className="col-span-1 mt-1 lg:-ms-2 md:-ms-1 -ms-2">
+                            {getShowICon ? (
+                              <svg
+                                className="h-5 w-5 text-white"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                strokeWidth="2"
+                                stroke="currentColor"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path stroke="none" d="M0 0h24v24H0z" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                              </svg>
+                            ) : (
+                              <svg
+                                className="h-5 w-5 text-white"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                strokeWidth="2"
+                                stroke="currentColor"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path stroke="none" d="M0 0h24v24H0z" />
+                                <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
+                                <path d="M4 16v2a2 2 0 0 0 2 2h2" />
+                                <path d="M16 4h2a2 2 0 0 1 2 2v2" />
+                                <path d="M16 20h2a2 2 0 0 0 2 -2v-2" />
+                                <circle cx="12" cy="12" r="3" />
+                              </svg>
+                            )}
+                          </div>
+                        </div>
+                        {getShowdetails && (
+                          <div className={`bg-white overflow-y-scroll resposive_stop_details ${stopWithSecond.length > 1 ? "lg:h-60 md:h-60 sm:h-60 h-24" : ""}`}>
+                            {stopWithSecond?.map((item: any) => {
+                              let isActive = item.date === selectedItemId;
+                              return loadingMap ? (
+                                <div
+                                  key={item.date}
+                                  onClick={() => handleItemClick(item)}
+                                  className={`cursor-pointer ${isActive ? 'bg-[#e1f0e3]' : ''}`}
+                                >
+                                  <p className="text-black font-popins px-2 py-2 text-sm word-wrap">
+                                    {/* <b>{item?.address?.display_name?.substring(0, 50)}</b>
                  */}
-                 <b>{item?.address?.display_name}</b>
-              </p>
-              <div className="grid grid-cols-12">
-                <div className="lg:col-span-1 md:col-span-2 sm:col-span-6 col-span-2"></div>
-                <div className="lg:col-span-8 md:col-span-8 sm:col-span-8 col-span-9 mx-2 text-center text-red text-bold px-1 w-full text-sm border-2 border-red stop_details_time">
-                  {item?.date?.slice(11, 19)}, {item?.time}
-                </div>
-              </div>
-              <br />
-              <hr className="text-gray" />
-            </div>
-          ) : null;
-        })}
-      </div>
-    )}
-  </div>   
-  <div onClick={handleFocus}
-      className="relative  cursor-pointer" 
-      onMouseEnter={handleMouseEnter} 
-      onMouseLeave={handleMouseLeave}
-    >
-      {isPlaying && userclick && (
-   
-        <>
-          <Image src={FocusIconNew} alt="buttonIcon" className="h-11 p-1 bg-green" style={{
-       borderRadius: '10px',
-      /*  borderColor: 'green', */
-       borderWidth: '0px',
-       width: '44px',
-       borderStyle: 'solid',
-       /* backgroundColor: 'bg-green', */
-      }} />
+                                    <b>{item?.address?.display_name}</b>
+                                  </p>
+                                  <div className="grid grid-cols-12">
+                                    <div className="lg:col-span-1 md:col-span-2 sm:col-span-6 col-span-2"></div>
+                                    <div className="lg:col-span-8 md:col-span-8 sm:col-span-8 col-span-9 mx-2 text-center text-red text-bold px-1 w-full text-sm border-2 border-red stop_details_time">
+                                      {item?.date?.slice(11, 19)}, {item?.time}
+                                    </div>
+                                  </div>
+                                  <br />
+                                  <hr className="text-gray" />
+                                </div>
+                              ) : null;
+                            })}
+                          </div>
+                        )}
+                      </div>
+                      <div onClick={handleFocus}
+                        className="relative  cursor-pointer"
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        {isPlaying && userclick && (
 
-          {isHovered && (
-          <>
-             <div className="absolute top-0 left-full ml-2 bg-green text-white p-2 rounded-md whitespace-nowrap">
-              Focus
-            </div>
-            
-            
-        </> 
-          )}
-        </>
-     )}  
-    </div>
-</div>
-  </div> 
-  
+                          <>
+                            <Image src={FocusIconNew} alt="buttonIcon" className="h-11 p-1 bg-green" style={{
+                              borderRadius: '10px',
+                              /*  borderColor: 'green', */
+                              borderWidth: '0px',
+                              width: '44px',
+                              borderStyle: 'solid',
+                              /* backgroundColor: 'bg-green', */
+                            }} />
 
-{/* <div
+                            {isHovered && (
+                              <>
+                                <div className="absolute top-0 left-full ml-2 bg-green text-white p-2 rounded-md whitespace-nowrap">
+                                  Focus
+                                </div>
+
+
+                              </>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+
+                  {/* <div
       className="grid grid-cols-1 absolute lg:top-100 xl:top-100 md:top-100 left-10 top-5  py-1 cursor-pointer"
       onClick={handleFocus}
       /* style={{
@@ -3127,66 +2407,54 @@ key={index}
      
     </div>
 </div> */}
-            </>
-             )}
+                </>
+              )}
 
-<div className="grid lg:grid-cols-10 grid-cols-10" id="speed_meter">
-              <div className="col-span-2  lg:w-52 md:w-44 sm:w-44 w-48 rounded-md ">
-                {isPlaying || isPaused ? (
-                  <div>
-                    {/* <ReactSpeedometer
-                      width={120}
-                      height={90}
-                      maxValue={180}
-                      value={getSpeedAndDistance()?.speed.replace("Mph", "")}
-                      needleColor="#00b56c"
-                      startColor="green"
-                      segments={1}
-                      endColor="blue"
-                      needleTransitionDuration={100}
-                      segmentColors={["#3a4848"]}
-                    /> */}
-                    <Speedometer
-                      value={
-                        getSpeedAndDistance()?.speed?.includes("Mph")
-                          ? getSpeedAndDistance()?.speed?.replace("Mph", "")
-                          : getSpeedAndDistance()?.speed?.replace("Kph", "")
-                      }
-                      max={140}
-                      angle={160}
-                      fontFamily="squada-one"
-                      accentColor="#00B56C"
-                      width={200}
+              <div className="grid lg:grid-cols-10 grid-cols-10" id="speed_meter">
+                <div className="col-span-2  lg:w-52 md:w-44 sm:w-44 w-48 rounded-md ">
+                  {isPlaying || isPaused ? (
+                    <div>
+                      <Speedometer
+                        value={
+                          getSpeedAndDistance()?.speed?.includes("Mph")
+                            ? getSpeedAndDistance()?.speed?.replace("Mph", "")
+                            : getSpeedAndDistance()?.speed?.replace("Kph", "")
+                        }
+                        max={140}
+                        angle={160}
+                        fontFamily="squada-one"
+                        accentColor="#00B56C"
+                        width={200}
                       // segmentColors="green"
-                    >
-                      <Background angle={180} />
-                      <Arc />
-                      <Needle />
-                      <Progress />
-                      <Marks />
-                    </Speedometer>
-                    <p className="text-white text-sm px-2 py-1 -mt-16 w-full bg-bgPlatBtn rounded-md">
-                      Distance: {getSpeedAndDistance()?.distanceCovered}
-                    </p>
-                  </div>
-                ) : null}
+                      >
+                        <Background angle={180} />
+                        <Arc />
+                        <Needle />
+                        <Progress />
+                        <Marks />
+                      </Speedometer>
+                      <p className="text-white text-sm px-2 py-1 -mt-16 w-full bg-bgPlatBtn rounded-md">
+                        Distance: {getSpeedAndDistance()?.distanceCovered}
+                      </p>
+                    </div>
+                  ) : null}
 
-                {isPlaying || isPaused ? (
-                  <p
-                    className="bg-bgPlatBtn text-white mt-3 w-full px-2 py-3 rounded-md
+                  {isPlaying || isPaused ? (
+                    <p
+                      className="bg-bgPlatBtn text-white mt-3 w-full px-2 py-3 rounded-md
                   trip_address
                   "
-                  >
-                    {addressTravelHistory?.slice(0, 3).map((item, index) => (
-                      <div key={index}>{<p>{item}</p>}</div>
-                    ))}
-                  </p>
-                ) : (
-                  ""
-                )}
-                {isPlaying && (
-                  <div>
-                    {/* <Speedometer
+                    >
+                      {addressTravelHistory?.slice(0, 3).map((item, index) => (
+                        <div key={index}>{<p>{item}</p>}</div>
+                      ))}
+                    </p>
+                  ) : (
+                    ""
+                  )}
+                  {isPlaying && (
+                    <div>
+                      {/* <Speedometer
                       value={getSpeedAndDistance()?.speed.replace("Mph", "")}
                       max={140}
                       angle={160}
@@ -3204,28 +2472,159 @@ key={index}
                     <p className="bg-bgPlatBtn text-white mt-3 px-2 py-3 rounded-md">
                       {TripAddressData}
                     </p> */}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-           {/*   {hidediv && (
-            <div
-          
-              className="absolute xl:left-56 lg:left-10 xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8  bottom-2  left-1 mr-48
-              journey_replay_center_box
-              "
-            >
-              <div className="grid xl:grid-cols-3 lg:grid-cols-3 md:grid-3 grid-cols-3 lg:gap-3 gap-2 ">
-               
-                <div className="xl:col-span-4 lg:col-span-8 col-span-12  journey_replay_slider ">
-                  <div className="grid lg:grid-cols-12 grid-cols-12 gap-1 lg:py-5 py-2 mt-8 pt-4 lg:pt-4 rounded-md  mx-2 px-5 bg-white space-x-4 ">
-                    <div
-                      className="lg:col-span-10 md:col-span-9 col-span-8 journey_replay_slider_res"
-                      // style={{ height: "4vh" }}
+
+              {hideicondiv && hidediv && (
+                <div
+                  className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2 cursor-pointer"
+                  onClick={() => setIsChecked(!isChecked)}
+                  style={{
+                    borderRadius: '10px',
+                    borderColor: 'green',
+                    borderWidth: '3px',
+                    borderStyle: 'solid',
+                    width: '160px', // Adjust width to make the div smaller
+                    backgroundColor: 'white',
+
+                  }}
+                >
+                  {/* Button and Checkbox */}
+                  <div className="col-span-1" style={{ color: 'green' }}>
+                    <button
+                      className="text-labelColor font-popins text-xs font-bold ml-4" // Reduced font size and margin
+                      style={{
+                        width: '80%', // Make the button fill the container width
+                        backgroundColor: 'white',
+                      }}
                     >
+                      Show Icon Details
+                    </button>
+                  </div>
+
+                  {/* Modal Content */}
+                  {isChecked && TravelHistoryresponse?.length > 0 && (
+                    <div className="mt-2 ml-1">
+                      {/* Location Start and End */}
+                      <div className="grid grid-cols-12 gap-2 mb-3">
+                        <div className="col-span-2 flex flex-col items-center mt-1">
+                          <Image src={markerA} alt="startIcon" className="h-4 w-4 mb-1" /> {/* Smaller icon size */}
+                          <Image src={markerB} alt="endIcon" className="h-4 w-4 mt-1" /> {/* Smaller icon size */}
+                        </div>
+                        <div className="col-span-10 text-xs font-semibold mt-1"> {/* Reduced font size */}
+                          <p>Location start</p>
+                          <p className="mt-2">Location End</p>
+                        </div>
+                      </div>
+
+                      {/* Harsh Acceleration, Cornering, and Braking */}
+                      <div className="space-y-2"> {/* Reduced spacing */}
+                        {TravelHistoryresponse?.filter((item) =>
+                          item.vehicleEvents.some(
+                            (event) => event.Event === 'HarshAcceleration'
+                          )
+                        ).length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <Image src={HarshAccelerationIcon} alt="harshAccelerationIcon" className="h-4 w-4" /> {/* Smaller icon size */}
+                              <div
+                                className="text-xs font-semibold"
+                                style={{
+                                  maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                }}
+                              >
+                                Harsh Acceleration (x
+                                {TravelHistoryresponse.reduce((count, item) =>
+                                  count +
+                                  item.vehicleEvents.filter(
+                                    (event) => event.Event === 'HarshAcceleration'
+                                  ).length
+                                  , 0)}
+                                )
+                              </div>
+                            </div>
+                          )}
+
+                        {TravelHistoryresponse?.filter((item) =>
+                          item.vehicleEvents.some(
+                            (event) => event.Event === 'HarshCornering'
+                          )
+                        ).length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <Image src={HarshCornerningIcon} alt="harshCorneringIcon" className="h-4 w-4" /> {/* Smaller icon size */}
+                              <div
+                                className="text-xs font-semibold"
+                                style={{
+                                  maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                }}
+                              >
+                                Harsh Cornering (x
+                                {TravelHistoryresponse.reduce((count, item) =>
+                                  count +
+                                  item.vehicleEvents.filter(
+                                    (event) => event.Event === 'HarshCornering'
+                                  ).length
+                                  , 0)}
+                                )
+                              </div>
+                            </div>
+                          )}
+
+                        {TravelHistoryresponse?.filter((item) =>
+                          item.vehicleEvents.some(
+                            (event) => event.Event === 'HarshBreak'
+                          )
+                        ).length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <Image src={harshAcceleration} alt="harshBrakingIcon" className="h-4 w-4" /> {/* Smaller icon size */}
+                              <div
+                                className="text-xs font-semibold"
+                                style={{
+                                  maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                }}
+                              >
+                                Harsh Break (x
+                                {TravelHistoryresponse.reduce((count, item) =>
+                                  count +
+                                  item.vehicleEvents.filter(
+                                    (event) => event.Event === 'HarshBreak'
+                                  ).length
+                                  , 0)}
+                                )
+                              </div>
+                            </div>
+                          )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+
+
+              {hidediv && (
+
+                <div className="absolute xl:left-56  xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8 bottom-2 left-10  rounded-md  ml-0  2xl:ml-48">
+                  <div className="grid lg:grid-cols-5 grid-cols-5 gap-1 lg:py-5 py-2 pt-4 lg:pt-4 rounded-md mx-2 px-5 bg-white space-x-4">
+                    <div className="lg:col-span-4 md:col-span-4 col-span-4">
                       <Slider
                         value={currentPositionIndex}
-                  
                         onChange={handleChangeValueSlider}
                         color="secondary"
                         style={{
@@ -3233,35 +2632,22 @@ key={index}
                           cursor: isPlaying ? "pointer" : "not-allowed",
                         }}
                         max={polylinedata.length}
-                        disabled={isPlaying ? false : true}
-                       
+                        disabled={!isPlaying}
                       />
-                      <div
-                        style={{ display: "flex", justifyContent: "center" }}
-                      >
-                        <div className="grid grid-cols-12 ">
-                          <div className="col-span-5 ">
+                      <div className="flex justify-center">
+                        <div className="grid grid-cols-6">
+                          <div className="col-span-2">
                             {isDynamicTime.TripStartTimeLabel}
                           </div>
-                 
-                          <div className="col-span-6 play_pause_icon">
+                          <div className="col-span-3 flex items-center justify-center space-x-2">
                             <Tooltip content="Pause" className="bg-black">
                               <button
                                 onClick={() => pausebtn && pauseTick()}
-                                className={`${
-                                  pausebtn
-                                    ? "cursor-pointer"
-                                    : "cursor-not-allowed"
-                                }`}
+                                className={`h-5 w-5 ${pausebtn ? "cursor-pointer" : "cursor-not-allowed"}`}
                               >
                                 <svg
-                                  className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6 mx-1"
-                                  // style={{
-                                  //   color: stopVehicle === true ? "gray" : "white",
-                                  // }}
-                                  style={{
-                                    color: isPauseColor ? "green" : "black",
-                                  }}
+                                  className="h-5 w-5"
+                                  style={{ color: isPauseColor ? "green" : "black" }}
                                   fill={isPauseColor ? "none" : "none"}
                                   width="24"
                                   height="24"
@@ -3271,62 +2657,42 @@ key={index}
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                 >
-                                  {" "}
-                                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                                  <line x1="4" y1="4" x2="4" y2="20" />{" "}
-                                  <line x1="20" y1="4" x2="20" y2="20" />{" "}
-                                  <rect
-                                    x="9"
-                                    y="6"
-                                    width="6"
-                                    height="12"
-                                    rx="2"
-                                  />
+                                  <path stroke="none" d="M0 0h24v24H0z" />
+                                  <line x1="4" y1="4" x2="4" y2="20" />
+                                  <line x1="20" y1="4" x2="20" y2="20" />
+                                  <rect x="9" y="6" width="6" height="12" rx="2" />
                                 </svg>
                               </button>
                             </Tooltip>
                             <Tooltip content="Play" className="bg-black">
                               <button
                                 onClick={() => playbtn && tick()}
-                                className={`${
-                                  playbtn
-                                    ? "cursor-pointer"
-                                    : "cursor-not-allowed"
-                                }`}
+                                className={`h-5 w-5 ${playbtn ? "cursor-pointer" : "cursor-not-allowed"}`}
                               >
                                 <svg
-                                  className="h-5 w-5  lg:mx-2  md:mx-3 sm:mx-3 mx-1"
+                                  className="h-5 w-5"
                                   viewBox="0 0 24 24"
-                                  style={{
-                                    color: isPlaying ? "green" : "black",
-                                  }}
+                                  style={{ color: isPlaying ? "green" : "black" }}
                                   fill={isPlaying ? "green" : "black"}
                                   stroke="currentColor"
                                   strokeWidth="2"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                 >
-                                  {" "}
                                   <polygon points="5 3 19 12 5 21 5 3" />
                                 </svg>
                               </button>
                             </Tooltip>
-                            <Tooltip content="Stop" Stop Details="bg-black">
+                            <Tooltip content="Stop" className="bg-black">
                               <button
                                 onClick={() => stopbtn && stopTick()}
-                                className={`${
-                                  stopbtn
-                                    ? "cursor-pointer"
-                                    : "cursor-not-allowed"
-                                }`}
+                                className={`h-4 w-4 ${stopbtn ? "cursor-pointer" : "cursor-not-allowed"}`}
                               >
                                 <svg
-                                  className="h-4 w-4 lg:mx-2 md:mx-3 sm:mx-3 mx-1"
+                                  className="h-4 w-4"
                                   width="24"
-                                  style={{
-                                    color: stopVehicle ? "green" : "black",
-                                  }}
-                                  fill={stopVehicle ? "green" : "black    "}
+                                  style={{ color: stopVehicle ? "green" : "black" }}
+                                  fill={stopVehicle ? "green" : "black"}
                                   height="24"
                                   viewBox="0 0 24 24"
                                   strokeWidth="2"
@@ -3334,15 +2700,8 @@ key={index}
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                 >
-                                  {" "}
-                                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                                  <rect
-                                    x="4"
-                                    y="4"
-                                    width="16"
-                                    height="16"
-                                    rx="2"
-                                  />
+                                  <path stroke="none" d="M0 0h24v24H0z" />
+                                  <rect x="4" y="4" width="16" height="16" rx="2" />
                                 </svg>
                               </button>
                             </Tooltip>
@@ -3352,18 +2711,15 @@ key={index}
                           </div>
                         </div>
                       </div>
-                    
                     </div>
-
-                    <div className="lg:col-span-2 md:col-span-3 col-span-4 mt-2 select_journey_speed">
-                      {isPlaying && (
-                       
+                    <div className="lg:col-span-1 md:col-span-1 col-span-1 mt-2">
+                      {(isPlaying || isPaused) && (
                         <Select
                           onChange={(e: any) => setSpeedFactor(Number(e.value))}
                           options={SpeedOption}
-                          placeholder="4x"
+                          placeholder="4X"
                           isSearchable={false}
-                          className="rounded-md h-10 -mt-3 w-full outline-green border border-grayLight"
+                          className="rounded-md h-10 w-full outline-green border border-gray-300"
                           defaultValue={SpeedOption[2]}
                           styles={{
                             control: (provided, state) => ({
@@ -3373,23 +2729,23 @@ key={index}
                             }),
                             menu: (provided, state) => ({
                               ...provided,
-                              zIndex: 9999, // Ensure the menu appears above other elements
+                              zIndex: 9999,
                               position: "absolute",
                               top: "auto",
-                              bottom: "100%", // Position the menu above the select input
+                              bottom: "100%",
                             }),
                             option: (provided, state) => ({
                               ...provided,
                               backgroundColor: state.isSelected
                                 ? "#00B56C"
                                 : state.isFocused
-                                ? "white"
-                                : "transparent",
+                                  ? "white"
+                                  : "transparent",
                               color: state.isSelected
                                 ? "white"
                                 : state.isFocused
-                                ? "black"
-                                : "black",
+                                  ? "black"
+                                  : "black",
                               "&:hover": {
                                 backgroundColor: "#00B56C",
                                 color: "white",
@@ -3401,306 +2757,16 @@ key={index}
                     </div>
                   </div>
                 </div>
-              </div>
+
+
+              )}
+
             </div>
-            )} */}
-{hideicondiv && hidediv && (
-  <div
-    className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2 cursor-pointer"
-    onClick={() => setIsChecked(!isChecked)}
-    style={{
-      borderRadius: '10px',
-      borderColor: 'green',
-      borderWidth: '3px',
-      borderStyle: 'solid',
-      width: '160px', // Adjust width to make the div smaller
-      backgroundColor: 'white',
-      
-    }}
-  >
-    {/* Button and Checkbox */}
-    <div className="col-span-1" style={{ color: 'green' }}>
-      <button
-        className="text-labelColor font-popins text-xs font-bold ml-4" // Reduced font size and margin
-        style={{
-          width: '80%', // Make the button fill the container width
-          backgroundColor: 'white',
-        }}
-      >
-        Show Icon Details
-      </button>
-    </div>
 
-    {/* Modal Content */}
-    {isChecked && TravelHistoryresponse?.length > 0 && (
-      <div className="mt-2 ml-1">
-        {/* Location Start and End */}
-        <div className="grid grid-cols-12 gap-2 mb-3">
-          <div className="col-span-2 flex flex-col items-center mt-1">
-            <Image src={markerA} alt="startIcon" className="h-4 w-4 mb-1" /> {/* Smaller icon size */}
-            <Image src={markerB} alt="endIcon" className="h-4 w-4 mt-1" /> {/* Smaller icon size */}
           </div>
-          <div className="col-span-10 text-xs font-semibold mt-1"> {/* Reduced font size */}
-            <p>Location start</p>
-            <p className="mt-2">Location End</p>
-          </div>
+
+          <Toaster position="top-center" reverseOrder={false} />
         </div>
-
-        {/* Harsh Acceleration, Cornering, and Braking */}
-        <div className="space-y-2"> {/* Reduced spacing */}
-          {TravelHistoryresponse?.filter((item) =>
-            item.vehicleEvents.some(
-              (event) => event.Event === 'HarshAcceleration'
-            )
-          ).length > 0 && (
-            <div className="flex items-center gap-2">
-              <Image src={HarshAccelerationIcon} alt="harshAccelerationIcon" className="h-4 w-4" /> {/* Smaller icon size */}
-              <div
-                className="text-xs font-semibold"
-                style={{
-                  maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                Harsh Acceleration (x
-                {TravelHistoryresponse.reduce((count, item) =>
-                  count +
-                  item.vehicleEvents.filter(
-                    (event) => event.Event === 'HarshAcceleration'
-                  ).length
-                , 0)}
-                )
-              </div>
-            </div>
-          )}
-
-          {TravelHistoryresponse?.filter((item) =>
-            item.vehicleEvents.some(
-              (event) => event.Event === 'HarshCornering'
-            )
-          ).length > 0 && (
-            <div className="flex items-center gap-2">
-              <Image src={HarshCornerningIcon} alt="harshCorneringIcon" className="h-4 w-4" /> {/* Smaller icon size */}
-              <div
-                className="text-xs font-semibold"
-                style={{
-                  maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                Harsh Cornering (x
-                {TravelHistoryresponse.reduce((count, item) =>
-                  count +
-                  item.vehicleEvents.filter(
-                    (event) => event.Event === 'HarshCornering'
-                  ).length
-                , 0)}
-                )
-              </div>
-            </div>
-          )}
-
-          {TravelHistoryresponse?.filter((item) =>
-            item.vehicleEvents.some(
-              (event) => event.Event === 'HarshBreak'
-            )
-          ).length > 0 && (
-            <div className="flex items-center gap-2">
-              <Image src={harshAcceleration} alt="harshBrakingIcon" className="h-4 w-4" /> {/* Smaller icon size */}
-              <div
-                className="text-xs font-semibold"
-                style={{
-                  maxWidth: 'calc(100% - 24px)', // Adjust width to account for icon size
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                Harsh Break (x
-                {TravelHistoryresponse.reduce((count, item) =>
-                  count +
-                  item.vehicleEvents.filter(
-                    (event) => event.Event === 'HarshBreak'
-                  ).length
-                , 0)}
-                )
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    )}
-  </div>
-)}
-
-
-
-{hidediv &&  ( 
-
-<div className="absolute xl:left-56  xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8 bottom-2 left-10  rounded-md  ml-0  2xl:ml-48">
-  <div className="grid lg:grid-cols-5 grid-cols-5 gap-1 lg:py-5 py-2 pt-4 lg:pt-4 rounded-md mx-2 px-5 bg-white space-x-4">
-    <div className="lg:col-span-4 md:col-span-4 col-span-4">
-      <Slider
-        value={currentPositionIndex}
-        onChange={handleChangeValueSlider}
-        color="secondary"
-        style={{
-          color: "#00B56C",
-          cursor: isPlaying ? "pointer" : "not-allowed",
-        }}
-        max={polylinedata.length}
-        disabled={!isPlaying}
-      />
-      <div className="flex justify-center">
-        <div className="grid grid-cols-6">
-          <div className="col-span-2">
-            {isDynamicTime.TripStartTimeLabel}
-          </div>
-          <div className="col-span-3 flex items-center justify-center space-x-2">
-            <Tooltip content="Pause" className="bg-black">
-              <button
-                onClick={() => pausebtn && pauseTick()}
-                className={`h-5 w-5 ${pausebtn ? "cursor-pointer" : "cursor-not-allowed"}`}
-              >
-                <svg
-                  className="h-5 w-5"
-                  style={{ color: isPauseColor ? "green" : "black" }}
-                  fill={isPauseColor ? "none" : "none"}
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" />
-                  <line x1="4" y1="4" x2="4" y2="20" />
-                  <line x1="20" y1="4" x2="20" y2="20" />
-                  <rect x="9" y="6" width="6" height="12" rx="2" />
-                </svg>
-              </button>
-            </Tooltip>
-            <Tooltip content="Play" className="bg-black">
-              <button
-                onClick={() => playbtn && tick()}
-                className={`h-5 w-5 ${playbtn ? "cursor-pointer" : "cursor-not-allowed"}`}
-              >
-                <svg
-                  className="h-5 w-5"
-                  viewBox="0 0 24 24"
-                  style={{ color: isPlaying ? "green" : "black" }}
-                  fill={isPlaying ? "green" : "black"}
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polygon points="5 3 19 12 5 21 5 3" />
-                </svg>
-              </button>
-            </Tooltip>
-            <Tooltip content="Stop" className="bg-black">
-              <button
-                onClick={() => stopbtn && stopTick()}
-                className={`h-4 w-4 ${stopbtn ? "cursor-pointer" : "cursor-not-allowed"}`}
-              >
-                <svg
-                  className="h-4 w-4"
-                  width="24"
-                  style={{ color: stopVehicle ? "green" : "black" }}
-                  fill={stopVehicle ? "green" : "black"}
-                  height="24"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" />
-                  <rect x="4" y="4" width="16" height="16" rx="2" />
-                </svg>
-              </button>
-            </Tooltip>
-          </div>
-          <div className="col-span-1">
-            {isDynamicTime.TripEndTimeLabel}
-          </div>
-        </div>
-      </div>
-    </div>
-    <div className="lg:col-span-1 md:col-span-1 col-span-1 mt-2">
-      {(isPlaying || isPaused) && (
-        <Select
-          onChange={(e: any) => setSpeedFactor(Number(e.value))}
-          options={SpeedOption}
-          placeholder="4X"
-          isSearchable={false}
-          className="rounded-md h-10 w-full outline-green border border-gray-300"
-          defaultValue={SpeedOption[2]}
-          styles={{
-            control: (provided, state) => ({
-              ...provided,
-              border: "none",
-              boxShadow: state.isFocused ? null : null,
-            }),
-            menu: (provided, state) => ({
-              ...provided,
-              zIndex: 9999,
-              position: "absolute",
-              top: "auto",
-              bottom: "100%",
-            }),
-            option: (provided, state) => ({
-              ...provided,
-              backgroundColor: state.isSelected
-                ? "#00B56C"
-                : state.isFocused
-                ? "white"
-                : "transparent",
-              color: state.isSelected
-                ? "white"
-                : state.isFocused
-                ? "black"
-                : "black",
-              "&:hover": {
-                backgroundColor: "#00B56C",
-                color: "white",
-              },
-            }),
-          }}
-        />
-      )}
-    </div>
-  </div>
-</div>
-
-
-)}
-{/* {isPlaying && userclick && (  */}
-
-
-    
-
-
-
-
-          </div>
-          
-        </div>
-        
-        <Toaster position="top-center" reverseOrder={false} />
-      </div>
-    </>
-  );
+      </>
+      );
 }

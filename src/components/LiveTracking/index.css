@@ -241,3 +241,13 @@ input[type="checkbox"]:hover {
 .leaflet-marker-icon.custom-icon.leaflet-zoom-animated.leaflet-interactive {
   margin-top: -25px !important;
 }
+/* munib */
+.gm-style-iw-chr{
+  display: none;
+}
+/* .gm-style-iw-tc{
+  transform: rotate(180deg) !important;
+  transition: transform 0.5s ease !important; 
+} */
+
+

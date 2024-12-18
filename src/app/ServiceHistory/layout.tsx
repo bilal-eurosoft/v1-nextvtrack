@@ -2,8 +2,8 @@ import PostLoginLayout from "../../components/Layouts/PostLoginLayout";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "VTrack Assign Driver",
-  description: "Assign Driver",
+  title: "VTrack Service History",
+  description: "Service History",
 };
 
 export default function RootLayout({
