@@ -77,7 +77,7 @@ const MapComponent = ({
     }
   };
   // const [isUserInteracting, setIsUserInteracting] = useState(false);
-  const [mapCenter, setMapCenter] = useState();
+  // const [mapCenter, setMapCenter] = useState({ lat: mapCoordinates[0], lng: mapCoordinates[1] });
   // const handleMoveEnd = (event: any) => {
   //   // setIsMapDragged(true);
   //   setIsUserInteracting(true); // User is interacting with the map
@@ -106,6 +106,7 @@ const MapComponent = ({
       setSelectedVehicle(null);
     }
   };
+  // console.log(mapCenter)
   // const handleZoomEnd = (event: any) => {
   //   if (unselectVehicles === true) {
   //     setSelectedVehicle(null);
@@ -129,10 +130,10 @@ const MapComponent = ({
     }
     setdata()
 
-    if (mapCoordinates?.length > 0) {
+    // if (mapCoordinates?.length > 0) {
 
-      setMapCenter({ lat: mapCoordinates[0], lng: mapCoordinates[1] })
-    }
+    //   setMapCenter({ lat: mapCoordinates[0], lng: mapCoordinates[1] })
+    // }
     return () => {
       if (mapRef.current) {
         mapRef.current = null;
@@ -182,7 +183,7 @@ const MapComponent = ({
 
           const bounds = L.latLngBounds(positions);
 
-let zoom1;
+          let zoom1;
           var center: LatLng | undefined;
           if (bounds.isValid()) {
             center = bounds.getCenter();
@@ -209,13 +210,13 @@ let zoom1;
             zoom1 = 11; //
           }
 
-          setMapCenter(center)
+          // setMapCenter(center)
           setSelectedVehicle(false);
           mapRef.current.panTo(center);
           mapRef.current.setZoom(zoom1)
         }
 
-      } 
+      }
       // else if (mapCoordinates.length > 0) {
       //   setMapCenter({ lat: mapCoordinates[0], lng: mapCoordinates[1] })
       // }
@@ -347,83 +348,91 @@ let zoom1;
   // }, [isLoaded]);
   // if (!googleLoaded) return <div>Loading...</div>;
   return (
-    <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
-      <GoogleMap
-        clickableIcons={false}
-        mapContainerStyle={containerStyle}
-        // center={{ lat, lng }}
-        center={mapCenter}
+    <>
+      {
+        mapCoordinates !== null && zoom !== null && (
+          <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+            <GoogleMap
+              clickableIcons={false}
+              mapContainerStyle={containerStyle}
+              // center={{ lat, lng }}
+              center={
+                { lat: mapCoordinates[0], lng: mapCoordinates[1] }
+              }
 
-        zoom={zoom}
-        onLoad={onLoad}
-        onClick={handleClick}
-        // onDragStart={handleDragStart} // Track drag interaction        
-        // onIdle={handleIdle}
-        options={{
-          draggable: true, // Make map draggable
-          // cameraControl:false, // disable camera option
-          // fullscreenControl:false, // disable full screen option
-          // streetViewControl:false, //disable map and sattelite control options
-          // styles:null,
-          disableDoubleClickZoom: true, //disable zoom in double click
-          disableDefaultUI: true,  //disable all options
-          // mapTypeControl:false //disable map and sattelite control options
-          // attributionControl: false,
+              zoom={zoom}
+              onLoad={onLoad}
+              onClick={handleClick}
+              // onDragStart={handleDragStart} // Track drag interaction        
+              // onIdle={handleIdle}
+              options={{
+                draggable: true, // Make map draggable
+                // cameraControl:false, // disable camera option
+                // fullscreenControl:false, // disable full screen option
+                // streetViewControl:false, //disable map and sattelite control options
+                // styles:null,
+                disableDoubleClickZoom: true, //disable zoom in double click
+                disableDefaultUI: true,  //disable all options
+                // mapTypeControl:false //disable map and sattelite control options
+                // attributionControl: false,
 
-        }}
-      // onDragEnd={handleMoveEnd}
-      // onZoomChanged={handleZoomEnd}        
-      >
-        {carData.map((vehicle, index) => {
-          const { gps: { latitude, longitude } } = vehicle;
-          const markerIcon = icon(
-            vehicle?.gps.speed || 0,
-            vehicle?.ignition || 0,
-            vehicle?.gps.Angle || 0,
-            vehicle?.vehicleType || ""
-          );
+              }}
+            // onDragEnd={handleMoveEnd}
+            // onZoomChanged={handleZoomEnd}        
+            >
+              {carData.map((vehicle, index) => {
+                const { gps: { latitude, longitude } } = vehicle;
+                const markerIcon = icon(
+                  vehicle?.gps.speed || 0,
+                  vehicle?.ignition || 0,
+                  vehicle?.gps.Angle || 0,
+                  vehicle?.vehicleType || ""
+                );
 
-          return (
-            <>
-              <MarkerF
-                position={{ lat: latitude, lng: longitude }}
-                icon={markerIcon}
-                title={vehicle?.vehicleReg}
-              >
-                <InfoWindow
-                  position={{ lat: latitude, lng: longitude - 10 }}
-                  options={{
-                    disableAutoPan: true,
-                    position: { lat: latitude, lng: longitude - 10 }
-                  }}
+                return (
+                  <>
+                    <MarkerF
+                      position={{ lat: latitude, lng: longitude }}
+                      icon={markerIcon}
+                      title={vehicle?.vehicleReg}
+                    >
+                      <InfoWindow
+                        position={{ lat: latitude, lng: longitude - 10 }}
+                        options={{
+                          disableAutoPan: true,
+                          position: { lat: latitude, lng: longitude - 10 }
+                        }}
 
-                >
-                  <div style={{ fontSize: "12px", paddingTop: "9px", maxWidth: "100px" }}>
-                    {vehicle?.vehicleReg}
+                      >
+                        <div style={{ fontSize: "12px", paddingTop: "9px", maxWidth: "100px" }}>
+                          {vehicle?.vehicleReg}
 
-                    {/* {vehicle?.gps.Angle} */}
+                          {/* {vehicle?.gps.Angle} */}
+                        </div>
+                      </InfoWindow>
+                    </MarkerF>
+
+
+                  </>
+                )
+
+
+
+
+              })}
+
+              {showZones && selectedZone && infoWindowPosition && (
+                <InfoWindow position={infoWindowPosition} >
+                  <div>
+                    <p>{selectedZone}</p>
                   </div>
                 </InfoWindow>
-              </MarkerF>
-
-
-            </>
-          )
-
-
-
-
-        })}
-
-        {showZones && selectedZone && infoWindowPosition && (
-          <InfoWindow position={infoWindowPosition} >
-            <div>
-              <p>{selectedZone}</p>
-            </div>
-          </InfoWindow>
-        )}
-      </GoogleMap>
-    </LoadScript>
+              )}
+            </GoogleMap>
+          </LoadScript>
+        )
+      }
+    </>
   );
 };
 export default MapComponent;

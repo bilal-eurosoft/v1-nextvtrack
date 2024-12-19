@@ -164,76 +164,83 @@ export default function EditZoneComp() {
     };
   }, []);
 
-  useEffect(() => {
-    if (Form &&  session?.MapType == "Google") {
-      const isRestrictedArea =
-        Form?.GeoFenceType === "Restricted-Area"; // && session?.clickToCall === true;
-      const isCityArea = Form?.GeoFenceType === "City-Area"; // && session?.clickToCall === true;     
-      if (Form?.zoneType === "Polygon") {
-        if (window.google) {
+    useEffect(() => {
+      if (!Form || !mapRef.current || !window.google) return;
 
-          polygonRef.current = new google.maps.Polygon({
-            paths: JSON.parse(Form.latlngCordinates),
-            strokeColor: isCityArea ? "green" : isRestrictedArea ? "red" : "blue", // Red border color
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: isCityArea ? "green" : isRestrictedArea ? "red" : "blue", // Red fill color
-            fillOpacity: 0.35,
-            map: mapRef.current, // Attach to the map instance 
-            editable: true
-          });
-          const updatePolygonData = () => {
-            const path = polygonRef.current.getPath();
-            const updatedCoordinates = [];
-            for (let i = 0; i < path.getLength(); i++) {
-              const latLng = path.getAt(i);
-              updatedCoordinates.push({ lat: latLng.lat(), lng: latLng.lng() });
-            }
-            handlePolygonSave(updatedCoordinates.map((coord: any) => [coord.lat, coord.lng]))
-            // setPolygonData({ coordinates: updatedCoordinates });
-          };
-          google.maps.event.addListener(polygonRef.current.getPath(), "set_at", () => {
-            updatePolygonData();
-          });
+    
 
-          google.maps.event.addListener(polygonRef.current.getPath(), "insert_at", () => {
-            updatePolygonData();
-          });
 
-          google.maps.event.addListener(polygonRef.current.getPath(), "remove_at", () => {
-            updatePolygonData();
-          });
+        const isRestrictedArea =
+          Form?.GeoFenceType === "Restricted-Area"; // && session?.clickToCall === true;
+        const isCityArea = Form?.GeoFenceType === "City-Area"; // && session?.clickToCall === true;     
+        if (Form?.zoneType === "Polygon") {
+  
+
+          if (window.google) {
+  
+            polygonRef.current = new google.maps.Polygon({
+              paths: JSON.parse(Form.latlngCordinates),
+              strokeColor: isCityArea ? "green" : isRestrictedArea ? "red" : "blue", // Red border color
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: isCityArea ? "green" : isRestrictedArea ? "red" : "blue", // Red fill color
+              fillOpacity: 0.35,
+              map: mapRef.current, // Attach to the map instance 
+              editable: true
+            });
+            const updatePolygonData = () => {
+              const path = polygonRef.current.getPath();
+              const updatedCoordinates = [];
+              for (let i = 0; i < path.getLength(); i++) {
+                const latLng = path.getAt(i);
+                updatedCoordinates.push({ lat: latLng.lat(), lng: latLng.lng() });
+              }
+              handlePolygonSave(updatedCoordinates.map((coord: any) => [coord.lat, coord.lng]))
+              // setPolygonData({ coordinates: updatedCoordinates });
+            };
+            google.maps.event.addListener(polygonRef.current.getPath(), "set_at", () => {
+              updatePolygonData();
+            });
+
+            google.maps.event.addListener(polygonRef.current.getPath(), "insert_at", () => {
+              updatePolygonData();
+            });
+
+            google.maps.event.addListener(polygonRef.current.getPath(), "remove_at", () => {
+              updatePolygonData();
+            });
+          }
+        } else {
+          if (window.google) {
+            
+
+            circleRef.current = new google.maps.Circle({
+              center: { lat: Number(Form.centerPoints.split(",")[0]), lng: Number(Form.centerPoints.split(",")[1]) }, // Circle center
+              radius: Number(Form.latlngCordinates), // Radius in meters
+              strokeColor: isCityArea ? "green" : isRestrictedArea ? "red" : "blue", // Red border color
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: isCityArea ? "green" : isRestrictedArea ? "red" : "blue", // Red fill color
+              fillOpacity: 0.35,
+              map: mapRef.current, // Attach to the map instance          
+              editable: true
+            });
+            google.maps.event.addListener(circleRef.current, "center_changed", (e) => {
+              const center = circleRef.current.getCenter();
+              const radius = circleRef.current.getRadius();
+              handleCircleSave({ lat: center.lat(), lng: center.lng() }, radius)
+            });
+
+            google.maps.event.addListener(circleRef.current, "radius_changed", () => {
+              const center = circleRef.current.getCenter();
+              const radius = circleRef.current.getRadius();
+              handleCircleSave({ lat: center.lat(), lng: center.lng() }, radius)
+            });
+
+          }
         }
-      } else {
-        if (window.google) {
-
-          circleRef.current = new google.maps.Circle({
-            center: { lat: Number(Form.centerPoints.split(",")[0]), lng: Number(Form.centerPoints.split(",")[1]) }, // Circle center
-            radius: Number(Form.latlngCordinates), // Radius in meters
-            strokeColor: isCityArea ? "green" : isRestrictedArea ? "red" : "blue", // Red border color
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: isCityArea ? "green" : isRestrictedArea ? "red" : "blue", // Red fill color
-            fillOpacity: 0.35,
-            map: mapRef.current, // Attach to the map instance          
-            editable: true
-          });
-          google.maps.event.addListener(circleRef.current, "center_changed", (e) => {
-            const center = circleRef.current.getCenter();
-            const radius = circleRef.current.getRadius();
-            handleCircleSave({ lat: center.lat(), lng: center.lng() }, radius)
-          });
-
-          google.maps.event.addListener(circleRef.current, "radius_changed", () => {
-            const center = circleRef.current.getCenter();
-            const radius = circleRef.current.getRadius();
-            handleCircleSave({ lat: center.lat(), lng: center.lng() }, radius)
-          });
-
-        }
-      }
-    }
-  }, [mapRef.current,window.google])
+      
+    }, [Form,mapRef.current,window.google])
 
   function calculateZoomLevel(circleRadius: number) {
     let zoomLevel = 20;
@@ -574,13 +581,6 @@ export default function EditZoneComp() {
     });
   };
 
-// if(session?.MapType=="Google"){
-//   const { isLoaded } = useLoadScript({
-//     googleMapsApiKey: GOOGLE_MAPS_API_KEY,    
-//   });
-//   if (!isLoaded) return <div>Loading...</div>;
-// }
-
   return (
     <>
       <div className="  shadow-lg bg-bgLight  border-t text-white edit_zone_main  ">
@@ -798,37 +798,6 @@ export default function EditZoneComp() {
                 <b>edraw</b>
               </span>
             </Button>
-            {/* <div
-              className="grid lg:grid-cols-3 grid-cols-3  bg-green lg:w-28 md:w-28 sm:w-28
-            w-32
-              rounded-md shadow-md  hover:shadow-gray transition duration-500 h-10 redraw_btn"
-     
-            >
-              <div className="col-span-1">
-                <svg
-                  className="h-10 py-2 w-full text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-              </div>
-              <div className="col-span-2">
-                <button
-                  className="text-white font-popins font-bold pt-2    px-2  "
-                  type="submit"
-                  onClick={handleredraw}
-                >
-                  Redraw
-                </button>
-              </div>
-            </div> */}
 
             <div className="flex justify-start"></div>
             <div className="lg:col-span-5  md:col-span-4  sm:col-span-5 col-span-4 mx-3">
@@ -854,17 +823,20 @@ export default function EditZoneComp() {
                               disableDefaultUI: true,  //disable all options
                             }}
                           >
-                            <DrawingManager
-                              onCircleComplete={handleCircleComplete}
-                              onPolygonComplete={handlePolygonComplete}
-                              options={{
-                                drawingControl: true,
-                                drawingControlOptions: {
-                                  position: window.google?.maps?.ControlPosition?.TOP_CENTER,
-                                  drawingModes: ["circle", "polygon"],
-                                },
-                              }}
-                            />
+                            {
+                              drawShape && (
+                                <DrawingManager
+                                  onCircleComplete={handleCircleComplete}
+                                  onPolygonComplete={handlePolygonComplete}
+                                  options={{
+                                    drawingControl: true,
+                                    drawingControlOptions: {
+                                      position: window.google?.maps?.ControlPosition?.TOP_CENTER,
+                                      drawingModes: ["circle", "polygon"],
+                                    },
+                                  }}
+                                />)}
+
                           </GoogleMap>
                         </LoadScript>
                       </div>
