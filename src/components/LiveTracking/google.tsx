@@ -56,7 +56,7 @@ const MapComponent = ({
   const [infoWindowPosition, setInfoWindowPosition] = useState(null);
   const [circleRefs, setCircleRefs] = useState([]);
   const [polygonRefs, setPolygonRefs] = useState([]);
-  
+  const [isMapMoved, setIsMapMoved] = useState(false);
   const handleCircleClick = (name: any, center: any) => {
     if (selectedZone == name) {
       setSelectedZone(null);
@@ -77,7 +77,7 @@ const MapComponent = ({
     }
   };
   // const [isUserInteracting, setIsUserInteracting] = useState(false);
-  // const [mapCenter, setMapCenter] = useState({ lat: mapCoordinates[0], lng: mapCoordinates[1] });
+  const [mapCenter, setMapCenter] = useState({ lat: mapCoordinates[0], lng: mapCoordinates[1] });
   // const handleMoveEnd = (event: any) => {
   //   // setIsMapDragged(true);
   //   setIsUserInteracting(true); // User is interacting with the map
@@ -98,20 +98,9 @@ const MapComponent = ({
     if (selectedVehicle) {
 
       setunselectVehicles(true);
-
-    }
-    if (unselectVehicles === true) {
-
-
       setSelectedVehicle(null);
     }
   };
-  // console.log(mapCenter)
-  // const handleZoomEnd = (event: any) => {
-  //   if (unselectVehicles === true) {
-  //     setSelectedVehicle(null);
-  //   }
-  // };
   async function loadSVG(filepath: string) {
     const response = await fetch(filepath);
     return await response.text();
@@ -169,7 +158,7 @@ const MapComponent = ({
       } else if (selectedVehicle == null && showAllVehicles === true) {
         if (!carData || carData.length === 0) return;
         else if (carData.length === 1) {
-          if (mapCoordinates) {
+          if (mapCoordinates && !isMapMoved) {
 
             mapRef.current.panTo({ lat: mapCoordinates[0], lng: mapCoordinates[0] });
             mapRef.current.setZoom(zoom);
@@ -209,11 +198,11 @@ const MapComponent = ({
             center = L.latLng(0, 0); // You may adjust the default center as per your needs
             zoom1 = 11; //
           }
-
-          // setMapCenter(center)
-          setSelectedVehicle(false);
-          mapRef.current.panTo(center);
-          mapRef.current.setZoom(zoom1)
+          if (!isMapMoved) {
+            setSelectedVehicle(false);
+            mapRef.current.panTo(center);
+            mapRef.current.setZoom(zoom1)
+          }
         }
 
       }
@@ -356,25 +345,19 @@ const MapComponent = ({
               clickableIcons={false}
               mapContainerStyle={containerStyle}
               // center={{ lat, lng }}
-              center={
-                { lat: mapCoordinates[0], lng: mapCoordinates[1] }
-              }
+              center={(mapCenter.lat && mapCenter.lng )? mapCenter : {
+                lat: mapCoordinates[0], lng: mapCoordinates[1]
+              }}
 
               zoom={zoom}
               onLoad={onLoad}
               onClick={handleClick}
-              // onDragStart={handleDragStart} // Track drag interaction        
-              // onIdle={handleIdle}
+              onDragStart={() => setIsMapMoved(true)} // Mark that the map has been moved
+              onDragEnd={() => setIsMapMoved(true)} //
               options={{
                 draggable: true, // Make map draggable
-                // cameraControl:false, // disable camera option
-                // fullscreenControl:false, // disable full screen option
-                // streetViewControl:false, //disable map and sattelite control options
-                // styles:null,
                 disableDoubleClickZoom: true, //disable zoom in double click
                 disableDefaultUI: true,  //disable all options
-                // mapTypeControl:false //disable map and sattelite control options
-                // attributionControl: false,
 
               }}
             // onDragEnd={handleMoveEnd}
