@@ -153,10 +153,10 @@ const MapComponent = ({
           carData.find((el) => el.IMEI === selectedVehicle?.IMEI) || null; // Assign null if selectedVehicle is not found
         if (selectedVehicleCurrentData.current) {
 
-          setMapCenter({
-            lat: selectedVehicleCurrentData.current.gps.latitude,
-            lng: selectedVehicleCurrentData.current.gps.longitude
-          })
+          // setMapCenter({
+          //   lat: selectedVehicleCurrentData.current.gps.latitude,
+          //   lng: selectedVehicleCurrentData.current.gps.longitude
+          // })
           mapRef.current.panTo(
             {
               lat: selectedVehicleCurrentData.current.gps.latitude,
@@ -182,7 +182,7 @@ const MapComponent = ({
 
           const bounds = L.latLngBounds(positions);
 
-
+let zoom1;
           var center: LatLng | undefined;
           if (bounds.isValid()) {
             center = bounds.getCenter();
@@ -201,22 +201,24 @@ const MapComponent = ({
             const latZoom = Math.floor(Math.log2(360 / (0.5 * latDistance)));
             const lngZoom = Math.floor(Math.log2(360 / (0.5 * lngDistance)));
 
-            zoom = Math.min(latZoom, lngZoom);
+            zoom1 = Math.min(latZoom, lngZoom);
             //setZoom(zoom)
           } else {
 
             center = L.latLng(0, 0); // You may adjust the default center as per your needs
-            zoom = 11; //
+            zoom1 = 11; //
           }
 
           setMapCenter(center)
           setSelectedVehicle(false);
           mapRef.current.panTo(center);
-          mapRef.current.setZoom(zoom)
+          mapRef.current.setZoom(zoom1)
         }
-      } else if (mapCoordinates.length > 0) {
-        setMapCenter({ lat: mapCoordinates[0], lng: mapCoordinates[1] })
-      }
+
+      } 
+      // else if (mapCoordinates.length > 0) {
+      //   setMapCenter({ lat: mapCoordinates[0], lng: mapCoordinates[1] })
+      // }
     }
   }, [carData, selectedVehicle, mapRef.current, mapCoordinates, zoom]);
 

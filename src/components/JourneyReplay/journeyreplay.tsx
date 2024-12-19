@@ -1990,10 +1990,10 @@ export default function JourneyReplayComp() {
                          mapcenterToFly={mapcenterToFly}
                          isPlaying={isPlaying}
                          isPaused={isPaused}
-                         coordsforgoogle={coordsforgoogle}
                          vehicleType={vehicleType}
                          lat={lat}
                          lng={lng}
+                         userclick={userclick}
                        />
                       </div>
 

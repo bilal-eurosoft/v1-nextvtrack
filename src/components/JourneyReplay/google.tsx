@@ -38,10 +38,9 @@ const MapComponent = ({
     zoom,
     carPosition, getCurrentAngle,
     zoomToFly, mapcenterToFly, isPlaying, isPaused,
-    coordsforgoogle,
     vehicleType,
     lat,
-    lng
+    lng, userclick
 }: {
     polylinedata: any,
     TravelHistoryresponse: any,
@@ -52,10 +51,9 @@ const MapComponent = ({
     zoom: any,
     carPosition: any, getCurrentAngle: any,
     zoomToFly: any, mapcenterToFly: any, isPlaying: any, isPaused: any,
-    coordsforgoogle: any,
     vehicleType: any,
     lat: any,
-    lng: any
+    lng: any, userclick: any
 }) => {
     const [carmove, setcarmove] = useState("")
     const [bikemove, setbikemove] = useState("")
@@ -120,16 +118,6 @@ const MapComponent = ({
         }
     }, [zoomToFly])
 
-    //     useEffect(() => { console.log("1")
-    // console.log(carPosition)
-    //         if (mapRef.current && coordsforgoogle) {
-    //             console.log("-0-0-0")
-    //             mapRef.current.panTo(coordsforgoogle);
-    //             // mapRef.current.setView(coordsforgoogle,14)
-    //             mapRef.current.setZoom(13)
-    //         }
-
-    //     }, [carPosition])
     useEffect(() => {
         if (mapRef.current) {
             mapRef.current.setZoom(zoom)
@@ -140,47 +128,40 @@ const MapComponent = ({
             mapRef.current.panTo({ lat: mapcenterToFly[0], lng: mapcenterToFly[1] });
         }
     }, [mapcenterToFly])
-    // useEffect(() => { console.log("6")
-    //     if (mapRef.current) {
-
-
-    //         if (!isPaused && !isPlaying) {
-
-
-    //             if (zoomToFly) {
+    const SetViewOnClick = ({ coords, zoom }: { coords: any, zoom: any }) => {
+        /* if (isPaused) {
+          setMapcenterToFly(null);
+          setzoomToFly(0);
+    
+        } */
 
 
 
-    //                 mapRef.current.panTo({ lat: mapcenterToFly[0], lng: mapcenterToFly[1] });
+        if (userclick && isPlaying) {
+            return null
+        }
 
-    //             } else {
+        if (coords) {
+            mapRef.current.panTo({ lat: coords[0], lng: coords[1] });
+        }
+        return null;
+    };
+
+    const SetViewfly = ({ coords, zoom }: { coords: any; zoom: number }) => {
 
 
-    //                 mapRef.current.setZoom(zoom)
+        // if (selectedItemId) {
+        //   return null
+        // }
+        if (coords && !Number.isNaN(coords[0]) && coords[0] != null) {
 
-    //             }
-    //         } else {
+            mapRef.current.panTo({ lat: coords[0], lng: coords[1] });
+            mapRef.current.setZoom(zoom)
 
-    //             // mapRef.current.panTo(carPosition);
-
-
-    //             // mapRef.current.setZoom(13)
-
-    //         }
-    //     }
-    // }, [
-
-    // ])
-    // const [googleLoaded, setGoogleLoaded] = useState(false);
-    // = useLoadScript({
-    //     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-    // });
-    // useEffect(() => { console.log("1")
-    //     if (isLoaded && window.google) {
-    //         setGoogleLoaded(true);
-    //     }
-    // }, [isLoaded]);
-    // if (!googleLoaded) return <div>Loading...</div>;
+        }
+        return null;
+    };
+    
 
     return (
         <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
@@ -210,7 +191,17 @@ const MapComponent = ({
                         path={polylinedata}
                     />
                 ) : null}
+                {isPlaying ? (
+                    <SetViewOnClick coords={mapcenter} zoom={zoom} />
+                ) : isPaused ? (
+                    <SetViewOnClick coords={mapcenter} zoom={zoom} />
+                )
+                    :
 
+                    (
+                        <SetViewfly coords={mapcenterToFly} zoom={zoomToFly} />
+                    )
+                }
                 {loadingMap
                     ? carPosition && (
                         <MarkerF
