@@ -437,10 +437,10 @@ export default function EditZoneComp() {
   const handleredraw = (e: any) => {
     setDrawShape(true);
     setForm({ ...Form, zoneType: "" });
-    if (session?.MapType == "Google") {
-      polygonRef.current?.setMap(null)
-      circleRef.current?.setMap(null)
-    }
+    // if (session?.MapType == "Google") {
+    //   polygonRef.current?.setMap(null)
+    //   circleRef.current?.setMap(null)
+    // }
     if (polygondataById.length > 0) {
       setPolygondataById([]);
       setPolygondata([]);
@@ -804,7 +804,7 @@ export default function EditZoneComp() {
               <div className="flex justify-start"></div>
               <div className="w-full  mt-4 overflow-hidden">
                 {mapcenter !== null && zoom >= 0 && (
-                   session?.MapType == "Google" ?
+                   session?.MapType == "Google1" ?
                     (
                       <div className="edit_zone_map_main">
 
@@ -846,10 +846,25 @@ export default function EditZoneComp() {
                         center={mapcenter}
                         className="z-10 edit_zone_map_main"
                       >
-                        <TileLayer
+                        {/* <TileLayer
                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                           attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
                         />
+                         */}
+                         {session?.MapType == "Google"?(
+                <TileLayer
+                url={`https://{s}.googleapis.com/maps/vt?lyrs=m&x={x}&y={y}&z={z}&key=AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo`}
+
+              subdomains={['mt0', 'mt1', 'mt2', 'mt3']} // Google tile servers
+              attribution="Google Maps"
+            />
+              ):(
+                <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
+                          />
+
+              )}
                         {drawShape == false && (
                           <FeatureGroup>
                             <EditControl

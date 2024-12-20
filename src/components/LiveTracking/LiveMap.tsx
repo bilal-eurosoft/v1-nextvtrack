@@ -160,7 +160,7 @@ const DynamicCarMap = ({
       <div className="xl:col-span-4 lg:col-span-3  md:col-span-3  sm:col-span-3 col-span-4 main_map">
         <div className="relative" onClick={handleClear}>
     
-        {session?.MapType == "Google" ? (
+        {session?.MapType == "Google1" ? (
 <GoogleLiveMap 
  carData={carData}
 //  clientSettings={clientSettings}
@@ -185,20 +185,31 @@ zoneList={zoneList}
               className="z-0"
               zoom={zoom}
             >
-              <TileLayer
+              {session?.MapType == "Google"?(
+                <TileLayer
+              url={`https://{s}.googleapis.com/maps/vt?lyrs=m&x={x}&y={y}&z={z}&key=AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo`}
+              subdomains={['mt0', 'mt1', 'mt2', 'mt3']} // Google tile servers
+              attribution="Google Maps"
+            />
+              ):(
+                <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
+                          />
+              )}
+              {/* <TileLayer
                 url={"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"}
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
-              />
+              /> */}
                 {/* <LayersControl position="bottomleft">
-          <LayersControl.BaseLayer  name="OpenStreetMap">
+          <LayersControl.BaseLayer checked name="OpenStreetMap">
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           </LayersControl.BaseLayer>
-
-          <LayersControl.BaseLayer checked name="Google Maps">
+          <LayersControl.BaseLayer name="Google Maps">
             <TileLayer
-               url={`https://maps.googleapis.com/maps/api/timezone/json?location=${mapCoordinates[0]},${mapCoordinates[1]}&key=AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo`}
-              url={`https://maps.googleapis.com/maps/api/js?key=AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo`}
-              
+              url={googleTileLayerUrl}
+              subdomains={['mt0', 'mt1', 'mt2', 'mt3']} // Google tile servers
+              attribution="Google Maps"
             />
           </LayersControl.BaseLayer>
           </LayersControl> */}
