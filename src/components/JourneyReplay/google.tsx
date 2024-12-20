@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
     GoogleMap, LoadScript,
     InfoWindow,
-    Polyline, MarkerF
+    Polyline, MarkerF,
+    useLoadScript
 } from '@react-google-maps/api';
 import HarshCornerningIcon from "../../../public/harshcornering.png";
 // import HarshAccelerationIcon from "../../../public/Images/HarshAccelerationIcon.png";
@@ -60,7 +61,7 @@ const MapComponent = ({
 
     // const [isUserInteracting, setIsUserInteracting] = useState(false);
     const [popup, setpopup] = useState("")
-    const [mapCenter, setMapCenter] = useState({ lat: mapcenter[0], lng: mapcenter[1] });
+    // const [mapCenter, setMapCenter] = useState({ lat: mapcenter[0], lng: mapcenter[1] });
     // const handleDragStart = () => {
     //     setIsUserInteracting(true); // User is interacting with the map
     // };
@@ -161,14 +162,23 @@ const MapComponent = ({
         }
         return null;
     };
-    
+    // const { isLoaded,loadError  } = useLoadScript({
+    //     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    //   });
+    //   console.log(isLoaded,loadError )
 
     return (
-        <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+// <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+<>
+
+    {
+
+        (mapcenter !== null && zoom !== null) && (
+
             <GoogleMap
                 clickableIcons={false}
                 mapContainerStyle={containerStyle}
-                center={mapCenter}
+                center={{ lat: mapcenter[0], lng: mapcenter[1] }}
                 zoom={zoom}
                 // center={((isPaused ||isPlaying)&& !userclick)?  carPosition: mapCenter}
                 // zoom={(isPaused ||isPlaying)?18: zoom}
@@ -379,7 +389,11 @@ const MapComponent = ({
                 })}
 
             </GoogleMap>
-        </LoadScript>
+        )
+    }
+</>
+// </LoadScript>
+
     );
 };
 export default MapComponent;

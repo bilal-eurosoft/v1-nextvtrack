@@ -286,7 +286,7 @@ export default function EditZoneComp() {
 
   const handlePolygonSave = (coordinates: [number, number][]) => {
 
-    if (session?.MapType == "Google") {
+    if (session?.MapType == "Google1") {
       const zoneCoords = coordinates.map(([lat, lng]) => ({
         latitude: lat,
         longitude: lng,

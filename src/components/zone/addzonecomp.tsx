@@ -175,7 +175,7 @@ export default function AddZoneComp() {
 
   const handlePolygonSave = (coordinates: [number, number][]) => {
     let zoneCoords:any;
-    if(session.MapType=="Google"){
+    if(session.MapType=="Google1"){
       zoneCoords = coordinates.map(([lat, lng]) => ({
         latitude: lat,
         longitude: lng
@@ -876,7 +876,7 @@ export default function AddZoneComp() {
             <div className="flex justify-start"></div>
             <div className="w-full  mt-4 overflow-hidden">
               {mapcenter !== null && (
-                session?.MapType == "Google"?
+                session?.MapType == "Google1"?
                   (
                     <div className="edit_zone_map_main">
 

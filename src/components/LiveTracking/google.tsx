@@ -77,7 +77,7 @@ const MapComponent = ({
     }
   };
   // const [isUserInteracting, setIsUserInteracting] = useState(false);
-  const [mapCenter, setMapCenter] = useState({ lat: mapCoordinates[0], lng: mapCoordinates[1] });
+  // const [mapCenter, setMapCenter] = useState({ lat: mapCoordinates[0], lng: mapCoordinates[1] });
   // const handleMoveEnd = (event: any) => {
   //   // setIsMapDragged(true);
   //   setIsUserInteracting(true); // User is interacting with the map
@@ -359,13 +359,13 @@ const MapComponent = ({
   return (
     <>
       {
-        mapCoordinates !== null && zoom !== null && (
+        (mapCoordinates !== null && zoom !== null) && (
           <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
             <GoogleMap
               clickableIcons={false}
               mapContainerStyle={containerStyle}
               // center={{ lat, lng }}
-              center={(mapCenter.lat && mapCenter.lng )? mapCenter : {
+              center={{
                 lat: mapCoordinates[0], lng: mapCoordinates[1]
               }}
 
