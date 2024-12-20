@@ -29,5 +29,7 @@ declare module "next-auth" {
     PortalNotification:Boolean;
     ServiceHistory:Boolean;
     defaultView:Boolean;
+    dateFormat:String,
+    timeFormat:String,
   }
 }

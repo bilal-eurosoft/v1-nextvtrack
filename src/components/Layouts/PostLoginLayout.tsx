@@ -948,7 +948,7 @@ export default function RootLayout({
                           {session?.clientName}
                         </div>
                         <div className="md:col-span-3 sm:col-span-4 col-span-3 flex items-center text-end md:justify-end sm:justify-center client_name_popup">
-                          <BlinkingTime timezone={session?.timezone} />
+                          <BlinkingTime timezone={session?.timezone} dateFormat={session?.dateFormat||"DD MM YYYY"} timeFormat={session?.timeFormat||"hh:mm:ss A"}/>
                         </div>
 
                         <div className="lg:col-span-2 md:col-span-1 sm:col-span-1 flex justify-end user_icon_top_header">
@@ -1468,7 +1468,7 @@ export default function RootLayout({
       {/* Time */}
       <div className="lg:col-span-4 md:col-span-4 sm:col-span-10 col-span-12 lg:mx-0 md:mx-4 sm:mx-4 mx-4 lg:mt-2 flex items-center">
         <a className="text-white text-center font-popins text-xl sm:text-md">
-          <BlinkingTime timezone={session?.timezone} />
+        <BlinkingTime timezone={session?.timezone} dateFormat={session?.dateFormat||"DD MM YYYY"} timeFormat={session?.timeFormat||"hh:mm:ss A"}/>
         </a>
       </div>
       {session?.PortalNotification && ( 

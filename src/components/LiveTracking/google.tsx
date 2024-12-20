@@ -142,6 +142,26 @@ const MapComponent = ({
         selectedVehicleCurrentData.current =
           carData.find((el) => el.IMEI === selectedVehicle?.IMEI) || null; // Assign null if selectedVehicle is not found
         if (selectedVehicleCurrentData.current) {
+    //       let count = 0;
+    //       let currentCenter = mapRef.current.getCenter();
+    //       let targetPosition ={
+    //         lat:selectedVehicleCurrentData.current.gps.latitude,
+    //         lng:selectedVehicleCurrentData.current.gps.longitude
+    //       }
+    //       let steps = 50;  // Number of steps in the fly animation
+    // let stepLat = (targetPosition.lat - currentCenter.lat) / steps;
+    // let stepLng = (targetPosition.lng - currentCenter.lng) / steps;
+    //       function animateFly() {
+    //         count++;
+    //         let newLat = currentCenter.lat() + stepLat * count;
+    //         let newLng = currentCenter.lng() + stepLng * count;
+    //         mapRef.current.panTo({ lat: newLat, lng: newLng });
+    //         if (count < steps) {
+    //           animateFly()
+    //           // requestAnimationFrame(animateFly);
+    //         }
+    //       }
+    //       animateFly()
 
           // setMapCenter({
           //   lat: selectedVehicleCurrentData.current.gps.latitude,
@@ -388,9 +408,7 @@ const MapComponent = ({
 
                       >
                         <div style={{ fontSize: "12px", paddingTop: "9px", maxWidth: "100px" }}>
-                          {vehicle?.vehicleReg}
-
-                          {/* {vehicle?.gps.Angle} */}
+                          <strong>{vehicle?.vehicleReg}</strong>
                         </div>
                       </InfoWindow>
                     </MarkerF>

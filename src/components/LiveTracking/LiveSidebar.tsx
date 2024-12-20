@@ -538,18 +538,20 @@ const [srcimgindex, setsrcimgindex] = useState(null);
         const timeDiffMinutes = Math.abs(targetTimeDate.getTime() - currentTimeDate.getTime()) / (1000 * 60);
         const newDivColor = timeDiffMinutes > 120 ? false : true;
         return (
-          <p key={attribute.key} style={{ fontSize: "15px" }}>
-            <strong>{attribute.label}:</strong> {newDivColor ? "On": "Off"}
-          </p>
+          <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
+          <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
+          <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}> {newDivColor ? "On": "Off"}</span>
+         </p>
         );                
       }
 
       // Render other attributes
       if(value){
       return (
-        <p key={attribute.key} style={{ fontSize: "15px" }}>
-          <strong>{attribute.label}:</strong> {value}
-        </p>
+        <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
+        <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
+        <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}>{value}</span>
+      </p>
       );}
       // if (attribute.allow && value) {
       // }

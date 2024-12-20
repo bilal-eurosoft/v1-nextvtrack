@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-
-const BlinkingTime = ({ timezone }: { timezone: string | undefined }) => {
+import moment from "moment"
+const BlinkingTime = ({ timezone, dateFormat,timeFormat }: any) => {
   const [time, setTime] = useState("");
 
   useEffect(() => {
@@ -8,11 +8,14 @@ const BlinkingTime = ({ timezone }: { timezone: string | undefined }) => {
       let currentTime;
 
       if (timezone) {
-        currentTime = new Date().toLocaleString("en-US", {
-          timeZone: timezone,
-        });
+        currentTime = 
+        moment(new Date())
+        .tz(timezone)
+        .format(dateFormat+" "+timeFormat)       
+
       } else {
-        currentTime = new Date().toLocaleString();
+        currentTime =   moment(new Date())        
+        .format(dateFormat+" "+timeFormat)   
       }
 
       setTime(currentTime);
