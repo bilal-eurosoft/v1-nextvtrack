@@ -9,6 +9,7 @@ export type DeviceAttach = {
   id: string;
   vehicleMake: string;
   vehicleModel: string;
+  vehicleType: string;
   vehicleNo: string;
   vehicleReg: string;
   vehicleskipstep: number;

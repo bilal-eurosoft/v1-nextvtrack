@@ -342,9 +342,7 @@ export default function Request({ socketdata, deviceCommandText }) {
               setdisabledcameraButton(true);
               setdisabledrequestButton(true);
             } else if (foundVehicle?.frontCamera?.value == 3) {
-             // console.log("secondsduration check 222", secondsduration);
-                /*   startTimer(secondsduration);
-                  setcameraHidediv(false) */
+            
               setdisabledcameraButton(true);
               setdisabledrequestButton(false);
             }
@@ -477,7 +475,7 @@ if (selectedFileType == "Video") {
     duration?: number;
   }
 
- // console.log("secondsduration", secondsduration);
+ 
   const handlecameraOn = async () => {
     //   if (duration == 100) toast("Data sent successfully");
     // let duration = 100;
@@ -771,7 +769,7 @@ if (selectedFileType == "Video") {
       const localTime = new Date(currentTime.toLocaleString("en-US", { timeZone: timezone }));
 
       const remainingSeconds = Math.floor((localTime.getTime() - seconds) / 1000);
-      console.log("object", remainingSeconds);
+     
       return remainingSeconds > 0 ? remainingSeconds : 0;
     };
 
@@ -816,7 +814,7 @@ if (selectedFileType == "Video") {
 
       // Calculate the elapsed time
       const elapsedTime = fullTimeInSeconds - startTimeInSeconds;
-    //  console.log("elapsedTime", elapsedTime);
+    
       const updatedSeconds = countdownTime - elapsedTime;
 
       // Update state if there's time left
@@ -836,7 +834,7 @@ if (selectedFileType == "Video") {
 
     const timerId = setInterval(() => {
       setSeconds(prevSeconds => {
-        console.log("Dsf");
+        
         if (prevSeconds > 0) {
           const newSeconds = prevSeconds - 1;
           localStorage.setItem('countdownTime', String(newSeconds)); // Update countdown time in local storage
@@ -923,7 +921,7 @@ working suppose i hit api and save the seconds in a state suppose 80 and on ever
   const startTimer = async (durationInSeconds) => {
     const currentTime = moment.tz(session?.timeZone);
     const endTime = currentTime.add(durationInSeconds, 'seconds');
-//console.log("durationInSeconds", durationInSeconds);
+
     localStorage.setItem('endTime', endTime.toISOString());
     
     setSeconds(durationInSeconds);
@@ -1259,49 +1257,7 @@ working suppose i hit api and save the seconds in a state suppose 80 and on ever
       </div>
       </div> */}
       </div>
-      {/*   <div className="flex flex-col items-center">
-      <div className="flex flex-wrap gap-4 my-6">
-        <button
-          className={`bg-green px-4 py-2 text-white ${disabledrequestButton ? "opacity-50 cursor-not-allowed" : ""}`}
-          onClick={() => console.log("Request")}
-          disabled={disabledrequestButton}
-        >
-          Request
-        </button>
-        <button
-          className={`bg-green px-4 py-2 text-white ${disabledcameraButton ? "opacity-50 cursor-not-allowed" : ""}`}
-          onClick={() => console.log("Camera On")}
-          disabled={disabledcameraButton}
-        >
-          Camera On
-        </button>
-      </div>
-
-      <div className="relative">
-        <svg className="-rotate-90 h-48 w-48">
-          <circle
-            r="70"
-            cx="90"
-            cy="90"
-            className="fill-transparent stroke-[#88adf1] stroke-[8px]"
-          ></circle>
-          <circle
-            r="70"
-            ref={secondCircle}
-            cx="90"
-            cy="90"
-            style={{
-              strokeDasharray: "451px",
-            }}
-            className="fill-transparent stroke-white stroke-[8px]"
-          ></circle>
-        </svg>
-        <div className="text-black absolute top-16 left-11 text-2xl font-semibold flex flex-col items-center w-24 h-20">
-          <span className="text-center">{seconds}</span>
-          <span className="text-center">{seconds === 1 ? "Second" : "Seconds"}</span>
-        </div>
-      </div>
-    </div> */}
+     
       {/* Date, Time, and Duration Form */}
       {showDurationTab && (
         <div className="my-6 bg-gray-100 p-4 rounded-lg shadow-md">

@@ -4,7 +4,7 @@ export default function countCars(carData: VehicleData[]) {
   const speeds = carData?.map((car) => car.gps.speed);
   const ignitions = carData?.map((car) => car.ignition);
   const countParked = speeds.filter(
-    (speed, index) => speed === 0 && ignitions[index] === 0
+    (speed, index) => speed === 0 && (ignitions[index] === 0||ignitions[index] === null)
   ).length;
   const countMoving = speeds.filter(
     (speed, index) => speed > 0 && ignitions[index] === 1

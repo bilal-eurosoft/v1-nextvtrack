@@ -69,6 +69,7 @@ export type VehicleData = {
   frontCamera: camStatusData;
   vehicleId: string;
   vehicleNo: string;
+  vehicleType: string;
   vehicleMake: string;
   vehicleModel: string;
   vehicleReg: string;
@@ -80,6 +81,7 @@ export type VehicleData = {
   color: string;
   vehicleStatus: string;
   DriverName: string;
+  defaultView:Boolean
 };
 
 export type CarMapList = {

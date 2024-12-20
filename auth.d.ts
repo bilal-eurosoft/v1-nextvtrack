@@ -27,5 +27,9 @@ declare module "next-auth" {
     smsForCamera:Boolean;
     immobilising:Boolean;
     PortalNotification:Boolean;
+    ServiceHistory:Boolean;
+    defaultView:Boolean;
+    dateFormat:String,
+    timeFormat:String,
   }
 }

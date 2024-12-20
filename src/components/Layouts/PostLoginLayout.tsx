@@ -39,6 +39,7 @@ import "./layout.css";
 import BlinkingTime from "../General/BlinkingTime";
 import { stringify } from "querystring";
 import NotificationDropdown from "./notifications";
+import { socket } from "@/utils/socket";
 // const inter = Inter({ subsets: ["latin"] });
 // Example import statement
 const drawerWidth = 58;
@@ -304,7 +305,76 @@ export default function RootLayout({
 
       fetchNotifications();
     }
-  }, [showNotifications]); 
+  }, [showNotifications]);
+  useEffect(() => { 
+      try {
+        socket.io.opts.query = { clientId: session?.clientId };
+        socket.connect();
+        socket.on(
+          "notification",
+          async (data) => {
+            if (data === null || data === undefined) {
+              return;
+            }
+            
+          }
+        );
+      } catch (err) {
+
+      }
+    
+   
+  }, []);
+
+  
+ 
+
+ /*  const notifications = [
+    {
+      dateTime: "October 16 2024 07:50:00 PM",
+      event: "ignitionOn",
+      clientId: "",
+      title: "ignitionOn Alert",
+      description: `Your Vehicle AXF-398 (R) has Ignition On at October 16 2024 07:50:00 PM`
+      },
+      {
+        dateTime: "October 16 2024 07:50:00 PM",
+        event: "ignitionOff",
+        clientId: "",
+        title: "ignitionOff Alert",
+        description: `Your Vehicle AXF-398 (R) has Ignition Off at October 16 2024 07:50:00 PM`
+        },
+        {
+          dateTime: "October 16 2024 07:50:00 PM",
+          event: "geofenceEntered",
+          clientId: "",
+          title: "geofenceEntered Alert",
+          description: `Your Vehicle AXF-398 (R) has geofenceEntered at October 16 2024 07:50:00 PM`
+          },
+          {
+            dateTime: "October 16 2024 07:50:00 PM",
+            event: "geofenceLeft",
+            clientId: "",
+            title: "geofenceLeft Alert",
+            description: `Your Vehicle AXF-398 (R) has geofenceLeft at October 16 2024 07:50:00 PM`
+            },
+            {
+              dateTime: "October 16 2024 07:50:00 PM",
+              event: "harshacceleration",
+              clientId: "",
+              title: "harshacceleration Alert",
+              description: `Your Vehicle AXF-398 (R) has harshacceleration at October 16 2024 07:50:00 PM`
+              },
+              {
+                dateTime: "October 16 2024 07:50:00 PM",
+                event: "harshcorning",
+                clientId: "",
+                title: "harshcorning Alert",
+                description: `Your Vehicle AXF-398 (R) has harshcorning at October 16 2024 07:50:00 PM`
+                },
+  ]; */
+
+  
   return (
     // <div className={inter.className}>
     <div>
@@ -730,23 +800,6 @@ export default function RootLayout({
                           backgroundColor: pathname == "/Immobilize" ? "white" : ""
                         }}
                       >
-                        {/*                  
-                        <g id="SVGRepo_iconCarrier">
-                          {" "}
-                          <g>
-                            <path
-                              d="M64,48L64,48h-8V32h8c8.836,0,16-7.164,16-16S72.836,0,64,0c-8.837,0-16,7.164-16,16v8H32v-8c0-8.836-7.164-16
- -16-16 S0,7.164,0,16s7.164,16,16,16h8v16h-8l0,0l0,0C7.164,48,0,55.164,0,64s7.164,16,16,16c8.837,0,16-7.164,16-16l0,0v-8h16v7
- .98 c0,0.008-0.001,0.014-0.001,0.02c0,8.836,7.164,16,16,16s16-7.164,16-16S72.836,48.002,64,48z M64,8c4.418,0,8,3.582,8,8 s-3
- .582,8-8,8h-8v-8C56,11.582,59.582,8,64,8z M8,16c0-4.418,3.582-8,8-8s8,3.582,8,8v8h-8C11.582,24,8,20.417,8,16z M16,72 c-4.418,
- 0-8-3.582-8-8s3.582-8,8-8l0,0h8v8C24,68.418,20.418,72,16,72z M32,48V32h16v16H32z M64,72c-4.418,0-8-3.582-8-8l0,0v-8 h7.999c4.418,
- 0,8,3.582,8,8S68.418,72,64,72z"
-                            ></path>
-                          </g>
-                        </g> */}
-                        {/* <defs>
-<style>.cls-1{fill:#fff;}</style>
-</defs> */}
  <g>
 	<path class="st0" d="M67.9,0H28.3L14,15.7l-0.4,0.5h-7c0,0-2.1,0-2.5,2.7c-0.3,1.5,0.3,3,1.5,3.8c1.1,0,2.1,0.1,3.1,0.3
 		c1.6,0.3,1.2,1.6,1.2,1.6c-6.2,3.9-9.7,11.3-9.7,11.3L0,65l2.1,2.5h13.4l2.6-6.2h56.5V37c-0.2-1.8,1.2-3.4,3-3.6c0.1,0,0.3,0,0.4,0
@@ -766,6 +819,88 @@ export default function RootLayout({
                 )}
               </div>
             )}
+
+{(session?.userRole == "SuperAdmin" ||
+              session?.userRole == "Admin") && (
+              <div>
+{session?.ServiceHistory && (
+  <Link href="/ServiceHistory">
+    <Tooltip
+      className="bg-[#00B56C] text-white rounded shadow-lg"
+      placement="right"
+      content="Service History"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className={`py-2 text-white-10 dark:text-white ${pathname == "/ServiceHistory" ? "border-b-2 mr-[1.5px] border-green-500" : "border-b-2  border-white"}`}
+        width="80px"
+        height="50px"
+        viewBox="0 0 512 512"
+        style={{
+          backgroundColor: pathname == "/ServiceHistory" ? "white" : "",  // White bg when active, black when not
+          borderRadius: "0",  // Ensure no rounding, so it stays as a square
+        }}
+      >
+        <g transform="translate(1 1)">
+          <g>
+            <g>
+              <path
+                d="M379.16,289.987c-32.427,0-63.147,12.8-83.627,36.693c-3.413,3.413-2.56,8.533,0.853,11.947
+                c3.413,3.413,8.533,2.56,11.947-0.853C325.4,317.293,351,306.2,378.307,306.2c52.053,0,93.867,41.813,93.867,93.867
+                c0,52.053-41.813,93.867-93.867,93.867c-42.463,0-79.831-28.994-91.449-68.267h40.249V408.6h-50.179
+                c-0.916-0.161-1.84-0.178-2.728,0h-15.36v68.267h17.067v-30.611C293.778,484.327,333.771,511,378.307,511
+                c61.44,0,111.787-48.64,111.787-110.08S440.6,289.987,379.16,289.987z"
+                fill={pathname == "/ServiceHistory" ? "green" : "white"}
+              />
+              <path
+                d="M71.107,50.2c-9.387,0-17.067,7.68-17.067,17.067V459.8c0,9.387,7.68,17.067,17.067,17.067H233.24
+                c5.12,0,8.533-3.413,8.533-8.533s-3.413-8.533-8.533-8.533H71.107V67.267h85.333c0,9.387,7.68,17.067,17.067,17.067h119.467
+                c9.387,0,17.067-7.68,17.067-17.067h85.333v196.267c0,5.12,3.413,8.533,8.533,8.533c5.12,0,8.533-3.413,8.533-8.533V67.267
+                c0-9.387-7.68-17.067-17.067-17.067H310.04V33.133h110.933c5.12,0,8.533,3.413,8.533,8.533v221.867
+                c0,5.12,3.413,8.533,8.533,8.533s8.533-3.413,8.533-8.533V41.667c0-14.507-11.093-25.6-25.6-25.6H310.04
+                C310.04,6.68,302.36-1,292.973-1H173.507c-9.387,0-17.067,7.68-17.067,17.067H45.507c-14.507,0-25.6,11.093-25.6,25.6V485.4
+                c0,14.507,11.093,25.6,25.6,25.6H233.24c5.12,0,8.533-3.413,8.533-8.533s-3.413-8.533-8.533-8.533H45.507
+                c-5.12,0-8.533-3.413-8.533-8.533V41.667c0-5.12,3.413-8.533,8.533-8.533H156.44V50.2H71.107z M173.507,16.067h119.467V24.6
+                v34.133v8.533H173.507v-8.533V24.6V16.067z"
+                fill={pathname == "/ServiceHistory" ? "green" : "white"}
+              />
+              <path
+                d="M330.264,177.347l-33.024-46.08c-5.12-7.68-13.653-11.947-23.04-11.947h-36.925c-1.169-0.55-2.525-0.853-4.035-0.853
+                s-2.865,0.304-4.035,0.853H192.28c-9.387,0-17.92,4.267-23.04,11.947l-33.024,46.08h-17.323c-12.8,0-22.187,10.24-22.187,22.187
+                v33.28c0,12.8,9.387,22.187,22.187,22.187h13.034c3.814,14.679,17.216,25.6,33.046,25.6c15.829,0,29.232-10.921,33.046-25.6
+                h70.442c3.814,14.679,17.216,25.6,33.046,25.6c15.829,0,29.232-10.921,33.046-25.6h13.034c12.8,0,22.187-9.387,23.04-22.187
+                v-33.28c0-12.8-10.24-22.187-22.187-22.187H330.264z M282.733,139.8l26.7,37.547h-67.66v-41.813h31.573
+                C277.613,135.533,281.027,137.24,282.733,139.8z M182.04,139.8c2.56-2.56,5.973-4.267,9.387-4.267h33.28v41.813h-68.532
+                L182.04,139.8z"
+                fill={pathname == "/ServiceHistory" ? "green" : "white"}
+              />
+              <path
+                d="M233.24,323.267h-128c-5.12,0-8.533,3.413-8.533,8.533c0,5.12,3.413,8.533,8.533,8.533h128
+                c5.12,0,8.533-3.413,8.533-8.533C241.773,326.68,238.36,323.267,233.24,323.267z"
+                fill={pathname == "/ServiceHistory" ? "green" : "white"}
+              />
+              <path
+                d="M233.24,365.933h-128c-5.12,0-8.533,3.413-8.533,8.533S100.12,383,105.24,383h128c5.12,0,8.533-3.413,8.533-8.533
+                S238.36,365.933,233.24,365.933z"
+                fill={pathname == "/ServiceHistory" ? "green" : "white"}
+              />
+              <path
+                d="M233.24,408.6h-128c-5.12,0-8.533,3.413-8.533,8.533s3.413,8.533,8.533,8.533h128c5.12,0,8.533-3.413,8.533-8.533
+                S238.36,408.6,233.24,408.6z"
+                fill={pathname == "/ServiceHistory" ? "green" : "white"}
+              />
+            </g>
+          </g>
+        </g>
+      </svg>
+    </Tooltip>
+  </Link>
+)}
+
+
+              </div>
+            )}
+
           </div>
 
           <hr></hr>
@@ -814,7 +949,7 @@ export default function RootLayout({
                           {session?.clientName}
                         </div>
                         <div className="md:col-span-3 sm:col-span-4 col-span-3 flex items-center text-end md:justify-end sm:justify-center client_name_popup">
-                          <BlinkingTime timezone={session?.timezone} />
+                          <BlinkingTime timezone={session?.timezone} dateFormat={session?.dateFormat||"DD MM YYYY"} timeFormat={session?.timeFormat||"hh:mm:ss A"}/>
                         </div>
 
                         <div className="lg:col-span-2 md:col-span-1 sm:col-span-1 flex justify-end user_icon_top_header">
@@ -1219,23 +1354,6 @@ export default function RootLayout({
                           backgroundColor: pathname == "/Immobilize" ? "white" : ""
                         }}
                       >
-                        {/*                  
-                        <g id="SVGRepo_iconCarrier">
-                          {" "}
-                          <g>
-                            <path
-                              d="M64,48L64,48h-8V32h8c8.836,0,16-7.164,16-16S72.836,0,64,0c-8.837,0-16,7.164-16,16v8H32v-8c0-8.836-7.164-16
- -16-16 S0,7.164,0,16s7.164,16,16,16h8v16h-8l0,0l0,0C7.164,48,0,55.164,0,64s7.164,16,16,16c8.837,0,16-7.164,16-16l0,0v-8h16v7
- .98 c0,0.008-0.001,0.014-0.001,0.02c0,8.836,7.164,16,16,16s16-7.164,16-16S72.836,48.002,64,48z M64,8c4.418,0,8,3.582,8,8 s-3
- .582,8-8,8h-8v-8C56,11.582,59.582,8,64,8z M8,16c0-4.418,3.582-8,8-8s8,3.582,8,8v8h-8C11.582,24,8,20.417,8,16z M16,72 c-4.418,
- 0-8-3.582-8-8s3.582-8,8-8l0,0h8v8C24,68.418,20.418,72,16,72z M32,48V32h16v16H32z M64,72c-4.418,0-8-3.582-8-8l0,0v-8 h7.999c4.418,
- 0,8,3.582,8,8S68.418,72,64,72z"
-                            ></path>
-                          </g>
-                        </g> */}
-                        {/* <defs>
-<style>.cls-1{fill:#fff;}</style>
-</defs> */}
  <g>
 	<path class="st0" d="M67.9,0H28.3L14,15.7l-0.4,0.5h-7c0,0-2.1,0-2.5,2.7c-0.3,1.5,0.3,3,1.5,3.8c1.1,0,2.1,0.1,3.1,0.3
 		c1.6,0.3,1.2,1.6,1.2,1.6c-6.2,3.9-9.7,11.3-9.7,11.3L0,65l2.1,2.5h13.4l2.6-6.2h56.5V37c-0.2-1.8,1.2-3.4,3-3.6c0.1,0,0.3,0,0.4,0
@@ -1254,6 +1372,87 @@ export default function RootLayout({
                           )}
                         </div>
                       )}
+                      
+{(session?.userRole == "SuperAdmin" ||
+              session?.userRole == "Admin") && (
+              <div>
+{session?.ServiceHistory && (
+  <Link href="/ServiceHistory">
+    <Tooltip
+      className="bg-[#00B56C] text-white rounded shadow-lg"
+      placement="right"
+      content="Service History"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className={`py-2 text-white-10 dark:text-white ${pathname == "/ServiceHistory" ? "border-b-2 mr-[1.5px] border-green-500" : "border-b-2  border-white"}`}
+        width="80px"
+        height="50px"
+        viewBox="0 0 512 512"
+        style={{
+          backgroundColor: pathname == "/ServiceHistory" ? "white" : "",  // White bg when active, black when not
+          borderRadius: "0",  // Ensure no rounding, so it stays as a square
+        }}
+      >
+        <g transform="translate(1 1)">
+          <g>
+            <g>
+              <path
+                d="M379.16,289.987c-32.427,0-63.147,12.8-83.627,36.693c-3.413,3.413-2.56,8.533,0.853,11.947
+                c3.413,3.413,8.533,2.56,11.947-0.853C325.4,317.293,351,306.2,378.307,306.2c52.053,0,93.867,41.813,93.867,93.867
+                c0,52.053-41.813,93.867-93.867,93.867c-42.463,0-79.831-28.994-91.449-68.267h40.249V408.6h-50.179
+                c-0.916-0.161-1.84-0.178-2.728,0h-15.36v68.267h17.067v-30.611C293.778,484.327,333.771,511,378.307,511
+                c61.44,0,111.787-48.64,111.787-110.08S440.6,289.987,379.16,289.987z"
+                fill={pathname == "/ServiceHistory" ? "green" : "white"}
+              />
+              <path
+                d="M71.107,50.2c-9.387,0-17.067,7.68-17.067,17.067V459.8c0,9.387,7.68,17.067,17.067,17.067H233.24
+                c5.12,0,8.533-3.413,8.533-8.533s-3.413-8.533-8.533-8.533H71.107V67.267h85.333c0,9.387,7.68,17.067,17.067,17.067h119.467
+                c9.387,0,17.067-7.68,17.067-17.067h85.333v196.267c0,5.12,3.413,8.533,8.533,8.533c5.12,0,8.533-3.413,8.533-8.533V67.267
+                c0-9.387-7.68-17.067-17.067-17.067H310.04V33.133h110.933c5.12,0,8.533,3.413,8.533,8.533v221.867
+                c0,5.12,3.413,8.533,8.533,8.533s8.533-3.413,8.533-8.533V41.667c0-14.507-11.093-25.6-25.6-25.6H310.04
+                C310.04,6.68,302.36-1,292.973-1H173.507c-9.387,0-17.067,7.68-17.067,17.067H45.507c-14.507,0-25.6,11.093-25.6,25.6V485.4
+                c0,14.507,11.093,25.6,25.6,25.6H233.24c5.12,0,8.533-3.413,8.533-8.533s-3.413-8.533-8.533-8.533H45.507
+                c-5.12,0-8.533-3.413-8.533-8.533V41.667c0-5.12,3.413-8.533,8.533-8.533H156.44V50.2H71.107z M173.507,16.067h119.467V24.6
+                v34.133v8.533H173.507v-8.533V24.6V16.067z"
+                fill={pathname == "/ServiceHistory" ? "green" : "white"}
+              />
+              <path
+                d="M330.264,177.347l-33.024-46.08c-5.12-7.68-13.653-11.947-23.04-11.947h-36.925c-1.169-0.55-2.525-0.853-4.035-0.853
+                s-2.865,0.304-4.035,0.853H192.28c-9.387,0-17.92,4.267-23.04,11.947l-33.024,46.08h-17.323c-12.8,0-22.187,10.24-22.187,22.187
+                v33.28c0,12.8,9.387,22.187,22.187,22.187h13.034c3.814,14.679,17.216,25.6,33.046,25.6c15.829,0,29.232-10.921,33.046-25.6
+                h70.442c3.814,14.679,17.216,25.6,33.046,25.6c15.829,0,29.232-10.921,33.046-25.6h13.034c12.8,0,22.187-9.387,23.04-22.187
+                v-33.28c0-12.8-10.24-22.187-22.187-22.187H330.264z M282.733,139.8l26.7,37.547h-67.66v-41.813h31.573
+                C277.613,135.533,281.027,137.24,282.733,139.8z M182.04,139.8c2.56-2.56,5.973-4.267,9.387-4.267h33.28v41.813h-68.532
+                L182.04,139.8z"
+                fill={pathname == "/ServiceHistory" ? "green" : "white"}
+              />
+              <path
+                d="M233.24,323.267h-128c-5.12,0-8.533,3.413-8.533,8.533c0,5.12,3.413,8.533,8.533,8.533h128
+                c5.12,0,8.533-3.413,8.533-8.533C241.773,326.68,238.36,323.267,233.24,323.267z"
+                fill={pathname == "/ServiceHistory" ? "green" : "white"}
+              />
+              <path
+                d="M233.24,365.933h-128c-5.12,0-8.533,3.413-8.533,8.533S100.12,383,105.24,383h128c5.12,0,8.533-3.413,8.533-8.533
+                S238.36,365.933,233.24,365.933z"
+                fill={pathname == "/ServiceHistory" ? "green" : "white"}
+              />
+              <path
+                d="M233.24,408.6h-128c-5.12,0-8.533,3.413-8.533,8.533s3.413,8.533,8.533,8.533h128c5.12,0,8.533-3.413,8.533-8.533
+                S238.36,408.6,233.24,408.6z"
+                fill={pathname == "/ServiceHistory" ? "green" : "white"}
+              />
+            </g>
+          </g>
+        </g>
+      </svg>
+    </Tooltip>
+  </Link>
+)}
+
+
+              </div>
+            )}
                     </List>
                     <Divider />
                   </Drawer>
@@ -1270,7 +1469,7 @@ export default function RootLayout({
       {/* Time */}
       <div className="lg:col-span-4 md:col-span-4 sm:col-span-10 col-span-12 lg:mx-0 md:mx-4 sm:mx-4 mx-4 lg:mt-2 flex items-center">
         <a className="text-white text-center font-popins text-xl sm:text-md">
-          <BlinkingTime timezone={session?.timezone} />
+        <BlinkingTime timezone={session?.timezone} dateFormat={session?.dateFormat||"DD MM YYYY"} timeFormat={session?.timeFormat||"hh:mm:ss A"}/>
         </a>
       </div>
       {session?.PortalNotification && ( 

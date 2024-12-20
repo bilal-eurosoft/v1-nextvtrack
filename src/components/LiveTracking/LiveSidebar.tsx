@@ -1,9 +1,10 @@
 import { VehicleData } from "@/types/vehicle";
-import { MouseEvent, useEffect, useState } from "react";
+
+import React, { MouseEvent, useEffect, useState } from "react";
 import { ActiveStatus } from "../General/ActiveStatus";
 import { useSession } from "next-auth/react";
 import { zonelistType } from "../../types/zoneType";
-import { getZoneListByClientId } from "../../utils/API_CALLS";
+import { getZoneListByClientId, getallattributes, getalluserview } from "../../utils/API_CALLS";
 import { useSearchParams } from "next/navigation";
 import { fetchZone } from "@/lib/slices/zoneSlice";
 import { useSelector } from "react-redux";
@@ -12,6 +13,8 @@ import infoIcon from "../../../public/icon2.svg"
 import infoIcon2 from "../../../public/icon3.svg"
 import { duration } from "moment";
 import Image from "next/image";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 const LiveSidebar = ({
   carData,
   countMoving,
@@ -71,6 +74,22 @@ const LiveSidebar = ({
       setZoneList(allZones?.zone);
     }
   }, [allZones]);
+  const [expandedIndex, setExpandedIndex] = useState(null);
+  const [allattributes, setallattributes] = useState([]);
+  const [allfields,setAllfields]= useState([])
+  useEffect(()=>{    
+    (async function () {
+      if(session?.defaultView == false){
+        const data =  await getalluserview(session?.userId, session?.accessToken)            
+        setallattributes(data.data)
+        }
+        const data = await getallattributes(session?.accessToken);
+        setAllfields(data.data);
+        
+    
+    })()
+  },[])
+
   // if (allZones?.zone?.length <= 0) {
   //   const func = async () => {
   //     const Data = await getZoneListByClientId({
@@ -207,6 +226,18 @@ const LiveSidebar = ({
         }
       })
       .map((item: any) => {
+        
+        let allatribute = allattributes?.find((i:any)=>{
+          return i.vehicleId==item.vehicleId
+        })
+
+        allatribute?.attributes?.map((i)=>{
+if(i.allow==false){
+  delete item[i.key]
+}
+        })
+        
+
         const i = zoneLatlog?.findIndex((zone: any) => {
           if (zone != undefined) {
             return isPointInPolygon(
@@ -276,7 +307,9 @@ const LiveSidebar = ({
 
   }
 
-
+  const toggleExpand = (index) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
+  };
 const [srcimgindex, setsrcimgindex] = useState(null);
   return (
     <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-2  col-span-5 main_sider_bar">
@@ -387,9 +420,8 @@ const [srcimgindex, setsrcimgindex] = useState(null);
         {filteredData?.map((item: VehicleData, index: any) => {
           return (
             <div key={index} style={{ backgroundColor: activeColor == item.vehicleId ? "#e1f0e3" : "" }} className="hover:bg-[#e1f0e3] cursor-pointer pt-2">
-            <div onClick={() => handleClickVehicle(item)} key={index}>
+            <div onClick={() => handleClickVehicle(item)}>
               <div key={item?.IMEI} className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 md:space-x-4 text-center py-2">
-            
                 <div className="xl:col-span-6 lg:col-span-5 md:col-span-4 sm:col-span-6 col-span-4 status_car_btn">
                   <div className="font-popins font-semibold text-start w-full lg:text-2xl text-1xl">
                     {item.vehicleStatus === "Parked" ? (
@@ -403,13 +435,13 @@ const [srcimgindex, setsrcimgindex] = useState(null);
                     )}
                   </div>
                 </div>
-           
+    
                 <div className="xl:col-span-2 lg:col-span-3 md:col-span-3 sm:col-span-3 col-span-3" id="btn_left_margin">
                   <button className={`${item?.vehicleStatus === "Hybrid" ? "bg-white text-black" : item?.vehicleStatus === "Moving" ? "bg-green text-white font-bold" : item?.vehicleStatus === "Parked" ? "bg-[#CF000F] text-white font-bold" : !item?.vehicleStatus ? "bg-[#CF000F] text-white font-bold" : "bg-yellow text-white font-bold"} p-1 px-3 -mt-1 shadow-lg`}>
                     {item?.vehicleStatus ? item?.vehicleStatus : "Parked"}
                   </button>
                 </div>
-           
+      
                 <div className="xl:col-span-4 lg:col-span-4 col-span-5 mph_speed">
                   <div className="grid grid-cols-4">
                     <div className="lg:col-span-3 md:col-span-3 col-span-2 font-bold">{item.gps.speedWithUnitDesc}</div>
@@ -431,29 +463,107 @@ const [srcimgindex, setsrcimgindex] = useState(null);
                 <h1 className="font-popins text-start">
                   <span>{item.timestamp} </span>
                 </h1>
-                {item.odometer != null && (
-                <Image
-                  src={srcimgindex === index ? infoIcon2 : infoIcon}
-                  alt="Odometer Icon"
-                  onMouseEnter={() => setsrcimgindex(index)} // Change to hover image
-                  onMouseLeave={() => setsrcimgindex(null)} // Change back to default image
-                  className="h-10 w-10 hover:scale-110 cursor-pointer"
-                  data-tooltip-target="tooltip-right"
-                  data-tooltip-placement="right"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleodometer(item, e);
-                  }}
-                />
-              )}
+                {/* {item.odometer != null && (
+                  <Image
+                    src={srcimgindex === index ? infoIcon2 : infoIcon}
+                    alt="Odometer Icon"
+                    onMouseEnter={() => setsrcimgindex(index)} // Change to hover image
+                    onMouseLeave={() => setsrcimgindex(null)} // Change back to default image
+                    className="h-10 w-10 hover:scale-110 cursor-pointer"
+                    data-tooltip-target="tooltip-right"
+                    data-tooltip-placement="right"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleodometer(item, e);
+                    }}
+                  />
+                )} */}
+                     {item.defaultView ==false       && ( //change to defualtview
+  <div
+    className="flex justify-end mr-[2px]"
+    data-tooltip-target="tooltip-right"
+    data-tooltip-placement="right"
+    onClick={(e) => {
+      e.stopPropagation();
+    }}
+  >
+    {expandedIndex === index ? (
+      <ExpandLessIcon
+        onClick={() => toggleExpand(null)} // Collapse when clicked
+        className="cursor-pointer text-[#00B56C]"
+        style={{ fontSize: "32px" }} // Increase icon size
+      />
+    ) : (
+      <ExpandMoreIcon
+        onClick={() => toggleExpand(index)} // Expand when clicked
+        className="cursor-pointer text-[#00B56C]"
+        style={{ fontSize: "32px" }} // Increase icon size
+      />
+    )}
+  </div>
+)}
+
               </div>
-          
               {item.DriverName && (item?.vehicleStatus === "Moving" || item?.vehicleStatus === "Pause") && (                
                 <p className="text-start font-bold">Driver Name: {item.DriverName.replace("undefine", "")}</p>
               )}
             </div>
-            <button className="border-b-2 border-green w-full text-end -mt-10"></button>
-          </div>
+      
+            {expandedIndex === index &&  item.defaultView ==false            
+             && (
+  <div className="mt-2 rounded-md bg-gray-100">
+    {allfields.map((attribute) => {
+      const getNestedValue = (obj, path) => {
+        const keys = path.split('.');
+        for (let key of keys) {
+          if (obj && obj.hasOwnProperty(key)) {
+            obj = obj[key];
+          } else {
+            return undefined;
+          }
+        }
+        return obj;
+      };
+      
+
+      const value = getNestedValue(item, attribute.key);
+
+      // Check if the current attribute is the one requiring calculation
+      if (attribute.key === "gpsStatus" && allattributes.find((i)=>{return i.vehicleId==item.vehicleId})?.attributes.find((j)=>{return j.key=="gpsStatus"})?.allow) {
+        // Only show this field if gpsStatus is true
+        const targetTimeDate = new Date(item.targetTime);
+        const currentTimeDate = new Date(item.currentTime);
+        const timeDiffMinutes = Math.abs(targetTimeDate.getTime() - currentTimeDate.getTime()) / (1000 * 60);
+        const newDivColor = timeDiffMinutes > 120 ? false : true;
+        return (
+          <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
+          <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
+          <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}> {newDivColor ? "On": "Off"}</span>
+         </p>
+        );                
+      }
+
+      // Render other attributes
+      if(value){
+      return (
+        <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
+        <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
+        <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}>{value}</span>
+      </p>
+      );}
+      // if (attribute.allow && value) {
+      // }
+      return null;
+    })}
+  </div>
+)}
+
+
+
+              <button className="border-b-2 border-green w-full text-end"></button>
+            
+            </div>
+   
           
        
           );
