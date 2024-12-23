@@ -48,7 +48,7 @@ const DynamicCarMap = ({
   setShowZones,
   showZones,
 
-  selectedOdoVehicle,
+  // selectedOdoVehicle,
   position,
   
 }: {
@@ -65,7 +65,7 @@ const DynamicCarMap = ({
   setShowZones: any;
   showZones: any;
 
-  selectedOdoVehicle:any;
+  // selectedOdoVehicle:any;
   position:any
   
 }) => {
@@ -130,7 +130,7 @@ const DynamicCarMap = ({
   const handleShowZone = () => {
     setShowZones(!showZones);
   };
-  let ododata = carData.filter((item)=> item.vehicleReg ==selectedOdoVehicle?.vehicleReg)[0]?.odometer
+  // let ododata = carData.filter((item)=> item.vehicleReg ==selectedOdoVehicle?.vehicleReg)[0]?.odometer
 
   return (
     <>
@@ -145,10 +145,22 @@ const DynamicCarMap = ({
               className="z-0"
               zoom={zoom}
             >
-              <TileLayer
+              {session?.MapType == "Google"?(
+                <TileLayer
+                url={`https://{s}.googleapis.com/maps/vt?lyrs=m&x={x}&y={y}&z={z}&key=AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo`}
+              subdomains={['mt0', 'mt1', 'mt2', 'mt3']} // Google tile servers
+              attribution="Google Maps"
+            />
+              ):(
+                <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
               />
+              )}
+              {/* <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
+              /> */}
 
               {showZones &&
                 zoneList.map((singleRecord: any) => {
@@ -203,7 +215,7 @@ const DynamicCarMap = ({
               />
             </MapContainer>
           )}
-{ selectedOdoVehicle != null  && ( 
+{/* { selectedOdoVehicle != null  && ( 
 <div
     className="absolute   left-2  bg-white border border-gray-300 p-2 rounded shadow-md"
 
@@ -217,8 +229,8 @@ const DynamicCarMap = ({
     
 
   </div>
-)}
-
+)} */}
+{/* 
 { selectedOdoVehicle != null  && ( 
 <div
     className="absolute   left-2  bg-white border border-gray-300 p-2 rounded shadow-md"
@@ -233,7 +245,7 @@ const DynamicCarMap = ({
     
 
   </div>
-)}
+)} */}
 
 
           {/* <div className="grid grid-cols-1 absolute shadow-lg rounded-md lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2">

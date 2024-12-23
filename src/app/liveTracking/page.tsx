@@ -41,9 +41,9 @@ const LiveTracking = () => {
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleData | null>(
     null
   );
-  const [selectedOdoVehicle, setSelectedOdoVehicle] = useState(
-    null
-  );
+  // const [selectedOdoVehicle, setSelectedOdoVehicle] = useState(
+  //   null
+  // );
   const [userVehicle, setuserVehicle] = useState([]);
   const [unselectVehicles, setunselectVehicles] = useState(false);
   const [zoom, setZoom] = useState(10);
@@ -284,8 +284,8 @@ useEffect(()=>{
           setZoom={setZoom}
           setShowZones={setShowZones}
           // setShowZonePopUp={setShowZonePopUp}
-          setSelectedOdoVehicle={setSelectedOdoVehicle}
-          selectedOdoVehicle={selectedOdoVehicle}
+          // setSelectedOdoVehicle={setSelectedOdoVehicle}
+          // selectedOdoVehicle={selectedOdoVehicle}
           setPosition={setPosition}
         />
         {carData?.current?.length !== 0 && (
@@ -302,7 +302,7 @@ useEffect(()=>{
             zoom={zoom}
             setShowZones={setShowZones}
             showZones={showZones}
-            selectedOdoVehicle={selectedOdoVehicle}
+            // selectedOdoVehicle={selectedOdoVehicle}
             position={position}
           />
         )}

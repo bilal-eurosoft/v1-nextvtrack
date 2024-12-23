@@ -2656,11 +2656,22 @@ key={index}
                minZoom={minzoom}
            maxZoom={maxzoom}
                  >
-                  <TileLayer
+                 {session?.MapType == "Google"?(
+                <TileLayer
+                url={`https://{s}.googleapis.com/maps/vt?lyrs=m&x={x}&y={y}&z={z}&key=AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo`}
+              subdomains={['mt0', 'mt1', 'mt2', 'mt3']} // Google tile servers
+              attribution="Google Maps"
+            />
+              ):(              
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
+              />
+              )}
+               {/* <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
-                  />
-                      
+                  /> */}
 
                   {loadingMap  ? (
                     <Polyline
