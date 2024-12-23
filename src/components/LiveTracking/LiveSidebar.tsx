@@ -449,7 +449,7 @@ const [srcimgindex, setsrcimgindex] = useState(null);
                       {session?.timezone !== undefined ? (
                         <ActiveStatus
                           currentTime={new Date().toLocaleString("en-US", { timeZone: session.timezone })}
-                          targetTime={item.timestamp}
+                          targetTime={item.timestampNotParsed}
                           reg={item.vehicleReg}
                         />
                       ) : ""}
