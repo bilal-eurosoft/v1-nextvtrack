@@ -29,8 +29,8 @@ const LiveSidebar = ({
   setZoom,
   // setShowZonePopUp,
   setShowZones,
-  setSelectedOdoVehicle,
-  selectedOdoVehicle,
+  // setSelectedOdoVehicle,
+  // selectedOdoVehicle,
   setPosition,
 }: {
   carData: VehicleData[];
@@ -46,8 +46,8 @@ const LiveSidebar = ({
   setZoom: any;
   // setShowZonePopUp: any;
   setShowZones: any;
-  setSelectedOdoVehicle:any;
-  selectedOdoVehicle:any;
+  // setSelectedOdoVehicle:any;
+  // selectedOdoVehicle:any;
   setPosition:any;
 
 
@@ -290,22 +290,22 @@ if(i.allow==false){
   // )} minutes, ${Math.abs(duration.seconds())} seconds`;
 
  
-  const handleodometer = (item:any, e: any) => {
+//   const handleodometer = (item:any, e: any) => {
    
-    const rect = e.currentTarget.getBoundingClientRect(); 
- if(selectedOdoVehicle?.vehicleReg == item.vehicleReg){
-  setPosition({ top: 0, left: 0 });
-  setSelectedOdoVehicle(null)
- }
- else{
-  setSelectedOdoVehicle(item)
+//     const rect = e.currentTarget.getBoundingClientRect(); 
+//  if(selectedOdoVehicle?.vehicleReg == item.vehicleReg){
+//   setPosition({ top: 0, left: 0 });
+//   // setSelectedOdoVehicle(null)
+//  }
+//  else{
+//   // setSelectedOdoVehicle(item)
   
- // setPosition({ top: e.clientY , left: e.clientX  });
- setPosition({ top: rect.top, left: rect.left }); 
+//  // setPosition({ top: e.clientY , left: e.clientX  });
+//  setPosition({ top: rect.top, left: rect.left }); 
 
- }
+//  }
 
-  }
+//   }
 
   const toggleExpand = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
@@ -447,20 +447,18 @@ const [srcimgindex, setsrcimgindex] = useState(null);
                     <div className="lg:col-span-3 md:col-span-3 col-span-2 font-bold">{item.gps.speedWithUnitDesc}</div>
                     <div className="text-labelColor lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-1">
                       {session?.timezone !== undefined ? (
-                       <> 
                         <ActiveStatus
                           currentTime={new Date().toLocaleString("en-US", { timeZone: session.timezone })}
-                          targetTime={item.timestamp}
+                          targetTime={item.timestampNotParsed}
                           reg={item.vehicleReg}
                         />
-                     
-                      </>
                       ) : ""}
                     </div>
                   </div>
                 </div>
               </div>
-      
+     
+            
               <div className="flex justify-between items-center mt-1 text-md font-bold text-labelColor">
                 <h1 className="font-popins text-start">
                   <span>{item.timestamp} </span>

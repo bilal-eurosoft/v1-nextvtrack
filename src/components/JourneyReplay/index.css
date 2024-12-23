@@ -148,9 +148,6 @@ input[type="checkbox"]:hover {
     grid-column: 3 span;
     margin-left: -13.4%;
   }
-  .gm-style-iw-chr{
-    display: none;
-  }
   .journey_replay_harsh_child {
     grid-column: 1 span;
   }

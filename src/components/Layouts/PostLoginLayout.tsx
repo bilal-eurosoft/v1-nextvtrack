@@ -25,6 +25,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { getNotificationsData, getNotificationsDataByUserId, getZoneListByClientId } from "@/utils/API_CALLS";
 import { fetchZone } from "@/lib/slices/zoneSlice";
 import { useSelector } from "react-redux";
+
 import { FaBell } from 'react-icons/fa'; // Using React Icons for the bell icon
 
 import {
