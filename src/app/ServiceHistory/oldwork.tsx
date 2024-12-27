@@ -7,9 +7,6 @@ import {
   getVehicleDataByClientIdForOdometer,
   handleServiceHistoryRequest,
   vehicleListByClientId,
-  handleServicesRequest,
-  getVehicleDataByClientId,
-  getevents
 } from "@/utils/API_CALLS";
 import Select from "react-select";
 import { DeviceAttach, VehicleData } from "@/types/vehiclelistreports";
@@ -17,192 +14,17 @@ import { MuiPickersUtilsProvider, DatePicker,TimePicker  } from "@material-ui/pi
 import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
 import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
 import "./assign.css";
-import Graph from '@/components/servicehistory/graph'; // Import the time icon
 import AccessTimeIcon from '@mui/icons-material/AccessTime'; // Import the time icon
 // Assuming there's an API service to get the service data
 import { FaCogs } from 'react-icons/fa';
-import { socket } from "@/utils/socket";
-import uniqueDataByIMEIAndLatestTimestamp from "@/utils/uniqueDataByIMEIAndLatestTimestamp";
 
 export default function ServiceHistory() {
   const router = useRouter();
   const { data: session } = useSession();
 
- /*  if (!session?.ServiceHistory) {
+  if (!session?.ServiceHistory) {
     router.push("/liveTracking");
   }
-  */
-  // State to store the service data, modal visibility, pagination info, and form data
-  const [services, setServices] = useState<any[]>([]);
-  const [simpleservices, setsimpleServices] = useState<any[]>([]);
-  const initialsimpleservicesForm = {
-  service: "",
-    other: ""
-  }
-  const [simpleservicesForm, setsimpleservicesForm] = useState(initialsimpleservicesForm);
-
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalOpenNew, setModalOpenNew] = useState(false);
-  const [vehicles, setVehicles] = useState<any[]>([]);
-  const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
-
-  const [SelectedServiceId, setSelectedServiceId] = useState();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editModal, seteditModal] = useState(false);
-  const [serviceType, setserviceType] = useState<String>();
-
-  const [disabledbutton, setdisabledbutton] = useState(false)
-
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [filteredServices, setFilteredServices] = useState([]); 
-  
- const [file, setFile] = useState(null);
- const [viewMode, setViewMode] = useState("card"); // "card" or "table"
- const [activeTab, setActiveTab ] = useState("services"); // "card" or "table"
- const [activeTabvehicle, setActiveTabvehicle ] = useState("vehicle"); // "card" or "table"
- 
-const [selectedvehicle, setselectedvehicle] = useState()
-const [singleVehicleDetail, setsingleVehicleDetail] = useState([])
- const [searchTerm, setSearchTerm] = useState("");
-
-////////////////////////////
-const carData = useRef<VehicleData[]>([]);
-const [isOnline, setIsOnline] = useState(false);
-const [piedata, setpiedata] = useState([])
-const [bardata, setbardata] = useState([])
-const [linedata, setlinedata] = useState([]);
-const [socketdata, setsocketdata] = useState<VehicleData[]>([]);
-
-const [isFirstTimeFetchedFromGraphQL, setIsFirstTimeFetchedFromGraphQL] = useState(false);
-useEffect(() => {
-    async function dataFetchHandler() {
-        if (session?.clientId) {
-            const clientVehicleData = await getVehicleDataByClientId(
-                session?.clientId
-            );
-            if (clientVehicleData?.data?.Value) {
-                let parsedData = JSON.parse(
-                    clientVehicleData?.data?.Value
-                )?.cacheList;
-                let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
-                carData.current = uniqueData;
-                setsocketdata(uniqueData)
-                setpiedata(uniqueData.map((item) => {
-                    return { name: item.vehicleReg, distance: Number(item.distance?.split(" ")[0]) || 0 }
-                }))
-                setbardata(uniqueData.map((item) => {
-                    return { name: item.vehicleReg, tripcount: Number(item?.tripcount) || 0 }
-                }))
-            }
-        }
-    }
-    dataFetchHandler();
-}, [isFirstTimeFetchedFromGraphQL
-]);
-const fetchTimeoutGraphQL = 60 * 1000; //60 seconds
-useEffect(() => {
-    setIsOnline(navigator.onLine);
-}, []);
-useEffect(() => {
-    let interval = setInterval(() => {
-        setIsFirstTimeFetchedFromGraphQL(prev => !prev)
-    }, fetchTimeoutGraphQL); // Runs every fetchTimeoutGraphQL seconds
-    return () => {
-        clearInterval(interval); // Clean up the interval on component unmount
-    };
-}, [isOnline,
-    session?.clientId])
-useEffect(() => {
-    if (isOnline && session?.clientId) {
-        try {
-            socket.io.opts.query = { clientId: session?.clientId };
-            socket.connect();
-            socket.on(
-                "message",
-                async (data: { cacheList: VehicleData[] } | null | undefined) => {
-                    if (data === null || data === undefined) {
-                        return;
-                    }
-
-                    const uniqueData = uniqueDataByIMEIAndLatestTimestamp(
-                        data?.cacheList
-                    );
-                    carData.current = uniqueData;
-                    setpiedata(uniqueData.map((item) => {
-                        return { name: item.vehicleReg, distance: Number(item?.distance?.split(" ")[0]) || 0 }
-                    }))
-                    setbardata(uniqueData.map((item) => {
-                        return { name: item.vehicleReg, tripcount: Number(item?.tripcount) || 0 }
-                    }))
-                }
-            );
-        } catch (err) { }
-    }
-    if (!isOnline) {
-        socket.disconnect();
-    }
-    return () => {
-        socket.disconnect();
-    };
-}, [isOnline, session?.clientId]);
-
-async function getEventsdata() {
-    let data = (await getevents(session?.clientId, session?.accessToken)).data
-
-    if (data.length == 0) {
-
-        setlinedata(
-            socketdata.map((item) => {
-            return {
-                name: item.vehicleReg,
-                "Harsh Acceleration": 0,
-                "Harsh Break": 0,
-                "Harsh Cornering": 0
-
-            }
-        }))
-    } else {
-        setlinedata(data)
-
-    }
-}
-useEffect(() => {
-    getEventsdata()
-}, [socketdata])
-
-////////////////////////////
-  
-  const [TimeValue, setTimeValue] = useState(null);
-  const [currentMileageByApi, setcurrentMileageByApi] =
-    useState<Number>();
-   
-  const [error, setError] = useState<string | null>(null);
-  const initialFormData: VehicleData = {
-    clientId: "",
-    vehicleId: "",
-    serviceTitle: "",
-    reminderDay: 0,
-    reminderMilage: 0,
-    expiryDay: 0,
-    expiryMilage: 0,
-    lastMilage: 0,
-    lastDate: "",
-    expiryDate: "",
-    dataType: "",
-    maintenanceType: "",
-    file: "",
-    filename: "",
-    documentType: "",
-    issueDate: "",
-    sms: false,
-    email: false,
-    pushnotification: false,
-    status: ""
-  };
-  const [formData, setFormData] = useState<VehicleData>(initialFormData);
-  const [menuIsOpen, setMenuIsOpen] = useState(false);
   const fetchServicesFromAPI = async () => {
     if (session) {
       try {
@@ -218,100 +40,74 @@ useEffect(() => {
       }
     }
   };
-  
 
-  //card wali services hai
-  const fetchServices = async () => {
-    if (session) {
-      try {
-        const Data = await handleServicesRequest({
-          token: session.accessToken,
-          method: "GET",
-        });
-        setsimpleServices(Data.data);
-        return  Data.data;
-      } catch (error) {
-        toast.error("Failed to load services.");
-        return [];
-      }
-    }
+  // State to store the service data, modal visibility, pagination info, and form data
+  const [services, setServices] = useState<any[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
+
+  const [SelectedServiceId, setSelectedServiceId] = useState();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editModal, seteditModal] = useState(false);
+  const [serviceType, setserviceType] = useState<String>();
+
+  const [disabledbutton, setdisabledbutton] = useState(false)
+ /*  const [formData, setFormData] = useState({
+    id: "",
+    serviceTitle: "",
+    vehicleReg: "",
+    serviceType: "",
+    targetValue: null,
+    pushnotification: false,
+    sms: false,
+    email: false,
+    clientId: session?.clientId ?? "", // Default to empty string if undefined
+  vehicleId:  "",  // Assumed to come from session
+  Preventive: false,
+  Corrective: false,
+  }); */
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [filteredServices, setFilteredServices] = useState([]); 
+  
+  const [TimeValue, setTimeValue] = useState(null);
+  const [currentMileageByApi, setcurrentMileageByApi] =
+    useState<Number>();
+  const [error, setError] = useState<string | null>(null);
+  const initialFormData: VehicleData = {
+    clientId: "",
+    vehicleId: "",
+    dataType: "Service",
+    serviceTitle: "",
+    serviceType: "",
+    maintenanceType: "",
+    file: "",
+    filename: "",
+    documentType: "",
+    createdDate: "",
+    expiryDate: "",
+    targetValue: "",
+    sms: false,
+    email: false,
+    pushnotification: false,
+    status: "due"
   };
-  const AddfetchServices = async (data) => {
-  
-  data.clientId = session?.clientId
-  console.log("dsvdsv", data);
-    if (session) {
-      try {
-        const Data = await handleServicesRequest({
-          token: session.accessToken,
-          method: "POST",
-          payload: data
-        });
-console.log("object",Data );
-if(Data.success == true){
- await fetchServices()
-  toast.success("Data Saved Succesfully")
-  setModalOpenNew(false)
+  const [formData, setFormData] = useState<VehicleData>(initialFormData);
+  // const initialFormData = {
+  //   id: "",
+  //   serviceTitle: "",
+  //   vehicleReg: "",
+  //   serviceType: "",
+  //   targetValue: null,
+  //   pushnotification: false,
+  //   sms: false,
+  //   email: false,
+  //   clientId: session?.clientId ?? "", // Default to empty string if undefined
+  //   vehicleId:  "",  // Assumed to come from session
 
-}
-        return Data;
-      } catch (error) {
-        toast.error("Failed to load services.");
-        return [];
-      }
-    }
-  };
-
-  const DeleteServices = async (id) => {
-  
-    console.log("id",id );
-      if (session) {
-        try {
-          const Data = await handleServicesRequest({
-            token: session.accessToken,
-            method: "DELETE",
-            payload: {id: id}
-          });
-  console.log("object",Data );
-  if(Data.success == true){
-   await fetchServices()
-    toast.success("Data Saved Succesfully")
-  }
-          return
-        } catch (error) {
-          toast.error("Failed to load services.");
-          return [];
-        }
-      }
-    };
-
-  const handleSubmitservice = async (e: React.FormEvent) => {
-    e.preventDefault();
-   await  AddfetchServices(simpleservicesForm)
-
-  }
-
-  useEffect(() => {
-    const loadsimpleServices = async () => {
-      try {
-        const fetchedServices = await fetchServices();
-        console.log("fetchedServices", fetchedServices);
-        if (fetchedServices.length > 0) {
-         // console.log("fetchedServices", fetchedServices);
-         setsimpleServices(fetchedServices);
-        
-        } else {
-          setsimpleServices([]); // Empty data set
-        
-        }
-       
-      } catch (error) {
-        toast.error("Failed to load services.");
-        setsimpleServices([]); // In case of error, set to empty
-      }
-    };
-    loadsimpleServices();
-  }, []);
+  // };
 
   // Fetch services on page load (or reload)
   useEffect(() => {
@@ -319,7 +115,7 @@ if(Data.success == true){
       try {
         const fetchedServices = await fetchServicesFromAPI();
         if (fetchedServices.length > 0) {
-         // console.log("fetchedServices", fetchedServices);
+          console.log("fetchedServices", fetchedServices);
           setServices(fetchedServices);
           setFilteredServices(fetchedServices); 
         } else {
@@ -334,7 +130,35 @@ if(Data.success == true){
     };
     loadServices();
   }, []);
-console.log("services", services);
+
+  /*  const fetchMileage = async () => {
+    try {
+      setLoading(true);
+      // Make the API request (replace with your actual API URL)
+      const response = await fetch('https://yourapi.com/mileage');
+      const data = await response.json();
+
+      // Assuming the API response has the mileage value
+      if (data && data.mileage) {
+        setFormData((prevState) => ({
+          ...prevState,
+          current: data.mileage, // Pre-filling the 'current' field with the API value
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching mileage:", error);
+    } finally {
+      setLoading(false);
+    }
+  }; */
+
+  /*   useEffect(() => {
+    // Trigger the API call only if 'Milagewise' is selected
+    if (formData.serviceType === 'Milagewise') {
+      fetchMileage();
+    }
+  }, [formData.serviceType]); */
+
   useEffect(() => {
     const vehicleListData = async () => {
       if (session) {
@@ -357,7 +181,7 @@ console.log("services", services);
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-   console.log("serviceTitle",name, value );
+   
     // Handle changes for the "current" input field
     if (name === "targetValue") {
       // Clear error when valid input is provided
@@ -385,29 +209,6 @@ console.log("services", services);
         [name]: value,
       }));
     }
-
-    setFormData((prev) => ({
-      ...prev,
-      dataType:
-        activeTab === "documentation"
-          ? "Documentation"
-          : activeTab === "maintenance"
-          ? "Maintenance"
-          : "Service",
-    }));
-
-  };
-
-  const handleInputserviceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
- 
-
-
-      setsimpleservicesForm((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-
   };
 
   useEffect(() => {
@@ -423,26 +224,6 @@ console.log("services", services);
       targetValue: formattedDate, // Update state with formatted date or null
     }));
   };
-  const handleCreatedDateChange = (newDate) => {
-    // Ensure that the selected date is either valid or null
-    const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
-
-    setFormData((prev) => ({
-      ...prev,
-      createdDate: formattedDate, // Update state with formatted date or null
-    }));
-  };
-  const handleExpiryDateChange = (newDate) => {
-    // Ensure that the selected date is either valid or null
-    const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
-
-    setFormData((prev) => ({
-      ...prev,
-      expiryDate: formattedDate, // Update state with formatted date or null
-    }));
-  };
-
-  
 
   const handleTimeChange = (time) => {
     setTimeValue(time)
@@ -490,30 +271,23 @@ console.log("dfgdfdf", formData.vehicleReg);
     }
 
   };
+
   // Handle form submit (for adding or updating services)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-
-   //return
-   const vehicle = vehicleList.filter((item)=> item.vehicleReg == selectedvehicle )
-
-   formData.clientId = session?.clientId,
-   formData.vehicleId = vehicle[0]._id
- 
-   let newdata
     // Check if all required fields are filled
     if (!formData.serviceTitle) {
       toast.error("Service Task is required!");
       return; // Stop the form submission if validation fails
     }
-    
-    
-    if(formData.dataType == "Service"){
-      if (!formData.serviceType) {
-        toast.error("Service Type is required!");
-        return; // Stop the form submission if validation fails
-      }
+    /* if (!formData.vehicleReg) {
+      toast.error("Vehicle Registration is required!");
+      return; // Stop the form submission if validation fails
+    } */
+    if (!formData.serviceType) {
+      toast.error("Service Type is required!");
+      return; // Stop the form submission if validation fails
+    }
     if (formData.serviceType === "Milagewise" && !formData.targetValue ) {
       toast.error("Current Milage is required!");
       return; // Stop the form submission if validation fails
@@ -522,7 +296,7 @@ console.log("dfgdfdf", formData.vehicleReg);
       toast.error("Current Date/Time is required!");
       return; // Stop the form submission if validation fails
     }
-     // Assuming TimeValue contains the new time to append
+    // Assuming TimeValue contains the new time to append
 let timeObj = new Date(TimeValue);
 
 // Get the time part in 'HH:mm:ss' format
@@ -536,95 +310,6 @@ let completeDateTime = `${datePart}T${timeString}`;
 
 // Update the formData.targetValue
 formData.targetValue = completeDateTime;
-console.log("completeDateTime", completeDateTime, TimeValue);
-formData.status = "pending";
-delete formData.documentType;
-delete formData.createdDate;
-delete formData.expiryDate;
-delete formData.file;
-delete formData.filename;
-delete formData.maintenanceType
-delete formData.id
-delete formData.vehicleReg
-
-  }
-  else  if(formData.dataType == "Maintenance"){
-    
-
- 
-  delete formData.documentType;
-  delete formData.createdDate;
-  delete formData.expiryDate;
-  delete formData.file;
-  delete formData.filename;
-  delete formData.email;
-  delete formData.pushnotification;
-  delete formData.serviceType;
-  delete formData.sms;
-  delete formData.status;
-  delete formData.targetValue;
-  delete formData.id
-  delete formData.vehicleReg
-  }
-  else {
-    formData.file = file
-    delete formData.documentType;
-    delete formData.filename;
-    delete formData.maintenanceType
-    delete formData.serviceType;
-  
-    delete formData.status;
-    delete formData.targetValue;
-    delete formData.id
-    delete formData.vehicleReg
-     newdata =  new FormData();
-    
-    //return
-    // const vehicle = vehicleList.filter((item)=> item.vehicleReg == selectedvehicle )
-    console.log(file)
-  //  newdata.append("file", file)  
-  //   newdata.append("clientId",session?.clientId)
-  // newdata.append("dataType",formData.dataType)
-  // newdata.append("serviceTitle",formData.serviceTitle)
-  // newdata.append("serviceType",formData.serviceType)
-  // newdata.append("clientId","session?.clientId")
-  // newdata.append("dataType","formData.dataType")
-  // newdata.append("serviceTitle","formData.serviceTitle")
-  // newdata.append("serviceType","formData.serviceType")
- 
-  if (file !== null) {
-    // Append the file to FormData
-    newdata.append("file", file);  
-  
-    // Append other fields to FormData
-    newdata.append("clientId", session?.clientId ?? "");  // Use fallback in case session?.clientId is null/undefined
-    newdata.append("dataType", formData.dataType ?? "");   // Fallback for undefined dataType
-    newdata.append("serviceTitle", formData.serviceTitle ?? ""); // Fallback for undefined serviceTitle
-    newdata.append("serviceType", formData.serviceType ?? "");   // Fallback for undefined serviceType
-    
-    console.log("File and other fields appended.");
-  } else {
-    // Handle the case where the file is null
-    console.log("No file to append.");
-  }
-  
-  // Log the contents of the FormData object by iterating over its entries
-  newdata.forEach((value, key) => {
-   
-    console.log(key, value);  // Logs each key and value in FormData
-  });
-  console.log("dvds", newdata);
-}
-const formDataObject: { [key: string]: any } = {};
-newdata?.forEach((value, key) => {
-  formDataObject[key] = value;
-});
-
-console.log("Converted FormData to plain object", formDataObject);
-  // Additionally, log formData and newdata to see their content outside of FormData
-  console.log("formData", formData);
-return
-
     // If all required fields are filled, proceed with the form submission
     try {
       //  console.log("formData",formData);
@@ -653,7 +338,7 @@ return
         }
       } else {
         // Add new service (API call to add)
-        let Data = await addService(formDataObject);
+        let Data = await addService(formData);
         if (Data.success == true) {
           setModalOpen(false);
           toast.success("Service added!");
@@ -688,70 +373,7 @@ return
     }
   };
 
-const handleSave = async() =>{
- 
-  return
-  try {
-    //  console.log("formData",formData);
-    if (formData._id) {
-      // Update existing service (API call to update)
-      const { _id, ...rest } = formData;
 
-      // Create the new data object with id field instead of _id
-      const data = {
-        id: _id, // Renaming _id to id
-        ...rest, // Spread the remaining fields from formData
-      };
-     
-      let Data = await updateService(data);
-      if (Data.success == true) {
-        toast.success("Service updated!");
-        setModalOpen(false);
-        const updatedServices = await fetchServicesFromAPI();
-        setServices(updatedServices);
-        setFilteredServices(updatedServices); 
-        setCurrentPage(1);
-        
-      } else {
-        toast.error(Data.message);
-        return;
-      }
-    } else {
-      // Add new service (API call to add)
-      let Data = await addService(formData);
-      if (Data.success == true) {
-        setModalOpen(false);
-        toast.success("Service added!");
-        const updatedServices = await fetchServicesFromAPI();
-        setServices(updatedServices);
-        setFilteredServices(updatedServices); 
-        setFormData(initialFormData)
-        
-        setCurrentPage(1);
-      } else {
-        toast.error(Data.message);
-      }
-    }
-
-    // Reset form data and close modal
-    setFormData({
-      id: "",
-      serviceTitle: "",
-      vehicleReg: "",
-      serviceType: "",
-      targetValue: null,
-      pushnotification: false,
-      sms: false,
-      email: false,
-      clientId: session?.clientId ?? "",
-      vehicleId: "",
-    });
-    setTimeValue(null)
-    setModalOpen(false);
-  } catch (error) {
-    toast.error("An error occurred while saving the service.");
-  }
-}
 
 
   // Add service (example API function)
@@ -868,14 +490,11 @@ const handleSave = async() =>{
     seteditModal(true);
     setserviceType("Update");
     setFormData(service);
-    console.log("service", service);
-    if(service.dataType == "Service"){
    let TimePart = service.targetValue.split('T')[1];
     const timeParts = TimePart.split(":"); 
     const dateWithTime = new Date();
     dateWithTime.setHours(timeParts[0], timeParts[1], timeParts[2]);
     setTimeValue(dateWithTime)
-  }
     setModalOpen(true);
   }
 
@@ -997,19 +616,16 @@ const handleSave = async() =>{
   };
   const colors = generateColors(vehicles.length);
 
+const [selectedvehicle, setselectedvehicle] = useState()
+const [singleVehicleDetail, setsingleVehicleDetail] = useState([])
   const handleCardClick = (e) => {
    
     setselectedvehicle(e)
     const vehicle = vehicleList.filter((item)=> item.vehicleReg == e)
-    console.log("vehicle", vehicle[0]._id);
-    // setFormData((prev) => ({
-    //   ...prev,
-    //   vehicleId:  vehicle[0]._id,
-    // }));
-    // setFormData((prev) => ({
-    //   ...prev,
-    //   clientId:  session?.clientId,
-    // }));
+    setFormData((prev) => ({
+      ...prev,
+      vehicleReg:  e,
+    }));
     
     setsingleVehicleDetail(vehicle)
     const query = e.toLowerCase();
@@ -1019,9 +635,8 @@ const handleSave = async() =>{
           value && value.toString().toLowerCase().includes(query) 
         )
     );
-  
+    console.log("Scacasca", filtered);
     setFilteredServices(filtered); 
-    console.log("scacsc",filtered);
     setActiveTab("services")
     setCurrentPage(1); 
   
@@ -1033,7 +648,10 @@ const handleSave = async() =>{
     setselectedvehicle(null);
   };
 
-
+  const [viewMode, setViewMode] = useState("card"); // "card" or "table"
+  const [activeTab, setActiveTab ] = useState("services"); // "card" or "table"
+  
+  const [searchTerm, setSearchTerm] = useState("");
 
 
   const handleTableRowClick = (service) => {
@@ -1057,14 +675,19 @@ const handleSave = async() =>{
     setActiveTab(null)
     setselectedvehicle(null)
   }
+  console.log("filteredServices",filteredServices);
+ console.log("paginatedServices",paginatedServices);
+ console.log("servifce",services);
 
 
+
+ const [file, setFile] = useState(null);
 
 
  const handleFileChange = (e) => {
    const selectedFile = e.target.files[0];
-console.log("selectedFile", selectedFile);
- 
+
+   // Validate file type
    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
    if (selectedFile && allowedTypes.includes(selectedFile.type)) {
      setFile(selectedFile);
@@ -1075,59 +698,6 @@ console.log("selectedFile", selectedFile);
    }
  };
 
- const serviceDocumentTypeOptions = [
-  { value: 'pdf-document', label: 'Sample Document 1 (PDF) - report.pdf' },
-  { value: 'png-image', label: 'Sample Image 1 (PNG) - image1.png' },
-  { value: 'pdf-document-2', label: 'Sample Document 2 (PDF) - document2.pdf' },
-  { value: 'png-image-2', label: 'Sample Image 2 (PNG) - image2.png' },
-];
-
-const [selectedDocuments, setSelectedDocuments] = useState([]);
-const [isDateSelected, setIsDateSelected] = useState(false);
-const [isReminderSelected, setIsReminderSelected] = useState(false);
-const [reminderValue, setReminderValue] = useState('');
-const [selectedDate, setSelectedDate] = useState('');
-// Handle change in selection
-const handleDocumentsServiceTypeChange = (selectedOption) => {
-  if (selectedOption) {
-    // Add selected document if not already selected
-    if (!selectedDocuments.some((doc) => doc.value === selectedOption.value)) {
-      setSelectedDocuments([...selectedDocuments, selectedOption]);
-    }
-  }
-};
-
-// Remove document from selectedDocuments
-const handleRemoveDocument = (value) => {
-  setSelectedDocuments(selectedDocuments.filter((doc) => doc.value !== value));
-};
-
-const handleDropdownToggle = () => {
-  setMenuIsOpen((prevState) => !prevState); // Toggle the state
-};
-
- // Handle checkbox changes for date
- const handleDateCheckboxChange = (e) => {
-  setIsDateSelected(e.target.checked);
-};
-
-// Handle checkbox changes for reminder
-const handleReminderCheckboxChange = (e) => {
-  setIsReminderSelected(e.target.checked);
-};
-
-// Handle reminder input change
-const handleReminderChange = (e) => {
-  setReminderValue(e.target.value);
-};
-
-// Handle date input change
-const handleDateChangeservice = (e) => {
-  console.log("object",e);
-  setSelectedDate(e);
-};
-
-
 /*  const handleSubmit2 = () => {
    if (file) {
      // Handle file submission logic (e.g., upload to server)
@@ -1136,135 +706,7 @@ const handleDateChangeservice = (e) => {
      console.log('No file selected');
    }
  }; */
- const documents = [
-  {
-    id: 1,
-    title: "Annual Report 2024",
-    issueDate: "2024-01-10",
-    expiryDate: "2025-01-10",
-    docType: "PDF",
-    alertTime: "7 days before expiry",
-  },
-  {
-    id: 2,
-    title: "Project Plan - XYZ",
-    issueDate: "2023-06-01",
-    expiryDate: "2024-06-01",
-    docType: "Word Document",
-    alertTime: "30 days before expiry",
-  },
-  {
-    id: 3,
-    title: "Invoice #12345",
-    issueDate: "2024-11-15",
-    expiryDate: "2025-11-15",
-    docType: "PDF",
-    alertTime: "15 days before expiry",
-  },
-  {
-    id: 4,
-    title: "Employee Contract - John Doe",
-    issueDate: "2023-09-25",
-    expiryDate: "2024-09-25",
-    docType: "PDF",
-    alertTime: "1 week before expiry",
-  },
-];
 
-
-const servicesTable = [
-  {
-    id: 1,
-    title: "aag laga do car ko",
-    other: "pesy nai hai",
-   
-  },
-  {
-    id: 2,
-    title: "Project Plan - XYZ",
-    issueDate: "",
-
-  },
-  {
-    id: 3,
-    title: "Invoice #12345",
-    issueDate: "",
-   
-  },
-  {
-    id: 4,
-    title: "Employee Contract - John Doe",
-    issueDate: "",
-  
-  },
-  {
-    id: 5,
-    title: "Annual Report 2024",
-    other: "",
-   
-  },
-  {
-    id: 6,
-    title: "Project Plan - XYZ",
-    issueDate: "",
-
-  },
-  {
-    id: 7,
-    title: "Invoice #12345",
-    issueDate: "",
-   
-  },
-  {
-    id: 8,
-    title: "Employee Contract - John Doe",
-    issueDate: "",
-  
-  },
-  {
-    id: 9,
-    title: "Annual Report 2024",
-    other: "",
-   
-  },
-  {
-    id: 10,
-    title: "Project Plan - XYZ",
-    issueDate: "",
-
-  },
-  {
-    id: 11,
-    title: "Invoice #12345",
-    issueDate: "",
-   
-  },
-  {
-    id: 12,
-    title: "Employee Contract - John Doe",
-    issueDate: "",
-  
-  },
-  {
-    id: 13,
-    title: "Employee Contract - John Doe",
-    issueDate: "",
-  
-  },
-  {
-    id: 14,
-    title: "Employee Contract - John Doe",
-    issueDate: "",
-  
-  },
-  {
-    id: 15,
-    title: "Employee Contract - John Doe",
-    issueDate: "",
-  
-  },
-
-];
 
 
 
@@ -1324,39 +766,17 @@ const servicesTable = [
         </div>
      
       )}
-{/*   {!selectedvehicle && (
+  {!selectedvehicle && (
     <> 
    <div className="flex gap-2 bg-white justify-between pr-[50px] mt-[20px] items-center mr-[140px]">
   <h2 className="text-3xl font-bold ml-8">Vehicles</h2>
-  <button
-    onClick={() => setModalOpenNew(true)}
-    className="ml-auto px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 bg-[#00B56C] text-white hover:bg-[#028B4A] transition-all"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="20px"
-      height="20px"
-      fill="none"
-      stroke="#ffffff"
-      strokeWidth="2"
-      className="w-5 h-5"
-    >
-      <path
-        fill="none"
-        stroke="#ffffff"
-        strokeWidth="2"
-        d="M12 5v14M5 12h14"
-      />
-    </svg>
-   Add service
-  </button>
+  
   <div className="flex gap-2">
     <button
       onClick={() => setViewMode("card")}
       className="px-2 py-2 bg-[#f3f4f6] rounded-md"
     >
-    
+      {/* Icon for card view */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
@@ -1374,7 +794,7 @@ const servicesTable = [
       onClick={() => setViewMode("table")}
       className="px-2 py-2 bg-[#f3f4f6] rounded-md"
     >
-    
+      {/* Icon for table view */}
       <svg
         fill="#000000"
         width="800px"
@@ -1390,87 +810,16 @@ const servicesTable = [
 </div>
 
       </>
-  )} */}
-  
+  )}
        
   {/* Toast Notifications */}
   <Toaster position="top-center" reverseOrder={false} />
  
   <div className={`${!selectedvehicle ? 'grid grid-cols-12 gap-4 bg-white' : ''}`}> 
-
-  <div className={`px-8  ${!selectedvehicle ? 'col-span-9' : ''}`}>
+  <div className={`px-8  ${!selectedvehicle ? 'col-span-8' : ''}`}>
     {/* Main Action Section */}
-    {!selectedvehicle && ( 
-    <div className="flex justify-start items-center border-b border-gray-200 mt-8 bg-[#f3f4f6] rounded-md">
-        
-        {/* Services Tab */}
-  
-  
-        <button 
-          onClick={() => setViewMode("card")}
-          className={`px-8 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${
-            viewMode === "card"
-              ? "bg-[#00B56C] text-white"
-              : "bg-transparent hover:bg-[#D1FAE5]"
-          }`}
-        >
-    {/* Icon for maintenance with rotated arrow */}
-   {/*  <svg
-      width="20px"
-      height="20px"
-      viewBox="0 0 512 512"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      stroke="white"
-      strokeWidth="2"
-      className="mr-2 w-5 h-5"
-    >
-      <g transform="translate(0,512) scale(0.1,-0.1)" fill={`${viewMode === "card" ? "white" : "black"}`} stroke="none">
-        <path d="M3595 5109 c-93 -13 -239 -52 -333 -90 -339 -135 -621 -424 -751
-          -769 -112 -298 -117 -585 -16 -926 5 -17 -170 -180 -1128 -1046 -624 -565
-          -1159 -1054 -1190 -1088 -64 -72 -116 -164 -149 -270 -19 -63 -23 -95 -22
-          -205 0 -148 21 -228 89 -352 50 -90 178 -218 268 -268 123 -68 203 -88 352
-          -89 110 -1 142 3 205 22 106 33 198 84 270 149 34 31 523 566 1088 1190 866
-          958 1029 1133 1046 1128 213 -63 389 -84 564 -67 341 34 626 171 858 415 182
-          191 292 403 351 677 37 177 17 524 -37 630 -32 62 -92 89 -167 75 -33 -6 -77
-          -45 -323 -290 l-285 -283 -259 52 c-175 35 -262 56 -267 66 -5 8 -31 128 -58
-          265 l-50 250 284 285 c245 246 284 290 290 323 14 74 -13 135 -75 167 -87 44
-          -393 71 -555 49z m-42 -492 c-174 -175 -202 -209 -209 -243 -6 -30 9 -123 66
-          -409 40 -203 79 -385 88 -403 28 -62 46 -68 444 -147 205 -41 385 -75 401 -75
-          51 0 90 30 286 223 l193 192 -6 -70 c-16 -167 -70 -331 -157 -471 -63 -101
-          -196 -242 -286 -303 -304 -203 -665 -243 -996 -112 -90 36 -139 39 -184 12
-          -17 -11 -520 -559 -1116 -1218 -867 -958 -1095 -1204 -1138 -1230 -226 -135
-          -513 -38 -611 207 -17 43 -22 75 -22 150 0 111 23 182 82 256 20 25 568 525
-          1217 1112 649 587 1190 1083 1202 1101 31 46 29 94 -7 184 -87 219 -101 448
-          -39 676 88 328 333 592 654 707 97 34 223 61 299 63 l40 1 -201 -203z"/>
-        <path d="M671 873 c-60 -30 -93 -111 -71 -177 14 -45 69 -93 115 -102 49 -9
-        119 19 146 58 46 64 30 165 -33 211 -37 27 -114 32 -157 10z"/>
-      </g>
-    </svg> */}
-    Vehicles
-  </button>
-  
-  
-        <button
-           onClick={() => setViewMode("table")}
-          className={`px-8 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${
-            viewMode === "table"
-              ? "bg-[#00B56C] text-white"
-              : "bg-transparent hover:bg-[#D1FAE5] "
-          }`}
-        >
-        {/*   <span className="service-icon">
-            <FaCogs className="w-5 h-5" /> 
-          </span> */}
-          Services
-        </button>
-       
-  
-    
-  </div>
-)}
     {!selectedvehicle && (
-    <div className="flex justify-between flex-wrap">
+    <div className="flex justify-between flex-wrap mt-8">
     {/*     <h2 className="text-3xl font-bold mr-2">Vehicles</h2> */}
 
         {/* Vehicle Selection Button */}
@@ -1519,154 +868,113 @@ const servicesTable = [
           </button>
         )}
 
-   
-      </div>
-   )}
-      {/* Display Vehicles Based on Selected View Mode /* bg-[#f3f4f6] */}
-
-      {!selectedvehicle && (
-         <div className="  rounded-md shadow px-4 py-[1rem] mt-4">
-           {viewMode === "table" && (
-   
-   <button
-     onClick={() => setModalOpenNew(true)}
-     className="mr-auto mb-4 px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 bg-[#00B56C] text-white hover:bg-[#028B4A] transition-all"
-   >
-     <svg
-       xmlns="http://www.w3.org/2000/svg"
-       viewBox="0 0 24 24"
-       width="20px"
-       height="20px"
-       fill="none"
-       stroke="#ffffff"
-       strokeWidth="2"
-       className="w-5 h-5"
-     >
-       <path
-         fill="none"
-         stroke="#ffffff"
-         strokeWidth="2"
-         d="M12 5v14M5 12h14"
-       />
-     </svg>
-     Add service
-   </button>
- 
-
-       )} 
-        <div className=" ">
-      
-          {/* Display Vehicles in Card View */}
-          {viewMode === "card" && (
-  <div className="overflow-y-auto max-h-[290px]" style={{ boxSizing: "border-box" }}>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-      {socketdata.map((vehicle, index) => (
-        <div
-          key={vehicle.vehicleReg}
-          onClick={() => handleCardClick(vehicle.vehicleReg)}
-          className="relative border-l-8 bg-white p-[1.1rem] rounded-lg h-[135px]  flex flex-col items-start hover:bg-[#D1FAE5] cursor-pointer"
-          style={{
-            borderLeftColor: vehicle.vehicleStatus === 'Parked'
-              ? '#FF0000' // Red for parked
-              : vehicle.vehicleStatus === 'Moving'
-              ? '#00B56C' // Green for moving
-              : vehicle.vehicleStatus === 'Pause'
-              ? '#eec40f' // Yellow for paused
-              : '#808080', // Gray for other statuses
-          }}
+        {/* Vehicle View Mode Selection (Card or Table) */}
+       {/*  {!selectedvehicle && (
+        <div className="flex gap-2">
+        <button
+          onClick={() => setViewMode("card")}
+             className="px-2 py-2 bg-[#f3f4f6] rounded-md"
         >
-          <h2 className="text-2xl mb-4">{vehicle.vehicleReg}</h2>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            fill={vehicle.vehicleStatus === 'Parked'
-              ? '#FF0000'
-              : vehicle.vehicleStatus === 'Moving'
-              ? '#00B56C'
-              : vehicle.vehicleStatus === 'Pause'
-              ? '#eec40f'
-              : '#808080'}
-            viewBox="0 0 15 15"
-            className="w-16 h-16"
-            style={{
-              borderLeftColor: vehicle.vehicleStatus === 'Parked'
-                ? '#FF0000' // Red for parked
-                : vehicle.vehicleStatus === 'Moving'
-                ? '#00B56C' // Green for moving
-                : vehicle.vehicleStatus === 'Pause'
-                ? '#eec40f' // Yellow for paused
-                : '#808080', // Gray for other statuses
-            }}
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            className="w-5 h-5 mr-2"
           >
-            <path d="M12.6,8.7,11.5,6.5a1.05,1.05,0,0,0-.9-.5H4.4a1.05,1.05,0,0,0-.9.5L2.4,8.7,1.16,9.852a.5.5,0,0,0-.16.367V14.5a.5.5,0,0,0,.5.5h2c.2,0,.5-.2.5-.4V14h7v.5c0,.2.2.5.4.5h2.1a.5.5,0,0,0,.5-.5V10.219a.5.5,0,0,0-.16-.367ZM4.5,7h6l1,2h-8ZM5,11.6c0,.2-.3.4-.5.4H2.4c-.2,0-.4-.3-.4-.5V10.4c.1-.3.3-.5.6-.4l2,.4c.2,0,.4.3.4.5Zm8-.1c0,.2-.2.5-.4.5H10.5c-.2,0-.5-.2-.5-.4v-.7c0-.2.2-.5.4-.5l2-.4c.3-.1.5.1.6.4ZM14,2V3a1.009,1.009,0,0,1-1.017,1H5.348A2.549,2.549,0,0,1,1,3.5H3.5v-2H1A2.549,2.549,0,0,1,5.348,1h7.635A1.009,1.009,0,0,1,14,2Z" />
+            <path fillRule="evenodd" clipRule="evenodd" d="M8 1C9.65685 1 11 2.34315 11 4V8C11 9.65685 9.65685 11 8 11H4C2.34315 11 1 9.65685 1 8V4C1 2.34315 2.34315 1 4 1H8ZM8 3C8.55228 3 9 3.44772 9 4V8C9 8.55228 8.55228 9 8 9H4C3.44772 9 3 8.55228 3 8V4C3 3.44772 3.44772 3 4 3H8Z" fill="#0F0F0F"/>
+            <path fillRule="evenodd" clipRule="evenodd" d="M8 13C9.65685 13 11 14.3431 11 16V20C11 21.6569 9.65685 23 8 23H4C2.34315 23 1 21.6569 1 20V16C1 14.3431 2.34315 13 4 13H8ZM8 15C8.55228 15 9 15.4477 9 16V20C9 20.5523 8.55228 21 8 21H4C3.44772 21 3 20.5523 3 20V16C3 15.4477 3.44772 15 4 15H8Z" fill="#0F0F0F"/>
+            <path fillRule="evenodd" clipRule="evenodd" d="M23 4C23 2.34315 21.6569 1 20 1H16C14.3431 1 13 2.34315 13 4V8C13 9.65685 14.3431 11 16 11H20C21.6569 11 23 9.65685 23 8V4ZM21 4C21 3.44772 20.5523 3 20 3H16C15.4477 3 15 3.44772 15 4V8C15 8.55228 15.4477 9 16 9H20C20.5523 9 21 8.55228 21 8V4Z" fill="#0F0F0F"/>
+            <path fillRule="evenodd" clipRule="evenodd" d="M20 13C21.6569 13 23 14.3431 23 16V20C23 21.6569 21.6569 23 20 23H16C14.3431 23 13 21.6569 13 20V16C13 14.3431 14.3431 13 16 13H20ZM20 15C20.5523 15 21 15.4477 21 16V20C21 20.5523 20.5523 21 20 21H16C15.4477 21 15 20.5523 15 20V16C15 15.4477 15.4477 15 16 15H20Z" fill="#0F0F0F"/>
           </svg>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+        </button>
+        
+        <button
+          onClick={() => setViewMode("table")}
+          className="px-2 py-2 bg-[#f3f4f6] rounded-md"
+        >
+         
+          <svg
+            fill="#000000"
+            width="800px"
+            height="800px"
+            viewBox="0 0 1000 1000"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5 mr-2"
+          >
+            <path d="M582 707H166v83h416v-83zm250-333H166v83h666v-83zM166 624h666v-83H166v83zm0-416v83h666v-83H166z"/>
+          </svg>
+        </button>
+      </div>
+      
+        )} */}
+      </div>
+   )}
+      {/* Display Vehicles Based on Selected View Mode */}
 
+      {!selectedvehicle && (
+         <div className=" bg-[#f3f4f6] rounded-md shadow px-4 py-4 mt-4">
+        <div className=" ">
+          {/* Display Vehicles in Card View */}
+          {viewMode === "card" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+              {vehicles.map((vehicle, index) => (
+                <div
+                  key={vehicle.value}
+                  onClick={() => handleCardClick(vehicle.value)}
+                  className="relative border-l-8 bg-white p-6 rounded-lg shadow-lg flex flex-col items-start hover:bg-[#D1FAE5] cursor-pointer"
+                  style={{ borderLeftColor: colors[index] }}
+                >
+                  <h2 className="text-2xl mb-4">{vehicle.label}</h2>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 15 15"
+                    className="w-16 h-16"
+                    style={{ color: colors[index] }}
+                  >
+                    <path d="M12.6,8.7,11.5,6.5a1.05,1.05,0,0,0-.9-.5H4.4a1.05,1.05,0,0,0-.9.5L2.4,8.7,1.16,9.852a.5.5,0,0,0-.16.367V14.5a.5.5,0,0,0,.5.5h2c.2,0,.5-.2.5-.4V14h7v.5c0,.2.2.5.4.5h2.1a.5.5,0,0,0,.5-.5V10.219a.5.5,0,0,0-.16-.367ZM4.5,7h6l1,2h-8ZM5,11.6c0,.2-.3.4-.5.4H2.4c-.2,0-.4-.3-.4-.5V10.4c.1-.3.3-.5.6-.4l2,.4c.2,0,.4.3.4.5Zm8-.1c0,.2-.2.5-.4.5H10.5c-.2,0-.5-.2-.5-.4v-.7c0-.2.2-.5.4-.5l2-.4c.3-.1.5.1.6.4ZM14,2V3a1.009,1.009,0,0,1-1.017,1H5.348A2.549,2.549,0,0,1,1,3.5H3.5v-2H1A2.549,2.549,0,0,1,5.348,1h7.635A1.009,1.009,0,0,1,14,2Z" />
+                  </svg>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Display Vehicles in Table View */}
           {viewMode === "table" && (
-  <div className="relative w-full bg-white overflow-x-auto h-[300px]"> {/* Set max height for the outer div */}
-    <div className="overflow-y-auto h-full"> {/* This ensures the inner div scrolls while maintaining the height of the parent div */}
-      <table className="min-w-full table-auto">
-        <thead className="bg-[#E2E8F0]">
-          <tr>
-            <th className="px-2 py-1 text-center  w-[50px]">S.No</th>
-            <th className="px-2 py-1 text-left">Service Title</th>
-            <th className="px-2 py-1 text-left">Other Information</th>
-            <th className="px-2 py-1 text-left w-[50px]">Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-        {simpleservices.length === 0 ? (
-  <tr>
-    <td colSpan="3" className="px-2 py-1 text-center text-gray-500">No data found</td>
-  </tr>
-) : (
-  simpleservices.map((item,index) => (
-    <tr
-      key={item.id} // Ensure you have a unique key, here using item.id
-      className="border-b hover:bg-[#D1FAE5]"
-    >
-      <td className="px-2 py-1 text-center">{index + 1}</td>
-      <td className="px-2 py-1 text-left">{item.service}</td>
-      <td className="px-2 py-1 text-left">{item.other}</td>
-      <td className="px-2 py-1 pl-[1.5rem] text-center">
-      <svg
-    onClick={() => DeleteServices(item._id)}
-    className="w-6 h-6 text-red-600 cursor-pointer hover:shadow-lg"
-    xmlns="http://www.w3.org/2000/svg"
-    version="1.0"
-    width="512.000000pt"
-    height="512.000000pt"
-    viewBox="0 0 512.000000 512.000000"
-    preserveAspectRatio="xMidYMid meet"
-  >
-    <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
-      <path d="M1801 5104 c-83 -22 -165 -71 -224 -133 -99 -104 -137 -210 -137 -383 l0 -107 -509 -3 c-497 -3 -510 -4 -537 -24 -53 -39 -69 -71 -69 -134 0 -63 16 -95 69 -134 l27 -21 2139 0 2139 0 27 21 c53 39 69 71 69 134 0 63 -16 95 -69 134 -27 20 -40 21 -537 24 l-509 3 0 107 c0 173 -38 279 -137 383 -61 64 -141 111 -228 134 -85 22 -1431 21 -1514 -1z m1485 -330 c60 -44 69 -67 72 -185 l4 -109 -801 0 -801 0 0 94 c0 102 9 137 43 175 48 52 32 51 769 48 676 -2 687 -2 714 -23z"/>
-      <path d="M575 3826 c-41 -18 -83 -69 -90 -109 -7 -36 129 -3120 144 -3270 7 -78 16 -113 44 -170 62 -132 171 -223 306 -259 61 -16 181 -17 1581 -17 1400 0 1520 1 1581 17 135 36 244 127 306 259 28 57 37 92 44 170 16 153 151 3243 144 3275 -9 39 -52 88 -92 104 -48 20 -3923 20 -3968 0z m3735 -353 c-1 -27 -31 -721 -69 -1544 -66 -1466 -68 -1497 -90 -1532 -12 -21 -40 -44 -65 -56 -42 -21 -46 -21 -1526 -21 -1480 0 -1484 0 -1526 21 -59 28 -84 72 -90 156 -6 77 -134 2944 -134 2992 l0 31 1750 0 1750 0 0 -47z"/>
-      <path d="M1590 3033 c-37 -14 -74 -50 -91 -88 -18 -41 -18 -59 21 -953 31 -715 42 -917 54 -939 62 -121 224 -122 283 -3 l22 45 -39 913 c-42 966 -40 941 -92 989 -40 37 -111 53 -158 36z"/>
-      <path d="M2495 3026 c-41 -18 -83 -69 -90 -109 -3 -18 -4 -442 -3 -944 3 -903 3 -912 24 -939 39 -53 71 -69 134 -69 63 0 95 16 134 69 21 27 21 34 21 966 0 932 0 939 -21 966 -11 15 -32 37 -46 47 -33 25 -113 32 -153 13z"/>
-      <path d="M3420 3029 c-33 -13 -68 -47 -86 -81 -11 -21 -23 -237 -54 -939 -38 -895 -39 -914 -21 -954 54 -123 224 -125 287 -4 12 23 22 211 54 941 39 894 39 913 21 953 -10 23 -33 52 -51 65 -37 26 -111 36 -150 19z"/>
-    </g>
-  </svg>
-
-      </td>
-    </tr>
-  ))
-)}
-
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
-
-
-
-
+            <div className="relative w-full bg-white">
+              <table className="min-w-full table-auto">
+                <thead className="bg-[#E2E8F0]">
+                  <tr>
+                    <th className="px-2 py-1 text-center">S.No</th>
+                    <th className="px-2 py-1 text-left">Vehicle Reg</th>
+                    <th className="px-2 py-1 text-left">Vehicle Model</th>
+                    <th className="px-2 py-1 text-left">Vehicle Make</th>
+                  </tr>
+                </thead>
+                <tbody>
+                
+                {vehicleList?.filter((item) =>
+      vehicles?.some((vehicle) => item.vehicleReg === vehicle.label)
+    ).map((item, index) => (
+      <tr
+        key={item.id} // Ensure you have a unique key, here using item.id
+        className="border-b hover:bg-[#D1FAE5]"
+        onClick={() => handleCardClick(item.vehicleReg)}
+      >
+        <td className="px-2 py-1 text-center">{index + 1}</td> {/* Row number */}
+        <td className="px-2 py-1 text-left" onClick={() => handleRowClick()} >{item.vehicleReg}</td> {/* Vehicle registration */}
+        <td className="px-2 py-1 text-left">
+          {item.vehicleModel}
+        </td> {/* Vehicle make */}
+        <td className="px-2 py-1 text-left">
+        {item.vehicleMake}
+        </td> {/* Vehicle model */}
+      </tr>
+    ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
         </div>
       )}
@@ -1759,16 +1067,13 @@ const servicesTable = [
           <rect x="4" y="4" width="16" height="16" stroke={activeTab === "documentation" ? "white" : "black"} strokeWidth="2" fill="none" />
           <line x1="4" y1="10" x2="20" y2="10" stroke={activeTab === "documentation" ? "white" : "black"} strokeWidth="2" />
         </svg>
-        Assign Documentation
+        Documentation
       </button>
 
- 
-
-    </div>
-    {activeTab && ( 
+ {activeTab && ( 
       <button
     onClick={() => setModalOpen(true)}
-    className="ml-auto mb-4 px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 bg-[#00B56C] text-white hover:bg-[#028B4A] transition-all"
+    className="ml-auto px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 bg-[#00B56C] text-white hover:bg-[#028B4A] transition-all"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -1787,11 +1092,14 @@ const servicesTable = [
         d="M12 5v14M5 12h14"
       />
     </svg>
-    {`${activeTab == "services"  ? "Attach Service" : activeTab == "maintenance"  ? "Add Maintenance" : "Attach Documentation" }`}
+    Add {activeTab}
   </button>
    )}
+
+    </div>
+
     {/* Conditional Rendering of Tables */}
-    {activeTab === "services" &&  (
+    {activeTab === "services" && (
       <>
         {/* Service Table Code */}
        {/*  <div className="relative w-full max-w-xs">
@@ -1820,16 +1128,17 @@ const servicesTable = [
                 </tr>
               </thead>
               <tbody className="bg-white">
-              {(filteredServices.length === 0 || paginatedServices.every(service => service.dataType !== 'Service')) ? (
-  <tr>
-    <td colSpan="8" className="px-4 py-2 text-center text-gray-500">
-      No Data Found
-    </td>
-  </tr>
-) : (
-             paginatedServices
-                .filter(service => service.dataType === 'Service')
-                .map((service, index) => (
+          {services.length === 0 ? (
+            <tr>
+              <td
+                colSpan="8"
+                className="px-4 py-2 text-center text-gray-500"
+              >
+                No Data Found
+              </td>
+            </tr>
+          ) : (
+            paginatedServices.map((service, index) => (
               <tr key={index} className="border-b hover:bg-[#D1FAE5]" >
                 <td className="px-2 py-1 text-center">
                   {(currentPage - 1) * rowsPerPage + index + 1}
@@ -1874,31 +1183,27 @@ const servicesTable = [
                   <td className="px-2 py-1 text-left">-</td>
                 )}
 
-                {service.status === "due" || service.status === "due soon" ? (
-                  <td className="px-2 py-1 relative text-left">
-                  <span
-                    className="text-[#E53E3E] underline group cursor-pointer"
-                    onClick={() => openConfirmationModal(service._id)}
-                  >
+                {service.status === "complete" ? (
+                  <td className="px-2 py-1 text-left">
                     {service.status.charAt(0).toUpperCase() +
                       service.status.slice(1)}
-
-                    <div className="absolute left-0 top-full mt-2 hidden group-hover:block z-20">
-                      <div className="text-xs font-semibold bg-[#D1FAE5] text-[#E53E3E] p-2 rounded-md mb-1 text-left">
-                        Click to update the status
-                      </div>
-                    </div>
-                  </span>
-                </td>
-
-                  
+                  </td>
                 ) : (
-                  
+                  <td className="px-2 py-1 relative text-left">
+                    <span
+                      className="text-[#E53E3E] underline group cursor-pointer"
+                      onClick={() => openConfirmationModal(service._id)}
+                    >
+                      {service.status.charAt(0).toUpperCase() +
+                        service.status.slice(1)}
 
-<td className="px-2 py-1 text-left">
-{service.status.charAt(0).toUpperCase() +
-  service.status.slice(1)}
-</td>
+                      <div className="absolute left-0 top-full mt-2 hidden group-hover:block z-20">
+                        <div className="text-xs font-semibold bg-[#D1FAE5] text-[#E53E3E] p-2 rounded-md mb-1 text-left">
+                          Click to update the status
+                        </div>
+                      </div>
+                    </span>
+                  </td>
                 )}
 
                 <td className="px-2 py-1 text-left">
@@ -1940,7 +1245,6 @@ const servicesTable = [
 
                 </td>
               </tr>
-             // ) 
             ))
           )}
         </tbody>
@@ -1973,20 +1277,22 @@ const servicesTable = [
                  <th className="px-2 py-1 text-left">Vehicle Reg</th>
                  <th className="px-2 py-1 text-left">Maintenance Type</th>
                
+                 <th className="px-2 py-1 text-left">Status</th>
                  <th className="px-2 py-1 text-left">Actions</th>
                </tr>
              </thead>
              <tbody className="bg-white">
-             {(filteredServices.length === 0 || paginatedServices.every(service => service.dataType !== 'Maintenance')) ? (
-  <tr>
-    <td colSpan="8" className="px-4 py-2 text-center text-gray-500">
-      No Data Found
-    </td>
-  </tr>
-) : (
-  paginatedServices
-  .filter(service => service.dataType === 'Maintenance')
-  .map((service, index) => (
+         {services.length === 0 ? (
+           <tr>
+             <td
+               colSpan="8"
+               className="px-4 py-2 text-center text-gray-500"
+             >
+               No Data Found
+             </td>
+           </tr>
+         ) : (
+           paginatedServices.map((service, index) => (
              <tr key={index} className="border-b hover:bg-[#D1FAE5]" >
                <td className="px-2 py-1 text-center">
                  {(currentPage - 1) * rowsPerPage + index + 1}
@@ -2001,11 +1307,11 @@ const servicesTable = [
                  </td>
      
 
-               <td className="px-2 py-1 text-left">{service.maintenanceType}</td>
+               <td className="px-2 py-1 text-left">{service.serviceType}</td>
 
             
 
-              {/*  {service.status === "complete" ? (
+               {service.status === "complete" ? (
                  <td className="px-2 py-1 text-left">
                    {service.status.charAt(0).toUpperCase() +
                      service.status.slice(1)}
@@ -2026,7 +1332,7 @@ const servicesTable = [
                      </div>
                    </span>
                  </td>
-               )} */}
+               )}
 
 <td className="px-2 py-1 text-left">
                 <div className="flex gap-4 justify-start">
@@ -2067,16 +1373,6 @@ const servicesTable = [
 
                 </td>
              </tr>
-             /* : ( service.dataType !== 'Maintenance') && (
-              <tr>
-              <td
-                colSpan="8"
-                className="px-4 py-2 text-center text-gray-500"
-              >
-                No Data Found
-              </td>
-            </tr>
-            ) */
            ))
          )}
        </tbody>
@@ -2104,28 +1400,28 @@ const servicesTable = [
              {/* Table header and body */}
              <thead className="bg-[#E2E8F0]">
                <tr>
-               <th className="px-2 py-1 text-center">S.No</th>
-               <th className="px-2 py-1 text-left">Document Title</th>
-                 
-               
-                 <th className="px-2 py-1 text-left">Issue Date</th>
-                 <th className="px-2 py-1 text-left">Expiry Date</th>
+               <th className="px-2 py-1 text-center">Work order</th>
+               <th className="px-2 py-1 text-left">Service Task</th>
+                 <th className="px-2 py-1 text-left">Vehicle Reg</th>
                  <th className="px-2 py-1 text-left">Documentation Type</th>
-                 <th className="px-2 py-1 text-left">When To Show Alert</th>
+                 <th className="px-2 py-1 text-left">{activeTab === "documentation" ? "Created Date" : "Targeted Date" }</th>
+                 <th className="px-2 py-1 text-left">{activeTab === "documentation" ? "Expiry Date" : "Targeted Mileage" }</th>
+                 <th className="px-2 py-1 text-left">Status</th>
                  <th className="px-2 py-1 text-left">Actions</th>
                </tr>
              </thead>
-            {/*  <tbody className="bg-white">
-             {(filteredServices.length === 0 || paginatedServices.every(service => service.dataType !== 'Documentation')) ? (
-  <tr>
-    <td colSpan="8" className="px-4 py-2 text-center text-gray-500">
-      No Data Found
-    </td>
-  </tr>
-) : (
-  paginatedServices
-  .filter(service => service.dataType === 'Documentation')
-  .map((service, index) => (
+             <tbody className="bg-white">
+         {services.length === 0 ? (
+           <tr>
+             <td
+               colSpan="8"
+               className="px-4 py-2 text-center text-gray-500"
+             >
+               No Data Found
+             </td>
+           </tr>
+         ) : (
+           paginatedServices.map((service, index) => (
              <tr key={index} className="border-b hover:bg-[#D1FAE5]" >
                <td className="px-2 py-1 text-center">
                  {(currentPage - 1) * rowsPerPage + index + 1}
@@ -2170,11 +1466,32 @@ const servicesTable = [
                  <td className="px-2 py-1 text-left">-</td>
                )}
 
-              
+               {service.status === "complete" ? (
+                 <td className="px-2 py-1 text-left">
+                   {service.status.charAt(0).toUpperCase() +
+                     service.status.slice(1)}
+                 </td>
+               ) : (
+                 <td className="px-2 py-1 relative text-left">
+                   <span
+                     className="text-[#E53E3E] underline group cursor-pointer"
+                     onClick={() => openConfirmationModal(service._id)}
+                   >
+                     {service.status.charAt(0).toUpperCase() +
+                       service.status.slice(1)}
+
+                     <div className="absolute left-0 top-full mt-2 hidden group-hover:block z-20">
+                       <div className="text-xs font-semibold bg-[#D1FAE5] text-[#E53E3E] p-2 rounded-md mb-1 text-left">
+                         Click to update the status
+                       </div>
+                     </div>
+                   </span>
+                 </td>
+               )}
 
 <td className="px-2 py-1 text-left">
                 <div className="flex gap-4 justify-start">
-
+  {/* Edit Icon */}
   <svg
     onClick={() => openUpdateModal(service)}
     className="w-6 h-6 text-green-600 cursor-pointer hover:shadow-lg"
@@ -2187,6 +1504,7 @@ const servicesTable = [
     </g>
   </svg>
 
+  {/* Delete Icon */}
   <svg
     onClick={() => opendeleteModal(service._id)}
     className="w-6 h-6 text-red-600 cursor-pointer hover:shadow-lg"
@@ -2210,92 +1528,9 @@ const servicesTable = [
 
                 </td>
              </tr>
-          //  ) 
            ))
          )}
-       </tbody> */}
-        <tbody>
-        {documents.map((document, index) => (
-          <tr key={document.id}>
-            <td className="px-2 py-1 text-center">{index + 1}</td>
-            <td className="px-2 py-1">{document.title}</td>
-            <td className="px-2 py-1">{document.issueDate}</td>
-            <td className="px-2 py-1">{document.expiryDate}</td>
-            <td className="px-2 py-1">{document.docType}</td>
-            <td className="px-2 py-1">
-              {/* Date picker component for alertTime */}
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <DatePicker
-                  value={ null}
-                  onChange={(date) => handleDateChange(date, document.id)}
-                  format="MM/dd/yyyy"
-                  variant="dialog"
-                  placeholder="Select Date"
-                  minDate={new Date("2024-12-20")}
-                  maxDate={new Date("2024-12-28")}
-                  autoOk
-                  inputProps={{ readOnly: true }}
-                  style={{
-                    width: "150px",
-                    border: "1px solid #ccc",
-                    borderRadius: "5px",
-                    padding: "5px",
-                    fontSize: "14px",
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <EventIcon
-                        style={{ width: "20px", height: "20px" }}
-                        className="text-gray"
-                      />
-                    ),
-                  }}
-                />
-              </MuiPickersUtilsProvider>
-            </td>
-            
-          
-<td className="px-2 py-1 text-left">
-                <div className="flex gap-4 justify-start">
-
-  <svg
-    onClick={() => openUpdateModal(service)}
-    className="w-6 h-6 text-green-600 cursor-pointer hover:shadow-lg"
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 512.000000 512.000000"
-    preserveAspectRatio="xMidYMid meet"
-  >
-    <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
-      <path d="M4253 5080 c-78 -20 -114 -37 -183 -83 -44 -29 -2323 -2296 -2361 -2349 -21 -29 -329 -1122 -329 -1168 0 -56 65 -120 122 -120 44 0 1138 309 1166 329 15 11 543 536 1174 1168 837 838 1157 1165 1187 1212 74 116 105 270 82 407 -7 39 -30 105 -53 154 -36 76 -55 99 -182 226 -127 127 -150 145 -226 182 -135 65 -260 78 -397 42z m290 -272 c55 -27 258 -231 288 -288 20 -38 24 -60 24 -140 0 -121 -18 -160 -132 -279 l-82 -86 -303 303 -303 303 88 84 c49 46 108 93 132 105 87 42 203 41 288 -2z m-383 -673 l295 -295 -933 -932 -932 -933 -295 295 c-162 162 -295 299 -295 305 0 13 1842 1855 1855 1855 6 0 143 -133 305 -295z m-1822 -2284 c-37 -12 -643 -179 -645 -178 -1 1 30 115 68 252 38 138 79 285 91 329 l21 78 238 -238 c132 -132 233 -241 227 -243z"/>
-    </g>
-  </svg>
-
-  <svg
-    onClick={() => opendeleteModal(service._id)}
-    className="w-6 h-6 text-red-600 cursor-pointer hover:shadow-lg"
-    xmlns="http://www.w3.org/2000/svg"
-    version="1.0"
-    width="512.000000pt"
-    height="512.000000pt"
-    viewBox="0 0 512.000000 512.000000"
-    preserveAspectRatio="xMidYMid meet"
-  >
-    <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
-      <path d="M1801 5104 c-83 -22 -165 -71 -224 -133 -99 -104 -137 -210 -137 -383 l0 -107 -509 -3 c-497 -3 -510 -4 -537 -24 -53 -39 -69 -71 -69 -134 0 -63 16 -95 69 -134 l27 -21 2139 0 2139 0 27 21 c53 39 69 71 69 134 0 63 -16 95 -69 134 -27 20 -40 21 -537 24 l-509 3 0 107 c0 173 -38 279 -137 383 -61 64 -141 111 -228 134 -85 22 -1431 21 -1514 -1z m1485 -330 c60 -44 69 -67 72 -185 l4 -109 -801 0 -801 0 0 94 c0 102 9 137 43 175 48 52 32 51 769 48 676 -2 687 -2 714 -23z"/>
-      <path d="M575 3826 c-41 -18 -83 -69 -90 -109 -7 -36 129 -3120 144 -3270 7 -78 16 -113 44 -170 62 -132 171 -223 306 -259 61 -16 181 -17 1581 -17 1400 0 1520 1 1581 17 135 36 244 127 306 259 28 57 37 92 44 170 16 153 151 3243 144 3275 -9 39 -52 88 -92 104 -48 20 -3923 20 -3968 0z m3735 -353 c-1 -27 -31 -721 -69 -1544 -66 -1466 -68 -1497 -90 -1532 -12 -21 -40 -44 -65 -56 -42 -21 -46 -21 -1526 -21 -1480 0 -1484 0 -1526 21 -59 28 -84 72 -90 156 -6 77 -134 2944 -134 2992 l0 31 1750 0 1750 0 0 -47z"/>
-      <path d="M1590 3033 c-37 -14 -74 -50 -91 -88 -18 -41 -18 -59 21 -953 31 -715 42 -917 54 -939 62 -121 224 -122 283 -3 l22 45 -39 913 c-42 966 -40 941 -92 989 -40 37 -111 53 -158 36z"/>
-      <path d="M2495 3026 c-41 -18 -83 -69 -90 -109 -3 -18 -4 -442 -3 -944 3 -903 3 -912 24 -939 39 -53 71 -69 134 -69 63 0 95 16 134 69 21 27 21 34 21 966 0 932 0 939 -21 966 -11 15 -32 37 -46 47 -33 25 -113 32 -153 13z"/>
-      <path d="M3420 3029 c-33 -13 -68 -47 -86 -81 -11 -21 -23 -237 -54 -939 -38 -895 -39 -914 -21 -954 54 -123 224 -125 287 -4 12 23 22 211 54 941 39 894 39 913 21 953 -10 23 -33 52 -51 65 -37 26 -111 36 -150 19z"/>
-    </g>
-  </svg>
-</div>
-
-
-                </td>
-          </tr>
-        ))}
-        
-      </tbody>
+       </tbody>
            </table>
          </div>
        </div>
@@ -2307,18 +1542,16 @@ const servicesTable = [
 
 
         {/* Modal for adding/updating service */}
-        
         {modalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className={`bg-white p-6 rounded-lg ${activeTab == "documentation" ?  "w-[45rem]" : "w-96"}`}>
+            <div className="bg-white p-6 rounded-lg w-96">
               <h3 className="text-xl font-bold mb-4 text-center">
-                {formData._id ? `Update ${activeTab} `: ` ${activeTab == "services"  ? "Add Service" : activeTab == "maintenance"  ? "Add Maintenance" : "Assign Documentation" }`}
+                {formData._id ? `Update ${activeTab} `: `Add ${activeTab}`}
               </h3>
               <form onSubmit={handleSubmit}>
-              {activeTab == "maintenance" && (
                 <div className="mb-4">
                   <label className="block text-sm font-medium">
-                    {activeTab == "services"  ? "Service Task" : activeTab == "maintenance"  ? "Maintenance Task" : "Document Title" } 
+                    Service Task
                   </label>
                   <input
                     type="text"
@@ -2327,409 +1560,59 @@ const servicesTable = [
                     onChange={handleInputChange}
                     className="w-full p-2 border border-[#CBD5E0] rounded-lg"
                     placeholder="Oil Changing / Tuning, etc."
-                    
+                    required
                   />
                 </div>
-              )}
-              {   activeTab == "documentation" && (
-                <> 
-             
-             <div className="selected-documents flex flex-wrap mb-4 gap-4">
-  {selectedDocuments.map((document) => (
-    <div
-      key={document.value}
-      className="selected-item flex items-center justify-between w-[30%] mb-2 px-3 py-2 bg-[#dcfce7] text-green-700 rounded-lg text-sm "
-    >
-     <span className="truncate w-[180px] ">{document?.label}</span>
-
-      <button
-        className="text-red text-lg"
-        onClick={() => handleRemoveDocument(document.value)}
-      >
-        ×
-      </button>
-    </div>
-  ))}
-</div>
-
-
-  <Select
-    value={null}
-  onChange={handleDocumentsServiceTypeChange}
- // options={serviceDocumentTypeOptions}
-  options={serviceDocumentTypeOptions.filter(
-    (option) => !selectedDocuments.some((doc) => doc.value === option.value)
-  )}
-  placeholder="Select Document "
-  isClearable
-  isSearchable
-  //  menuIsOpen={menuIsOpen} // Keep the menu open
-
-  //  onMenuClose={() => setMenuIsOpen(false)} // Close dropdown when clicked outside
-  //  onMenuOpen={() => setMenuIsOpen(true)} // Open dropdown manually
-  //onFocus={() => setMenuIsOpen(false)} // Open dropdown when focused (optional)
- // onBlur={() => setMenuIsOpen( true)} 
-
-  noOptionsMessage={() => 'No options available'}
-  className="rounded-md w-full outline-green border border-grayLight hover:border-green"
-  styles={{
-    control: (provided, state) => ({
-      ...provided,
-      border: 'none',
-      boxShadow: state.isFocused ? null : null,
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isSelected
-        ? '#00B56C'
-        : state.isFocused
-        ? '#e1f0e3'
-        : 'transparent',
-      color: state.isSelected
-        ? 'white'
-        : state.isFocused
-        ? 'black'
-        : 'black',
-      '&:hover': {
-        backgroundColor: '#e1f0e3',
-        color: 'black',
-      },
-    }),
-  }}
-/>
-
-</>
-             ) }
+             {/*    <div className="mb-4">
+                  <label className="block text-sm font-medium">
+                    Vehicle Registration
+                  </label>
+                  <Select
+                    value={
+                      formData.vehicleReg
+                        ? {
+                            value: formData.vehicleReg,
+                            label: formData.vehicleReg,
+                          }
+                        : null
+                    }
+                    onChange={handleInputChangeSelect}
+                    options={vehicles}
+                    placeholder="Pick Vehicle"
+                    isClearable
+                    isSearchable
+                    className="rounded-md w-full outline-green border border-grayLight hover:border-green"
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        border: "none",
+                        boxShadow: state.isFocused ? null : null,
+                      }),
+                      option: (provided, state) => ({
+                        ...provided,
+                        backgroundColor: state.isSelected
+                          ? "#00B56C"
+                          : state.isFocused
+                          ? "#e1f0e3"
+                          : "transparent",
+                        color: state.isSelected
+                          ? "white"
+                          : state.isFocused
+                          ? "black"
+                          : "black",
+                        "&:hover": {
+                          backgroundColor: "#e1f0e3",
+                          color: "black",
+                        },
+                      }),
+                    }}
+                  />
+                </div> */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium">
-                  {
-  ( activeTab === "maintenance") ? `${activeTab == "services" ? "Service " : "Maintenance" } Type` : null
-}
-
+                  {activeTab} Type
                   </label>
-              
-                  {activeTab === "maintenance" ? (
-  <>
-   <div className="mb-4 ml-2 flex items-center">
-  <input
-    type="radio"
-    name="maintenance"
-    checked={formData.maintenance === "" ? false : formData.maintenanceType === "Preventative"}
-   
-    onChange={() =>
-      setFormData({
-        ...formData,
-        maintenanceType: "Preventative" 
-      })
-    }
-    className="mr-2"
-  />
-  <label>Preventive maintenance</label>
-</div>
-<div className="mb-4 ml-2 flex items-center">
-  <input
-    type="radio"
-    name="maintenance"
-    checked={formData.maintenance === "" ? false : formData.maintenanceType === "Corrective"}
-   
-    onChange={() =>
-      setFormData({
-        ...formData,
-        maintenanceType: "Corrective" 
-      })
-    }
-    className="mr-2"
-  />
-  <label>Corrective maintenance</label>
-</div>
-
-  </>
-) : activeTab === "services" ? (
-  <>
-  <div className="selected-documents flex flex-wrap mb-4 gap-4">
-    {selectedDocuments.map((document) => (
-      <div
-        key={document.value}
-        className="selected-item flex items-center justify-between w-[30%] mb-2 px-3 py-2 bg-[#dcfce7] text-green-700 rounded-lg text-sm "
-      >
-        <span className="truncate w-[180px] ">{document?.label}</span>
-
-        <button
-          className="text-red text-lg"
-          onClick={() => handleRemoveDocument(document.value)}
-        >
-          ×
-        </button>
-      </div>
-    ))}
-  </div>
-
-  <Select
-    value={null}
-    onChange={handleDocumentsServiceTypeChange}
-    options={serviceDocumentTypeOptions.filter(
-      (option) => !selectedDocuments.some((doc) => doc.value === option.value)
-    )}
-    placeholder="Select Service"
-    isClearable
-    isSearchable
-    noOptionsMessage={() => 'No options available'}
-    className="rounded-md w-full outline-green border border-grayLight hover:border-green"
-    styles={{
-      control: (provided, state) => ({
-        ...provided,
-        border: 'none',
-        boxShadow: state.isFocused ? null : null,
-      }),
-      option: (provided, state) => ({
-        ...provided,
-        backgroundColor: state.isSelected
-          ? '#00B56C'
-          : state.isFocused
-          ? '#e1f0e3'
-          : 'transparent',
-        color: state.isSelected
-          ? 'white'
-          : state.isFocused
-          ? 'black'
-          : 'black',
-        '&:hover': {
-          backgroundColor: '#e1f0e3',
-          color: 'black',
-        },
-      }),
-    }}
-  />
-
-  <div className="checkboxes mt-4">
-    {/* Checkbox for Date */}
-    <label className="block text-sm font-medium mb-2 ml-2">
-        Reminder settings
-      </label>
-      
-      <div className="flex items-center justify-between mb-4">
-        {/* Left side: Checkbox and Label */}
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            checked={isDateSelected}
-            onChange={handleDateCheckboxChange}
-            id="date-checkbox"
-            className="mr-2"
-          />
-          <label htmlFor="date-checkbox" className="text-sm">
-           Reminder Date
-          </label>
-        </div>
-        
-        {/* Right side: DatePicker */}
-       
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <DatePicker
-              value={selectedDate || null}
-           
-              onChange={(date) => handleDateChangeservice(date)}
-              format="MM/dd/yyyy"
-              variant="dialog"
-              disabled={!isDateSelected}
-              placeholder="Issue Date"
-              autoOk
-              inputProps={{ readOnly: true }}
-              style={{
-                width: '200px',
-                marginLeft: '10px',
-                padding: '10px',
-                fontSize: '14px',
-                border: '1px solid #ccc',
-                borderRadius: '5px',
-              }}
-              InputProps={{
-                endAdornment: (
-                  <EventIcon style={{ width: '20px', height: '20px' }} className="text-gray" />
-                ),
-              }}
-              DialogProps={{
-                PaperProps: {
-                  style: {
-                    backgroundColor: '#f4f6f8',
-                    borderRadius: '10px',
-                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)',
-                  },
-                },
-              }}
-            />
-          </MuiPickersUtilsProvider>
-       
-      </div>
-
-    {/* Checkbox for Reminder */}
-    <div className="flex items-center mb-4 justify-between">
-  {/* Left side: Checkbox and Label */}
-  <div className="flex items-center ">
-    <input
-      type="checkbox"
-      checked={isReminderSelected}
-      onChange={handleReminderCheckboxChange}
-      id="reminder-checkbox"
-      className="mr-2"
-    />
-    <label htmlFor="reminder-checkbox" className="text-sm">
-    Reminder Milage
-    </label>
-  </div>
-
-  {/* Right side: Input field for reminder */}
- 
-    <input
-      type="text"
-      value={reminderValue}
-      onChange={handleReminderChange}
-      placeholder="Enter reminder"
-      className=" p-2 border border-[#e4e4e7] rounded-lg w-[12.5rem]" // Adjusted width for input field
-      disabled={!isReminderSelected}
-    />
- 
-</div>
-
-  </div>
-  <div className="flex checkboxes mt-4">
-  {/* Expiry settings label */}
-  <label className="block text-sm font-medium mb-2 ml-2 mr-8">
-    Expiry settings
-  </label>
-
-  {/* Row for Expiry Date checkbox and DatePicker */}
-  <div className="flex items-center mb-4">
-    {/* Left side: Checkbox and Label for Expiry Date */}
-    <div className="flex items-center mr-4">
-      <input
-        type="checkbox"
-        checked={isDateSelected}
-        onChange={handleDateCheckboxChange}
-        id="date-checkbox"
-        className="mr-2"
-      />
-      <label htmlFor="date-checkbox" className="text-sm">
-        Date
-      </label>
-    </div>
-  </div>
-
-  {/* Row for Expiry Mileage checkbox and Input */}
-  <div className="flex items-center mb-4">
-    {/* Left side: Checkbox and Label for Expiry Mileage */}
-    <div className="flex items-center mr-4">
-      <input
-        type="checkbox"
-        checked={isReminderSelected}
-        onChange={handleReminderCheckboxChange}
-        id="reminder-checkbox"
-        className="mr-2"
-      />
-      <label htmlFor="reminder-checkbox" className="text-sm">
-        Mileage
-      </label>
-    </div>
-  </div>
-  
-  
-</div>
-
-<div className="flex items-center mb-4 ">
-{isDateSelected && (
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <DatePicker
-          value={selectedDate || null}
-          onChange={handleDateChangeservice}
-          format="MM/dd/yyyy"
-          variant="dialog"
-          disabled={!isDateSelected}
-          placeholder="Issue Date"
-          autoOk
-          inputProps={{ readOnly: true }}
-          style={{
-            width: '330px',
-            padding: '10px',
-            fontSize: '14px',
-            border: '1px solid #ccc',
-            borderRadius: '5px',
-          }}
-          InputProps={{
-            endAdornment: (
-              <EventIcon style={{ width: '20px', height: '20px' }} className="text-gray" />
-            ),
-          }}
-          DialogProps={{
-            PaperProps: {
-              style: {
-                backgroundColor: '#f4f6f8',
-                borderRadius: '10px',
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)',
-              },
-            },
-          }}
-        />
-      </MuiPickersUtilsProvider>
-    )} 
-  </div>
-
-<div className="flex items-center mb-4">
-     {isReminderSelected && (
-      <input
-        type="text"
-        value={reminderValue}
-        onChange={handleReminderChange}
-        placeholder="Enter reminder"
-        className="p-2 border border-[#e4e4e7] rounded-lg w-[330px]"
-      />
-    )}
-  </div>
-
-  <div className="flex checkboxes mt-4">
-  {/* Expiry settings label */}
-  <label className="block text-sm font-medium mb-2 ml-2 mr-8">
-    last settings
-  </label>
-
-  {/* Row for Expiry Date checkbox and DatePicker */}
-  <div className="flex items-center mb-4">
-    {/* Left side: Checkbox and Label for Expiry Date */}
-    <div className="flex items-center mr-4">
-      <input
-        type="checkbox"
-        checked={isDateSelected}
-        onChange={handleDateCheckboxChange}
-        id="date-checkbox"
-        className="mr-2"
-      />
-      <label htmlFor="date-checkbox" className="text-sm">
-        Date
-      </label>
-    </div>
-  </div>
-
-  {/* Row for Expiry Mileage checkbox and Input */}
-  <div className="flex items-center mb-4">
-    {/* Left side: Checkbox and Label for Expiry Mileage */}
-    <div className="flex items-center mr-4">
-      <input
-        type="checkbox"
-        checked={isReminderSelected}
-        onChange={handleReminderCheckboxChange}
-        id="reminder-checkbox"
-        className="mr-2"
-      />
-      <label htmlFor="reminder-checkbox" className="text-sm">
-        Mileage
-      </label>
-    </div>
-  </div>
-  
-  
-</div>
-</>
-  // Your JSX for when activeTab is "services"
- /*  <Select
+                 {/*  <Select
                     value={serviceTypeOptions.find(
                       (option) => option.value === formData.serviceType
                     )} // Find the selected option from options
@@ -2764,26 +1647,92 @@ const servicesTable = [
                         },
                       }),
                     }}
-                  />  */
+                  /> */}
+                  {activeTab === "maintenance" ? (
+  <>
+   <div className="mb-4 ml-2 flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.Preventive}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        Preventive: e.target.checked,
+                      })
+                    }
+                    className="mr-2"
+                  />
+                  <label>Preventive maintenance</label>
+                </div>
+                <div className="mb-4 ml-2 flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.Corrective}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        Corrective: e.target.checked,
+                      })
+                    }
+                    className="mr-2"
+                  />
+                  <label>Corrective maintenance</label>
+                </div>
+  </>
+) : activeTab === "services" ? (
+  // Your JSX for when activeTab is "services"
+  <Select
+                    value={serviceTypeOptions.find(
+                      (option) => option.value === formData.serviceType
+                    )} // Find the selected option from options
+                    onChange={handleServiceTypeChange}
+                    options={serviceTypeOptions}
+                    placeholder="Select Service Type"
+                    isClearable
+                    isSearchable
+                    noOptionsMessage={() => "No options available"}
+                    className="rounded-md w-full outline-green border border-grayLight hover:border-green"
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        border: "none",
+                        boxShadow: state.isFocused ? null : null,
+                      }),
+                      option: (provided, state) => ({
+                        ...provided,
+                        backgroundColor: state.isSelected
+                          ? "#00B56C"
+                          : state.isFocused
+                          ? "#e1f0e3"
+                          : "transparent",
+                        color: state.isSelected
+                          ? "white"
+                          : state.isFocused
+                          ? "black"
+                          : "black",
+                        "&:hover": {
+                          backgroundColor: "#e1f0e3",
+                          color: "black",
+                        },
+                      }),
+                    }}
+                  /> 
 ) : (
-/*   <>
-  <label className="block text-sm font-medium">
-  Issue Date
-                  </label>
+  <>
+ 
                 <MuiPickersUtilsProvider   utils={DateFnsUtils}>
                       <DatePicker
-                        value={formData.createdDate || null}
-                        onChange={handleCreatedDateChange}
+                        value={formData.targetValue || null}
+                        onChange={handleDateChange}
                         format="MM/dd/yyyy" // Display format for the date
                         variant="dialog"
-                        placeholder="Issue Date "
-                        //minDate={currentDate} // Prevent selecting past dates
+                        placeholder="Created Date "
+                        minDate={currentDate} // Prevent selecting past dates
                         autoOk
                         inputProps={{ readOnly: true }} // Make input read-only
                         style={{
-                          marginTop: '0%', // Adjust top margin
-                          marginBottom: "2%",
-                          width: '333px', // Adjust width of the input
+                          marginTop: '2%', // Adjust top margin
+                          width: '160px', // Adjust width of the input
                           border: '1px solid #ccc', // Border style
                           borderRadius: '5px', // Rounded corners
                         padding: '10px',
@@ -2813,21 +1762,18 @@ height: "458px",
                       
                      
                       />
-                       <label className="block text-sm font-medium">
-                       Expiry Date
-                  </label>
                     <DatePicker
-                        value={formData.expiryDate || null}
-                        onChange={handleExpiryDateChange}
+                        value={formData.targetValue || null}
+                        onChange={handleDateChange}
                         format="MM/dd/yyyy" // Display format for the date
                         variant="dialog"
-                        placeholder="Expiry Date "
-                        minDate={formData.createdDate} // Prevent selecting past dates
+                        placeholder="Created Date "
+                        minDate={currentDate} // Prevent selecting past dates
                         autoOk
                         inputProps={{ readOnly: true }} // Make input read-only
                         style={{
-                          marginTop: '0%', // Adjust top margin
-                          width: '333px', // Adjust width of the input
+                          marginTop: '2%', // Adjust top margin
+                          width: '160px', // Adjust width of the input
                           border: '1px solid #ccc', // Border style
                           borderRadius: '5px', // Rounded corners
                         padding: '10px',
@@ -2858,28 +1804,36 @@ height: "458px",
                      
                       />  
                     </MuiPickersUtilsProvider>
-                    <div className=" mt-4">
-      <h2 className="block text-sm font-medium">Upload PDF, JPEG, or PNG</h2>
+                    <div className="flex flex-col items-center p-6 border rounded-md shadow-lg space-y-4 w-80 mx-auto">
+      <h2 className="text-lg font-semibold text-gray-700">Upload PDF, JPEG, or PNG</h2>
       
       <input 
         type="file" 
         accept=".pdf, .jpeg, .jpg, .png"
         onChange={handleFileChange}
-        className="w-full pr-3 py-2  rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
       />
       
       {error && <p className="text-red-500 text-sm">{error}</p>}
       
-     
+      {file && (
+        <div className="w-full flex justify-between items-center">
+          <p className="text-gray-700">Selected file: {file.name}</p>
+          <button 
+            onClick={handleSubmit} 
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200"
+          >
+            Upload File
+          </button>
+        </div>
+      )}
     </div>
-  </> */
-  
-  <></>
+  </>
 )}
                     
                 </div>
 
-                { activeTab === "services" && formData.serviceType === "Datewise" && (
+                {formData.serviceType === "Datewise" && (
                   <div className="mb-4 ml-1">
                     <label className="block text-sm font-medium">
                       Alert Date & Time
@@ -2970,7 +1924,7 @@ height: "458px",
                   </div>
                 )}
 
-                { activeTab === "services" && formData.serviceType === "Milagewise" && (
+                {formData.serviceType === "Milagewise" && (
                   <>
                     <div className="mb-4">
                       <label className="block text-sm font-medium ml-1">
@@ -2994,62 +1948,6 @@ height: "458px",
                     </div>
                   </>
                 )}
-                  {/*  {activeTab == "documentation" && ( 
-                    <>
-                     <label className="block text-sm font-medium ml-1">
-                   
-                     When to show Alert 
-                     </label>
-                    <MuiPickersUtilsProvider   utils={DateFnsUtils}>
-                      <DatePicker
-                        value={formData.targetValue || null}
-                        onChange={handleDateChange}
-                        format="MM/dd/yyyy" // Display format for the date
-                        variant="dialog"
-                        placeholder="Select Date"
-                      //  minDate={currentDate} // Prevent selecting past dates
-                      minDate={new Date("2024-12-20")}
-                        maxDate={new Date("2024-12-28")}
-                        autoOk
-                        inputProps={{ readOnly: true }} // Make input read-only
-                        style={{
-                          marginTop: '2%', // Adjust top margin
-                          marginBottom: '2%',
-                          width: '670px', // Adjust width of the input
-                          border: '1px solid #ccc', // Border style
-                          borderRadius: '5px', // Rounded corners
-                        padding: '10px',
-                          fontSize: '14px', // Font size
-                    
-                        }}
-                        InputProps={{
-                          endAdornment: (
-                            <EventIcon
-                              style={{ width: "20px", height: "20px" }}
-                              className="text-gray"
-                            />
-                          ),
-                        }}
-                        DialogProps={{
-                          PaperProps: {
-                            style: {
-                              backgroundColor: '#f4f6f8', // Change background color of the calendar dialog
-                              borderRadius: '10px', // Round corners of the calendar dialog
-                              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)', // Shadow for the dialog
-                            
-height: "458px",
-
-                            },
-                          },
-                        }}
-                      
-                     
-                      />
-       
-                    </MuiPickersUtilsProvider>
-                    </>
-                   )} */}
-
                 {activeTab !== "maintenance" && (
                   <>
                 <label className="block text-sm font-medium mb-2 ml-2">
@@ -3100,9 +1998,7 @@ height: "458px",
                       setModalOpen(false); // Close the modal
                       seteditModal(false);
                       setTimeValue(null)
-                      setFile(null)
                       setFormData(initialFormData); // Reset form data to initial state
-                      setSelectedDocuments([])
                     }}
                     className="bg-[#E53E3E] text-white px-4 py-2 rounded-lg"
                   >
@@ -3119,77 +2015,8 @@ height: "458px",
             </div>
           </div>
         )}
-
-        {modalOpenNew && (
- <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
- <div className={`bg-white p-6 rounded-lg ${activeTab == "documentation" ?  "w-[45rem]" : "w-96"}`}>
-   <h3 className="text-xl font-bold mb-4 text-center">
-    Add service 1
-   </h3>
-   <form onSubmit={handleSubmitservice}>
-  
-     <div className="mb-4">
-       <label className="block text-sm font-medium">
-        service Title
-       </label>
-       <input
-         type="text"
-         name="service"
-         value={simpleservicesForm.service}
-         onChange={handleInputserviceChange}
-         className="w-full p-2 border border-[#CBD5E0] rounded-lg"
-         placeholder="Oil Changing / Tuning, etc."
-         
-       />
-     </div>
-     <div className="mb-4">
-       <label className="block text-sm font-medium">
-        Other
-       </label>
-       <input
-         type="text"
-         name="other"
-         value={simpleservicesForm.other}
-         onChange={handleInputserviceChange}
-         className="w-full p-2 border border-[#CBD5E0] rounded-lg"
-         placeholder="Any Information"
-         
-       />
-     </div>
-  
- 
     
 
-     <div className="flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setModalOpenNew(false)
-                      setsimpleservicesForm(initialsimpleservicesForm)
-                     /*  setModalOpen(false); // Close the modal
-                      seteditModal(false);
-                      setTimeValue(null)
-                      setFile(null)
-                      setFormData(initialFormData); // Reset form data to initial state
-                      setSelectedDocuments([]) */
-                    }}
-                    className="bg-[#E53E3E] text-white px-4 py-2 rounded-lg"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-[#00B56C] text-white px-4 py-2 rounded-lg"
-                  >
-                    Save
-                  </button>
-                </div>
-   </form>
- </div>
-</div>
-        )}
-    
-{/* update / delete modal */}
 {isModalOpen && (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 bg-opacity-50 backdrop-blur-sm">
       <div className="bg-white p-6 rounded-lg w-full sm:w-1/3 z-10 max-w-lg">
@@ -3254,24 +2081,66 @@ height: "458px",
   )}
      
       </div>
-
-
-{/* vehciles summary  */}
       {!selectedvehicle && 
-      <div className="px-4 col-span-3 mt-[42px] ">
+      <div className="px-4 col-span-4 mt-[42px] pl-[150px]">
+    {/*   <div className="grid grid-cols-12 gap-4">
  
+      <div className="col-span-12 bg-[#f3f4f6] rounded-md shadow p-4">
+  <div className="grid gap-y-[130px]">
+ 
+    <div>
+      <h2 className="text-lg font-bold text-gray-700  pb-2">Vehicle 1 Header</h2>
+      <div className="bg-green-500 p-4 rounded-md shadow">
+      <div className="text-center">
+  <h2 className="text-lg font-bold text-gray-700 pb-4">Vehicle 1 Header</h2>
+  <div className="grid grid-cols-2 gap-4">
+    <div>
+      <p className="text-4xl font-bold text-green-600">9</p>
+      <p className="text-sm font-medium">Assigned</p>
+    </div>
+    <div>
+      <p className="text-4xl font-bold text-yellow-500">0</p>
+      <p className="text-sm font-medium">Unassigned</p>
+    </div>
+  </div>
+</div>
+
+      </div>
+    </div>
+
+  
+    <div>
+      <h2 className="text-lg font-bold text-gray-700 border-b pb-2">Vehicle 2 Header</h2>
+      <div className="bg-green-500 p-4 rounded-md shadow">
+        <div className="grid grid-cols-2 text-center">
+     
+          <div>
+            <p className="text-4xl font-bold text-green-600">9</p>
+            <p className="text-sm font-medium">Assigned</p>
+          </div>
+       
+          <div>
+            <p className="text-4xl font-bold text-yellow-500">0</p>
+            <p className="text-sm font-medium">Unassigned</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>bg-[#f3f4f6]
+</div> */}
 <div className="grid row-span-2 gap-[42px]">
 <div className="p-2 rounded-md bg-white border border-gray p-2 w-[345px] h-[170px]">
 
     <h2 className="text-lg font-bold text-gray-700 pb-8">Vehicle Service Reminder</h2>
     <div className="grid grid-cols-2 gap-4">
       <div className="text-center">
-        <p className="text-4xl font-bold text-red">{services.filter((item) => item.dataType === "Service" && item.status == "over due").length}
+        <p className="text-4xl font-bold text-red">{vehicleList.filter((item) => item.DeviceAttach === true).length}
         </p>
         <p className="text-sm font-medium">Over Due</p>
       </div>
       <div className="text-center">
-        <p className="text-4xl font-bold text-yellow">{services.filter((item) => item.dataType === "Service" && item.status == "due soon").length}</p>
+        <p className="text-4xl font-bold text-yellow">{vehicleList.filter((item) => item.DeviceAttach === false).length}</p>
         <p className="text-sm font-medium">Due Soon</p>
       </div>
     </div>
@@ -3282,11 +2151,11 @@ height: "458px",
     <h2 className="text-lg font-bold text-gray-700 pb-8">Vehicle Renewal Reminders</h2>
     <div className="grid grid-cols-2 gap-4">
       <div className="text-center">
-        <p className="text-4xl font-bold text-red">{services.filter((item) => item.dataType === "Documentation" && item.status == "over due").length}</p>
+        <p className="text-4xl font-bold text-red">9</p>
         <p className="text-sm font-medium">Over Due</p>
       </div>
       <div className="text-center">
-        <p className="text-4xl font-bold text-yellow">{services.filter((item) => item.dataType === "Documentation" && item.status == "due soon").length}</p>
+        <p className="text-4xl font-bold text-yellow">0</p>
         <p className="text-sm font-medium">Due Soon</p>
       </div>
     </div>
@@ -3296,23 +2165,8 @@ height: "458px",
         
          </div>
         }
+      </div>
 
-
-</div>
-      {!selectedvehicle && (
-     <div className="mx-8 mb-0 mt-4">
-
-        <Graph
-        piedata={piedata}
-        
-        linedata={linedata}
-        
-        bardata={bardata}
-        />
-        </div>
-        )}
-
- 
     </div>
   );
 }

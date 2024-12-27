@@ -5,12 +5,11 @@ import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
 import { immobiliserequest } from "@/types/immobiliserequest";
 import uniqueDataByIMEIAndLatestTimestamp from "./uniqueDataByIMEIAndLatestTimestamp";
- var URL = "http://172.16.10.73:80"
-// var URL ="https://backend.vtracksolutions.com";
+ //var URL = "http://172.16.10.99:80"
+  var URL ="https://backend.vtracksolutions.com";
 
 export async function getVehicleDataByClientId(clientId: string) {
   try {
-    
     const response = await fetch(
       `https://socketio.vtracksolutions.com:1102/${clientId}`,
       {
@@ -53,126 +52,7 @@ export async function getVehicleDataByClientIdForOdometer(clientId: string) {
     return [];
   }
 }
-////////////////////
-export async function addDocument(payload: any ,token:string) {
-  try {
-    const response = await fetch(
-      `${URL}/document`,
-      {
-        headers: {          
-          authorization: `Bearer ${token}`,          
-        },
-        body:payload,
-        method: "POST", // Use lowercase 'get' for method
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching data", error);
-    return [];
-  }
-}
-export async function getDocuments(token:string) {
-  try {
-    const response = await fetch(
-      `${URL}/document`,
-      {
-        headers: {
-          accept: "application/json, text/plain, */*",
-          authorization: `Bearer ${token}`,
-          "content-type": "application/json",
-        },
-        method: "GET", // Use lowercase 'get' for method
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching data", error);
-    return [];
-  }
-}
 
-export async function editDocuments(payload:any,token:string) {
-  try {
-    const response = await fetch(
-      `${URL}/document`,
-      {
-        headers: {
-          accept: "application/json, text/plain, */*",
-          authorization: `Bearer ${token}`,
-          "content-type": "application/json",
-        },
-        body:JSON.stringify(payload),
-        method: "PUT", // Use lowercase 'get' for method
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching data", error);
-    return [];
-  }
-}export async function deleteDocuments(id:string,token:string) {
-  try {
-    const response = await fetch(
-      `${URL}/document`,
-      {
-        headers: {
-          accept: "application/json, text/plain, */*",
-          authorization: `Bearer ${token}`,
-          "content-type": "application/json",
-        },
-        body:JSON.stringify({id}),
-        method: "DELETE", // Use lowercase 'get' for method
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching data", error);
-    return [];
-  }
-}
-////////////////////
-
-
-export async function getevents(clientId: string ,token:string) {
-  try {
-    const response = await fetch(
-      `${URL}/geteventsbyclientId?clientId=${clientId}`,
-      {
-        headers: {
-          accept: "application/json, text/plain, */*",
-          authorization: `Bearer ${token}`,
-          "content-type": "application/json",
-        },
-        method: "GET", // Use lowercase 'get' for method
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching data", error);
-    return [];
-  }
-}
 export async function getalluserview(userId: string,token:string ) {
   try {
     const response = await fetch(
@@ -196,7 +76,8 @@ export async function getalluserview(userId: string,token:string ) {
     return [];
   }
 }
-export async function getallattributes(token:string ) {
+
+export async function getallattributes(userId: string,token:string ) {
   try {
     const response = await fetch(
       `${URL}/attributes`,
@@ -219,7 +100,6 @@ export async function getallattributes(token:string ) {
     return [];
   }
 }
-
 
 export async function getClientSettingByClinetIdAndToken({
   token,
@@ -248,38 +128,6 @@ export async function getClientSettingByClinetIdAndToken({
     return [];
   }
 }
-
-export async function getallNotifications({
-
-  token,
-  body
-}: {
-  token: string;
-  body: any;
-}){
-  try {
-    const response = await fetch(`${URL}/getallnotifications`, {
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body,
-      //  `{\"clientId\":\"${clientId}\"}`,
-      method: "POST",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    
-    return [];
-  }
-}
-
-
 export async function getNotificationsData({
   token,
   clientId,
@@ -316,7 +164,7 @@ export async function getNotificationsDataByUserId({
   clientId: string;
 }) {
   try {
-   
+   // console.log("object", clientId,token);
     const response = await fetch(`${URL}/notifications`, {
       headers: {
         accept: "application/json, text/plain, */*",
@@ -356,6 +204,7 @@ export async function handleServiceHistoryRequest({
       accept: "application/json, text/plain, */*",
       authorization: `Bearer ${token}`,
       "content-type": "application/json",
+     
     };
 
     // Prepare the fetch options
@@ -380,8 +229,8 @@ export async function handleServiceHistoryRequest({
     }
 
     // Perform the request
-    const response = await fetch( `${URL}/serviceHistory`, fetchOptions);
-
+  //  const response = await fetch( `${URL}/serviceHistory`, fetchOptions);
+  const response = await fetch( `http://172.16.10.73:80/serviceHistory`, fetchOptions);
     // Handle non-2xx status codes
     if (!response.ok) {
       throw new Error(`Failed to fetch data from the API. Status: ${response.status}`);
@@ -405,6 +254,169 @@ export async function handleServiceHistoryRequest({
 }
 
 
+export async function handleServicesRequest({
+  token,
+  method,
+  payload,
+}: {
+  token: string;
+  method: "GET" | "POST" | "PUT" | "DELETE";
+  payload?: any; // Payload is optional for methods like GET and DELETE
+}) {
+  try {
+    const headers = {
+      accept: "application/json, text/plain, */*",
+      authorization: `Bearer ${token}`,
+      "content-type": "application/json",
+    };
+
+    // If the method is GET or DELETE, we don't need a body
+    const options: RequestInit = {
+      method,
+      headers,
+    };
+
+    // Include body only if there's a payload (POST or PUT)
+    if (payload && (method === "POST" || method === "PUT" || method === "DELETE")) {
+      options.body = JSON.stringify(payload);
+    }
+ 
+    const response = await fetch(`${"http://172.16.10.73/service"}`, options);
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+
+    // If the method is GET, we expect a response body
+    if (method === "GET") {
+      const data = await response.json();
+      return data;
+    }
+
+    // For POST, PUT, DELETE, we might not get a response body
+    return await response.json();
+  } catch (error) {
+    console.error("API request error:", error);
+    return null; // Return null or handle error accordingly
+  }
+}
+
+export async function addDocument(payload: any ,token:string) {
+  try {
+    const response = await fetch(
+      `${"http://172.16.10.73"}/document`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+        body:payload,
+        method: "POST", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+export async function getDocuments(token:string) {
+  try {
+    const response = await fetch(
+      `${"http://172.16.10.73"}/document`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        method: "GET", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+export async function editDocuments(payload:any,token:string) {
+  try {
+    const response = await fetch(
+      `${"http://172.16.10.73"}/document`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body:JSON.stringify(payload),
+        method: "PUT", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}export async function deleteDocuments(id:string,token:string) {
+  try {
+    const response = await fetch(
+      `${"http://172.16.10.73"}/document`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body:JSON.stringify({id}),
+        method: "DELETE", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+////////////////////
+export async function getevents(clientId: string ,token:string) {
+  try {
+    const response = await fetch(
+      `${"http://172.16.10.73"}/geteventsbyclientId?clientId=${clientId}`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        method: "GET", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
 
 export async function vehicleListByClientId({
   token,
@@ -465,6 +477,36 @@ export async function vehicleListByClientId({
 //     return [];
 //   }
 // }
+
+export async function getallNotifications({
+  token,
+  body
+}: {
+  token: string;
+  body: any;
+}){
+  try {
+    const response = await fetch(`${URL}/getallnotifications`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body,
+      //  `{\"clientId\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return [];
+  }
+}
+
+
 export function expireForgotLink(payload: any) {
   const ressult = axios
     .post(`${URL}/forgotpassword/UpdateLink`, payload)

@@ -697,15 +697,7 @@ const LiveSidebar = ({
                     <div className="font-popins font-semibold text-start lg:text-xl text-1xl">
                       {/* Vehicle Registration */}
                       <p
-                        className={`${item.vehicleStatus === "Parked"
-                          ? "text-black"
-                          : item.vehicleStatus === "Moving"
-                            ? "text-black"
-                            : item.vehicleStatus === "Hybrid"
-                              ? "text-black"
-                              : "text-black"
-                          }`}
-                      >
+                        className="text-black">
                         {item?.vehicleReg}
                       </p>
 
@@ -714,12 +706,11 @@ const LiveSidebar = ({
                         <div className="flex items-center space-x-2">
                           <div
                             className={`inline-block px-1 py-1 rounded-md text-sm shadow ${item?.vehicleStatus === "Moving"
-                              ? "bg-green text-white"
-                              : item?.vehicleStatus === "Parked"
-                                ? "bg-red text-white"
-                                : item?.vehicleStatus === "Pause"
-                                  ? "bg-[#eec40f] text-white"
-                                  : "bg-gray text-gray"
+                                ? "bg-green text-white"
+                                : item?.vehicleStatus === "Parked"
+                                  ? "bg-red text-white"
+                                  :  "bg-[#eec40f] text-white"
+                                
                               }`}
                           >
                             <span>{item?.vehicleStatus || "Unknown"}</span>
@@ -739,8 +730,6 @@ const LiveSidebar = ({
                               {item.gps.speedWithUnitDesc}
                             </p>
                           </div>
-
-
                           {session?.timezone !== undefined ? (
                             <>
                               <ActiveStatus
@@ -771,21 +760,17 @@ const LiveSidebar = ({
 
                     </div>
 
-
-
                   </div>
 
 
 
                   <div className="xl:col-span-6 text-[13px] lg:col-span-4 md:col-span-4 sm:col-span-6 col-span-4 pl-8">
                     <div className=" border border-gray p-1 rounded-md">
-
                       {
                         timeAgo(item.timestampNotParsed?.includes("-") ? item?.timestamp : item?.timestampNotParsed)
 
                       }
                     </div>
-
                     {item.defaultView == false && ( //change to defualtview
                       <div
                         className="flex justify-end mr-[2px]"
