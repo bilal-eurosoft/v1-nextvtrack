@@ -5,7 +5,7 @@ import { ActiveStatus } from "../General/ActiveStatus";
 import { useSession } from "next-auth/react";
 import { zonelistType } from "../../types/zoneType";
 import { getZoneListByClientId, getallattributes, getalluserview } from "../../utils/API_CALLS";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { fetchZone } from "@/lib/slices/zoneSlice";
 import { useSelector } from "react-redux";
 import "./index.css";
@@ -15,6 +15,34 @@ import { duration } from "moment";
 import Image from "next/image";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+const moment = require("moment-timezone");
+const CountryFlag = ({ country }) => {
+  const flagMap = {
+    France: "https://flagpedia.net/data/flags/h80/fr.png",
+    Switzerland: "https://flagpedia.net/data/flags/h80/ch.png",
+    Pakistan: "https://flagpedia.net/data/flags/h80/pk.png",
+    "United Arab Emirates": "https://flagpedia.net/data/flags/h80/ae.png",
+    "United Kingdom": "https://flagpedia.net/data/flags/h80/gb.png",
+    Canada: "https://flagpedia.net/data/flags/h80/ca.png",
+    Australia: "https://flagpedia.net/data/flags/h80/au.png",
+  };
+
+  const flagUrl = flagMap[country] || "";
+
+  return (
+    <>
+      {flagUrl &&
+        <img
+          src={flagUrl}
+          alt="Flag"
+          className="h-5 w-5 object-cover" // Adjust size as necessary
+        />
+      }
+    </>
+
+  );
+};
+
 const LiveSidebar = ({
   carData,
   countMoving,
@@ -29,8 +57,8 @@ const LiveSidebar = ({
   setZoom,
   // setShowZonePopUp,
   setShowZones,
-  // setSelectedOdoVehicle,
-  // selectedOdoVehicle,
+  setSelectedOdoVehicle,
+  selectedOdoVehicle,
   setPosition,
 }: {
   carData: VehicleData[];
@@ -46,14 +74,14 @@ const LiveSidebar = ({
   setZoom: any;
   // setShowZonePopUp: any;
   setShowZones: any;
-  // setSelectedOdoVehicle:any;
-  // selectedOdoVehicle:any;
-  setPosition:any;
+  setSelectedOdoVehicle: any;
+  selectedOdoVehicle: any;
+  setPosition: any;
 
 
 }) => {
   const { data: session } = useSession();
-  const moment = require("moment-timezone");
+
   const [searchData, setSearchData] = useState({
     search: "",
   });
@@ -76,19 +104,22 @@ const LiveSidebar = ({
   }, [allZones]);
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [allattributes, setallattributes] = useState([]);
-  const [allfields,setAllfields]= useState([])
-  useEffect(()=>{    
+  const [allfields, setAllfields] = useState([])
+  useEffect(() => {
     (async function () {
-      if(session?.defaultView == false){
-        const data =  await getalluserview(session?.userId, session?.accessToken)            
+      if (session?.defaultView == false) {
+        const data = await getalluserview(session.userId, session.accessToken)
         setallattributes(data.data)
-        }
-        const data = await getallattributes(session?.accessToken);
-        setAllfields(data.data);
-        
-    
+      }
+      const data = await getallattributes({
+        token: session.accessToken,
+        userId: session.userId,
+      });
+      setAllfields(data.data);
+
+
     })()
-  },[])
+  }, [])
 
   // if (allZones?.zone?.length <= 0) {
   //   const func = async () => {
@@ -142,7 +173,30 @@ const LiveSidebar = ({
     setIsActiveColor(0);
     setZoom(10);
   };
+  function timeAgo(timestamp: any) {
+    const now =
+      (new Date(new Date().toLocaleString("en-US", { timeZone: session.timezone }))).getTime()
+    const past = (new Date(timestamp)).getTime();
+    const diffInSeconds = Math.floor((now - past) / 1000); // Difference in seconds   
 
+    if (diffInSeconds < 60) { // 60 sec
+      return "few seconds ago";
+    } else if (diffInSeconds < 1800) { //1800s = 30 min
+      const minutes = Math.floor(diffInSeconds / 60);
+      return minutes === 1 ? "a minute ago" : `few minutes ago`;
+    } else if (diffInSeconds < 3600) { // 3600 sec 1 hour (lies in this block between 30 min to 1 hour)
+      return "half an hour ago"
+    }
+    else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return hours === 1 ? "an hour ago" : `few hours ago`;
+    } else if (diffInSeconds < 172800) {
+      return "yesterday";
+    } else {
+      const days = Math.floor(diffInSeconds / 86400);
+      return days === 1 ? "a day ago" : `few days ago`;
+    }
+  }
   useEffect(() => {
     const interval = setInterval(() => {
       setDiffernceTimes(moment.tz(session?.timezone));
@@ -154,7 +208,7 @@ const LiveSidebar = ({
   }, []);
   const currentMoment = moment.tz(session?.timezone);
   // const formattedDateTime = currentMoment.format("MMMM DD YYYY hh:mm:ss A");
-  
+
 
   const formattedTimes = filteredData?.map((item: any) => {
     const timestampMoment = moment.tz(
@@ -183,12 +237,12 @@ const LiveSidebar = ({
   // let hourConvertIntoDay;
   // if (formattedTimes?.hours >= 24) {
   //   hourConvertIntoDay = formattedTimes?.hours;
-  
+
   // }
 
-  
 
-  
+
+
   // const dataArray = Object.values(dataFilter);
   // const mappedDataArray = dataArray.map((item: any, index) => {
   //   return {
@@ -196,7 +250,10 @@ const LiveSidebar = ({
   //     duration: dataFilter,
   //   };
   // });
- 
+  const [activeIndex, setActiveIndex] = useState(0); // Tracks the active button
+  const [activeLabel, setactiveLabel] = useState("All"); // Tracks the active button
+
+
   useEffect(() => {
     const zoneLatlog = zoneList?.map((item: any) => {
       if (item.zoneType == "Polygon") {
@@ -207,65 +264,126 @@ const LiveSidebar = ({
         return undefined;
       }
     });
-    const filtered = carData
-      ?.filter((data) =>
-        data.vehicleReg.toLowerCase().includes(searchData.search.toLowerCase())
-      )
-      .sort((a: any, b: any) => {
-        const aReg = a.vehicleReg;
-        const bReg = b.vehicleReg;
+    if (activeLabel == "All") {
 
-        // Check if both are numbers
-        const aIsNumeric = !isNaN(parseInt(aReg));
-        const bIsNumeric = !isNaN(parseInt(bReg));
+      if (searchData.search) {
+        const filtered = carData
+          ?.filter((data) =>
+            data.vehicleReg.toLowerCase().includes(searchData.search.toLowerCase())
+          )
+          .sort((a: any, b: any) => {
+            const aReg = a.vehicleReg;
+            const bReg = b.vehicleReg;
 
-        if (aIsNumeric && bIsNumeric) {
-          return parseInt(aReg) - parseInt(bReg);
-        } else {
-          return aReg.localeCompare(bReg);
-        }
-      })
-      .map((item: any) => {
-        
-        let allatribute = allattributes?.find((i:any)=>{
-          return i.vehicleId==item.vehicleId
-        })
+            // Check if both are numbers
+            const aIsNumeric = !isNaN(parseInt(aReg));
+            const bIsNumeric = !isNaN(parseInt(bReg));
 
-        allatribute?.attributes?.map((i)=>{
-if(i.allow==false){
-  delete item[i.key]
-}
-        })
-        
+            if (aIsNumeric && bIsNumeric) {
+              return parseInt(aReg) - parseInt(bReg);
+            } else {
+              return aReg.localeCompare(bReg);
+            }
+          })
+          .map((item: any) => {
 
-        const i = zoneLatlog?.findIndex((zone: any) => {
-          if (zone != undefined) {
-            return isPointInPolygon(
-              [item.gps.latitude, item.gps.longitude],
-              zone
-            );
+            let allatribute = allattributes?.find((i: any) => {
+              return i.vehicleId == item.vehicleId
+            })
+
+            allatribute?.attributes?.map((i) => {
+              if (i.allow == false) {
+                delete item[i.key]
+              }
+            })
+
+
+            const i = zoneLatlog?.findIndex((zone: any) => {
+              if (zone != undefined) {
+                return isPointInPolygon(
+                  [item.gps.latitude, item.gps.longitude],
+                  zone
+                );
+              }
+            });
+            if (i && i != -1) {
+              item.zone = zoneList[i]?.zoneName;
+            }
+            return item;
+          });
+        // const updatedFiltered = {
+        //   ...filtered,
+        //   duaration: filterTimes, // Add your new key and its value here
+        // };
+        setFilteredData(filtered);
+      }
+      else {
+
+        setFilteredData(carData)
+      }
+
+    }
+    else {
+      const filtered = carData
+        ?.filter((data) =>
+          data.vehicleStatus?.toLowerCase().includes(activeLabel?.toLowerCase())
+        )
+        .sort((a: any, b: any) => {
+          const aReg = a.vehicleReg;
+          const bReg = b.vehicleReg;
+
+          // Check if both are numbers
+          const aIsNumeric = !isNaN(parseInt(aReg));
+          const bIsNumeric = !isNaN(parseInt(bReg));
+
+          if (aIsNumeric && bIsNumeric) {
+            return parseInt(aReg) - parseInt(bReg);
+          } else {
+            return aReg.localeCompare(bReg);
           }
+        })
+        .map((item: any) => {
+
+          let allatribute = allattributes?.find((i: any) => {
+            return i.vehicleId == item.vehicleId
+          })
+
+          allatribute?.attributes?.map((i) => {
+            if (i.allow == false) {
+              delete item[i.key]
+            }
+          })
+
+
+          const i = zoneLatlog?.findIndex((zone: any) => {
+            if (zone != undefined) {
+              return isPointInPolygon(
+                [item.gps.latitude, item.gps.longitude],
+                zone
+              );
+            }
+          });
+          if (i && i != -1) {
+            item.zone = zoneList[i]?.zoneName;
+          }
+          return item;
         });
-        if (i && i != -1) {
-          item.zone = zoneList[i]?.zoneName;
-        }
-        return item;
-      });
-    // const updatedFiltered = {
-    //   ...filtered,
-    //   duaration: filterTimes, // Add your new key and its value here
-    // };
-    setFilteredData(filtered);
-    // setDataFilter({ ...filtered, dauartions: formattedTimes });
-    // setFilteredData((preData: any) => ({
-    //   filtered,
-    // }));
-  }, [searchData.search, carData]);
+      // const updatedFiltered = {
+      //   ...filtered,
+      //   duaration: filterTimes, // Add your new key and its value here
+      // };
+      setFilteredData(filtered);
+    }
+
+  }, [searchData.search, carData, activeLabel]);
+  let router = useRouter()
+
   const handleClickVehicle = (item: any) => {
-    const filterData = carData.filter(
-      (items) => items.vehicleId === item.vehicleId
-    );
-    
+    //const filterData = carData.filter(
+    //   (items) => items.vehicleId === item.vehicleId
+    // );
+    router.push(`/liveTracking?IMEI=${item.IMEI}`)
+
     setSelectedVehicle(item);
     setshowAllVehicles(false);
     setIsActiveColor(item.vehicleId);
@@ -289,28 +407,79 @@ if(i.allow==false){
   //   duration.minutes()
   // )} minutes, ${Math.abs(duration.seconds())} seconds`;
 
- 
-//   const handleodometer = (item:any, e: any) => {
-   
-//     const rect = e.currentTarget.getBoundingClientRect(); 
-//  if(selectedOdoVehicle?.vehicleReg == item.vehicleReg){
-//   setPosition({ top: 0, left: 0 });
-//   // setSelectedOdoVehicle(null)
-//  }
-//  else{
-//   // setSelectedOdoVehicle(item)
-  
-//  // setPosition({ top: e.clientY , left: e.clientX  });
-//  setPosition({ top: rect.top, left: rect.left }); 
 
-//  }
+  const handleodometer = (item: any, e: any) => {
 
-//   }
+    const rect = e.currentTarget.getBoundingClientRect();
+    if (selectedOdoVehicle?.vehicleReg == item.vehicleReg) {
+      setPosition({ top: 0, left: 0 });
+      setSelectedOdoVehicle(null)
+    }
+    else {
+      setSelectedOdoVehicle(item)
+
+      // setPosition({ top: e.clientY , left: e.clientX  });
+      setPosition({ top: rect.top, left: rect.left });
+
+    }
+
+  }
 
   const toggleExpand = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
-const [srcimgindex, setsrcimgindex] = useState(null);
+
+
+
+
+  const data = [
+    { label: 'All', color: '#94a3b8', count: countParked + countMoving + countPause },
+    { label: 'Parked', color: 'red', count: countParked },
+    { label: 'Moving', color: 'green', count: countMoving },
+    { label: 'Pause', color: '#eec40f', count: countPause },
+  ];
+
+  const handleButtonClick = (index) => {
+    // You can add additional logic here based on the index.
+    setActiveIndex(index);
+
+    // You can use the active index to show specific data.
+    // For example:
+    const selectedData = data[index];
+    setactiveLabel(selectedData.label)
+
+    /*  if (index === "All") {
+        // setFilteredData(carData)
+         return
+       }
+   
+    else {
+   
+   
+     const filtered = carData
+         ?.filter((data) =>
+           data.vehicleStatus.toLowerCase().includes(selectedData.label.toLowerCase())
+         )
+         .sort((a: any, b: any) => {
+           const aReg = a.vehicleReg;
+           const bReg = b.vehicleReg;
+   
+           // Check if both are numbers
+           const aIsNumeric = !isNaN(parseInt(aReg));
+           const bIsNumeric = !isNaN(parseInt(bReg));
+   
+           if (aIsNumeric && bIsNumeric) {
+             return parseInt(aReg) - parseInt(bReg);
+           } else {
+             return aReg.localeCompare(bReg);
+           }
+         })
+         
+         setFilteredData(filtered)
+       } */
+
+  };
+
   return (
     <div className="xl:col-span-1  lg:col-span-2  md:col-span-2 sm:col-span-2  col-span-5 main_sider_bar">
       <div
@@ -357,7 +526,7 @@ const [srcimgindex, setsrcimgindex] = useState(null);
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-2  md:pb-8 text-center border-y-2  border-green bg-zoneTabelBg py-4 text-white vehicle_summary">
+      {/* <div className="grid grid-cols-2  md:pb-8 text-center border-y-2  border-green bg-zoneTabelBg py-4 text-white vehicle_summary">
         <div className="lg:col-span-1 w-full">
           <p className="text-md mt-1 text-black font-popins font-semibold">
             Vehicle Summary:
@@ -411,6 +580,108 @@ const [srcimgindex, setsrcimgindex] = useState(null);
             <div className="lg:col-span-1 text-black font-popins font-bold">{`${countParked}`}</div>
           </div>
         </div>
+      </div> */}
+      <div className="pb-[3px] bg-zoneTabelBg border-y-2 border-green text-white">
+        {/*  <div className="text-center">
+        <p className="text-xs font-popins font-semibold text-black ">Vehicle Summary:</p>
+      </div> */}
+
+        <div className="grid grid-cols-4 text-center px-2">
+          {data.map(({ label, color, count }, index) => (
+            <div
+              key={index}
+              className={`flex flex-col items-center justify-center cursor-pointer group`}
+              onClick={() => handleButtonClick(index)} // Set active index on click
+            >
+              <span
+                className={`text-black font-bold text-2xl transition-transform group-hover:text-black`}
+              >
+                {count}
+              </span>
+              <span
+                className="font-medium text-sm"
+                style={{
+                  color: color, // Yellow text if label is 'Pause', otherwise dynamic color
+
+                }}
+              >
+                {label}
+              </span>
+              {/*   <span
+  className="font-medium text-sm"
+  style={{
+    color: label === 'Pause' ? 'yellow' : color, // Yellow text if label is 'Pause', otherwise dynamic color
+    WebkitTextStroke: label === 'Pause' ? '0.7px black' : 'none', // Black outline for 'Pause' text
+  }}
+>
+  {label}
+</span> */}
+
+
+              {/* Container with fixed height to prevent text movement */}
+              <div className="h-[4px] w-full mt-1">
+                <div
+                  className={`h-[2px] w-full transition-all group-hover:bg-black`}
+                  style={{
+                    backgroundColor: activeIndex === index ? color : "transparent", // Active color
+                    height: activeIndex === index ? "4px" : "2px", // Thicker line for active
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+
+
+
+        {/*  <div className="grid grid-cols-4  text-center">
+      <div className="flex items-center justify-center space-x-2">
+        <svg
+          className="h-2 w-2 text-blue"
+          viewBox="0 0 24 24"
+          fill="#3b82f6"
+        >
+          <circle cx="12" cy="12" r="10" />
+        </svg>
+        <span className="text-black font-bold text-sm">{`${countMoving + countPause + countParked}`}</span>
+      </div>
+      <div className="flex items-center justify-center space-x-2">
+          <svg
+            className="h-2 w-2 text-red"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <circle cx="12" cy="12" r="10" />
+          </svg>
+          <span className="text-black font-bold text-sm">{`${countParked}`}</span>
+        </div>
+
+        
+        <div className="flex items-center justify-center space-x-2">
+          <svg
+            className="h-2 w-2 text-green"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <circle cx="12" cy="12" r="10" />
+          </svg>
+          <span className="text-black font-bold text-sm">{`${countMoving}`}</span>
+        </div>
+
+        <div className="flex items-center justify-center space-x-2">
+          <svg
+            className="h-2 w-2 text-yellow"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <circle cx="12" cy="12" r="10" />
+          </svg>
+          <span className="text-black font-bold text-sm">{`${countPause}`}</span>
+        </div>
+
+      
+      </div> */}
       </div>
       <div
         className="overflow-y-scroll bg-zoneTabelBg"
@@ -420,152 +691,194 @@ const [srcimgindex, setsrcimgindex] = useState(null);
         {filteredData?.map((item: VehicleData, index: any) => {
           return (
             <div key={index} style={{ backgroundColor: activeColor == item.vehicleId ? "#e1f0e3" : "" }} className="hover:bg-[#e1f0e3] cursor-pointer pt-2">
-            <div onClick={() => handleClickVehicle(item)}>
-              <div key={item?.IMEI} className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 md:space-x-4 text-center py-2">
-                <div className="xl:col-span-6 lg:col-span-5 md:col-span-4 sm:col-span-6 col-span-4 status_car_btn">
-                  <div className="font-popins font-semibold text-start w-full lg:text-2xl text-1xl">
-                    {item.vehicleStatus === "Parked" ? (
-                      <p className="text-[#CF000F] text-start">{item?.vehicleReg}</p>
-                    ) : item.vehicleStatus === "Moving" ? (
-                      <p className="text-green text-start">{item?.vehicleReg}</p>
-                    ) : (
-                      <p className={`${item?.vehicleStatus === "Hybrid" ? "text-black" : !item?.vehicleStatus ? "text-[#CF000F]" : "text-yellow"}`}>
+              <div onClick={() => handleClickVehicle(item)}>
+                <div key={item?.IMEI} className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 md:space-x-4 text-center">
+                  <div className="xl:col-span-6 lg:col-span-5 md:col-span-4 sm:col-span-6 col-span-4 status_car_btn">
+                    <div className="font-popins font-semibold text-start lg:text-xl text-1xl">
+                      {/* Vehicle Registration */}
+                      <p
+                        className={`${item.vehicleStatus === "Parked"
+                          ? "text-black"
+                          : item.vehicleStatus === "Moving"
+                            ? "text-black"
+                            : item.vehicleStatus === "Hybrid"
+                              ? "text-black"
+                              : "text-black"
+                          }`}
+                      >
                         {item?.vehicleReg}
                       </p>
+
+                      {/* Badge Section */}
+                      <div className="">
+                        <div className="flex items-center space-x-2">
+                          <div
+                            className={`inline-block px-1 py-1 rounded-md text-sm shadow ${item?.vehicleStatus === "Moving"
+                              ? "bg-green text-white"
+                              : item?.vehicleStatus === "Parked"
+                                ? "bg-red text-white"
+                                : item?.vehicleStatus === "Pause"
+                                  ? "bg-[#eec40f] text-white"
+                                  : "bg-gray text-gray"
+                              }`}
+                          >
+                            <span>{item?.vehicleStatus || "Unknown"}</span>
+                          </div>
+
+
+                          {item?.flag ? (
+                            <img
+                              src={item.flag}
+                              alt="Flag"
+                              className="h-5 w-5 object-cover" // Adjust size as necessary
+                            />
+                          ) : <CountryFlag country={item.OsmElement?.address?.country} />
+                          }
+                          <div className="lg:col-span-3 md:col-span-3 col-span-2 text-sm w-max">
+                            <p className="w-max">
+                              {item.gps.speedWithUnitDesc}
+                            </p>
+                          </div>
+
+
+                          {session?.timezone !== undefined ? (
+                            <>
+                              <ActiveStatus
+                                currentTime={new Date().toLocaleString("en-US", { timeZone: session.timezone })}
+                                targetTime={item.timestampNotParsed}
+                                reg={item.vehicleReg}
+                              />
+
+                            </>
+                          ) : ""}
+
+
+                        </div>
+
+                      </div>
+
+
+                    </div>
+                    <div
+                      className=
+                      "font-popins flex items-center space-x-2 text-sm w-max"
+
+                    // "inline-block px-1 py-1 rounded-md text-sm shadow"
+                    >
+                      <p style={{ fontSize: "15px" }}>
+                        <strong>Last Parked:</strong> {item?.lastParked}
+                      </p>
+
+                    </div>
+
+
+
+                  </div>
+
+
+
+                  <div className="xl:col-span-6 text-[13px] lg:col-span-4 md:col-span-4 sm:col-span-6 col-span-4 pl-8">
+                    <div className=" border border-gray p-1 rounded-md">
+
+                      {
+                        timeAgo(item.timestampNotParsed?.includes("-") ? item?.timestamp : item?.timestampNotParsed)
+
+                      }
+                    </div>
+
+                    {item.defaultView == false && ( //change to defualtview
+                      <div
+                        className="flex justify-end mr-[2px]"
+                        data-tooltip-target="tooltip-right"
+                        data-tooltip-placement="right"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        {expandedIndex === index ? (
+                          <ExpandLessIcon
+                            onClick={() => toggleExpand(null)} // Collapse when clicked
+                            className="cursor-pointer text-[#00B56C]"
+                            style={{ fontSize: "32px" }} // Increase icon size
+                          />
+                        ) : (
+                          <ExpandMoreIcon
+                            onClick={() => toggleExpand(index)} // Expand when clicked
+                            className="cursor-pointer text-[#00B56C]"
+                            style={{ fontSize: "32px" }} // Increase icon size
+                          />
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
-    
-                <div className="xl:col-span-2 lg:col-span-3 md:col-span-3 sm:col-span-3 col-span-3" id="btn_left_margin">
-                  <button className={`${item?.vehicleStatus === "Hybrid" ? "bg-white text-black" : item?.vehicleStatus === "Moving" ? "bg-green text-white font-bold" : item?.vehicleStatus === "Parked" ? "bg-[#CF000F] text-white font-bold" : !item?.vehicleStatus ? "bg-[#CF000F] text-white font-bold" : "bg-yellow text-white font-bold"} p-1 px-3 -mt-1 shadow-lg`}>
-                    {item?.vehicleStatus ? item?.vehicleStatus : "Parked"}
-                  </button>
+
+                <div className="flex justify-between items-center mt-1 text-md font-bold text-labelColor">
+
                 </div>
-      
-                <div className="xl:col-span-4 lg:col-span-4 col-span-5 mph_speed">
-                  <div className="grid grid-cols-4">
-                    <div className="lg:col-span-3 md:col-span-3 col-span-2 font-bold">{item.gps.speedWithUnitDesc}</div>
-                    <div className="text-labelColor lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-1">
-                      {session?.timezone !== undefined ? (
-                        <ActiveStatus
-                          currentTime={new Date().toLocaleString("en-US", { timeZone: session.timezone })}
-                          targetTime={item.timestampNotParsed}
-                          reg={item.vehicleReg}
-                        />
-                      ) : ""}
-                    </div>
+                {item.DriverName && (item?.vehicleStatus === "Moving" || item?.vehicleStatus === "Pause") && (
+                  <p className="text-start font-bold">Driver Name: {item.DriverName.replace("undefine", "")}</p>
+                )}
+              </div>
+
+              {expandedIndex === index && item.defaultView == false
+                && (
+                  <div className="mt-2 rounded-md bg-gray-100">
+                    {allfields.map((attribute) => {
+                      const getNestedValue = (obj, path) => {
+                        const keys = path.split('.');
+                        for (let key of keys) {
+                          if (obj && obj.hasOwnProperty(key)) {
+                            obj = obj[key];
+                          } else {
+                            return undefined;
+                          }
+                        }
+                        return obj;
+                      };
+
+                      const value = getNestedValue(item, attribute.key);
+
+                      // Check if the current attribute is the one requiring calculation
+                      if (attribute.key === "gpsStatus") {
+                        // Only show this field if gpsStatus is true
+                        if (item.gpsStatus) {
+                          const targetTimeDate = new Date(item.targetTime);
+                          const currentTimeDate = new Date(item.currentTime);
+                          const timeDiffMinutes = Math.abs(targetTimeDate.getTime() - currentTimeDate.getTime()) / (1000 * 60);
+                          const newDivColor = timeDiffMinutes > 120 ? false : true;
+                          return (
+                            <p key={attribute.key} style={{ fontSize: "15px" }}>
+                              <strong>{attribute.label}:</strong> {newDivColor ? "On" : "Off"}
+                            </p>
+                          );
+                        }
+                        return null; // Don't show the field if gpsStatus is false
+                      }
+
+                      // Render other attributes
+                      if (value) {
+                        return (
+                          <p key={attribute.key} style={{ fontSize: "15px" }}>
+                            <strong>{attribute.label}:</strong> {value}
+                          </p>
+                        );
+                      }
+                      // if (attribute.allow && value) {
+                      // }
+                      return null;
+                    })}
                   </div>
-                </div>
-              </div>
-     
-            
-              <div className="flex justify-between items-center mt-1 text-md font-bold text-labelColor">
-                <h1 className="font-popins text-start">
-                  <span>{item.timestamp} </span>
-                </h1>
-                {/* {item.odometer != null && (
-                  <Image
-                    src={srcimgindex === index ? infoIcon2 : infoIcon}
-                    alt="Odometer Icon"
-                    onMouseEnter={() => setsrcimgindex(index)} // Change to hover image
-                    onMouseLeave={() => setsrcimgindex(null)} // Change back to default image
-                    className="h-10 w-10 hover:scale-110 cursor-pointer"
-                    data-tooltip-target="tooltip-right"
-                    data-tooltip-placement="right"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleodometer(item, e);
-                    }}
-                  />
-                )} */}
-                     {item.defaultView ==false       && ( //change to defualtview
-  <div
-    className="flex justify-end mr-[2px]"
-    data-tooltip-target="tooltip-right"
-    data-tooltip-placement="right"
-    onClick={(e) => {
-      e.stopPropagation();
-    }}
-  >
-    {expandedIndex === index ? (
-      <ExpandLessIcon
-        onClick={() => toggleExpand(null)} // Collapse when clicked
-        className="cursor-pointer text-[#00B56C]"
-        style={{ fontSize: "32px" }} // Increase icon size
-      />
-    ) : (
-      <ExpandMoreIcon
-        onClick={() => toggleExpand(index)} // Expand when clicked
-        className="cursor-pointer text-[#00B56C]"
-        style={{ fontSize: "32px" }} // Increase icon size
-      />
-    )}
-  </div>
-)}
-
-              </div>
-              {item.DriverName && (item?.vehicleStatus === "Moving" || item?.vehicleStatus === "Pause") && (                
-                <p className="text-start font-bold">Driver Name: {item.DriverName.replace("undefine", "")}</p>
-              )}
-            </div>
-      
-            {expandedIndex === index &&  item.defaultView ==false            
-             && (
-  <div className="mt-2 rounded-md bg-gray-100">
-    {allfields.map((attribute) => {
-      const getNestedValue = (obj, path) => {
-        const keys = path.split('.');
-        for (let key of keys) {
-          if (obj && obj.hasOwnProperty(key)) {
-            obj = obj[key];
-          } else {
-            return undefined;
-          }
-        }
-        return obj;
-      };
-      
-
-      const value = getNestedValue(item, attribute.key);
-
-      // Check if the current attribute is the one requiring calculation
-      if (attribute.key === "gpsStatus" && allattributes.find((i)=>{return i.vehicleId==item.vehicleId})?.attributes.find((j)=>{return j.key=="gpsStatus"})?.allow) {
-        // Only show this field if gpsStatus is true
-        const targetTimeDate = new Date(item.targetTime);
-        const currentTimeDate = new Date(item.currentTime);
-        const timeDiffMinutes = Math.abs(targetTimeDate.getTime() - currentTimeDate.getTime()) / (1000 * 60);
-        const newDivColor = timeDiffMinutes > 120 ? false : true;
-        return (
-          <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
-          <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
-          <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}> {newDivColor ? "On": "Off"}</span>
-         </p>
-        );                
-      }
-
-      // Render other attributes
-      if(value){
-      return (
-        <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
-        <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
-        <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}>{value}</span>
-      </p>
-      );}
-      // if (attribute.allow && value) {
-      // }
-      return null;
-    })}
-  </div>
-)}
+                )}
 
 
 
               <button className="border-b-2 border-green w-full text-end"></button>
-            
+
             </div>
-   
-          
-       
+
+
+
           );
         })}
       </div>

@@ -52,12 +52,12 @@ export default function DualCam() {
   const [pictureVideoDataOfVehicle, setPictureVideoDataOfVehicle] = useState<
     pictureVideoDataOfVehicleT[]
   >([]);
-  const { data: session } = useSession();  
- 
-if(!session?.cameraProfile){
-redirect("/liveTracking")
-}
-  
+  const { data: session } = useSession();
+
+  if (!session?.cameraProfile) {
+    redirect("/liveTracking")
+  }
+
   const [open, setOpen] = React.useState(false);
   const [openSecond, setOpenSecond] = React.useState(false);
   const [toastId, setToastId] = useState<string | null>(null);
@@ -76,7 +76,7 @@ redirect("/liveTracking")
   const [progress, setProgress] = useState<number>(0);
   const [deviceCommandText, setDeviceCommandText] = useState<any>([]);
   const [servertoastId, setservertoastId] = useState<string | null>(null);
-  const [fetchdata, setfetchdata] = useState<Boolean>(false); 
+  const [fetchdata, setfetchdata] = useState<Boolean>(false);
 
   const [socketdata, setSocketdata] = useState({
     camera: 0,
@@ -112,24 +112,14 @@ redirect("/liveTracking")
       query: { clientId: session?.clientId },
       transports: ["websocket", "polling", "flashsocket"],
       reconnection: true, // Enable automatic reconnections
-    reconnectionAttempts: Infinity, // Attempt reconnections indefinitely
-    reconnectionDelay: 1000, // Delay between reconnections (in milliseconds)
-    reconnectionDelayMax: 5000 // Max delay between reconnections (in milliseconds)
+      reconnectionAttempts: Infinity, // Attempt reconnections indefinitely
+      reconnectionDelay: 1000, // Delay between reconnections (in milliseconds)
+      reconnectionDelayMax: 5000 // Max delay between reconnections (in milliseconds)
     });
     setSocketConnected(true); // Update connection status on successful connection
-  
+
 
     socketRef.current.connect();
-    
-    /* socketRef.current.on("connect_error", () => {
-     // if (!servertoastId) {
-        
-        const id = toast.error("Socket connection failed. Retrying...", {
-          position: "top-center",
-         duration: 5000
-        });
-       // setservertoastId(id); }
-    }); */
     socketRef.current.on("connect_error", () => {
       if (!connectionErrorToastShown) {
         connectionErrorToastShown = true;
@@ -141,14 +131,10 @@ redirect("/liveTracking")
       }
     });
 
-    // Clear error toast if connection is successful
-    socketRef.current.on("connect", () => {
-      // if (servertoastId) {
 
-      //   toast.dismiss(servertoastId);
-      //   setservertoastId(null);
-      // }
-    
+    socketRef.current.on("connect", () => {
+
+
       toast.success("Socket connected successfully!", {
         position: "top-center",
         autoClose: 5000,
@@ -160,18 +146,18 @@ redirect("/liveTracking")
     socketRef.current.on("message", async (data) => {
       setProgress(Math.floor(data.progress));
       setSocketdata(data);
-      
+
       if (data.message) {
-     
+
         toast.dismiss(toastId);
-      setToastId(null);
-    
+        setToastId(null);
+
         // Show toast notification if 'message' attribute is present
         toast.success(data.message, {
           position: "top-center",
           duration: 5000,
         });
-      } 
+      }
 
       if (socketTimeoutRef.current) {
         clearTimeout(socketTimeoutRef.current);
@@ -186,73 +172,56 @@ redirect("/liveTracking")
               position: "top-center",
               autoClose: 5000,
             });
-            
+
             setToastId(id);
           }
         }
       }, 100000)
-     // handleSocketDisconnection();
-  
-    });
-  }, []);
-    //  }, [servertoastId]);
+      // handleSocketDisconnection();
 
-/*   useEffect(() => {
-    if (socketdata?.filetype === ".h265" && socketdata.progress > 1 && socketdata.progress < 100) {
-      if (!toastId) {
-        const id = toast.loading("Video Downloading", {
-          position: "top-center",
-        });
-        setActiveTab1("View");
-        setMediaType("videos");
-        setToastId(id);
-      }
-    } else if (socketdata?.progress === 100 && toastId) {
-    toast.success("Video Downloaded Successfully", {
-      position: "top-center",
-      autoClose: 5000,
-    })
-      toast.dismiss(toastId);
-      setToastId(null);
+    });
+
+    return () => {
+      socketRef?.current?.off("message");
+      socketRef?.current?.disconnect()
     }
-  }, [socketdata, toastId]); */
+  }, []);
 
   useEffect(() => {
-     if (socketdata?.progress === 100 && toastId) {
+    if (socketdata?.progress === 100 && toastId) {
       let timeoutId;
-     // setfetchdata(!fetchdata)
+
       toast.dismiss(toastId);
       setToastId(null);
-        // Delay state change by 2 seconds
-      
-        timeoutId = setTimeout(() => {
-          setfetchdata(!fetchdata);
-       
-        }, 2000);
+
+      timeoutId = setTimeout(() => {
+        setfetchdata(!fetchdata);
+
+      }, 2000);
 
       // Cleanup function to clear the timeout if dependencies change
       return () => clearTimeout(timeoutId);
- /*      setfetchdata(!fetchdata)
-      toast.dismiss(toastId);
-      setToastId(null); */
+      /*      setfetchdata(!fetchdata)
+           toast.dismiss(toastId);
+           setToastId(null); */
     }
   }, [socketdata, toastId]);
   useEffect(() => {
     if (socketdata?.progress === 100) {
-     let timeoutId;
-    
-       timeoutId = setTimeout(() => {
-         setfetchdata(!fetchdata);
-    
-       }, 2000); 
+      let timeoutId;
 
-     return () => clearTimeout(timeoutId);
-   }
- }, [socketdata]);
+      timeoutId = setTimeout(() => {
+        setfetchdata(!fetchdata);
+
+      }, 2000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [socketdata]);
 
   useEffect(() => {
     // Connect to the server
-    
+
     const socket2 = io("https://socketio.vtracksolutions.com:1102", {
       autoConnect: false,
       query: { clientId: session?.clientId }, // This gets updated later on with client code.
@@ -262,7 +231,7 @@ redirect("/liveTracking")
     socket2.connect(); // Explicitly connect the socket
 
     socket2.on("device", async (data) => {
-      
+
       let message;
       if (
         data.commandtext ===
@@ -288,7 +257,7 @@ redirect("/liveTracking")
       socketdata.progress > 1 &&
       socketdata.progress < 100
     ) {
-    
+
       if (!toastId) {
         const id: any = toast.loading(`Image Downloading `, {
           position: "top-center",
@@ -298,7 +267,7 @@ redirect("/liveTracking")
         setToastId(id);
       }
     } else if (socketdata.progress == 100 && toastId && socketdata.filetype == ".jpeg") {
-    
+
       toast.success("Image Downloaded Successfully", {
         position: "top-center",
         autoClose: 5000,
@@ -307,25 +276,25 @@ redirect("/liveTracking")
       setToastId(null);
     }
     else if (socketdata.progress == 100 && toastId && socketdata.filetype == ".mp4") {
-   
+
       toast.success("Video Downloaded Successfully", {
         position: "top-center",
         autoClose: 5000,
       })
-        toast.dismiss(toastId);
-        setToastId(null);
+      toast.dismiss(toastId);
+      setToastId(null);
     }
-    else  if ( socketdata.filetype == ".h265" && socketdata.progress > 1 && socketdata.progress < 100) {
-      
-        if (!toastId) {
-          const id = toast.loading("Video Downloading", {
-            position: "top-center",
-          });
-          setActiveTab1("View");
-          setMediaType("videos");
-          setToastId(id);
-        }
-      
+    else if (socketdata.filetype == ".h265" && socketdata.progress > 1 && socketdata.progress < 100) {
+
+      if (!toastId) {
+        const id = toast.loading("Video Downloading", {
+          position: "top-center",
+        });
+        setActiveTab1("View");
+        setMediaType("videos");
+        setToastId(id);
+      }
+
     }
   }, [socketdata, toastId]);
 
@@ -336,7 +305,7 @@ redirect("/liveTracking")
           token: session?.accessToken,
           clientId: session?.clientId,
         });
-      
+
         setFilteredRecords(response);
       }
       //  setLoading(false);
@@ -498,16 +467,16 @@ redirect("/liveTracking")
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    if(!selectedVehiclelist){
+    if (!selectedVehiclelist) {
       toast.error("Please select Vehicle")
       return
     }
-    if (!fromDate){
+    if (!fromDate) {
       toast.error("Please select From Date")
       return
     }
 
-    if (!toDate){
+    if (!toDate) {
       toast.error("Please select To Date")
       return
     }
@@ -550,12 +519,12 @@ redirect("/liveTracking")
     setToDate(null);
   };
 
-  useEffect(()=>{
-    if(fromDate==null && toDate==null){
-       fetchVideoListData()
+  useEffect(() => {
+    if (fromDate == null && toDate == null) {
+      fetchVideoListData()
     }
-  },[fromDate,toDate, fetchdata])
-  
+  }, [fromDate, toDate, fetchdata])
+
   const recordsPerPage = 8;
   const lastIndex = currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
@@ -700,7 +669,7 @@ redirect("/liveTracking")
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-//sonsole.log("windowWidth", windowWidth);
+  //sonsole.log("windowWidth", windowWidth);
   const getImageStyles = () => {
     if (isFullScreen) {
       return {
@@ -716,21 +685,21 @@ redirect("/liveTracking")
       return {
         width: '100%',
         height: 'auto',
-      //  objectFit: 'contain',
+        //  objectFit: 'contain',
       };
     } else if (windowWidth < 1024) {
       // For medium screens
       return {
         width: '100%',
-          height: '490px',
-      //  objectFit: 'contain',
+        height: '490px',
+        //  objectFit: 'contain',
       };
     } else {
       // For large screens
       return {
         width: '1100px',
         height: '490px',
-     //   objectFit: 'contain',
+        //   objectFit: 'contain',
       };
     }
   };
@@ -741,7 +710,7 @@ redirect("/liveTracking")
       <p className="bg-green px-4 py-1 text-white mb-5 font-bold text-center">
         Camera Management
       </p>
-    
+
       <List
         component="nav"
         className="nav nav-tabs  nav nav-pills bg-nav-pills "
@@ -767,7 +736,7 @@ redirect("/liveTracking")
             <ExpandMoreIcon style={{ width: "24px", height: "24px" }} />
           )}
         </ListItem>
-        <Collapse style={{overflow:"hidden"}} in={activeTab1 === "Request"} timeout="auto">
+        <Collapse style={{ overflow: "hidden" }} in={activeTab1 === "Request"} timeout="auto">
           <div >
             <Request
               socketdata={socketdata}
@@ -826,7 +795,7 @@ redirect("/liveTracking")
                       <div className="grid grid-cols-12  gap-6 mx-4 ">
                         <div
                           className="col-span-3 w-full shadow-lg "
-                          // style={{ height: "34em" }}
+                        // style={{ height: "34em" }}
                         >
                           <p>Front Camera:</p>
 
@@ -838,7 +807,7 @@ redirect("/liveTracking")
                           </div>
                           <div
                             className="grid grid-cols-6 text-center pt-5"
-                            //  style={{borderBottom: "1px solid green"}}
+                          //  style={{borderBottom: "1px solid green"}}
                           >
                             <div className="col-span-1">
                               <p className="font-bold text-sm">S.No</p>
@@ -954,7 +923,7 @@ redirect("/liveTracking")
                         </Dialog>
                         <div
                           className="col-span-3 shadow-lg w-full lg:-ms-4 "
-                          // style={{ height: "auto" }}
+                        // style={{ height: "auto" }}
                         >
                           <p className="text-white">.</p>
                           <div className="bg-green shadow-lg sticky top-0">
@@ -1272,13 +1241,13 @@ redirect("/liveTracking")
                           backgroundColor: state.isSelected
                             ? "#00B56C"
                             : state.isFocused
-                            ? "#E1F0E3"
-                            : "transparent",
+                              ? "#E1F0E3"
+                              : "transparent",
                           color: state.isSelected
                             ? "white"
                             : state.isFocused
-                            ? "black"
-                            : "black",
+                              ? "black"
+                              : "black",
                           "&:hover": {
                             backgroundColor: "#E1F0E3",
                             color: "black",
@@ -1293,202 +1262,202 @@ redirect("/liveTracking")
                   
                   */}
 
-                  
+
                   <div className="col-span-2">
-  <form>
-    {/* Container for large screens (from 1024px upwards) */}
-    <div className="hidden lg:grid lg:grid-cols-12 lg:gap-4 px-4 md:px-6 lg:px-10 items-center">
-      <div className="lg:col-span-3 flex flex-col">
-        <label className="text-green mb-1">From</label>
-        <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
-          <DatePicker
-            format="MM/dd/yyyy"
-            value={fromDate}
-            onChange={(date) => handleDateChange1("from", date)}
-            variant="inline"
-            maxDate={currenTDates}
-            placeholder="Start Date"
-            autoOk
-            style={{ width: "100%" }}
-            inputProps={{ readOnly: true }}
-            InputProps={{
-              endAdornment: (
-                <EventIcon style={{ width: 20, height: 20 }} />
-              ),
-            }}
-          />
-        </MuiPickersUtilsProvider>
-      </div>
-      <div className="lg:col-span-3 flex flex-col">
-        <label className="text-green mb-1">To</label>
-        <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
-          <DatePicker
-            format="MM/dd/yyyy"
-            value={toDate}
-            onChange={(date) => handleDateChange1("to", date)}
-            variant="inline"
-            placeholder="End Date"
-            maxDate={currenTDates}
-            autoOk
-            inputProps={{ readOnly: true }}
-            InputProps={{
-              endAdornment: (
-                <EventIcon style={{ width: 20, height: 20 }} />
-              ),
-            }}
-          />
-        </MuiPickersUtilsProvider>
-      </div>
-      <div className="lg:col-span-2 flex items-center justify-center">
-        <button
-          style={{ background: "none" }}
-          className="text-green text-2xl"
-          onClick={(e) => handleClear(e)}
-        >
-          x
-        </button>
-      </div>
-      <div className="lg:col-span-2 flex items-center justify-center">
-        <button
-          className="bg-green py-2 text-white flex items-center justify-center font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none px-4 rounded-lg"
-          onClick={(e) => handleSearch1(e)}
-          style={{ fontWeight: "bold" }}
-        >
-          <svg
-            className="h-5 w-5 text-white mr-2"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="4"
-            strokeLinejoin="round"
-          >
-            <circle cx="10" cy="10" r="7"></circle>
-            <line x1="21" y1="21" x2="15" y2="15"></line>
-          </svg>
-          <span>Search</span>
-        </button>
-      </div>
-    </div>
+                    <form>
+                      {/* Container for large screens (from 1024px upwards) */}
+                      <div className="hidden lg:grid lg:grid-cols-12 lg:gap-4 px-4 md:px-6 lg:px-10 items-center">
+                        <div className="lg:col-span-3 flex flex-col">
+                          <label className="text-green mb-1">From</label>
+                          <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
+                            <DatePicker
+                              format="MM/dd/yyyy"
+                              value={fromDate}
+                              onChange={(date) => handleDateChange1("from", date)}
+                              variant="inline"
+                              maxDate={currenTDates}
+                              placeholder="Start Date"
+                              autoOk
+                              style={{ width: "100%" }}
+                              inputProps={{ readOnly: true }}
+                              InputProps={{
+                                endAdornment: (
+                                  <EventIcon style={{ width: 20, height: 20 }} />
+                                ),
+                              }}
+                            />
+                          </MuiPickersUtilsProvider>
+                        </div>
+                        <div className="lg:col-span-3 flex flex-col">
+                          <label className="text-green mb-1">To</label>
+                          <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
+                            <DatePicker
+                              format="MM/dd/yyyy"
+                              value={toDate}
+                              onChange={(date) => handleDateChange1("to", date)}
+                              variant="inline"
+                              placeholder="End Date"
+                              maxDate={currenTDates}
+                              autoOk
+                              inputProps={{ readOnly: true }}
+                              InputProps={{
+                                endAdornment: (
+                                  <EventIcon style={{ width: 20, height: 20 }} />
+                                ),
+                              }}
+                            />
+                          </MuiPickersUtilsProvider>
+                        </div>
+                        <div className="lg:col-span-2 flex items-center justify-center">
+                          <button
+                            style={{ background: "none" }}
+                            className="text-green text-2xl"
+                            onClick={(e) => handleClear(e)}
+                          >
+                            x
+                          </button>
+                        </div>
+                        <div className="lg:col-span-2 flex items-center justify-center">
+                          <button
+                            className="bg-green py-2 text-white flex items-center justify-center font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none px-4 rounded-lg"
+                            onClick={(e) => handleSearch1(e)}
+                            style={{ fontWeight: "bold" }}
+                          >
+                            <svg
+                              className="h-5 w-5 text-white mr-2"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                              strokeLinejoin="round"
+                            >
+                              <circle cx="10" cy="10" r="7"></circle>
+                              <line x1="21" y1="21" x2="15" y2="15"></line>
+                            </svg>
+                            <span>Search</span>
+                          </button>
+                        </div>
+                      </div>
 
-    {/* Container for smaller screens (up to 770px) */}
-    <div className="lg:hidden flex flex-col gap-4 px-4 md:px-6 lg:px-10">
-  <div className="flex items-start gap-4">
-    <div className="flex flex-col flex-grow mb-2">
-      <label className="text-green mb-1">From</label>
-      <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
-        <DatePicker
-          format="MM/dd/yyyy"
-          value={fromDate}
-          onChange={(date) => handleDateChange1("from", date)}
-          variant="inline"
-          maxDate={currenTDates}
-          placeholder="Start Date"
-          autoOk
-          style={{ width: "100%" }}
-          inputProps={{ readOnly: true }}
-          InputProps={{
-            endAdornment: (
-              <EventIcon style={{ width: 20, height: 20 }} />
-            ),
-          }}
-        />
-      </MuiPickersUtilsProvider>
-    </div>
+                      {/* Container for smaller screens (up to 770px) */}
+                      <div className="lg:hidden flex flex-col gap-4 px-4 md:px-6 lg:px-10">
+                        <div className="flex items-start gap-4">
+                          <div className="flex flex-col flex-grow mb-2">
+                            <label className="text-green mb-1">From</label>
+                            <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
+                              <DatePicker
+                                format="MM/dd/yyyy"
+                                value={fromDate}
+                                onChange={(date) => handleDateChange1("from", date)}
+                                variant="inline"
+                                maxDate={currenTDates}
+                                placeholder="Start Date"
+                                autoOk
+                                style={{ width: "100%" }}
+                                inputProps={{ readOnly: true }}
+                                InputProps={{
+                                  endAdornment: (
+                                    <EventIcon style={{ width: 20, height: 20 }} />
+                                  ),
+                                }}
+                              />
+                            </MuiPickersUtilsProvider>
+                          </div>
 
-    <div className="flex flex-col flex-grow mb-2">
-      <label className="text-green mb-1">To</label>
-      <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
-        <DatePicker
-          format="MM/dd/yyyy"
-          value={toDate}
-          onChange={(date) => handleDateChange1("to", date)}
-          variant="inline"
-          placeholder="End Date"
-          maxDate={currenTDates}
-          autoOk
-          inputProps={{ readOnly: true }}
-          InputProps={{
-            endAdornment: (
-              <EventIcon style={{ width: 20, height: 20 }} />
-            ),
-          }}
-        />
-      </MuiPickersUtilsProvider>
-    </div>
+                          <div className="flex flex-col flex-grow mb-2">
+                            <label className="text-green mb-1">To</label>
+                            <MuiPickersUtilsProvider utils={DateFnsMomentUtils}>
+                              <DatePicker
+                                format="MM/dd/yyyy"
+                                value={toDate}
+                                onChange={(date) => handleDateChange1("to", date)}
+                                variant="inline"
+                                placeholder="End Date"
+                                maxDate={currenTDates}
+                                autoOk
+                                inputProps={{ readOnly: true }}
+                                InputProps={{
+                                  endAdornment: (
+                                    <EventIcon style={{ width: 20, height: 20 }} />
+                                  ),
+                                }}
+                              />
+                            </MuiPickersUtilsProvider>
+                          </div>
 
-    <div className="flex">
-      <button
-        style={{ background: "none" }}
-        className="text-green text-2xl"
-        onClick={(e) => handleClear(e)}
-      >
-        x
-      </button>
-    </div>
-  </div>
+                          <div className="flex">
+                            <button
+                              style={{ background: "none" }}
+                              className="text-green text-2xl"
+                              onClick={(e) => handleClear(e)}
+                            >
+                              x
+                            </button>
+                          </div>
+                        </div>
 
-      <div className="flex items-center">
-        <button
-          className="bg-green py-2 text-white flex items-center justify-center font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none px-4 rounded-lg"
-          onClick={(e) => handleSearch1(e)}
-          style={{ fontWeight: "bold", margin: "auto" }}
-        >
-          <svg
-            className="h-5 w-5 text-white mr-2"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="4"
-            strokeLinejoin="round"
-          >
-            <circle cx="10" cy="10" r="7"></circle>
-            <line x1="21" y1="21" x2="15" y2="15"></line>
-          </svg>
-          <span>Search</span>
-        </button>
-      </div>
-    </div>
-  </form>
-</div>
+                        <div className="flex items-center">
+                          <button
+                            className="bg-green py-2 text-white flex items-center justify-center font-popins shadow-md hover:shadow-gray transition duration-500 cursor-pointer hover:bg-green border-none px-4 rounded-lg"
+                            onClick={(e) => handleSearch1(e)}
+                            style={{ fontWeight: "bold", margin: "auto" }}
+                          >
+                            <svg
+                              className="h-5 w-5 text-white mr-2"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                              strokeLinejoin="round"
+                            >
+                              <circle cx="10" cy="10" r="7"></circle>
+                              <line x1="21" y1="21" x2="15" y2="15"></line>
+                            </svg>
+                            <span>Search</span>
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
 
 
 
                 </div>
-                
-<div className=" lg:flex lg:items-center lg:justify-center lg:mt-4 lg:w-full" style={{margin: "auto", marginTop: "20px"}}>
-  <div className="flex items-center justify-center gap-4">
-    <label className="text-sm flex items-center">
-      <input
-        type="radio"
-        className="w-4 h-4 mr-2 form-radio text-green"
-        name="mediaType"
-        value="images"
-        checked={mediaType === "images"}
-        onChange={handleMediaType}
-        style={{ accentColor: "green" }}
-      />
-      Images
-    </label>
-    <label className="text-sm flex items-center">
-      <input
-        type="radio"
-        className="w-4 h-4 mr-2 form-radio text-green"
-        name="mediaType"
-        value="videos"
-        checked={mediaType === "videos"}
-        onChange={handleMediaType}
-        style={{ accentColor: "green" }}
-      />
-      Videos
-    </label>
-  </div>
-</div>
+
+                <div className=" lg:flex lg:items-center lg:justify-center lg:mt-4 lg:w-full" style={{ margin: "auto", marginTop: "20px" }}>
+                  <div className="flex items-center justify-center gap-4">
+                    <label className="text-sm flex items-center">
+                      <input
+                        type="radio"
+                        className="w-4 h-4 mr-2 form-radio text-green"
+                        name="mediaType"
+                        value="images"
+                        checked={mediaType === "images"}
+                        onChange={handleMediaType}
+                        style={{ accentColor: "green" }}
+                      />
+                      Images
+                    </label>
+                    <label className="text-sm flex items-center">
+                      <input
+                        type="radio"
+                        className="w-4 h-4 mr-2 form-radio text-green"
+                        name="mediaType"
+                        value="videos"
+                        checked={mediaType === "videos"}
+                        onChange={handleMediaType}
+                        style={{ accentColor: "green" }}
+                      />
+                      Videos
+                    </label>
+                  </div>
+                </div>
 
 
 
 
 
-{/*  */}
+                {/*  */}
                 <div
                   className="grid lg:grid-cols-5  sm:grid-cols-5 md:grid-cols-5 grid-cols-1  mt-5 "
                   style={{
@@ -1499,27 +1468,27 @@ redirect("/liveTracking")
                   <div className="lg:col-span-4  md:col-span-4  sm:col-span-5 col-span-4  ">
                     {loading ? (
                       <div className="camera_loading">
-                                <Image src={logo} alt="" className="loading_all_page" />
-                      <div role="status">
-                      <svg
-                        aria-hidden="true"
-                        className="inline fixed top-20 right-0 bottom-0 left-0 m-auto lg:w-12 lg:h-12 md:w-12 md:h-12 sm:w-12 sm:h-12 w-10 h-10  text-green animate-spin dark:text-green fill-black"
-                        viewBox="0 0 100 101"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                          fill="currentColor"
-                        />
-                        <path
-                          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                          fill="currentFill"
-                        />
-                      </svg>
-                      <span className="sr-only text-3xl">Loading...</span>
-                    </div>
-                    </div>
+                        <Image src={logo} alt="" className="loading_all_page" />
+                        <div role="status">
+                          <svg
+                            aria-hidden="true"
+                            className="inline fixed top-20 right-0 bottom-0 left-0 m-auto lg:w-12 lg:h-12 md:w-12 md:h-12 sm:w-12 sm:h-12 w-10 h-10  text-green animate-spin dark:text-green fill-black"
+                            viewBox="0 0 100 101"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                              fill="currentColor"
+                            />
+                            <path
+                              d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                              fill="currentFill"
+                            />
+                          </svg>
+                          <span className="sr-only text-3xl">Loading...</span>
+                        </div>
+                      </div>
 
                       // <Loading />
                     ) : (
@@ -1640,13 +1609,13 @@ redirect("/liveTracking")
                                             >
                                               {(socketdata.camera_type ||
                                                 socketdata.camera_type) ===
-                                              "%photof"
+                                                "%photof"
                                                 ? "Front"
                                                 : (socketdata.camera_type ||
-                                                    socketdata.camera_type) ===
+                                                  socketdata.camera_type) ===
                                                   "%photor"
-                                                ? "Back"
-                                                : " "}
+                                                  ? "Back"
+                                                  : " "}
                                             </TableCell>
                                             <TableCell
                                               colSpan={1}
@@ -1658,7 +1627,7 @@ redirect("/liveTracking")
                                             </TableCell>
                                           </TableRow>
                                         )}
-                                       {/*  {
+                                      {/*  {
                                           progress == 100 &&
                                           socketdata.filetype === ".jpeg" &&(
                                             <TableRow
@@ -1975,10 +1944,10 @@ redirect("/liveTracking")
                                                   item.cameraType) === "%photof"
                                                   ? "Front"
                                                   : (item.cameraType ||
-                                                      item.cameraType) ===
+                                                    item.cameraType) ===
                                                     "%photor"
-                                                  ? "Back"
-                                                  : " "}
+                                                    ? "Back"
+                                                    : " "}
                                               </TableCell>
                                               <TableCell
                                                 align="center"
@@ -2172,7 +2141,7 @@ redirect("/liveTracking")
 
                             <div
                               className="flex  justify-end mt-8"
-                              // style={{ position: "fixed", bottom: "1%" }}
+                            // style={{ position: "fixed", bottom: "1%" }}
                             >
                               <div className="grid lg:grid-cols-4 my-4 ">
                                 <div className="col-span-1">
@@ -2190,7 +2159,7 @@ redirect("/liveTracking")
                                   <Stack spacing={2}>
                                     <Pagination
                                       count={totalCount}
-                                      page={input }
+                                      page={input}
                                       onChange={handleChange}
                                       className="text-sm"
                                     />
@@ -2200,21 +2169,21 @@ redirect("/liveTracking")
                                   <span className="text-sm">Go To</span>
                                   <input
                                     type="text"
-                                    
+
                                     className="w-14 border border-grayLight outline-green mx-2 px-2"
-                                    onChange={(e)=>{
-                                      let inputValues:any = e.target.value.match(/\d+/g);
-                                        if(inputValues>0 && inputValue<totalCount){
+                                    onChange={(e) => {
+                                      let inputValues: any = e.target.value.match(/\d+/g);
+                                      if (inputValues > 0 && inputValue < totalCount) {
                                         setInput(parseInt(e.target.value))
                                         setCurrentPage(e.target.value)
-                                      }else{
+                                      } else {
                                         setInput("")
                                       }
-                                      }}
+                                    }}
                                   />
                                   <span
                                     className="text-labelColor text-sm"
-                                    
+
                                   >
                                     page &nbsp;&nbsp;
                                   </span>
@@ -2359,13 +2328,13 @@ redirect("/liveTracking")
                                             >
                                               {(socketdata.camera_type ||
                                                 socketdata.camera_type) ===
-                                              "%videof"
+                                                "%videof"
                                                 ? "Front"
                                                 : (socketdata.camera_type ||
-                                                    socketdata.camera_type) ===
+                                                  socketdata.camera_type) ===
                                                   "%videor"
-                                                ? "Back"
-                                                : " "}
+                                                  ? "Back"
+                                                  : " "}
                                             </TableCell>
                                             <TableCell
                                               colSpan={1}
@@ -2377,7 +2346,7 @@ redirect("/liveTracking")
                                             </TableCell>
                                           </TableRow>
                                         )}
-                                        {/*  {
+                                      {/*  {
                                           progress == 100 &&
                                           socketdata.filetype === ".h265" &&
                                             <TableRow
@@ -2650,9 +2619,9 @@ redirect("/liveTracking")
                                                     padding: "4px 8px",
                                                   }}
                                                 >
-                                               
+
                                                   {timerequested}
-                                    
+
                                                 </TableCell>
                                                 <TableCell
                                                   align="center"
@@ -2664,13 +2633,13 @@ redirect("/liveTracking")
                                                 >
                                                   {(item?.cameraType ||
                                                     item.cameraType) ===
-                                                  "%videof"
+                                                    "%videof"
                                                     ? "Front"
                                                     : (item?.cameraType ||
-                                                        item.cameraType) ===
+                                                      item.cameraType) ===
                                                       "%videor"
-                                                    ? "Back"
-                                                    : " "}
+                                                      ? "Back"
+                                                      : " "}
                                                 </TableCell>
                                                 <TableCell
                                                   align="center" // Set align to center
@@ -2776,11 +2745,10 @@ redirect("/liveTracking")
                                                             </a>
 
                                                             <div
-                                                              className={`video-container ${
-                                                                isFullScreen
+                                                              className={`video-container ${isFullScreen
                                                                   ? "fullscreen"
                                                                   : ""
-                                                              }`}
+                                                                }`}
                                                             >
                                                               <video
                                                                 controls
@@ -2797,7 +2765,7 @@ redirect("/liveTracking")
                                                                 }}
                                                                 className="video-element"
                                                                 controlsList="noplaybackrate nodownload "
-                                                                // disablePictureInPicture
+                                                              // disablePictureInPicture
                                                               >
                                                                 <source
                                                                   src={
@@ -2875,7 +2843,7 @@ redirect("/liveTracking")
                                   <Stack spacing={2}>
                                     <Pagination
                                       count={totalCountVideo}
-                                      
+
                                       page={currentPageVideo}
                                       onChange={handleChangeVideo}
                                       className="text-sm"
@@ -2886,24 +2854,24 @@ redirect("/liveTracking")
                                   <span className="text-sm">Go To</span>
                                   <input
                                     type="text"
-                                    
+
                                     className="w-14 border border-grayLight outline-green mx-2 px-2"
                                     onChange={(
                                       e: React.ChangeEvent<HTMLInputElement>
-                                    ) =>{
-                                      let inputVideoValue=e.target.value.match(/\d+/g)
-                                      if(inputVideoValue>0 && inputVideoValue<totalCount ){
+                                    ) => {
+                                      let inputVideoValue = e.target.value.match(/\d+/g)
+                                      if (inputVideoValue > 0 && inputVideoValue < totalCount) {
                                         // setInput(parseInt(e.target.value))
-                                       setCurrentPageVideo(parseInt(e.target.value))
+                                        setCurrentPageVideo(parseInt(e.target.value))
                                       }
-                                      else{
-                                setInputValue("")
+                                      else {
+                                        setInputValue("")
                                       }
                                     }}
                                   />
                                   <span
                                     className="text-labelColor text-sm"
-                                    
+
                                   >
                                     page &nbsp;&nbsp;
                                   </span>

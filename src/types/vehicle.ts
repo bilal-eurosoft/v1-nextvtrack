@@ -63,6 +63,7 @@ export type VehicleData = {
   verifyDateTime: string;
   vehicleColor: string;
   vehicleTextColor: string;
+  OsmElement:{},
   clientId: string;
   camStatus: camStatusData;
   backCamera: camStatusData;

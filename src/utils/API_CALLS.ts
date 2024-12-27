@@ -5,11 +5,12 @@ import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
 import { immobiliserequest } from "@/types/immobiliserequest";
 import uniqueDataByIMEIAndLatestTimestamp from "./uniqueDataByIMEIAndLatestTimestamp";
-//  var URL = "http://172.16.10.73:80"
-var URL ="https://backend.vtracksolutions.com";
+ var URL = "http://172.16.10.73:80"
+// var URL ="https://backend.vtracksolutions.com";
 
 export async function getVehicleDataByClientId(clientId: string) {
   try {
+    
     const response = await fetch(
       `https://socketio.vtracksolutions.com:1102/${clientId}`,
       {
@@ -49,6 +50,126 @@ export async function getVehicleDataByClientIdForOdometer(clientId: string) {
     return uniqueData;
   } catch (error) {
     
+    return [];
+  }
+}
+////////////////////
+export async function addDocument(payload: any ,token:string) {
+  try {
+    const response = await fetch(
+      `${URL}/document`,
+      {
+        headers: {          
+          authorization: `Bearer ${token}`,          
+        },
+        body:payload,
+        method: "POST", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+export async function getDocuments(token:string) {
+  try {
+    const response = await fetch(
+      `${URL}/document`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        method: "GET", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+
+export async function editDocuments(payload:any,token:string) {
+  try {
+    const response = await fetch(
+      `${URL}/document`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body:JSON.stringify(payload),
+        method: "PUT", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}export async function deleteDocuments(id:string,token:string) {
+  try {
+    const response = await fetch(
+      `${URL}/document`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body:JSON.stringify({id}),
+        method: "DELETE", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+////////////////////
+
+
+export async function getevents(clientId: string ,token:string) {
+  try {
+    const response = await fetch(
+      `${URL}/geteventsbyclientId?clientId=${clientId}`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        method: "GET", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
     return [];
   }
 }
@@ -127,6 +248,38 @@ export async function getClientSettingByClinetIdAndToken({
     return [];
   }
 }
+
+export async function getallNotifications({
+
+  token,
+  body
+}: {
+  token: string;
+  body: any;
+}){
+  try {
+    const response = await fetch(`${URL}/getallnotifications`, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body,
+      //  `{\"clientId\":\"${clientId}\"}`,
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    return [];
+  }
+}
+
+
 export async function getNotificationsData({
   token,
   clientId,
