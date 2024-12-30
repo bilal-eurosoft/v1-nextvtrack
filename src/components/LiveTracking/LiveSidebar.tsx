@@ -706,11 +706,11 @@ const LiveSidebar = ({
                         <div className="flex items-center space-x-2">
                           <div
                             className={`inline-block px-1 py-1 rounded-md text-sm shadow ${item?.vehicleStatus === "Moving"
-                                ? "bg-green text-white"
-                                : item?.vehicleStatus === "Parked"
-                                  ? "bg-red text-white"
-                                  :  "bg-[#eec40f] text-white"
-                                
+                              ? "bg-green text-white"
+                              : item?.vehicleStatus === "Parked"
+                                ? "bg-red text-white"
+                                : "bg-[#eec40f] text-white"
+
                               }`}
                           >
                             <span>{item?.vehicleStatus || "Unknown"}</span>
@@ -827,25 +827,27 @@ const LiveSidebar = ({
                       // Check if the current attribute is the one requiring calculation
                       if (attribute.key === "gpsStatus") {
                         // Only show this field if gpsStatus is true
-                        if (item.gpsStatus) {
+                        if (attribute.key === "gpsStatus" && allattributes.find((i) => { return i.vehicleId == item.vehicleId })?.attributes.find((j) => { return j.key == "gpsStatus" })?.allow) {
+                          // Only show this field if gpsStatus is true
                           const targetTimeDate = new Date(item.targetTime);
                           const currentTimeDate = new Date(item.currentTime);
                           const timeDiffMinutes = Math.abs(targetTimeDate.getTime() - currentTimeDate.getTime()) / (1000 * 60);
                           const newDivColor = timeDiffMinutes > 120 ? false : true;
                           return (
-                            <p key={attribute.key} style={{ fontSize: "15px" }}>
-                              <strong>{attribute.label}:</strong> {newDivColor ? "On" : "Off"}
+                            <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
+                              <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
+                              <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}> {newDivColor ? "On" : "Off"}</span>
                             </p>
                           );
                         }
-                        return null; // Don't show the field if gpsStatus is false
-                      }
 
-                      // Render other attributes
+                        // Render other attributes
+                      }
                       if (value) {
                         return (
-                          <p key={attribute.key} style={{ fontSize: "15px" }}>
-                            <strong>{attribute.label}:</strong> {value}
+                          <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
+                            <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
+                            <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}>{value}</span>
                           </p>
                         );
                       }

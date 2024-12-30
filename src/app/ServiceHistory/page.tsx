@@ -15,7 +15,7 @@ import {
   addDocument
 } from "@/utils/API_CALLS";
 import Select from "react-select";
-import { DeviceAttach, VehicleData } from "@/types/vehiclelistreports";
+import { DeviceAttach } from "@/types/vehiclelistreports";
 import { MuiPickersUtilsProvider, DatePicker, TimePicker } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
 import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
@@ -643,19 +643,28 @@ export default function ServiceHistory() {
 
 
 
-      delete formData.documentType;
-      delete formData.createdDate;
-      delete formData.expiryDate;
-      delete formData.file;
-      delete formData.filename;
-      delete formData.email;
-      delete formData.pushnotification;
-      delete formData.serviceType;
-      delete formData.sms;
-      delete formData.status;
-      delete formData.targetValue;
-      delete formData.id
-      delete formData.vehicleReg
+      
+      const payload = {
+        clientId: formData.clientId,
+        vehicleId: formData.vehicleId,
+        dataType: "Maintenance",
+        status: "pending",
+
+        maintenanceType: formData.maintenanceType,
+        serviceTitle: formData.serviceTitle
+      }
+
+      const Data = await handleServiceHistoryRequest({
+        token: session?.accessToken,
+        method: "POST",
+        body: payload,
+      });
+
+      if (Data.success == true) {
+        toast.success("Document Added!");
+        setModalOpen(false);
+      }
+
     }
     else {
 
@@ -676,7 +685,9 @@ export default function ServiceHistory() {
         pushnotification: formData.pushnotification,
         sms: formData.sms,
         email: formData.email,
-        documents: documentData, dataType: "Documentation"
+        documents: documentData, dataType: "Documentation",
+        status: "pending",
+
       }
 
       const Data = await handleServiceHistoryRequest({
