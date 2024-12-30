@@ -229,8 +229,7 @@ export async function handleServiceHistoryRequest({
     }
 
     // Perform the request
-  //  const response = await fetch( `${URL}/serviceHistory`, fetchOptions);
-  const response = await fetch( `http://172.16.10.73:80/serviceHistory`, fetchOptions);
+   const response = await fetch( `${URL}/serviceHistory`, fetchOptions);  
     // Handle non-2xx status codes
     if (!response.ok) {
       throw new Error(`Failed to fetch data from the API. Status: ${response.status}`);
@@ -280,8 +279,8 @@ export async function handleServicesRequest({
     if (payload && (method === "POST" || method === "PUT" || method === "DELETE")) {
       options.body = JSON.stringify(payload);
     }
- 
-    const response = await fetch(`${"http://172.16.10.73/service"}`, options);
+    const response = await fetch( `${URL}/service`, options); 
+    
 
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
@@ -303,8 +302,9 @@ export async function handleServicesRequest({
 
 export async function addDocument(payload: any ,token:string) {
   try {
+    
     const response = await fetch(
-      `${"http://172.16.10.73"}/document`,
+      `${URL}/document`,
       {
         headers: {
           authorization: `Bearer ${token}`,
@@ -326,7 +326,7 @@ export async function addDocument(payload: any ,token:string) {
 export async function getDocuments(token:string) {
   try {
     const response = await fetch(
-      `${"http://172.16.10.73"}/document`,
+      `${URL}/document`,
       {
         headers: {
           accept: "application/json, text/plain, */*",
@@ -349,7 +349,7 @@ export async function getDocuments(token:string) {
 export async function editDocuments(payload:any,token:string) {
   try {
     const response = await fetch(
-      `${"http://172.16.10.73"}/document`,
+      `${URL}/document`,
       {
         headers: {
           accept: "application/json, text/plain, */*",
@@ -372,7 +372,7 @@ export async function editDocuments(payload:any,token:string) {
 }export async function deleteDocuments(id:string,token:string) {
   try {
     const response = await fetch(
-      `${"http://172.16.10.73"}/document`,
+      `${URL}/document`,
       {
         headers: {
           accept: "application/json, text/plain, */*",
@@ -397,7 +397,7 @@ export async function editDocuments(payload:any,token:string) {
 export async function getevents(clientId: string ,token:string) {
   try {
     const response = await fetch(
-      `${"http://172.16.10.73"}/geteventsbyclientId?clientId=${clientId}`,
+      `${URL}/geteventsbyclientId?clientId=${clientId}`,
       {
         headers: {
           accept: "application/json, text/plain, */*",
@@ -602,60 +602,7 @@ export async function Verifyimmobiliserequest({
     return [];
   }
 }
-// export async function getGprsCommandLatest({
-//   token,
-// }: // payload,
-// {
-//   token: string;
-//   // payload: commandrequest;
-// }) {
-//   try {
-//     const response = await fetch(
-//       `http://172.16.10.99:3001/GetLatestGprsCommand`,
-//       {
-//         headers: {
-//           accept: "application/json, text/plain, */*",
-//           authorization: `Bearer ${token}`,
-//           "content-type": "application/json",
-//         },
-//         // body: JSON.stringify(payload),
-//         method: "POST",
-//       }
-//     );
-//     if (!response.ok) {
-//       throw new Error("Failed to fetch data from the API");
-//     }
-//     const data = await response.json();
-//     return data;
-//   } catch (error) {
-//     
-//     return [];
-//   }
-// }
 
-// export async function responsegprs({ token }: { token: string }) {
-//   try {
-//     const response = await fetch(
-//       `http://172.16.10.46:80/gprscommands/most-recent`,
-//       {
-//         headers: {
-//           accept: "application/json, text/plain, */*",
-//           authorization: `Bearer ${token}`,
-//           "content-type": "application/json",
-//         },
-//         method: "POST", // Adjust the method according to your API's requirement
-//       }
-//     );
-//     if (!response.ok) {
-//       throw new Error("Failed to fetch data from the API");
-//     }
-//     const data = await response.json();
-//     return data;
-//   } catch (error) {
-//     
-//     return null;
-//   }
-// }
 
 export async function getAllVehicleByUserId({
   token,
