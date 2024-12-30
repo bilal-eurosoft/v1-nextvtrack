@@ -1684,7 +1684,7 @@ const handleMouseLeave = () => setIsHovered(false);
                           handleDateChange("toDateTime", newDate)
                         }
                         variant="inline"
-                        // maxDate={currenTDates}
+                        minDate={Ignitionreport.fromDateTime}
                         placeholder="End Date"
                         inputProps={{ readOnly: true }}
                         maxDate={currenTDates}

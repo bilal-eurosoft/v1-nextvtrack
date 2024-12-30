@@ -379,7 +379,7 @@ export default function NotificationTab() {
                           handleDateChange("toDateTime", newDate)
                         }
                         variant="inline"
-                        // maxDate={currenTDates}
+                        minDate={fromDate|| new Date()}
                         placeholder="End Date"
                         inputProps={{ readOnly: true }}
                         maxDate={new Date()}

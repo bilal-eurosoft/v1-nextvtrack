@@ -27,7 +27,7 @@ const LiveTracking = () => {
   const [updatedData, setUpdateData] = useState<VehicleData[]>([]);
   const searchParams = useSearchParams();
   const IMEI = searchParams.get("IMEI");
-  const vehicleReg = searchParams.get("vehicleReg");
+  const vehicleReg = searchParams.get("vehicleReg")?.replaceAll("%", " ");
 
   const [clientSettings, setClientSettings] = useState<ClientSettings[]>([]);
   const [position, setPosition] = useState({ top: 0, left: 0 });
