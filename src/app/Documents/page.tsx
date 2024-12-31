@@ -1,19 +1,16 @@
 "use client";
 import React, { useEffect, useState } from 'react'
 import { MuiPickersUtilsProvider, DatePicker, TimePicker } from "@material-ui/pickers";
-import AccessTimeIcon from '@mui/icons-material/AccessTime'; // Import the time icon
 import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
-import { VehicleData } from '@/types/vehicle';
 import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
-import { addDocument, deleteDocuments, editDocuments, getDocuments, handleServiceHistoryRequest } from '@/utils/API_CALLS';
+import { addDocument, deleteDocuments, editDocuments, getDocuments } from '@/utils/API_CALLS';
 import { useSession } from 'next-auth/react';
-import { loadBindings } from 'next/dist/build/swc';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
 function Documents() {
   const { data: session } = useSession();
-const router = useRouter()
+  const router = useRouter()
   if (!session?.ServiceHistory) {
     router.push("/liveTracking");
   }
@@ -22,7 +19,7 @@ const router = useRouter()
   const [modalOpen, setModalOpen] = useState(false);
   const [file, setFile] = useState(null);
   const [error, setError] = useState<string | null>(null);
-  const [serviceType, setserviceType] = useState<String>()
+  const [documentType, setdocumentType] = useState<String>()
   const initialFormData: any = {
     id: "",
     title: "",
@@ -46,9 +43,9 @@ const router = useRouter()
     let response = await deleteDocuments(id, session?.accessToken)
     if (response.success) {
 
-      toast.success(response.message)
+      toast.success(response.message, { position: "top-center" })
     } else {
-      toast.error(response.message)
+      toast.error(response.message, { position: "top-center" })
 
     }
 
@@ -58,19 +55,34 @@ const router = useRouter()
 
   }
   const handleSubmit = async (e: any) => {
-    if (serviceType == "Update") {
+    if (!formData.title) {
+      toast.error("Document title is missing", { position: "top-center" })
+      return
+    }
+    if (error != "") {
+      toast.error(error, { position: "top-center" })
+      return
+    }
+    if (documentType == "Update") {
 
       let response = await editDocuments(formData, session?.accessToken)
-      if (response.success) {
+      if (response?.success) {
 
-        toast.success(response.message)
+        toast.success(response?.message, { position: "top-center" })
+        loadDocuments()
+        setFormData(initialFormData)
+        setModalOpen(false)
       } else {
-        toast.error(response.message)
+        toast.error(response?.message, { position: "top-center" })
 
       }
     } else {
+      if (!file) {
+        toast.error("Please upload an document", { position: "top-center" })
+
+      }
       let data = new FormData()
-      console.log(file)
+
       data.append("file", file)
       data.append("clientId", session?.clientId)
       data.append("title", formData.title)
@@ -79,20 +91,22 @@ const router = useRouter()
 
 
       let response = await addDocument(data, session?.accessToken)
-      if (response.success) {
+      if (response?.success) {
 
-        toast.success(response.message)
+        toast.success(response?.message, { position: "top-center" })
+        loadDocuments()
+        setFormData(initialFormData)
+        setModalOpen(false)
       } else {
-        toast.error(response.message)
+        toast.error(response?.message, { position: "top-center" })
 
       }
     }
-    loadDocuments()
-    setModalOpen(false)
+
   }
 
   const handleCreatedDateChange = (newDate) => {
-    // Ensure that the selected date is either valid or null
+
     const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
 
     setFormData((prev) => ({
@@ -101,7 +115,7 @@ const router = useRouter()
     }));
   };
   const handleExpiryDateChange = (newDate) => {
-    // Ensure that the selected date is either valid or null
+
     const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
 
     setFormData((prev) => ({
@@ -113,7 +127,7 @@ const router = useRouter()
 
   const handleFileChange = async (e) => {
 
-    console.log(e.target)
+
     const selectedFile = e.target.files[0];
     setFile(e.target.files[0]);
 
@@ -135,52 +149,101 @@ const router = useRouter()
 
 
 
-  const openUpdateModal = (service: any) => {
+  const openUpdateModal = (document: any) => {
 
-    setserviceType("Update");
-    setFormData({ ...service, id: service._id });
+    setdocumentType("Update");
+    setFormData({ ...document, id: document._id });
     setModalOpen(true);
   }
 
 
-  const opendelteModal = (service: any) => {
+  const opendelteModal = (document: any) => {
 
-    setId(service._id)
+    setId(document._id)
     setDeleteModal(true);
   }
+  const data = Array.from({ length: 50 }, (_, i) => ({
+    header1: `Data ${i + 1} - Col 1`,
+    header2: `Data ${i + 1} - Col 2`,
+    header3: `Data ${i + 1} - Col 3`,
+  }));
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
+
+  // Calculate total pages
+  const totalPages = Math.ceil(documents.length / rowsPerPage);
+
+  // Get current page data
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const currentData = documents.slice(startIndex, startIndex + rowsPerPage);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
   return (
-    <>
-      <button
-        onClick={() => {
-          setserviceType("Add")
-          setModalOpen(true)
-        }}
-        className="mt-[50px] ml-[50px] mb-[50px]  px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 bg-[#00B56C] text-white hover:bg-[#028B4A] transition-all"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          width="20px"
-          height="20px"
-          fill="none"
-          stroke="#ffffff"
-          strokeWidth="2"
-          className="w-5 h-5"
+    <div>
+      <p className="bg-green px-4 py-1 border-t  text-center text-2xl text-white font-bold journey_heading">
+        Manage Documents
+      </p>
+      <div className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-2
+         lg:px-4 text-start  bg-bgLight ">
+        <div
+          className="xl:col-span-8 lg:col-span-8 md:col-span-7 col-span-8"
+
         >
-          <path
-            fill="none"
-            stroke="#ffffff"
-            strokeWidth="2"
-            d="M12 5v14M5 12h14"
-          />
-        </svg>
-        Add Document
-      </button>
+
+        </div>
+
+
+        <div
+          className="xl:col-span-2 lg:col-span-2 md:col-span-3 col-span-2"
+
+        ><button
+          onClick={() => {
+            setdocumentType("Add")
+            setModalOpen(true)
+          }}
+          className="
+        mt-[10px] ml-[10px] mb-[10px]  
+        px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 bg-[#00B56C] text-white hover:bg-[#028B4A] transition-all"
+        >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="20px"
+              height="20px"
+              fill="none"
+              stroke="#ffffff"
+              strokeWidth="2"
+              className="w-5 h-5"
+            >
+              <path
+                fill="none"
+                stroke="#ffffff"
+                strokeWidth="2"
+                d="M12 5v14M5 12h14"
+              />
+            </svg>
+            Upload Document
+          </button>
+
+        </div>
+      </div>
+
 
       <div className="relative px-4">
-        <div className="bg-white shadow-md rounded-lg overflow-y-auto h-full">
-          <table className="min-w-full table-auto ">
+        <div className="bg-white shadow-md overflow-y-auto"
+          style={{ maxHeight: "40rem" }}>
+          <table className="table-auto border-collapse border border-gray-300 w-full ">
             {/* Table header and body */}
             <thead className="bg-[#E2E8F0]">
               <tr>
@@ -194,7 +257,7 @@ const router = useRouter()
               </tr>
             </thead>
             <tbody className="bg-white">
-              {(documents.length === 0) ? (
+              {(documents?.length === 0) ? (
                 <tr>
                   <td colSpan="8" className="px-4 py-2 text-center text-gray-500">
                     No Data Found
@@ -207,22 +270,22 @@ const router = useRouter()
                       <td className="px-2 py-1 text-center">
                         {index + 1}
                       </td>
-                      <td className="px-2 py-1 text-left">{document.title}</td>
+                      <td className="px-2 py-1 text-left">{document?.title}</td>
 
 
 
 
 
-                      <td className="px-2 py-1 text-left">{document.issueDate}</td>
-                      <td className="px-2 py-1 text-left">{document.expiryDate}</td>
-                      <td className="px-2 py-1 text-left">{document.fileType.replace("/", "-")}</td>
+                      <td className="px-2 py-1 text-left">{document?.issueDate}</td>
+                      <td className="px-2 py-1 text-left">{document?.expiryDate}</td>
+                      <td className="px-2 py-1 text-left">{document?.fileType?.replace("/", "-")}</td>
 
 
 
                       <td className="px-2 py-1 text-left">
                         <div className="flex gap-2 justify-start">
                           <svg
-                            onClick={() => openUpdateModal(service)}
+                            onClick={() => openUpdateModal(document)}
                             className="w-6 h-6 text-blue-600 cursor-pointer hover:shadow-lg"
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
@@ -281,165 +344,177 @@ const router = useRouter()
             </tbody>
           </table>
         </div>
+
+
+
+
+
       </div>
 
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-96">
             <h3 className="text-xl font-bold mb-4 text-center">
-              {serviceType} Document
+              {documentType} Document
             </h3>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium">
-                  Document Title
-                </label>
-                <input
-                  type="text"
-                  name="serviceTitle"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-[#CBD5E0] rounded-lg"
-                  placeholder="Oil Changing / Tuning, etc."
 
-                />
-              </div>
-
-
-
-
+            <div className="mb-4">
               <label className="block text-sm font-medium">
-                Issue Date
+                Document Title
               </label>
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <DatePicker
-                  value={formData.issueDate || null}
-                  onChange={handleCreatedDateChange}
-                  format="MM/dd/yyyy" // Display format for the date
-                  variant="dialog"
-                  placeholder="Issue Date "
-                  //minDate={currentDate} // Prevent selecting past dates
-                  autoOk
-                  inputProps={{ readOnly: true }} // Make input read-only
-                  style={{
-                    marginTop: '0%', // Adjust top margin
-                    marginBottom: "2%",
-                    width: '333px', // Adjust width of the input
-                    border: '1px solid #ccc', // Border style
-                    borderRadius: '5px', // Rounded corners
-                    padding: '10px',
-                    fontSize: '14px', // Font size
+              <input
+                type="text"
+                name="documentTitle"
+                value={formData.title}
+                onChange={handleInputChange}
+                className="w-full p-2 border border-[#CBD5E0] rounded-lg"
+                placeholder="Insurance Doc / Mot Doc"
 
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <EventIcon
-                        style={{ width: "20px", height: "20px" }}
-                        className="text-gray"
-                      />
-                    ),
-                  }}
-                  DialogProps={{
-                    PaperProps: {
-                      style: {
-                        backgroundColor: '#f4f6f8', // Change background color of the calendar dialog
-                        borderRadius: '10px', // Round corners of the calendar dialog
-                        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)', // Shadow for the dialog
+              />
+            </div>
 
-                        height: "458px",
 
-                      },
+
+
+            <label className="block text-sm font-medium">
+              Issue Date
+            </label>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <DatePicker
+                value={formData.issueDate || null}
+                onChange={handleCreatedDateChange}
+                format="MM/dd/yyyy" // Display format for the date
+                variant="dialog"
+                placeholder="Issue Date "
+                maxDate={new Date()} // Prevent selecting past dates
+
+
+                autoOk
+                inputProps={{ readOnly: true }} // Make input read-only
+                style={{
+                  marginTop: '0%', // Adjust top margin
+                  marginBottom: "2%",
+                  width: '333px', // Adjust width of the input
+                  border: '1px solid #ccc', // Border style
+                  borderRadius: '5px', // Rounded corners
+                  padding: '10px',
+                  fontSize: '14px', // Font size
+
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <EventIcon
+                      style={{ width: "20px", height: "20px" }}
+                      className="text-gray"
+                    />
+                  ),
+                }}
+                DialogProps={{
+                  PaperProps: {
+                    style: {
+                      backgroundColor: '#f4f6f8', // Change background color of the calendar dialog
+                      borderRadius: '10px', // Round corners of the calendar dialog
+                      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)', // Shadow for the dialog
+
+                      height: "458px",
+
                     },
-                  }}
+                  },
+                }}
 
 
-                />
-                <label className="block text-sm font-medium">
-                  Expiry Date
-                </label>
-                <DatePicker
-                  value={formData.expiryDate || null}
-                  onChange={handleExpiryDateChange}
-                  format="MM/dd/yyyy" // Display format for the date
-                  variant="dialog"
-                  placeholder="Expiry Date "
-                  minDate={formData.issueDate} // Prevent selecting past dates
-                  autoOk
-                  inputProps={{ readOnly: true }} // Make input read-only
-                  style={{
-                    marginTop: '0%', // Adjust top margin
-                    width: '333px', // Adjust width of the input
-                    border: '1px solid #ccc', // Border style
-                    borderRadius: '5px', // Rounded corners
-                    padding: '10px',
-                    fontSize: '14px', // Font size
+              />
+              <label className="block text-sm font-medium">
+                Expiry Date
+              </label>
+              <DatePicker
+                value={formData.expiryDate || null}
+                onChange={handleExpiryDateChange}
+                format="MM/dd/yyyy" // Display format for the date
+                variant="dialog"
+                placeholder="Expiry Date "
+                minDate={formData.issueDate} // Prevent selecting past dates
+                autoOk
+                inputProps={{ readOnly: true }} // Make input read-only
+                style={{
+                  marginTop: '0%', // Adjust top margin
+                  width: '333px', // Adjust width of the input
+                  border: '1px solid #ccc', // Border style
+                  borderRadius: '5px', // Rounded corners
+                  padding: '10px',
+                  fontSize: '14px', // Font size
 
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <EventIcon
-                        style={{ width: "20px", height: "20px" }}
-                        className="text-gray"
-                      />
-                    ),
-                  }}
-                  DialogProps={{
-                    PaperProps: {
-                      style: {
-                        backgroundColor: '#f4f6f8', // Change background color of the calendar dialog
-                        borderRadius: '10px', // Round corners of the calendar dialog
-                        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)', // Shadow for the dialog
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <EventIcon
+                      style={{ width: "20px", height: "20px" }}
+                      className="text-gray"
+                    />
+                  ),
+                }}
+                DialogProps={{
+                  PaperProps: {
+                    style: {
+                      backgroundColor: '#f4f6f8', // Change background color of the calendar dialog
+                      borderRadius: '10px', // Round corners of the calendar dialog
+                      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)', // Shadow for the dialog
 
-                        height: "458px",
+                      height: "458px",
 
-                      },
                     },
-                  }}
+                  },
+                }}
 
 
+              />
+            </MuiPickersUtilsProvider>
+            {documentType == "Add" &&
+              <div className=" mt-4">
+                <h2 className="block text-sm font-medium">Upload PDF, JPEG, or PNG</h2>
+
+                <input
+                  type="file"
+                  accept=".pdf, .jpeg, .jpg, .png"
+                  onChange={handleFileChange}
+                  className="w-full pr-3 py-2  rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
-              </MuiPickersUtilsProvider>
-              {serviceType == "Add" &&
-                <div className=" mt-4">
-                  <h2 className="block text-sm font-medium">Upload PDF, JPEG, or PNG</h2>
 
-                  <input
-                    type="file"
-                    accept=".pdf, .jpeg, .jpg, .png"
-                    onChange={handleFileChange}
-                    className="w-full pr-3 py-2  rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-
-                  {error && <p className="text-red-500 text-sm">{error}</p>}
-
-
-                </div>
-              }
-
-
-
-
-
-              <div className="flex justify-end space-x-2 mt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setModalOpen(false);
-                    setFormData(initialFormData)
-
+                {error && <p className="text-sm "
+                  style={{
+                    color: "red"
                   }}
-                  className="bg-[#E53E3E] text-white px-4 py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-[#00B56C] text-white px-4 py-2 rounded-lg"
-                >
-                  Save
-                </button>
+                >{error}</p>}
+
+
               </div>
-            </form>
+            }
+
+
+
+
+
+            <div className="flex justify-end space-x-2 mt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setModalOpen(false);
+                  setFormData(initialFormData)
+
+                }}
+                className="bg-[#E53E3E] text-white px-4 py-2 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                // type="submit"
+                onClick={handleSubmit}
+                className="bg-[#00B56C] text-white px-4 py-2 rounded-lg"
+              >
+                Save
+              </button>
+            </div>
+
           </div>
         </div>
       )}
@@ -478,7 +553,7 @@ const router = useRouter()
       )
 
       }
-    </>
+    </div>
   )
 }
 

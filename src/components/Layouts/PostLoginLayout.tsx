@@ -25,7 +25,8 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { getNotificationsData, getNotificationsDataByUserId, getZoneListByClientId } from "@/utils/API_CALLS";
 import { fetchZone } from "@/lib/slices/zoneSlice";
 import { useSelector } from "react-redux";
-import { toast, Toaster } from "react-hot-toast";
+import toast from 'react-hot-toast';
+
 
 import { FaBell } from 'react-icons/fa'; // Using React Icons for the bell icon
 
@@ -999,7 +1000,7 @@ export default function RootLayout({
       <Tooltip
         className="bg-[#00B56C] text-white rounded shadow-lg"
         placement="right"
-        content="Documents"
+        content="Manage Documents"
       >
         <svg xmlns="http://www.w3.org/2000/svg"
           className={`py-2 text-white-10 dark:text-white ${pathname == "/Documents" ? "border-b-2 mr-[1.5px] border-green-500" : "border-b-2 border-white"}`}
@@ -1770,7 +1771,7 @@ export default function RootLayout({
           </div>
         </div>
       </div>
-      <Toaster position="bottom-right" reverseOrder={false} />
+      
     </div>
   );
 }

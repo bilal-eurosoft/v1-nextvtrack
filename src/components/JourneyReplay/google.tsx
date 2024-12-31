@@ -165,7 +165,6 @@
 //     // const { isLoaded,loadError  } = useLoadScript({
 //     //     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
 //     //   });
-//     //   console.log(isLoaded,loadError )
 
 //     return (
 // // <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>

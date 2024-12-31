@@ -275,58 +275,17 @@ export default function NotificationTab() {
          lg:px-4 text-start  bg-bgLight select_box_journey"
         >
           <div
-            className="xl:col-span-1 lg:col-span-2 md:col-span-3   col-span-12
-            select_box_column 
-          "
-
-          >
-            {/* <Select
-             
-              onChange={handleInputChangeSelect}
-              options={options}
-              placeholder="Pick Vehicle"
-              isClearable
-              isSearchable
-              noOptionsMessage={() => "No options available"}
-              className="   rounded-md w-full  outline-green border border-grayLight  hover:border-green select_vehicle"
-              styles={{
-                control: (provided, state) => ({
-                  ...provided,
-                  border: "none",
-                  boxShadow: state.isFocused ? null : null,
-                }),
-                option: (provided, state) => ({
-                  ...provided,
-                  backgroundColor: state.isSelected
-                    ? "#00B56C"
-                    : state.isFocused
-                    ? "#e1f0e3"
-                    : "transparent",
-                  color: state.isSelected
-                    ? "white"
-                    : state.isFocused
-                    ? "black"
-                    : "black",
-                  "&:hover": {
-                    backgroundColor: "#e1f0e3",
-                    color: "black",
-                  },
-                }),
-              }}
-            /> */}
+            className="xl:col-span-1 lg:col-span-2 md:col-span-3 col-span-12 select_box_column">
             <input
               type="text"
               placeholder="Search Notifications..."
-              className="text-sm p-[0.4rem] border-[2.8px] border-none rounded-md w-full focus:outline-none"
+              className="text-sm p-[0.4rem] rounded-md w-full notification-search"
               style={{
-                // borderColor: getBorderColor(),
+                borderColor: getBorderColor(),
               }}
               value={searchQuery}
               onChange={handleSearchChange}
             />
-
-
-
           </div>
 
           <div className="xl:col-span-3 lg:col-span-4 md:col-span-6 col-span-12 days_select">
@@ -379,7 +338,7 @@ export default function NotificationTab() {
                           handleDateChange("toDateTime", newDate)
                         }
                         variant="inline"
-                        minDate={fromDate|| new Date()}
+                        minDate={fromDate || new Date()}
                         placeholder="End Date"
                         inputProps={{ readOnly: true }}
                         maxDate={new Date()}

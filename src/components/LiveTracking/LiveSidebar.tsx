@@ -440,43 +440,10 @@ const LiveSidebar = ({
   ];
 
   const handleButtonClick = (index) => {
-    // You can add additional logic here based on the index.
     setActiveIndex(index);
-
-    // You can use the active index to show specific data.
-    // For example:
     const selectedData = data[index];
     setactiveLabel(selectedData.label)
 
-    /*  if (index === "All") {
-        // setFilteredData(carData)
-         return
-       }
-   
-    else {
-   
-   
-     const filtered = carData
-         ?.filter((data) =>
-           data.vehicleStatus.toLowerCase().includes(selectedData.label.toLowerCase())
-         )
-         .sort((a: any, b: any) => {
-           const aReg = a.vehicleReg;
-           const bReg = b.vehicleReg;
-   
-           // Check if both are numbers
-           const aIsNumeric = !isNaN(parseInt(aReg));
-           const bIsNumeric = !isNaN(parseInt(bReg));
-   
-           if (aIsNumeric && bIsNumeric) {
-             return parseInt(aReg) - parseInt(bReg);
-           } else {
-             return aReg.localeCompare(bReg);
-           }
-         })
-         
-         setFilteredData(filtered)
-       } */
 
   };
 

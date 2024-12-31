@@ -245,7 +245,6 @@ export default function JourneyReplayComp() {
  
   const SetViewfly = ({ coords, zoom }: { coords: any; zoom: number }) => {
     const map = useMap();
-   // console.log("click" , selectedItemId);
     if(selectedItemId){
       return null
     }
@@ -855,13 +854,11 @@ export default function JourneyReplayComp() {
   function getFormattedDate(date: any) {
     return date.toISOString().slice(0, 10);
   }
-//console.log("polyline", polylinedata.length, "loading", loadingMap);
   const handleDivClick = async (
     TripStart: TripsByBucket["TripStart"],
     TripEnd: TripsByBucket["TripEnd"],
     id: any
   ) => {
-  //  console.log("DSFDSdsds");
   sethidediv(true)
   setPolylinedata([])
   setCarPosition(null)
@@ -1052,11 +1049,7 @@ export default function JourneyReplayComp() {
     } catch (error) {}
 
     setloadingMap(true);
-  };
-
- //console.log("user", userclick);
-  
-  
+  };   
   useEffect(() => {
 
     if (TravelHistoryresponse && TravelHistoryresponse.length > 0) {
@@ -1383,64 +1376,7 @@ export default function JourneyReplayComp() {
    
     setuserclick(true)
   }
- /*  useEffect(() => {
-    // Function to handle map events
-    console.log("Adfa");
-    const handleMapEvents = (map: L.Map) => {
-      console.log("Adf3243242a");
-      map.on('zoomend', handleuserclick);
-      map.on('moveend', handleuserclick);
-    };
-
-    // Initialize Leaflet map instance and add event listeners
-    const map = document.getElementById('map') 
-    console.log("sacfcde897889", map);
-    if (map) {
-      console.log("sacfcde897889", map);
-      handleMapEvents(L.map(map));
-    }
-
-    // Cleanup function to remove event listeners
-    return () => {
-      if (map) {
-        console.log("Adfa7789897889");
-        map.off('zoomend', handleuserclick);
-        map.off('moveend', handleuserclick);
-      }
-    };
-  }, [isPaused,isPlaying]);
-   */
- /*  const mapRef = useRef(null);
-  
-  const MapEvents = () => {
-    const map = useMap();
-
-    useEffect(() => {
-      if (!map) return;
-
-      const handleZoomEnd = () => {
-        console.log("Zoom ended");
-        handleuserclick();
-      };
-
-      const handleMoveEnd = () => {
-        console.log("Move ended");
-        handleuserclick();
-      };
-
-      // Add event listeners
-      map.on('zoomstart', handleZoomEnd);
-      map.on('moveend', handleMoveEnd);
-
-      // Cleanup function to remove event listeners
-      return () => {
-        map.off('zoomstart', handleZoomEnd);
-        map.off('moveend', handleMoveEnd);
-      };
-    }, [map]);
-
-    return null;
-  }; */
+ 
   const [isChecked, setIsChecked] = useState(false);
 
 

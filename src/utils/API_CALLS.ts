@@ -5,8 +5,8 @@ import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
 import { immobiliserequest } from "@/types/immobiliserequest";
 import uniqueDataByIMEIAndLatestTimestamp from "./uniqueDataByIMEIAndLatestTimestamp";
- //var URL = "http://172.16.10.99:80"
-  var URL ="https://backend.vtracksolutions.com";
+// var URL = "http://172.16.10.73:80"
+var URL = "https://backend.vtracksolutions.com";
 
 export async function getVehicleDataByClientId(clientId: string) {
   try {
@@ -23,7 +23,7 @@ export async function getVehicleDataByClientId(clientId: string) {
 
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -40,20 +40,20 @@ export async function getVehicleDataByClientIdForOdometer(clientId: string) {
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-   //  data?.data?.Value
-      let parsedData = JSON.parse(
-        data?.data?.Value
-      )?.cacheList;
-      // call a filter function here to filter by IMEI and latest time stamp
-      let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
+    //  data?.data?.Value
+    let parsedData = JSON.parse(
+      data?.data?.Value
+    )?.cacheList;
+    // call a filter function here to filter by IMEI and latest time stamp
+    let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
     return uniqueData;
   } catch (error) {
-    
+
     return [];
   }
 }
 
-export async function getalluserview(userId: string,token:string ) {
+export async function getalluserview(userId: string, token: string) {
   try {
     const response = await fetch(
       `${URL}/userview?userId=${userId}`,
@@ -77,7 +77,7 @@ export async function getalluserview(userId: string,token:string ) {
   }
 }
 
-export async function getallattributes(userId: string,token:string ) {
+export async function getallattributes(userId: string, token: string) {
   try {
     const response = await fetch(
       `${URL}/attributes`,
@@ -124,7 +124,7 @@ export async function getClientSettingByClinetIdAndToken({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -151,7 +151,7 @@ export async function getNotificationsData({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -164,7 +164,7 @@ export async function getNotificationsDataByUserId({
   clientId: string;
 }) {
   try {
-   // console.log("object", clientId,token);
+
     const response = await fetch(`${URL}/notifications`, {
       headers: {
         accept: "application/json, text/plain, */*",
@@ -180,7 +180,7 @@ export async function getNotificationsDataByUserId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -204,48 +204,38 @@ export async function handleServiceHistoryRequest({
       accept: "application/json, text/plain, */*",
       authorization: `Bearer ${token}`,
       "content-type": "application/json",
-     
     };
-
     // Prepare the fetch options
     const fetchOptions: RequestInit = {
       method,
       headers,
     };
-
     // Add body only for methods that need it (POST, PUT, DELETE)
     if (body && (method === 'POST' || method === 'PUT')) {
       fetchOptions.body = JSON.stringify(body);
     }
-    if ( method === 'DELETE') {
-  
-      fetchOptions.body = JSON.stringify(body);
+    if (method === 'DELETE') {
+      fetchOptions.body = JSON.stringify({ id: body });
     }
-    
     // Handle GET method separately, no body is required
     if (method === 'GET') {
       // For GET requests, we just send the token as part of the headers.
       delete fetchOptions.body;
     }
-
     // Perform the request
-   const response = await fetch( `${URL}/serviceHistory`, fetchOptions);  
+    const response = await fetch(`${URL}/serviceHistory`, fetchOptions);
     // Handle non-2xx status codes
     if (!response.ok) {
       throw new Error(`Failed to fetch data from the API. Status: ${response.status}`);
     }
-
     // Parse JSON response body
     const data = await response.json();
-
     // For GET requests, we return the data (example: 'data' field is the key you want to extract)
     if (method === 'GET') {
       return data.data;
     }
-
     // For POST, PUT, DELETE, return the response data
     return data;
-
   } catch (error) {
     console.error('Error occurred while fetching service history:', error);
     return null; // Or you can return an empty array if preferred
@@ -279,8 +269,8 @@ export async function handleServicesRequest({
     if (payload && (method === "POST" || method === "PUT" || method === "DELETE")) {
       options.body = JSON.stringify(payload);
     }
-    const response = await fetch( `${URL}/service`, options); 
-    
+    const response = await fetch(`${URL}/service`, options);
+
 
     if (!response.ok) {
       throw new Error("Failed to fetch data from the API");
@@ -300,16 +290,16 @@ export async function handleServicesRequest({
   }
 }
 
-export async function addDocument(payload: any ,token:string) {
+export async function addDocument(payload: any, token: string) {
   try {
-    
+
     const response = await fetch(
       `${URL}/document`,
       {
         headers: {
           authorization: `Bearer ${token}`,
         },
-        body:payload,
+        body: payload,
         method: "POST", // Use lowercase 'get' for method
       }
     );
@@ -323,7 +313,7 @@ export async function addDocument(payload: any ,token:string) {
     return [];
   }
 }
-export async function getDocuments(token:string) {
+export async function getDocuments(token: string) {
   try {
     const response = await fetch(
       `${URL}/document`,
@@ -346,7 +336,7 @@ export async function getDocuments(token:string) {
     return [];
   }
 }
-export async function editDocuments(payload:any,token:string) {
+export async function editDocuments(payload: any, token: string) {
   try {
     const response = await fetch(
       `${URL}/document`,
@@ -356,7 +346,7 @@ export async function editDocuments(payload:any,token:string) {
           authorization: `Bearer ${token}`,
           "content-type": "application/json",
         },
-        body:JSON.stringify(payload),
+        body: JSON.stringify(payload),
         method: "PUT", // Use lowercase 'get' for method
       }
     );
@@ -369,7 +359,7 @@ export async function editDocuments(payload:any,token:string) {
     console.error("Error fetching data", error);
     return [];
   }
-}export async function deleteDocuments(id:string,token:string) {
+} export async function deleteDocuments(id: string, token: string) {
   try {
     const response = await fetch(
       `${URL}/document`,
@@ -379,7 +369,7 @@ export async function editDocuments(payload:any,token:string) {
           authorization: `Bearer ${token}`,
           "content-type": "application/json",
         },
-        body:JSON.stringify({id}),
+        body: JSON.stringify({ id }),
         method: "DELETE", // Use lowercase 'get' for method
       }
     );
@@ -394,7 +384,7 @@ export async function editDocuments(payload:any,token:string) {
   }
 }
 ////////////////////
-export async function getevents(clientId: string ,token:string) {
+export async function getevents(clientId: string, token: string) {
   try {
     const response = await fetch(
       `${URL}/geteventsbyclientId?clientId=${clientId}`,
@@ -441,7 +431,7 @@ export async function vehicleListByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -484,7 +474,7 @@ export async function getallNotifications({
 }: {
   token: string;
   body: any;
-}){
+}) {
   try {
     const response = await fetch(`${URL}/getallnotifications`, {
       headers: {
@@ -512,7 +502,7 @@ export function expireForgotLink(payload: any) {
     .post(`${URL}/forgotpassword/UpdateLink`, payload)
     .then((response: any) => response?.data)
     .catch((error) => {
-      
+
     });
   return ressult;
 }
@@ -541,7 +531,7 @@ export async function portalGprsCommand({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -569,7 +559,7 @@ export async function ImmobiliseRequest({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -598,7 +588,7 @@ export async function Verifyimmobiliserequest({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -692,10 +682,10 @@ export async function clientbyClientid({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    
+
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -787,10 +777,10 @@ export async function vehiclebyClientid({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    
+
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -815,10 +805,10 @@ export async function vehiclebyClientidbyimmobilising({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    
+
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -849,7 +839,7 @@ export async function IgnitionReportByTrip({
     }
 
     const data = await response.json();
-    
+
     return data;
   } catch (error) {
     console.error("Error fetching data", error);
@@ -880,7 +870,7 @@ export async function IgnitionReportByDailyactivity({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -907,7 +897,7 @@ export async function IgnitionReportByIgnition({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -934,7 +924,7 @@ export async function IgnitionReportByEvents({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -961,7 +951,7 @@ export async function IgnitionReportByDetailReport({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -988,16 +978,16 @@ export async function IgnitionReportByIdlingActivity({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
 export async function GprsCommandbyCliendId({
-  token,clientId
-}:{
+  token, clientId
+}: {
   token: string;
   clientId: string;
-}){
+}) {
   try {
     const response = await fetch(`${URL}/GprsCommandbyCliendId`, {
       headers: {
@@ -1014,10 +1004,10 @@ export async function GprsCommandbyCliendId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
-  
+
 }
 export async function videoList({
   token,
@@ -1042,7 +1032,7 @@ export async function videoList({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1070,7 +1060,7 @@ export async function getZoneListByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1098,7 +1088,7 @@ export async function forgetEmailByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1126,7 +1116,7 @@ export async function forgetPasswordClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1155,7 +1145,7 @@ export async function forgetPasswordByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1184,7 +1174,7 @@ export async function forgetPasswordUpdateLinkClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1218,7 +1208,7 @@ export async function postDriverDataByClientId({
 
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1264,10 +1254,10 @@ export async function postDriverDataAssignByClientId({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-   
+
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1279,7 +1269,7 @@ export async function postDriverDeDataAssignByClientId({
   token: string;
   newformdata: any;
 }) {
-  
+
   try {
     const response = await fetch(`${URL}/v2/DriverDeAssign`, {
       method: "POST",
@@ -1295,10 +1285,10 @@ export async function postDriverDeDataAssignByClientId({
       throw new Error("Failed to fetch data from the API");
     }
     const data = await response.json();
-    
+
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1326,7 +1316,7 @@ export async function GetDriverDataByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1355,7 +1345,7 @@ export async function GetRfIdByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1384,7 +1374,7 @@ export async function onAssignRfid({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1412,7 +1402,7 @@ export async function GetDriverDataAssignByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1440,7 +1430,7 @@ export async function GetDriverforvehicel({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1468,7 +1458,7 @@ export async function ZoneFindById({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1498,7 +1488,7 @@ export async function alertSettingCountZone({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1526,7 +1516,7 @@ export async function zoneRuleDeleteByZoneId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1557,7 +1547,7 @@ export async function zonevehicleByZoneId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1585,7 +1575,7 @@ export async function modifyCollectionStatus({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1597,7 +1587,7 @@ export async function getSearchAddress({
   country: string;
 }) {
   try {
-   
+
     const response = await fetch(
       `${URL}/zoneaddresssearch?q=${query},${country}`,
       {
@@ -1617,9 +1607,9 @@ export async function getSearchAddress({
     const data = await response.json();
 
     return data;
-   
+
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1646,14 +1636,14 @@ export async function postZoneDataByClientId({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
 
 export async function zoneDelete({ token, id }: { token: any; id: string }) {
   try {
-    
+
     const response = await fetch(`${URL}/zoneDelete`, {
       headers: {
         accept: "application/json, text/plain, */*",
@@ -1669,7 +1659,7 @@ export async function zoneDelete({ token, id }: { token: any; id: string }) {
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1699,7 +1689,7 @@ export async function zonenamesearch({
     const data = await response.json();
     return data;
   } catch (error) {
-    
+
     return [];
   }
 }
@@ -1789,7 +1779,7 @@ export async function TripAddress({
     }
 
     const data = await response.json();
-    
+
     return data;
   } catch (error) {
     console.error("Error fetching data", error);
@@ -1899,22 +1889,22 @@ export async function sentSmsForCamera({
   vehicleId,
   clientId,
 }: {
-   token: string;
+  token: string;
   vehicleId: string;
   clientId: string;
 }) {
   try {
-    let payload  =  {
+    let payload = {
       vehicleId,
-  clientId,
+      clientId,
 
     }
-    
+
     const response = await fetch(`${URL}/commandSenddAdd`, {
       method: "POST",
       headers: {
         accept: "application/json, text/plain, */*",
-         authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
         "content-type": "application/json",
       },
       body: JSON.stringify(payload),

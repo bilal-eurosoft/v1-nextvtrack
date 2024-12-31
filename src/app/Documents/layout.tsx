@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "VTrack Documents",
-  description: "Documents",
+  description: "Manage Documents",
 };
 
 export default function RootLayout({

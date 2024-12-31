@@ -45,7 +45,9 @@ const COLORS = ["#8884d8", "#82ca9d", "#74c0fc", "#688ae8", "#c33d69", "#2ea597"
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Pie>
-                                    <Tooltip />
+                                    <Tooltip
+                                    formatter={(value, name, entry) => `${value} ${session?.unit}s`}
+                                    />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
@@ -80,8 +82,22 @@ const COLORS = ["#8884d8", "#82ca9d", "#74c0fc", "#688ae8", "#c33d69", "#2ea597"
                                     />
                                 </XAxis>
                                 <YAxis />
-                                <Tooltip />
-                                <Legend margin={{ top: 20, right: 0, left: 20, bottom: 0 }} />
+                                <Tooltip 
+                                cursor={{
+                                    fill: 'transparent'                                   
+                                }}                             
+                                />
+                                <Legend 
+                                wrapperStyle={{                                    
+                                    fontSize:"12px",
+                                    marginLeft:"-18%"
+                                }}                                
+                                margin={{ top: 20, right: 0, left: 20, bottom: 0 }} 
+                                layout="vertical" // Makes the legend vertical
+                                 
+                                //  align="left" // Aligns the legend to the right
+                                 verticalAlign="bottom"
+                                />
                                 <Bar stackId="monotone" dataKey="Harsh Acceleration" fill="#688ae8" barSize={20} />
                                 <Bar stackId="monotone" dataKey="Harsh Break" fill="#c33d69" barSize={20} />
                                 <Bar stackId="monotone" dataKey="Harsh Cornering" fill="#2ea597" barSize={20} />
