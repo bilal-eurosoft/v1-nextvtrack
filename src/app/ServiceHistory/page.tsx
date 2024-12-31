@@ -38,10 +38,10 @@ export default function Work() {
   const router = useRouter();
   const { data: session } = useSession();
 
-  /*  if (!session?.ServiceHistory) {
-     router.push("/liveTracking");
-   }
-   */
+  if (!session?.ServiceHistory) {
+    router.push("/liveTracking");
+  }
+
   // State to store the service data, modal visibility, pagination info, and form data
 
   //jo state is page pr rakhni hai wo yahan
@@ -165,7 +165,7 @@ export default function Work() {
             );
           }
         );
-      } catch (err) {}
+      } catch (err) { }
     }
     if (!isOnline) {
       socket.disconnect();
@@ -235,7 +235,7 @@ export default function Work() {
     }
   };
 
- 
+
   //card wali services hai
   const fetchServices = async () => {
     if (session) {
@@ -315,7 +315,7 @@ export default function Work() {
     loadsimpleServices();
   }, []);
 
-// console.log("singleVehicleDetail",singleVehicleDetail);
+  // console.log("singleVehicleDetail",singleVehicleDetail);
 
   // Fetch services on page load (or reload)
   //all table table service,maintenance, documentation
@@ -323,7 +323,7 @@ export default function Work() {
     const loadServices = async () => {
       try {
         const fetchedServices = await fetchServicesFromAPI();
-   
+
         setServices(fetchedServices)
         if (fetchedServices.length > 0) {
           setserviceHistory(fetchedServices);
@@ -377,9 +377,9 @@ export default function Work() {
       )
     );
 
-  //  setFilteredServices(filtered);
+    //  setFilteredServices(filtered);
     setActiveTab("services");
-  //  setCurrentPage(1);
+    //  setCurrentPage(1);
   };
 
   const hanldecancelVehicle = () => {
@@ -462,7 +462,7 @@ export default function Work() {
     initialServiceFormData
   );
 
-  
+
   const [filteredServices, setFilteredServices] = useState([]);
 
   return (
@@ -539,9 +539,8 @@ export default function Work() {
         <Toaster position="top-center" reverseOrder={false} />
 
         <div
-          className={`${
-            !selectedvehicle ? "grid grid-cols-12 gap-4 bg-white" : ""
-          }`}
+          className={`${!selectedvehicle ? "grid grid-cols-12 gap-4 bg-white" : ""
+            }`}
         >
           <div className={`px-8  ${!selectedvehicle ? "col-span-9" : ""}`}>
             {/* inner side of cards */}
@@ -552,11 +551,10 @@ export default function Work() {
                   {/* Services Tab */}
                   <button
                     onClick={() => setActiveTab("services")}
-                    className={`px-4 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${
-                      activeTab === "services"
+                    className={`px-4 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${activeTab === "services"
                         ? "bg-[#00B56C] text-white"
                         : "bg-transparent hover:bg-[#D1FAE5] "
-                    }`}
+                      }`}
                   >
                     <span className="service-icon">
                       <FaCogs className="w-5 h-5" /> {/* Gears icon */}
@@ -566,11 +564,10 @@ export default function Work() {
 
                   <button
                     onClick={() => setActiveTab("maintenance")}
-                    className={`px-4 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${
-                      activeTab === "maintenance"
+                    className={`px-4 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${activeTab === "maintenance"
                         ? "bg-[#00B56C] text-white"
                         : "bg-transparent hover:bg-[#D1FAE5]"
-                    }`}
+                      }`}
                   >
                     {/* Icon for maintenance with rotated arrow */}
                     <svg
@@ -585,9 +582,8 @@ export default function Work() {
                     >
                       <g
                         transform="translate(0,512) scale(0.1,-0.1)"
-                        fill={`${
-                          activeTab === "maintenance" ? "white" : "black"
-                        }`}
+                        fill={`${activeTab === "maintenance" ? "white" : "black"
+                          }`}
                         stroke="none"
                       >
                         <path
@@ -623,77 +619,76 @@ export default function Work() {
                       setActiveTab("documentation");
                       setFormData({ ...formData, dataType: "Documentation" });
                     }}
-                    className={`px-4 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${
-                      activeTab === "documentation"
+                    className={`px-4 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${activeTab === "documentation"
                         ? "bg-[#00B56C] text-white"
                         : "bg-transparent hover:bg-[#D1FAE5]"
-                    }`}
+                      }`}
                   >
-                   
+
                     <svg
-  width="24px"
-  height="24px"
-  viewBox="0 0 24 24"
-  xmlns="http://www.w3.org/2000/svg"
-  fill="none"
-  stroke="#ffffff"
-  strokeWidth="2"
-  className="mr-2 w-6 h-6"
->
-  {/* Documentation Icon */}
-  <rect
-    x="5"
-    y="3"
-    width="14"
-    height="18"
-    stroke={
-        activeTab === "documentation" ? "white" : "black"
-      }
-    strokeWidth="2"
-    fill="none"
-  />
-  <line
-    x1="13"
-    y1="3"
-    x2="13"
-    y2="9"
-    stroke={
-        activeTab === "documentation" ? "white" : "black"
-      }
-    strokeWidth="2"
-  />
-  <line
-    x1="13"
-    y1="9"
-    x2="19"
-    y2="9"
-    stroke={
-        activeTab === "documentation" ? "white" : "black"
-      }
-    strokeWidth="2"
-  />
-</svg>
+                      width="24px"
+                      height="24px"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      stroke="#ffffff"
+                      strokeWidth="2"
+                      className="mr-2 w-6 h-6"
+                    >
+                      {/* Documentation Icon */}
+                      <rect
+                        x="5"
+                        y="3"
+                        width="14"
+                        height="18"
+                        stroke={
+                          activeTab === "documentation" ? "white" : "black"
+                        }
+                        strokeWidth="2"
+                        fill="none"
+                      />
+                      <line
+                        x1="13"
+                        y1="3"
+                        x2="13"
+                        y2="9"
+                        stroke={
+                          activeTab === "documentation" ? "white" : "black"
+                        }
+                        strokeWidth="2"
+                      />
+                      <line
+                        x1="13"
+                        y1="9"
+                        x2="19"
+                        y2="9"
+                        stroke={
+                          activeTab === "documentation" ? "white" : "black"
+                        }
+                        strokeWidth="2"
+                      />
+                    </svg>
 
                     Attach Documents
                   </button>
                 </div>
 
-                {activeTab === "documentation" && ( 
-<>
+                {activeTab === "documentation" && (
+                  <>
 
-<DocumentTab documentationdata={alldataofdocumentation} singleVehicleDetail={singleVehicleDetail}/>
+                    <DocumentTab documentationdata={alldataofdocumentation} singleVehicleDetail={singleVehicleDetail} />
 
-</>
+                  </>
                 )}
-                 {activeTab === "maintenance" && ( 
-<>
-<MaintenanceTab maintenancedata={alldataofmaintenance} singleVehicleDetail={singleVehicleDetail} />
-</>
+                {activeTab === "maintenance" && (
+                  <>
+                    <MaintenanceTab maintenancedata={alldataofmaintenance} singleVehicleDetail={singleVehicleDetail} />
+                  </>
                 )}
-                   {activeTab === "services" && ( 
-<>
-<ServiceTab servicedata={alldataofservices} singleVehicleDetail={singleVehicleDetail} />
-</>
+                {activeTab === "services" && (
+                  <>
+                    <ServiceTab servicedata={alldataofservices} singleVehicleDetail={singleVehicleDetail} />
+                  </>
                 )}
               </>
             )}
@@ -706,22 +701,20 @@ export default function Work() {
 
                 <button
                   onClick={() => setViewMode("card")}
-                  className={`px-8 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${
-                    viewMode === "card"
+                  className={`px-8 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${viewMode === "card"
                       ? "bg-[#00B56C] text-white"
                       : "bg-transparent hover:bg-[#D1FAE5]"
-                  }`}
+                    }`}
                 >
                   Vehicles
                 </button>
 
                 <button
                   onClick={() => setViewMode("table")}
-                  className={`px-8 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${
-                    viewMode === "table"
+                  className={`px-8 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${viewMode === "table"
                       ? "bg-[#00B56C] text-white"
                       : "bg-transparent hover:bg-[#D1FAE5] "
-                  }`}
+                    }`}
                 >
                   Services
                 </button>
@@ -773,10 +766,10 @@ export default function Work() {
                                 vehicle.vehicleStatus === "Parked"
                                   ? "#FF0000" // Red for parked
                                   : vehicle.vehicleStatus === "Moving"
-                                  ? "#00B56C" // Green for moving
-                                  : vehicle.vehicleStatus === "Pause"
-                                  ? "#eec40f" // Yellow for paused
-                                  : "#808080", // Gray for other statuses
+                                    ? "#00B56C" // Green for moving
+                                    : vehicle.vehicleStatus === "Pause"
+                                      ? "#eec40f" // Yellow for paused
+                                      : "#808080", // Gray for other statuses
                             }}
                           >
                             {/* Left side: Vehicle Reg and SVG */}
@@ -793,10 +786,10 @@ export default function Work() {
                                   vehicle.vehicleStatus === "Parked"
                                     ? "#FF0000" // Red for parked
                                     : vehicle.vehicleStatus === "Moving"
-                                    ? "#00B56C" // Green for moving
-                                    : vehicle.vehicleStatus === "Pause"
-                                    ? "#eec40f" // Yellow for paused
-                                    : "#808080" // Gray for other statuses
+                                      ? "#00B56C" // Green for moving
+                                      : vehicle.vehicleStatus === "Pause"
+                                        ? "#eec40f" // Yellow for paused
+                                        : "#808080" // Gray for other statuses
                                 }
                                 viewBox="0 0 15 15"
                                 className="w-12 h-12"
@@ -956,9 +949,8 @@ export default function Work() {
             {modalOpenNew && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div
-                  className={`bg-white p-6 rounded-lg ${
-                    activeTab == "documentation" ? "w-[45rem]" : "w-96"
-                  }`}
+                  className={`bg-white p-6 rounded-lg ${activeTab == "documentation" ? "w-[45rem]" : "w-96"
+                    }`}
                 >
                   <h3 className="text-xl font-bold mb-4 text-center">
                     Add service 1
@@ -1032,7 +1024,7 @@ export default function Work() {
                     <div className="text-center">
                       <p className="text-4xl font-bold text-red">
                         {
-                          services.filter(
+                          services?.filter(
                             (item) =>
                               item.dataType === "Service" &&
                               item.status == "due"
@@ -1044,7 +1036,7 @@ export default function Work() {
                     <div className="text-center">
                       <p className="text-4xl font-bold text-yellow">
                         {
-                          services.filter(
+                          services?.filter(
                             (item) =>
                               item.dataType === "Service" &&
                               item.status == "due soon"

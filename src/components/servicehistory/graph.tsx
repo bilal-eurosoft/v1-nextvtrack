@@ -83,11 +83,11 @@ const COLORS = ["#8884d8", "#82ca9d", "#74c0fc", "#688ae8", "#c33d69", "#2ea597"
                                 </XAxis>
                                 <YAxis />
                                 <Tooltip 
-                                cursor={{
+                                 cursor={{
                                     fill: 'transparent'                                   
                                 }}                             
                                 />
-                                <Legend 
+                            <Legend 
                                 wrapperStyle={{                                    
                                     fontSize:"12px",
                                     marginLeft:"-18%"
