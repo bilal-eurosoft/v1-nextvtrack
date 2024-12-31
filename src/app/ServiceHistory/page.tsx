@@ -107,7 +107,8 @@ export default function Work() {
             })
           );
           setbardata(
-            uniqueData.map((item) => {
+            uniqueData.filter((i)=>i.tripcount!=0)
+            .map((item) => {
               return {
                 name: item.vehicleReg,
                 tripcount: Number(item?.tripcount) || 0,

@@ -13,7 +13,15 @@ export default function Dashboard({piedata,linedata,bardata}:any) {
     }
 const COLORS = ["#8884d8", "#82ca9d", "#74c0fc", "#688ae8", "#c33d69", "#2ea597"];
    
-   
+const [activeIndex, setActiveIndex] = useState(null);
+
+const handleMouseEnter = (index) => {
+    setActiveIndex(index);
+};
+
+const handleMouseLeave = () => {
+    setActiveIndex(null);
+};
     return (
         <>
         <div className="rounded-md    p-4"> 
@@ -36,7 +44,7 @@ const COLORS = ["#8884d8", "#82ca9d", "#74c0fc", "#688ae8", "#c33d69", "#2ea597"
                                         data={piedata}
                                         cx="50%"
                                         cy="50%"
-                                        outerRadius={80}
+                                        outerRadius={120}
                                         fill="#8884d8"
                                         dataKey="distance"
                                     // label
@@ -98,9 +106,54 @@ const COLORS = ["#8884d8", "#82ca9d", "#74c0fc", "#688ae8", "#c33d69", "#2ea597"
                                 //  align="left" // Aligns the legend to the right
                                  verticalAlign="bottom"
                                 />
-                                <Bar stackId="monotone" dataKey="Harsh Acceleration" fill="#688ae8" barSize={20} />
-                                <Bar stackId="monotone" dataKey="Harsh Break" fill="#c33d69" barSize={20} />
-                                <Bar stackId="monotone" dataKey="Harsh Cornering" fill="#2ea597" barSize={20} />
+                                <Bar stackId="monotone" dataKey="Harsh Acceleration" fill="#688ae8" barSize={20} >
+                                
+                                
+                                {linedata.map((entry, index) => (
+                        <Cell
+                            key={`cell-${index}`}
+                            fill="#688ae8"
+                            z-index={1}
+                            transform={
+                                index === activeIndex
+                                    ? "scale(1.01)" // Increase the size when hovered
+                                    : "scale(1)"
+                            }
+                            onMouseEnter={() => handleMouseEnter(index)}
+                            onMouseLeave={handleMouseLeave}
+                        />
+                    ))}
+                                </Bar>
+                                <Bar stackId="monotone" dataKey="Harsh Break" fill="#c33d69" barSize={20} > {linedata.map((entry, index) => (
+                        <Cell
+                            key={`cell-${index}`}
+                            fill="#c33d69"
+                            z-index={1}
+                            transform={
+                                index === activeIndex
+                                    ? "scale(1.01)" // Increase the size when hovered
+                                    : "scale(1)"
+                            }
+                            onMouseEnter={() => handleMouseEnter(index)}
+                            onMouseLeave={handleMouseLeave}
+                        />
+                    ))}
+                                </Bar>
+                                <Bar stackId="monotone" dataKey="Harsh Cornering" fill="#2ea597" barSize={20} > {linedata.map((entry, index) => (
+                        <Cell
+                            key={`cell-${index}`}
+                            fill="#2ea597"
+                            z-index={1}
+                            transform={
+                                index === activeIndex
+                                    ? "scale(1.01)" // Increase the size when hovered
+                                    : "scale(1)"
+                            }
+                            onMouseEnter={() => handleMouseEnter(index)}
+                            onMouseLeave={handleMouseLeave}
+                        />
+                    ))}
+                                </Bar>
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -115,7 +168,9 @@ const COLORS = ["#8884d8", "#82ca9d", "#74c0fc", "#688ae8", "#c33d69", "#2ea597"
                         <ResponsiveContainer width="90%" height={300}>
                             <BarChart data={bardata} barSize={20}
                             >
-                                <Tooltip />
+                                <Tooltip cursor={{
+                                    fill: 'transparent'                                   
+                                }} />
                                 <XAxis
                                     dataKey="name"
                                     tick={false}
@@ -125,7 +180,22 @@ const COLORS = ["#8884d8", "#82ca9d", "#74c0fc", "#688ae8", "#c33d69", "#2ea597"
                                     />
                                 </XAxis>
                                 <YAxis />
-                                <Bar dataKey="tripcount" fill="#8884d8" />
+                                <Bar dataKey="tripcount" fill="#8884d8" >
+                                {bardata.map((entry, index) => (
+                        <Cell
+                            key={`cell-${index}`}
+                            fill="#8884d8"
+                            z-index={ 1}
+                            transform={
+                                index === activeIndex
+                                    ? "scale(1.01)" // Increase the size when hovered
+                                    : "scale(1)"
+                            }
+                            onMouseEnter={() => handleMouseEnter(index)}
+                            onMouseLeave={handleMouseLeave}
+                        />
+                    ))}
+                                </Bar>
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

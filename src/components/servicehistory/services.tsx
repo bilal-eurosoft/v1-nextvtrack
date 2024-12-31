@@ -634,7 +634,7 @@ id: serviceFormData.id,
                           value: doc._id,  // Use _id as the value
                           ...doc, // Keep other properties for later use
                         }))}
-                        placeholder="Select Document"
+                        placeholder="Select Service"
                         isClearable
                         isSearchable
                         noOptionsMessage={() => 'No options available'}
