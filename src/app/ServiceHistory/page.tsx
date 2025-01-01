@@ -3,29 +3,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { FaRegFileAlt, FaWrench, FaArrowRight } from "react-icons/fa"; // Example ico
+import { FaRegFileAlt, FaWrench } from "react-icons/fa"; // Example ico
 import {
-  getVehicleDataByClientIdForOdometer,
   handleServiceHistoryRequest,
   vehicleListByClientId,
   handleServicesRequest,
   getVehicleDataByClientId,
   getevents,
-  getDocuments,
-  addDocument,
 } from "@/utils/API_CALLS";
-import Select from "react-select";
 import { DeviceAttach } from "@/types/vehiclelistreports";
-import {
-  MuiPickersUtilsProvider,
-  DatePicker,
-  TimePicker,
-} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
-import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
 import "./assign.css";
 import Graph from "@/components/servicehistory/graph"; // Import the time icon
-import AccessTimeIcon from "@mui/icons-material/AccessTime"; // Import the time icon
 // Assuming there's an API service to get the service data
 import { FaCogs } from "react-icons/fa";
 import { socket } from "@/utils/socket";
@@ -46,20 +34,20 @@ export default function Work() {
 
   //jo state is page pr rakhni hai wo yahan
 
-  const carData = useRef<VehicleData[]>([]);
+
   const [isOnline, setIsOnline] = useState(false);
   const [piedata, setpiedata] = useState([]);
   const [bardata, setbardata] = useState([]);
   const [linedata, setlinedata] = useState([]);
   const [socketdata, setsocketdata] = useState<VehicleData[]>([]);
 
-  const [vehicles, setVehicles] = useState<any[]>([]);
+  // const [vehicles, setVehicles] = useState<any[]>([]);
   const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
 
   const [selectedvehicle, setselectedvehicle] = useState();
   const [singleVehicleDetail, setsingleVehicleDetail] = useState([]);
 
-  const [serviceHistory, setserviceHistory] = useState<any[]>([]);
+  // const [serviceHistory, setserviceHistory] = useState<any[]>([]);
 
   const [alldataofservices, setalldataofservices] = useState<any[]>([]);
   const [alldataofmaintenance, setalldataofmaintenance] = useState<any[]>([]);
@@ -96,8 +84,22 @@ export default function Work() {
             clientVehicleData?.data?.Value
           )?.cacheList;
           let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
-          carData.current = uniqueData;
-          setsocketdata(uniqueData);
+
+
+          setsocketdata([...uniqueData, ...vehicleList].reduce((acc, curr) => {
+            const existing = acc.find(item => item.vehicleReg === curr.vehicleReg);
+
+            if (existing) {
+              // Update the existing entry with the maximum values
+              existing.service = Math.max(existing.service, curr.service);
+              existing.document = Math.max(existing.document, curr.document);
+            } else {
+              // Add a new entry if it doesn't exist
+              acc.push({ ...curr });
+            }
+
+            return acc;
+          }, []));
           setpiedata(
             uniqueData.map((item) => {
               return {
@@ -107,19 +109,19 @@ export default function Work() {
             })
           );
           setbardata(
-            uniqueData.filter((i)=>i.tripcount!=0)
-            .map((item) => {
-              return {
-                name: item.vehicleReg,
-                tripcount: Number(item?.tripcount) || 0,
-              };
-            })
+            uniqueData.filter((i) => { return i.tripcount != 0 })
+              .map((item) => {
+                return {
+                  name: item.vehicleReg,
+                  tripcount: Number(item?.tripcount) || 0,
+                };
+              })
           );
         }
       }
     }
     dataFetchHandler();
-  }, [isFirstTimeFetchedFromGraphQL]);
+  }, [isFirstTimeFetchedFromGraphQL, vehicleList]);
   const fetchTimeoutGraphQL = 60 * 1000; //60 seconds
   useEffect(() => {
     setIsOnline(navigator.onLine);
@@ -132,6 +134,13 @@ export default function Work() {
       clearInterval(interval); // Clean up the interval on component unmount
     };
   }, [isOnline, session?.clientId]);
+  useEffect(() => {
+    
+    if (activeTab == null) {
+
+      vehicleListData()
+    }
+  }, [activeTab])
   useEffect(() => {
     if (isOnline && session?.clientId) {
       try {
@@ -147,7 +156,7 @@ export default function Work() {
             const uniqueData = uniqueDataByIMEIAndLatestTimestamp(
               data?.cacheList
             );
-            carData.current = uniqueData;
+
             setpiedata(
               uniqueData.map((item) => {
                 return {
@@ -201,22 +210,16 @@ export default function Work() {
   {
     /* vehciles ki list */
   }
+  const vehicleListData = async () => {
+    if (session) {
+      const Data = await vehicleListByClientId({
+        token: session.accessToken,
+        clientId: session?.clientId,
+      });
+      setVehicleList(Data.data);
+    }
+  };
   useEffect(() => {
-    const vehicleListData = async () => {
-      if (session) {
-        const Data = await vehicleListByClientId({
-          token: session.accessToken,
-          clientId: session?.clientId,
-        });
-
-        setVehicleList(Data.data);
-        const vehicleOptions = Data.data.map((vehicle: any) => ({
-          value: vehicle.vehicleReg, // Assuming `vehicleReg` is the unique identifier
-          label: vehicle.vehicleReg, // Or any field you'd like to display as label
-        }));
-        setVehicles(vehicleOptions);
-      }
-    };
     vehicleListData();
   }, []);
 
@@ -316,7 +319,7 @@ export default function Work() {
     loadsimpleServices();
   }, []);
 
-  // console.log("singleVehicleDetail",singleVehicleDetail);
+  
 
   // Fetch services on page load (or reload)
   //all table table service,maintenance, documentation
@@ -327,22 +330,26 @@ export default function Work() {
 
         setServices(fetchedServices)
         if (fetchedServices.length > 0) {
-          setserviceHistory(fetchedServices);
-          fetchedServices.forEach((service: any) => {
-            if (service.dataType === 'Documentation') {
-              setalldataofdocumentation((prevData) => [...prevData, service]);
-            } else if (service.dataType === 'Maintenance') {
-              setalldataofmaintenance((prevData) => [...prevData, service]);
-            } else {
-              setalldataofservices((prevData) => [...prevData, service]);
-            }
-          });
+          // setserviceHistory(fetchedServices);
+          setalldataofdocumentation(fetchedServices.filter((i) => { return i.dataType === 'Documentation' }))
+          setalldataofmaintenance(fetchedServices.filter((i) => { return i.dataType === 'Maintenance' }))
 
-        } else {
+          setalldataofservices(fetchedServices.filter((i) => { return i.dataType === 'Service' }))
+
+          // fetchedServices.forEach((service: any) => {
+          //   if (service.dataType === 'Documentation') {
+          //     setalldataofdocumentation((prevData) => [...prevData, service]);
+          //   } else if (service.dataType === 'Maintenance') {
+          //     setalldataofmaintenance((prevData) => [...prevData, service]);
+          //   } else {
+          //     setalldataofservices((prevData) => [...prevData, service]);
+          //   }
+          // });
+
         }
       } catch (error) {
         toast.error("Failed to load services.");
-        setserviceHistory([]); // In case of error, set to empty
+        // setserviceHistory([]); // In case of error, set to empty
       }
     };
     loadServices();
@@ -369,50 +376,40 @@ export default function Work() {
   const handleCardClick = (e) => {
     setselectedvehicle(e);
     const vehicle = vehicleList.filter((item) => item.vehicleReg == e);
-
     setsingleVehicleDetail(vehicle);
-    const query = e.toLowerCase();
-    const filtered = filteredServices.filter((item) =>
-      Object.values(item).some(
-        (value) => value && value.toString().toLowerCase().includes(query)
-      )
-    );
-
-    //  setFilteredServices(filtered);
     setActiveTab("services");
-    //  setCurrentPage(1);
   };
 
   const hanldecancelVehicle = () => {
-    setFilteredServices(services);
+    // setFilteredServices(services);
     setActiveTab(null);
     setselectedvehicle(null);
   };
 
-  const initialFormData: VehicleData = {
-    clientId: "",
-    vehicleId: "",
-    serviceTitle: "",
-    reminderDay: 0,
-    reminderMilage: 0,
-    expiryDay: 0,
-    expiryMilage: 0,
-    lastMilage: 0,
-    lastDate: "",
-    expiryDate: "",
-    dataType: "",
-    maintenanceType: "",
-    file: "",
-    filename: "",
-    documentType: "",
-    issueDate: "",
-    sms: false,
-    email: false,
-    pushnotification: false,
-    status: "",
-    documents: [],
-  };
-  const [formData, setFormData] = useState<VehicleData>(initialFormData);
+  // const initialFormData: VehicleData = {
+  //   clientId: "",
+  //   vehicleId: "",
+  //   serviceTitle: "",
+  //   reminderDay: 0,
+  //   reminderMilage: 0,
+  //   expiryDay: 0,
+  //   expiryMilage: 0,
+  //   lastMilage: 0,
+  //   lastDate: "",
+  //   expiryDate: "",
+  //   dataType: "",
+  //   maintenanceType: "",
+  //   file: "",
+  //   filename: "",
+  //   documentType: "",
+  //   issueDate: "",
+  //   sms: false,
+  //   email: false,
+  //   pushnotification: false,
+  //   status: "",
+  //   documents: [],
+  // };
+  // const [formData, setFormData] = useState<VehicleData>(initialFormData);
 
   interface VehicleData {
     clientId: string;
@@ -437,34 +434,34 @@ export default function Work() {
     documents: Array;
   }
 
-  const initialServiceFormData: VehicleData = {
-    clientId: "",
-    vehicleId: "",
-    serviceTitle: "",
-    reminderDay: 0,
-    reminderMilage: 0,
-    expiryDay: 0,
-    expiryMilage: 0,
-    lastMilage: 0,
-    lastDate: "",
-    dataType: "",
-    sms: false,
-    email: false,
-    pushnotification: false,
-    isExpiryDateSelected: false,
-    isExpiryMileageSelected: false,
-    isReminderDateSelected: false,
-    isReminderMileageSelected: false,
-    isLastDateSelected: false,
-    isLastMileageSelected: false,
-    documents: [],
-  };
-  const [serviceFormData, setServiceFormData] = useState<VehicleData>(
-    initialServiceFormData
-  );
+  // const initialServiceFormData: VehicleData = {
+  //   clientId: "",
+  //   vehicleId: "",
+  //   serviceTitle: "",
+  //   reminderDay: 0,
+  //   reminderMilage: 0,
+  //   expiryDay: 0,
+  //   expiryMilage: 0,
+  //   lastMilage: 0,
+  //   lastDate: "",
+  //   dataType: "",
+  //   sms: false,
+  //   email: false,
+  //   pushnotification: false,
+  //   isExpiryDateSelected: false,
+  //   isExpiryMileageSelected: false,
+  //   isReminderDateSelected: false,
+  //   isReminderMileageSelected: false,
+  //   isLastDateSelected: false,
+  //   isLastMileageSelected: false,
+  //   documents: [],
+  // };
+  // const [serviceFormData, setServiceFormData] = useState<VehicleData>(
+  //   initialServiceFormData
+  // );
 
 
-  const [filteredServices, setFilteredServices] = useState([]);
+  // const [filteredServices, setFilteredServices] = useState([]);
 
   return (
     <>
@@ -553,8 +550,8 @@ export default function Work() {
                   <button
                     onClick={() => setActiveTab("services")}
                     className={`px-4 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${activeTab === "services"
-                        ? "bg-[#00B56C] text-white"
-                        : "bg-transparent hover:bg-[#D1FAE5] "
+                      ? "bg-[#00B56C] text-white"
+                      : "bg-transparent hover:bg-[#D1FAE5] "
                       }`}
                   >
                     <span className="service-icon">
@@ -566,8 +563,8 @@ export default function Work() {
                   <button
                     onClick={() => setActiveTab("maintenance")}
                     className={`px-4 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${activeTab === "maintenance"
-                        ? "bg-[#00B56C] text-white"
-                        : "bg-transparent hover:bg-[#D1FAE5]"
+                      ? "bg-[#00B56C] text-white"
+                      : "bg-transparent hover:bg-[#D1FAE5]"
                       }`}
                   >
                     {/* Icon for maintenance with rotated arrow */}
@@ -618,11 +615,11 @@ export default function Work() {
                   <button
                     onClick={() => {
                       setActiveTab("documentation");
-                      setFormData({ ...formData, dataType: "Documentation" });
+                      // setFormData({ ...formData, dataType: "Documentation" });
                     }}
                     className={`px-4 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${activeTab === "documentation"
-                        ? "bg-[#00B56C] text-white"
-                        : "bg-transparent hover:bg-[#D1FAE5]"
+                      ? "bg-[#00B56C] text-white"
+                      : "bg-transparent hover:bg-[#D1FAE5]"
                       }`}
                   >
 
@@ -703,8 +700,8 @@ export default function Work() {
                 <button
                   onClick={() => setViewMode("card")}
                   className={`px-8 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${viewMode === "card"
-                      ? "bg-[#00B56C] text-white"
-                      : "bg-transparent hover:bg-[#D1FAE5]"
+                    ? "bg-[#00B56C] text-white"
+                    : "bg-transparent hover:bg-[#D1FAE5]"
                     }`}
                 >
                   Vehicles
@@ -713,8 +710,8 @@ export default function Work() {
                 <button
                   onClick={() => setViewMode("table")}
                   className={`px-8 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${viewMode === "table"
-                      ? "bg-[#00B56C] text-white"
-                      : "bg-transparent hover:bg-[#D1FAE5] "
+                    ? "bg-[#00B56C] text-white"
+                    : "bg-transparent hover:bg-[#D1FAE5] "
                     }`}
                 >
                   Services
@@ -988,12 +985,7 @@ export default function Work() {
                         onClick={() => {
                           setModalOpenNew(false);
                           setsimpleservicesForm(initialsimpleservicesForm);
-                          /*  setModalOpen(false); // Close the modal
-                 seteditModal(false);
-                 setTimeValue(null)
-                 setFile(null)
-                 setFormData(initialFormData); // Reset form data to initial state
-                 setselectedserviceDocuments([]) */
+
                         }}
                         className="bg-[#E53E3E] text-white px-4 py-2 rounded-lg"
                       >

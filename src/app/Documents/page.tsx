@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react'
-import { MuiPickersUtilsProvider, DatePicker, TimePicker } from "@material-ui/pickers";
+import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
 import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
 import { addDocument, deleteDocuments, editDocuments, getDocuments } from '@/utils/API_CALLS';
@@ -284,8 +284,12 @@ function Documents() {
 
                       <td className="px-2 py-1 text-left">
                         <div className="flex gap-2 justify-start">
+                          {/* Eye icon */}
                           <svg
-                            onClick={() => openUpdateModal(document)}
+                            onClick={() => 
+                              window.open(document.file, "_blank") // Opens the file in a new tab
+                              
+                            }
                             className="w-6 h-6 text-blue-600 cursor-pointer hover:shadow-lg"
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"

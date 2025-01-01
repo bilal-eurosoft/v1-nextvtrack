@@ -110,8 +110,6 @@ export default function Maintenance({maintenancedata, singleVehicleDetail}:any) 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-      console.log("payload",formData);
       if(formData.id == ""){
         const Data = await handleServiceHistoryRequest({
             token: session?.accessToken,
@@ -155,7 +153,7 @@ else {
     }
 
     const openUpdateModal = (service: any) => {
-       console.log("service", service);
+       
        
       //  setFormData(service);
       if(service.dataType === "Maintenance"){
@@ -174,7 +172,7 @@ else {
     }
 
     const handledelete = async (id) =>{
-        console.log("id",id);
+        
               const Data = await handleServiceHistoryRequest({
                   token: session?.accessToken,
                   method: "DELETE",

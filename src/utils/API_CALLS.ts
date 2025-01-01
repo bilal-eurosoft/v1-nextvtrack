@@ -192,7 +192,40 @@ interface ApiRequestParams {
   method: ApiMethod;
   body?: Record<string, any>; // Optional for methods like GET
 }
-
+export async function handleServiceStatus({ token,
+  method,
+  body}:ApiRequestParams){
+    try {
+      // Set up the request headers
+      const headers = {
+        accept: "application/json, text/plain, */*",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      };
+      // Prepare the fetch options
+      const fetchOptions: RequestInit = {
+        method,
+        headers,
+        body : JSON.stringify(body)
+      };     
+      const response = await fetch(`${URL}/servicestatus`, fetchOptions);
+      // Handle non-2xx status codes
+      if (!response.ok) {
+        throw new Error(`Failed to fetch data from the API. Status: ${response.status}`);
+      }
+      // Parse JSON response body
+      const data = await response.json();
+      // For GET requests, we return the data (example: 'data' field is the key you want to extract)
+      if (method === 'GET') {
+        return data.data;
+      }
+      // For POST, PUT, DELETE, return the response data
+      return data;
+    } catch (error) {
+      console.error('Error occurred while fetching service history:', error);
+      return null; // Or you can return an empty array if preferred
+    }
+}
 export async function handleServiceHistoryRequest({
   token,
   method,
