@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "VTrack Notifications",
-  description: "Events and Notifications",
+  description: "Notifications",
 };
 
 export default function RootLayout({
