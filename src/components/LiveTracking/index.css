@@ -51,11 +51,11 @@ input[type="checkbox"]:hover {
 }
 
 .search_live_tracking {
-  height: 5vh;
+  height: 4vh;
 }
 
 .vehicle_summary {
-  height: 6vh;
+  height: 7vh;
 }
 
 .main_sider_bar {
@@ -111,7 +111,7 @@ input[type="checkbox"]:hover {
     overflow: hidden;
   }
   .search_live_tracking {
-    height: 7vh !important;
+    height: 6vh !important;
   }
   .main_map {
     grid-column: 3 span;
@@ -130,22 +130,22 @@ input[type="checkbox"]:hover {
 }
 @media (max-width: 1200px) and (min-width: 1050px) and (max-height: 900px) and (min-height: 300px) {
   .search_live_tracking {
-    height: 10vh;
+    height: 9vh;
   }
 }
 @media (max-width: 1049px) and (min-width: 900px) {
   .search_live_tracking {
-    height: 4vh !important;
+    height: 3vh !important;
   }
 }
 @media (max-width: 1049px) and (min-width: 900px) and (max-height: 900px) {
   .search_live_tracking {
-    height: 8vh !important;
+    height: 7vh !important;
   }
 }
 @media (max-width: 901px) and (min-width: 766px) {
   .search_live_tracking {
-    height: 5vh;
+    height: 4vh;
   }
 }
 @media (max-width: 768px) and (min-width: 643px) {
@@ -177,7 +177,7 @@ input[type="checkbox"]:hover {
 
 @media (max-width: 634px) and (min-width: 319px) {
   .vehicle_summary {
-    height: 7vh !important;
+    height: 8vh !important;
   }
   #btn_left_margin {
     display: flex;
@@ -187,7 +187,7 @@ input[type="checkbox"]:hover {
   .search_live_tracking {
     display: flex !important;
     align-items: center !important;
-    height: 7vh !important;
+    height: 6vh !important;
   }
   .main_sider_bar {
     height: 40vh;
@@ -197,10 +197,10 @@ input[type="checkbox"]:hover {
     overflow-y: scroll;
   }
   .search_live_tracking {
-    height: 6.7vh;
+    height: 5.7vh;
   }
   .vehicle_summary {
-    height: 7.5vh;
+    height: 8.5vh;
   }
   #maps {
     margin-top: -10%;
@@ -209,7 +209,7 @@ input[type="checkbox"]:hover {
 }
 @media (max-width: 320px) {
   .vehicle_summary {
-    height: 10vh !important;
+    height: 11vh !important;
   }
   #btn_left_margin {
     display: flex;
@@ -219,7 +219,7 @@ input[type="checkbox"]:hover {
   .search_live_tracking {
     display: flex !important;
     align-items: center !important;
-    height: 10vh !important;
+    height: 9vh !important;
   }
   .main_sider_bar {
     height: 40vh;
@@ -228,10 +228,10 @@ input[type="checkbox"]:hover {
     height: 30vh !important;
   }
   .search_live_tracking {
-    height: 6.7vh;
+    height: 5.7vh;
   }
   .vehicle_summary {
-    height: 7.5vh;
+    height: 8.5vh;
   }
   #maps {
     height: 42vh;

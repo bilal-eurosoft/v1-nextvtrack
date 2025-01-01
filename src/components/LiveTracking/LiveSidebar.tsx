@@ -76,7 +76,7 @@ const LiveSidebar = ({
   setShowZones: any;
   // setSelectedOdoVehicle:any;
   // selectedOdoVehicle:any;
-  setPosition:any;
+  setPosition: any;
 
 
 }) => {
@@ -452,8 +452,8 @@ const LiveSidebar = ({
       <div
         className={
           fullparams == "full"
-            ? "grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3"
-            : "grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3 search_live_tracking"
+            ? "grid grid-cols-12 bg-white py-2  lg:gap-0 gap-3"
+            : "grid grid-cols-12 bg-white lg:gap-0 gap-3 search_live_tracking"
         }
       >
         <div className="lg:col-span-7 w-full  md:col-span-5 sm:col-span-5 col-span-6 sticky top-0 search_vehicle_live_tracking">
@@ -493,66 +493,8 @@ const LiveSidebar = ({
           </button>
         </div>
       </div>
-      {/* <div className="grid grid-cols-2  md:pb-8 text-center border-y-2  border-green bg-zoneTabelBg py-4 text-white vehicle_summary">
-        <div className="lg:col-span-1 w-full">
-          <p className="text-md mt-1 text-black font-popins font-semibold">
-            Vehicle Summary:
-          </p>
-        </div>
-        <div className="lg:col-span-1">
-          <div className="grid grid-cols-10">
-            <div className="lg:col-span-1">
-              <svg
-                className="h-6 w-3 text-black mr-2"
-                viewBox="0 0 24 24"
-                fill="green"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinejoin="round"
-              >
-                {" "}
-                <circle cx="12" cy="12" r="10" />
-              </svg>
-            </div>
-            <div className="lg:col-span-1 text-black font-popins font-bold">{`${countMoving}`}</div>
-            <div className="lg:col-span-1"></div>
-            <div className="lg:col-span-1">
-              <svg
-                className="h-6 w-3 text-black mr-2"
-                viewBox="0 0 24 24"
-                fill="yellow"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinejoin="round"
-              >
-                {" "}
-                <circle cx="12" cy="12" r="10" />
-              </svg>
-            </div>
-            <div className="lg:col-span-1 text-black font-popins font-bold">{`${countPause}`}</div>
-            <div className="lg:col-span-1"></div>
-            <div className="lg:col-span-1">
-              <svg
-                className="h-6 w-3 text-black mr-2"
-                viewBox="0 0 24 24"
-                fill="#CF000F"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinejoin="round"
-              >
-                {" "}
-                <circle cx="12" cy="12" r="10" />
-              </svg>
-            </div>
-            <div className="lg:col-span-1 text-black font-popins font-bold">{`${countParked}`}</div>
-          </div>
-        </div>
-      </div> */}
-      <div className="pb-[3px] bg-zoneTabelBg border-y-2 border-green text-white">
-        {/*  <div className="text-center">
-        <p className="text-xs font-popins font-semibold text-black ">Vehicle Summary:</p>
-      </div> */}
-
+     
+      <div className=" bg-zoneTabelBg border-y-2 border-green text-white vehicle_summary">
         <div className="grid grid-cols-4 text-center px-2">
           {data.map(({ label, color, count }, index) => (
             <div
@@ -586,9 +528,9 @@ const LiveSidebar = ({
 
 
               {/* Container with fixed height to prevent text movement */}
-              <div className="h-[4px] w-full mt-1">
+              <div className="w-full">
                 <div
-                  className={`h-[2px] w-full transition-all group-hover:bg-black`}
+                  className={`w-full transition-all group-hover:bg-black`}
                   style={{
                     backgroundColor: activeIndex === index ? color : "transparent", // Active color
                     height: activeIndex === index ? "4px" : "2px", // Thicker line for active
@@ -602,53 +544,7 @@ const LiveSidebar = ({
 
 
 
-        {/*  <div className="grid grid-cols-4  text-center">
-      <div className="flex items-center justify-center space-x-2">
-        <svg
-          className="h-2 w-2 text-blue"
-          viewBox="0 0 24 24"
-          fill="#3b82f6"
-        >
-          <circle cx="12" cy="12" r="10" />
-        </svg>
-        <span className="text-black font-bold text-sm">{`${countMoving + countPause + countParked}`}</span>
-      </div>
-      <div className="flex items-center justify-center space-x-2">
-          <svg
-            className="h-2 w-2 text-red"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <circle cx="12" cy="12" r="10" />
-          </svg>
-          <span className="text-black font-bold text-sm">{`${countParked}`}</span>
-        </div>
 
-        
-        <div className="flex items-center justify-center space-x-2">
-          <svg
-            className="h-2 w-2 text-green"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <circle cx="12" cy="12" r="10" />
-          </svg>
-          <span className="text-black font-bold text-sm">{`${countMoving}`}</span>
-        </div>
-
-        <div className="flex items-center justify-center space-x-2">
-          <svg
-            className="h-2 w-2 text-yellow"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <circle cx="12" cy="12" r="10" />
-          </svg>
-          <span className="text-black font-bold text-sm">{`${countPause}`}</span>
-        </div>
-
-      
-      </div> */}
       </div>
       <div
         className="overflow-y-scroll bg-zoneTabelBg"
