@@ -452,8 +452,8 @@ const LiveSidebar = ({
       <div
         className={
           fullparams == "full"
-            ? "grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3"
-            : "grid grid-cols-12 bg-white py-3  lg:gap-0 gap-3 pb-[4px]"
+            ? "grid grid-cols-12 bg-white py-2  lg:gap-0 gap-3"
+            : "grid grid-cols-12 bg-white lg:gap-0 gap-3 search_live_tracking"
         }
       >
         <div className="lg:col-span-7 w-full  md:col-span-5 sm:col-span-5 col-span-6 sticky top-0 search_vehicle_live_tracking">
@@ -494,7 +494,7 @@ const LiveSidebar = ({
         </div>
       </div>
      
-      <div className="pb-[3px] bg-zoneTabelBg border-y-2 border-green text-white">
+      <div className=" bg-zoneTabelBg border-y-2 border-green text-white vehicle_summary">
         <div className="grid grid-cols-4 text-center px-2">
           {data.map(({ label, color, count }, index) => (
             <div
@@ -528,9 +528,9 @@ const LiveSidebar = ({
 
 
               {/* Container with fixed height to prevent text movement */}
-              <div className="h-[4px] w-full mt-1">
+              <div className="w-full">
                 <div
-                  className={`h-[2px] w-full transition-all group-hover:bg-black`}
+                  className={`w-full transition-all group-hover:bg-black`}
                   style={{
                     backgroundColor: activeIndex === index ? color : "transparent", // Active color
                     height: activeIndex === index ? "4px" : "2px", // Thicker line for active
