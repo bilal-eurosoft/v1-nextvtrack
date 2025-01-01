@@ -39,10 +39,8 @@ import {
 } from "@material-tailwind/react";
 import "./layout.css";
 import BlinkingTime from "../General/BlinkingTime";
-import { stringify } from "querystring";
 import NotificationDropdown from "./notifications";
 import { socket } from "@/utils/socket";
-
 // const inter = Inter({ subsets: ["latin"] });
 // Example import statement
 const drawerWidth = 58;
@@ -206,7 +204,6 @@ export default function RootLayout({
 
     filterZoneIds();
   }, [zoneList]);
-
   const [loading, setLoading] = useState(false); // Loading state
 
   const BellButton = ({ toggleNotifications }) => {
@@ -359,7 +356,7 @@ export default function RootLayout({
         "notification",
         async (data) => {
 
-          toast(data.description)
+          toast(data.description, {position:"top-center"})
 
           setNotificationCount((prevCount) => prevCount + 1)
           if (data === null || data === undefined) {
@@ -1376,11 +1373,11 @@ export default function RootLayout({
                           placement="right"
                           content="Events and Notifications"
                         >
-                          <svg className={`w-20 h-14 py-3  text-white-10 dark:text-white ${pathname === "/Notifications"
+                          <svg className={`w-14 h-14 py-3  text-white-10 dark:text-white ${pathname === "/Notifications"
                             ? "border-r-2 border-#29303b -my-1"
                             : "border-y-1 border-b-2"
                             }`}
-                            viewBox="0 0 720 720"
+                            viewBox="0 0 710 720"
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="20"
@@ -1656,6 +1653,52 @@ export default function RootLayout({
 
                           </div>
                         )}
+                         {(session?.userRole == "SuperAdmin" ||
+                  session?.userRole == "Admin") && (
+                    <div>
+    {session?.ServiceHistory && (
+      <Link href="/Documents">
+      <Tooltip
+        className="bg-[#00B56C] text-white rounded shadow-lg"
+        placement="right"
+        content="Manage Documents"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg"
+          className={`py-2 text-white-10 dark:text-white ${pathname == "/Documents" ? "border-b-2 mr-[1.5px] border-green-500" : "border-b-2 border-white"}`}          
+
+          width="60px"
+          height="50px"
+          viewBox="0 0 482.14 482.14"
+          style={{
+            backgroundColor: pathname == "/Documents" ? "white" : "",  // White bg when active, black when not
+            borderRadius: "0",  // Ensure no rounding, so it stays as a square
+          }}
+        >
+          <g>
+            <path 
+              d="M302.599,0H108.966C80.66,0,57.652,23.025,57.652,51.315v379.509c0,28.289,23.008,51.315,51.314,51.315h264.205
+              c28.275,0,51.316-23.026,51.316-51.315V121.449L302.599,0z M373.171,450.698H108.966c-10.969,0-19.89-8.905-19.89-19.874V51.315
+              c0-10.953,8.921-19.858,19.89-19.858l181.875-0.189v67.218c0,19.653,15.949,35.603,35.588,35.603l65.877-0.189l0.725,296.925
+              C393.03,441.793,384.142,450.698,373.171,450.698z"
+              fill={pathname == "/Documents" ? "green" : "white"}
+            />
+            <path 
+              d="M241.054,150.96c-49.756,0-90.102,40.347-90.102,90.109c0,49.764,40.346,90.11,90.102,90.11
+              c49.771,0,90.117-40.347,90.117-90.11C331.171,191.307,290.825,150.96,241.054,150.96z M273.915,253.087h-20.838v20.835
+              c0,6.636-5.373,12.017-12.023,12.017c-6.619,0-12.01-5.382-12.01-12.017v-20.835H208.21c-6.637,0-12.012-5.383-12.012-12.018
+              c0-6.634,5.375-12.017,12.012-12.017h20.834v-20.835c0-6.636,5.391-12.018,12.01-12.018c6.65,0,12.023,5.382,12.023,12.018v20.835
+              h20.838c6.635,0,12.008,5.383,12.008,12.017C285.923,247.704,280.55,253.087,273.915,253.087z"
+              fill={pathname == "/Documents" ? "green" : "white"}
+            />
+          </g>
+        </svg>
+      </Tooltip>
+    </Link>
+                  )}
+
+
+                </div>
+              )}
                     </List>
                     <Divider />
                   </Drawer>

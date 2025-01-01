@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Table } from "antd";
 const moment = require("moment-timezone");
-
-import Select from "react-select";
 import {
   MuiPickersUtilsProvider, DatePicker
 } from "@material-ui/pickers";

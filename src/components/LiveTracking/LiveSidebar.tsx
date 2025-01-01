@@ -57,8 +57,8 @@ const LiveSidebar = ({
   setZoom,
   // setShowZonePopUp,
   setShowZones,
-  setSelectedOdoVehicle,
-  selectedOdoVehicle,
+  // setSelectedOdoVehicle,
+  // selectedOdoVehicle,
   setPosition,
 }: {
   carData: VehicleData[];
@@ -74,9 +74,9 @@ const LiveSidebar = ({
   setZoom: any;
   // setShowZonePopUp: any;
   setShowZones: any;
-  setSelectedOdoVehicle: any;
-  selectedOdoVehicle: any;
-  setPosition: any;
+  // setSelectedOdoVehicle:any;
+  // selectedOdoVehicle:any;
+  setPosition:any;
 
 
 }) => {
@@ -408,22 +408,22 @@ const LiveSidebar = ({
   // )} minutes, ${Math.abs(duration.seconds())} seconds`;
 
 
-  const handleodometer = (item: any, e: any) => {
+  // const handleodometer = (item: any, e: any) => {
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    if (selectedOdoVehicle?.vehicleReg == item.vehicleReg) {
-      setPosition({ top: 0, left: 0 });
-      setSelectedOdoVehicle(null)
-    }
-    else {
-      setSelectedOdoVehicle(item)
+  //   const rect = e.currentTarget.getBoundingClientRect();
+  //   if (selectedOdoVehicle?.vehicleReg == item.vehicleReg) {
+  //     setPosition({ top: 0, left: 0 });
+  //     setSelectedOdoVehicle(null)
+  //   }
+  //   else {
+  //     setSelectedOdoVehicle(item)
 
-      // setPosition({ top: e.clientY , left: e.clientX  });
-      setPosition({ top: rect.top, left: rect.left });
+  //     // setPosition({ top: e.clientY , left: e.clientX  });
+  //     setPosition({ top: rect.top, left: rect.left });
 
-    }
+  //   }
 
-  }
+  // }
 
   const toggleExpand = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);

@@ -1049,7 +1049,7 @@ export default function JourneyReplayComp() {
     } catch (error) {}
 
     setloadingMap(true);
-  };   
+  };
   useEffect(() => {
 
     if (TravelHistoryresponse && TravelHistoryresponse.length > 0) {

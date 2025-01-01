@@ -76,7 +76,7 @@ export default function DualCam() {
   const [progress, setProgress] = useState<number>(0);
   const [deviceCommandText, setDeviceCommandText] = useState<any>([]);
   const [servertoastId, setservertoastId] = useState<string | null>(null);
-  const [fetchdata, setfetchdata] = useState<Boolean>(false);
+  const [fetchdata, setfetchdata] = useState<Boolean>(false); 
 
   const [socketdata, setSocketdata] = useState({
     camera: 0,
@@ -669,7 +669,6 @@ export default function DualCam() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  //sonsole.log("windowWidth", windowWidth);
   const getImageStyles = () => {
     if (isFullScreen) {
       return {

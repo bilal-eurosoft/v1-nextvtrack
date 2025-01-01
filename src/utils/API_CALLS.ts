@@ -5,8 +5,8 @@ import { zonelistType } from "@/types/zoneType";
 import axios from "axios";
 import { immobiliserequest } from "@/types/immobiliserequest";
 import uniqueDataByIMEIAndLatestTimestamp from "./uniqueDataByIMEIAndLatestTimestamp";
-// var URL = "http://172.16.10.73:80"
-var URL = "https://backend.vtracksolutions.com";
+//  var URL = "http://172.16.10.73:80"
+var URL ="https://backend.vtracksolutions.com";
 
 export async function getVehicleDataByClientId(clientId: string) {
   try {
@@ -77,7 +77,7 @@ export async function getalluserview(userId: string, token: string) {
   }
 }
 
-export async function getallattributes(userId: string, token: string) {
+export async function getallattributes(token: string) {
   try {
     const response = await fetch(
       `${URL}/attributes`,
