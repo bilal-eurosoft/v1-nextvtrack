@@ -54,7 +54,25 @@ const handleMouseLeave = () => {
                                         ))}
                                     </Pie>
                                     <Tooltip
-                                    formatter={(value, name, entry) => `${value} ${session?.unit}s`}
+                                    separator=""
+                                    formatter={(value, name, entry) => 
+                                    (
+                                        <>
+                                        <br />
+                                        {value}{" "}
+                                        {session?.unit}s
+                                      </>
+                                    )
+                                        
+                                    }
+                                    wrapperStyle={{
+                                        
+                                        
+                                        fontSize:"12px",
+                                        lineHeight:1,
+                                        textAlign:"center"                                    
+                                    }}
+                                    
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
@@ -85,8 +103,10 @@ const handleMouseLeave = () => {
                                     tick={false}
                                     dataKey="name"
                                 >
-                                    <Label value="Vehicle Registration Number"
-                                        position={{ x: 325, y: 30 }}
+                                    <Label 
+                                    className="italic text-sm"
+                                    value="Hover to see vehicle registeration"
+                                        position={{ x: 250, y: 30 }}
                                     />
                                 </XAxis>
                                 <YAxis />
@@ -94,13 +114,21 @@ const handleMouseLeave = () => {
                                  cursor={{
                                     fill: 'transparent'                                   
                                 }}                             
+                                wrapperStyle={{
+                                    padding:0,
+                                    fontSize:"12px",
+                                    lineHeight:1,
+                                    textAlign:"center"
+                                }}
+                                
                                 />
+
                             <Legend 
                                 wrapperStyle={{                                    
                                     fontSize:"12px",
                                     marginLeft:"-18%"
                                 }}                                
-                                margin={{ top: 20, right: 0, left: 20, bottom: 0 }} 
+                                margin={{ top: 30, right: 0, left: 20, bottom: 0 }} 
                                 layout="vertical" // Makes the legend vertical
                                  
                                 //  align="left" // Aligns the legend to the right
@@ -170,13 +198,23 @@ const handleMouseLeave = () => {
                             >
                                 <Tooltip cursor={{
                                     fill: 'transparent'                                   
-                                }} />
+                                }} 
+                                wrapperStyle={{
+                                    padding:0,
+                                    fontSize:"12px",
+                                    lineHeight:1,
+                                    textAlign:"center"
+                                }}
+                                
+                                />
                                 <XAxis
                                     dataKey="name"
                                     tick={false}
                                 >
-                                    <Label value="Vehicle Registration Number"
-                                        position={{ x: 240, y: 30 }}
+                                    <Label 
+                                    className="italic text-sm"
+                                    value="Hover to see vehicle registeration"
+                                        position={{ x: 250, y: 30 }}
                                     />
                                 </XAxis>
                                 <YAxis />

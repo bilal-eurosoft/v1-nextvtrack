@@ -194,50 +194,35 @@ function Documents() {
       <p className="bg-green px-4 py-1 border-t  text-center text-2xl text-white font-bold journey_heading">
         Manage Documents
       </p>
-      <div className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-2
-         lg:px-4 text-start  bg-bgLight ">
-        <div
-          className="xl:col-span-8 lg:col-span-8 md:col-span-7 col-span-8"
-
-        >
-
-        </div>
-
-
-        <div
-          className="xl:col-span-2 lg:col-span-2 md:col-span-3 col-span-2"
-
-        ><button
-          onClick={() => {
-            setdocumentType("Add")
-            setModalOpen(true)
-          }}
-          className="
-        mt-[10px] ml-[10px] mb-[10px]  
+      <button
+        onClick={() => {
+          setdocumentType("Add")
+          setModalOpen(true)
+        }}
+        className="
+        mt-[10px]  mb-[10px]  ml-4
         px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 bg-[#00B56C] text-white hover:bg-[#028B4A] transition-all"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="20px"
+          height="20px"
+          fill="none"
+          stroke="#ffffff"
+          strokeWidth="2"
+          className="w-5 h-5"
         >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              width="20px"
-              height="20px"
-              fill="none"
-              stroke="#ffffff"
-              strokeWidth="2"
-              className="w-5 h-5"
-            >
-              <path
-                fill="none"
-                stroke="#ffffff"
-                strokeWidth="2"
-                d="M12 5v14M5 12h14"
-              />
-            </svg>
-            Upload Document
-          </button>
+          <path
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="2"
+            d="M12 5v14M5 12h14"
+          />
+        </svg>
+        Upload Document
+      </button>
 
-        </div>
-      </div>
 
 
       <div className="relative px-4">
@@ -286,9 +271,9 @@ function Documents() {
                         <div className="flex gap-2 justify-start">
                           {/* Eye icon */}
                           <svg
-                            onClick={() => 
+                            onClick={() =>
                               window.open(document.file, "_blank") // Opens the file in a new tab
-                              
+
                             }
                             className="w-6 h-6 text-blue-600 cursor-pointer hover:shadow-lg"
                             xmlns="http://www.w3.org/2000/svg"

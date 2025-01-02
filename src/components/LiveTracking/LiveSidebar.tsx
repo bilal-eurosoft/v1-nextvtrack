@@ -588,11 +588,13 @@ const LiveSidebar = ({
                             />
                           ) : <CountryFlag country={item.OsmElement?.address?.country} />
                           }
+                         {item?.vehicleStatus !="Parked"&&
                           <div className="lg:col-span-3 md:col-span-3 col-span-2 text-sm w-max">
                             <p className="w-max">
                               {item.gps.speedWithUnitDesc}
                             </p>
                           </div>
+                         }
                           {session?.timezone !== undefined ? (
                             <>
                               <ActiveStatus
