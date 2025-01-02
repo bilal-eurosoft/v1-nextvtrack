@@ -18,6 +18,13 @@ const [activeIndex, setActiveIndex] = useState(null);
 const handleMouseEnter = (index) => {
     setActiveIndex(index);
 };
+const [activeIndex2, setActiveIndex2] = useState(null);
+const handleMouseEnter2 = (index) => {
+    setActiveIndex2(index);
+};
+const handleMouseLeave2 = () => {
+    setActiveIndex2(null);
+};
 
 const handleMouseLeave = () => {
     setActiveIndex(null);
@@ -225,12 +232,12 @@ const handleMouseLeave = () => {
                             fill="#8884d8"
                             z-index={ 1}
                             transform={
-                                index === activeIndex
+                                index === activeIndex2
                                     ? "scale(1.01)" // Increase the size when hovered
                                     : "scale(1)"
                             }
-                            onMouseEnter={() => handleMouseEnter(index)}
-                            onMouseLeave={handleMouseLeave}
+                            onMouseEnter={() => handleMouseEnter2(index)}
+                            onMouseLeave={handleMouseLeave2}
                         />
                     ))}
                                 </Bar>

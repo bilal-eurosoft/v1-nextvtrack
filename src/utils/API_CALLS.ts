@@ -226,6 +226,55 @@ export async function handleServiceStatus({ token,
       return null; // Or you can return an empty array if preferred
     }
 }
+
+export async function addServiceHistory(payload: any, token: string,file) {
+  try {
+
+    const response = await fetch(
+      `${URL}/servicehistory`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+        body: file? payload:JSON.stringify(payload),
+        method: "POST", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+
+export async function renewServiceHistory(payload: any, token: string,file) {
+  try {
+
+    const response = await fetch(
+      `${URL}/servicehistory`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+        body: file? payload:JSON.stringify(payload),
+        method: "PUT", // Use lowercase 'get' for method
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return [];
+  }
+}
+
 export async function handleServiceHistoryRequest({
   token,
   method,
@@ -233,9 +282,10 @@ export async function handleServiceHistoryRequest({
 }: ApiRequestParams) {
   try {
     // Set up the request headers
+  
     const headers = {
       accept: "application/json, text/plain, */*",
-      authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
       "content-type": "application/json",
     };
     // Prepare the fetch options
@@ -245,7 +295,7 @@ export async function handleServiceHistoryRequest({
     };
     // Add body only for methods that need it (POST, PUT, DELETE)
     if (body && (method === 'POST' || method === 'PUT')) {
-      fetchOptions.body = JSON.stringify(body);
+       fetchOptions.body = JSON.stringify(body);
     }
     if (method === 'DELETE') {
       fetchOptions.body = JSON.stringify({ id: body });

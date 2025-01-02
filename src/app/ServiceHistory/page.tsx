@@ -665,7 +665,7 @@ export default function Work() {
                     />
                   </svg>
 
-                  Attach Documents
+                  Upload Documents
                 </button>
               </div>
 
