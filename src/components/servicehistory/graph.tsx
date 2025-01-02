@@ -113,7 +113,7 @@ const handleMouseLeave = () => {
                                     <Label 
                                     className="italic text-sm"
                                     value="Hover to see vehicle registeration"
-                                        position={{ x: 250, y: 30 }}
+                                        position={{ x: 290, y: 30 }}
                                     />
                                 </XAxis>
                                 <YAxis />
@@ -221,7 +221,7 @@ const handleMouseLeave = () => {
                                     <Label 
                                     className="italic text-sm"
                                     value="Hover to see vehicle registeration"
-                                        position={{ x: 250, y: 30 }}
+                                        position={{ x: 290, y: 30 }}
                                     />
                                 </XAxis>
                                 <YAxis />
