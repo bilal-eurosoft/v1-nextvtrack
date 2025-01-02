@@ -7,11 +7,12 @@ import Select from "react-select";
 import { MuiPickersUtilsProvider, DatePicker, TimePicker } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
 import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
-import { getDocuments, handleServiceHistoryRequest, handleServiceStatus } from "@/utils/API_CALLS";
+import { addServiceHistory, getDocuments, handleServiceHistoryRequest, handleServiceStatus, renewServiceHistory } from "@/utils/API_CALLS";
 import { format } from 'date-fns'; // Import format from date-fns
 
 export default function Document({ documentationdata, singleVehicleDetail }: any) {
   const { data: session } = useSession();
+  const [documentType, setdocumentType] = useState<String>()
 
   const [modalOpen, setModalOpen] = useState(false);
   const [EditmodalOpen, setEditmodalOpen] = useState(false);
@@ -30,21 +31,44 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
   const [confirmModalOpen, setconfirmModalOpen] = useState(false);
 
   const [fetchedDocumentsbyVehicle, setfetchedDocumentsbyVehicle] = useState([]);
-  const initialFormData = {
+ /*  const initialFormData = {
     id: "",
     sms: false,
     email: false,
     pushNotification: false,
-  }
+  } */
+    const initialFormData: any = {
+        id: "",
+        serviceTitle: "",
+        issueDate: "",
+        expiryDate: "",
+       
+      
+        clientId: "",
+        vehicleId: "",
+        sms: false,
+        email: false,
+        pushNotification: false,
+      };
+
   const [documentDataforupdate, setdocumentDataforupdate] = useState();
   const [formData, setFormData] = useState(initialFormData);
   const [dateforalert, setdateforalert] = useState({ id: null, date: null });
   const [loading, setLoading] = useState(true); // Initial loading state
+  const [file, setFile] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  
 
   useEffect(() => {
     const d = documentationdata.filter((item) => item.vehicleId === singleVehicleDetail[0]._id);
     setfetchedDocumentsbyVehicle(d);
     setLoading(false); // Data is loaded, set loading to false
+    
+    setFormData((prevData) => ({
+        ...prevData,
+        vehicleId: singleVehicleDetail[0]._id,
+      }));
+
   }, [documentationdata]);
 
   // Effect to fetch services from API
@@ -171,7 +195,110 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (EditmodalOpen) {
+   
+    if (!formData.serviceTitle) {
+        toast.error("Document title is missing", { position: "top-center" })
+        return
+      }
+     /*  if (error != "") {
+        toast.error(error, { position: "top-center" })
+        return
+      } */
+      if (documentType == "Update") {
+    
+       
+        const response = await handleServiceHistoryRequest({
+            token: session?.accessToken,
+            method: "PUT",
+            body: formData,
+          });
+    
+       //let response = await editDocuments(formData, session?.accessToken)
+        if (response?.success) {
+  
+          toast.success(response?.message, { position: "top-center" })
+        //  loadDocuments()
+        await loadServices()
+          setFormData(initialFormData)
+          setModalOpen(false)
+        } else {
+          toast.error(response?.message, { position: "top-center" })
+  
+        }
+      }
+      else if(documentType =="Renew"){
+       
+        if (!file) {
+            toast.error("Please upload an document", { position: "top-center" })
+    
+          }
+        
+          let data = new FormData()
+    
+          data.append("file", file)
+          data.append("clientId", formData?.clientId)
+          data.append("vehicleId", formData?.vehicleId)
+          data.append("serviceTitle", formData.serviceTitle)
+          data.append("issueDate", formData.issueDate)
+          data.append("expiryDate", formData.expiryDate)
+          data.append("pushNotification", formData.pushNotification)
+          data.append("sms", formData.sms)
+          data.append("email", formData.email)
+          data.append("id", formData.id)
+          data.append("dataType", "Documentation")
+          data.append("status", "renew")
+         
+          const response = await renewServiceHistory(data,session?.accessToken, file);
+  
+          if (response?.success) {
+    
+            toast.success(response?.message, { position: "top-center" })
+            await loadServices()
+        //    loadDocuments()
+            setFormData(initialFormData)
+            setModalOpen(false)
+          } else {
+            toast.error(response?.message, { position: "top-center" })
+    
+          }
+      }
+      
+      else {
+        if (!file) {
+          toast.error("Please upload an document", { position: "top-center" })
+  
+        }
+      
+        let data = new FormData()
+  
+        data.append("file", file)
+        data.append("clientId", session?.clientId)
+        data.append("vehicleId", formData?.vehicleId)
+        data.append("serviceTitle", formData.serviceTitle)
+        data.append("issueDate", formData.issueDate)
+        data.append("expiryDate", formData.expiryDate)
+        data.append("pushNotification", formData.pushNotification)
+        data.append("sms", formData.sms)
+        data.append("email", formData.email)
+        data.append("dataType", "Documentation")
+  
+        
+        const response = await addServiceHistory(data,session?.accessToken, file);
+
+        if (response?.success) {
+  
+          toast.success(response?.message, { position: "top-center" })
+          await loadServices()
+      //    loadDocuments()
+          setFormData(initialFormData)
+          setModalOpen(false)
+        } else {
+          toast.error(response?.message, { position: "top-center" })
+  
+        }
+      }
+
+  /*   if (EditmodalOpen) {
     
 
       const updatepayload = {
@@ -209,18 +336,18 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
         await loadServices()
       }
       return
-    }
+    } */
 
-    const documentData = selectedDocumentsForAttach.map(item => ({
+  /*   const documentData = selectedDocumentsForAttach.map(item => ({
       serviceTitle: item.title,
       file: item.file,
       filename: item.fileName,
       documentType: item.fileType,
       issueDate: item.issueDate,
       expiryDate: item.expiryDate
-    }));
+    })); */
 
-    const payload = {
+    /* const payload = {
 
       clientId: singleVehicleDetail[0].clientId,
       vehicleId: singleVehicleDetail[0]._id,
@@ -228,20 +355,20 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
       sms: formData.sms,
       email: formData.email,
       documents: documentData, dataType: "Documentation"
-    }
-    const Data = await handleServiceHistoryRequest({
+    } */
+    /* const Data = await handleServiceHistoryRequest({
       token: session?.accessToken,
       method: "POST",
       body: payload,
-    });
+    }); */
 
-    if (Data.success == true) {
+    /* if (Data.success == true) {
       toast.success(Data.message);
       setModalOpen(false);
       setEditmodalOpen(false)
       setFormData(initialFormData)
       await loadServices()
-    }
+    } */
 
   }
 
@@ -324,11 +451,55 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
   };
 
+  const handleInputChange = (e: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      serviceTitle: e.target.value, // Update state with formatted date or null
+    }));
+  }
+
+  const handleCreatedDateChange = (newDate) => {
+
+    const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
+
+    setFormData((prev) => ({
+      ...prev,
+      issueDate: formattedDate, // Update state with formatted date or null
+    }));
+  };
+  const handleExpiryDateChange = (newDate) => {
+
+    const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
+
+    setFormData((prev) => ({
+      ...prev,
+      expiryDate: formattedDate, // Update state with formatted date or null
+    }));
+  };
+
+
+  const handleFileChange = async (e) => {
+
+
+    const selectedFile = e.target.files[0];
+    setFile(e.target.files[0]);
+
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+    if (selectedFile && allowedTypes.includes(selectedFile.type)) {
+      setError('');
+    } else {
+      setError('Please upload a valid PDF, JPEG, or PNG file.');
+      setFile(null);
+    }
+  };
 
   return (
     <>
       <button
-        onClick={() => setModalOpen(true)}
+      onClick={() => {
+          setdocumentType("Add")
+          setModalOpen(true)
+        }}
         className="ml-auto mb-4 px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 bg-[#00B56C] text-white hover:bg-[#028B4A] transition-all"
       >
         <svg
@@ -348,7 +519,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
             d="M12 5v14M5 12h14"
           />
         </svg>
-        Attach Document
+        Upload Document
       </button>
 
       <div className="relative">
@@ -367,10 +538,10 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                     <th className="px-2 py-1 text-left">Document Title</th>
                     <th className="px-2 py-1 text-left">Issue Date</th>
                     <th className="px-2 py-1 text-left">Expiry Date</th>
-                    <th className="px-2 py-1 text-left">Documentation Type</th>
+                  {/*   <th className="px-2 py-1 text-left">Documentation Type</th> */}
                     <th className="px-2 py-1 text-left">When to Trigger Alert</th>
                     <th className="px-2 py-1 text-left">Status</th>
-                    <th className="px-2 py-1 text-left">Actions</th>
+                    <th className="px-2 pr-[45px] py-1 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -387,7 +558,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                         <td className="px-2 py-1">{service.serviceTitle}</td>
                         <td className="px-2 py-1">{service.issueDate}</td>
                         <td className="px-2 py-1">{service.expiryDate}</td>
-                        <td className="px-2 py-1">{service.documentType?.replace(/\/[^/]+$/, '')}</td>
+                  {/*       <td className="px-2 py-1">{service.documentType?.replace(/\/[^/]+$/, '')}</td> */}
                         <td className="px-2 py-1">
                           {/* Date picker component for alertTime */}
                           <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -421,8 +592,8 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                             />
                           </MuiPickersUtilsProvider>
                         </td>
-                        <td
-                          className={`px-2 py-1 ${service.status === "pending" ? "text-[#808080]" :
+                        <td className="px-2 py-1"
+                          /* className={`px-2 py-1 ${service.status === "pending" ? "text-[#808080]" :
                             service.status === "due soon" ? "text-[#FFA500]" :
                               service.status === "due" ? "text-[#FF0000]" :
                                 service.status === "renew" ? "text-[#008000]" : ""}`}
@@ -432,39 +603,93 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                               setdocumentDataforupdate(service);
                               setconfirmModalOpen(true);
                             }
-                          }}
+                          }} */
                         >
                           {service.status}
                         </td>
 
-                        <td className="px-2 py-1 text-left">
-                          <div className="flex gap-4 justify-start">
+                        <td className="px-2 py-1 pl-[15px] pr-0 text-center m-0 w-[200px]">
+                        <div className="flex justify-start gap-2 m-0 items-center">
+                            {/* view button */}
+{/* 
+                            <svg
+                            onClick={() =>
+                              window.open(service.file, "_blank") // Opens the file in a new tab
+
+                            }
+                            className="w-6 h-6 text-blue-600 cursor-pointer hover:shadow-lg"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            width="24"
+                            height="24"
+                          >
+                            <path
+                              fill="none"
+                              d="M0 0h24v24H0z"
+                            />
+                            <path
+                              d="M12 4.5C7.15 4.5 3.12 6.68 1.26 9.47c-.22.35-.22.76 0 1.1C3.12 17.32 7.15 19.5 12 19.5c4.85 0 8.88-2.18 10.74-4.97.22-.35.22-.76 0-1.1C20.88 6.68 16.85 4.5 12 4.5zm0 10.5c-2.49 0-4.5-1.5-4.5-3s2.01-3 4.5-3 4.5 1.5 4.5 3-2.01 3-4.5 3zm0-5c-.83 0-1.5.67-1.5 1.5S11.17 12 12 12s1.5-.67 1.5-1.5S12.83 9 12 9z"
+                            />
+                          </svg> */}
+ <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    xmlnsXlink="http://www.w3.org/1999/xlink" 
+    viewBox="0 0 32 32" 
+    xmlSpace="preserve"
+    width="23" 
+    height="23"
+    onClick={() =>
+        window.open(service.file, "_blank") // Opens the file in a new tab
+
+      }
+      className="cursor-pointer hover:shadow-lg"
+  >
+    <style type="text/css">
+      {`
+        .st0 {
+          fill: none;
+          stroke: #000000;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          stroke-miterlimit: 10;
+        }
+      `}
+    </style>
+    <path 
+      className="st0" 
+      d="M29,16c0,0-5.8,8-13,8S3,16,3,16s5.8-8,13-8S29,16,29,16z" 
+    />
+    <circle className="st0" cx="16" cy="16" r="4" />
+  </svg>
+
+
+
                             {/* Edit Icon */}
                             <svg
-                              className="w-6 h-6 text-green-600 cursor-pointer hover:shadow-lg"
+                              className="w-5 h-5 text-green-600 cursor-pointer hover:shadow-lg"
                               xmlns="http://www.w3.org/2000/svg"
                               viewBox="0 0 512.000000 512.000000"
                               preserveAspectRatio="xMidYMid meet"
                               onClick={() => {
                                 setModalOpen(true)
+                                setdocumentType("Update")
                                 setEditmodalOpen(true)
-                                let {
+                                setFormData((prev) => ({
+                                    ...prev,
+                              clientId: service.clientId,
+                              vehicleId: service.vehicleId,
 
-                                  sms,
-                                  email,
-                                  pushNotification,
+                                    id: service._id,
+                                    serviceTitle: service.serviceTitle, // Update state with formatted date or null
+                                    issueDate: service.issueDate, // Update state with formatted date or null
+                                    expiryDate: service.expiryDate, // Update state with formatted date or null
+                                    sms: service.sms ? service.sms : false, // Update state with formatted date or null
+                                    email: service.email ? service.email : false, // Update state with formatted date or null
+                                
+                                    pushNotification : service.pushNotification ? service.pushNotification : false
 
-                                } = service
-                                setFormData({
-                                  sms,
-                                  email,
-                                  pushNotification, id: service._id
-                                })
-                                setSelectedDocumentForAttach({
-                                  id: "",
-                                  serviceTitle: service.serviceTitle,
-                                  filename: service.filename, file: service.file, documentType: service.documentType, issueDate: service.issueDate, expiryDate: service.expiryDate
-                                })
+                                }));
                               }}
                             >
                               <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
@@ -474,7 +699,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
                             {/* Delete Icon */}
                             <svg
-                              className="w-6 h-6 text-red-600 cursor-pointer hover:shadow-lg"
+                              className="w-4 h-4 text-red-600 cursor-pointer hover:shadow-lg"
                               xmlns="http://www.w3.org/2000/svg"
                               version="1.0"
                               width="512.000000pt"
@@ -492,6 +717,41 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                                 <path d="M3420 3029 c-33 -13 -68 -47 -86 -81 -11 -21 -23 -237 -54 -939 -38 -895 -39 -914 -21 -954 54 -123 224 -125 287 -4 12 23 22 211 54 941 39 894 39 913 21 953 -10 23 -33 52 -51 65 -37 26 -111 36 -150 19z" />
                               </g>
                             </svg>
+
+                            {/* renew */}
+                            <svg
+  fill="#000000"
+  width="23px" // Smaller width
+  height="23px" // Smaller height
+  viewBox="0 0 32 32"
+  xmlns="http://www.w3.org/2000/svg"
+  onClick={() => {
+    setModalOpen(true)
+    setdocumentType("Renew")
+    setFormData((prev) => ({
+        ...prev,
+  clientId: service.clientId,
+  vehicleId: service.vehicleId,
+  id: service._id,
+        status: "renew",
+    }));
+  }}
+  className="cursor-pointer"
+>
+  <defs>
+    <style>{`.cls-1{fill:none;}`}</style>
+  </defs>
+  <title>renew</title>
+  <path d="M12,10H6.78A11,11,0,0,1,27,16h2A13,13,0,0,0,6,7.68V4H4v8h8Z" />
+  <path d="M20,22h5.22A11,11,0,0,1,5,16H3a13,13,0,0,0,23,8.32V28h2V20H20Z" />
+  <g id="_Transparent_Rectangle_" data-name="<Transparent Rectangle>">
+    <rect className="cls-1" width="4" height="4" />
+  </g>
+</svg>
+
+
+
+
                           </div>
                         </td>
                       </tr>
@@ -505,7 +765,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
         </div>
       </div>
 
-      {modalOpen && (
+    {/*   {modalOpen && (
         <>
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className={`bg-white p-6 rounded-lg w-[45rem]`}>
@@ -708,6 +968,210 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
             </div>
           </div>
         </>
+      )} */}
+        {modalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-96">
+            <h3 className="text-xl font-bold mb-4 text-center">
+              {documentType} Document
+            </h3>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium">
+                Document Title
+              </label>
+              <input
+                type="text"
+                name="serviceTitle"
+                value={formData.serviceTitle}
+                onChange={handleInputChange}
+                className="w-full p-2 border border-[#CBD5E0] rounded-lg"
+                placeholder="Insurance Doc / Mot Doc"
+
+              />
+            </div>
+
+
+
+
+            <label className="block text-sm font-medium">
+              Issue Date
+            </label>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <DatePicker
+                value={formData.issueDate || null}
+                onChange={handleCreatedDateChange}
+                format="MM/dd/yyyy" // Display format for the date
+                variant="dialog"
+                placeholder="Issue Date "
+                maxDate={new Date()} // Prevent selecting past dates
+
+
+                autoOk
+                inputProps={{ readOnly: true }} // Make input read-only
+                style={{
+                  marginTop: '0%', // Adjust top margin
+                  marginBottom: "2%",
+                  width: '333px', // Adjust width of the input
+                  border: '1px solid #ccc', // Border style
+                  borderRadius: '5px', // Rounded corners
+                  padding: '10px',
+                  fontSize: '14px', // Font size
+
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <EventIcon
+                      style={{ width: "20px", height: "20px" }}
+                      className="text-gray"
+                    />
+                  ),
+                }}
+                DialogProps={{
+                  PaperProps: {
+                    style: {
+                      backgroundColor: '#f4f6f8', // Change background color of the calendar dialog
+                      borderRadius: '10px', // Round corners of the calendar dialog
+                      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)', // Shadow for the dialog
+
+                      height: "458px",
+
+                    },
+                  },
+                }}
+
+
+              />
+              <label className="block text-sm font-medium">
+                Expiry Date
+              </label>
+              <DatePicker
+                value={formData.expiryDate || null}
+                onChange={handleExpiryDateChange}
+                format="MM/dd/yyyy" // Display format for the date
+                variant="dialog"
+                placeholder="Expiry Date "
+                minDate={formData.issueDate} // Prevent selecting past dates
+                autoOk
+                inputProps={{ readOnly: true }} // Make input read-only
+                style={{
+                  marginTop: '0%', // Adjust top margin
+                  width: '333px', // Adjust width of the input
+                  border: '1px solid #ccc', // Border style
+                  borderRadius: '5px', // Rounded corners
+                  padding: '10px',
+                  fontSize: '14px', // Font size
+
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <EventIcon
+                      style={{ width: "20px", height: "20px" }}
+                      className="text-gray"
+                    />
+                  ),
+                }}
+                DialogProps={{
+                  PaperProps: {
+                    style: {
+                      backgroundColor: '#f4f6f8', // Change background color of the calendar dialog
+                      borderRadius: '10px', // Round corners of the calendar dialog
+                      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)', // Shadow for the dialog
+
+                      height: "458px",
+
+                    },
+                  },
+                }}
+
+
+              />
+
+            </MuiPickersUtilsProvider>
+            {(documentType == "Add" || documentType == "Renew") &&
+              <div className=" mt-4">
+                <h2 className="block text-sm font-medium">Upload PDF, JPEG, or PNG</h2>
+
+                <input
+                  type="file"
+                  accept=".pdf, .jpeg, .jpg, .png"
+                  onChange={handleFileChange}
+                  className="w-full pr-3 py-2  rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+
+                {error && <p className="text-sm "
+                  style={{
+                    color: "red"
+                  }}
+                >{error}</p>}
+
+
+              </div>
+            }
+            <div>
+                  <label className="block text-sm font-medium mb-2 ml-2">
+                    Alert types
+                  </label>
+                  <div className="mb-2 ml-2 flex items-center">
+                    <input
+                      type="checkbox"
+                      name="sms" // Use name attribute to reference the state
+                      checked={formData.sms} // Bind to formData.sms
+                      onChange={handleCheckboxChange} // Update the state when checkbox is clicked
+                      className="mr-2"
+                    />
+                    <label>SMS</label>
+                  </div>
+                  <div className="mb-2 ml-2 flex items-center">
+                    <input
+                      type="checkbox"
+                      name="email" // Use name attribute to reference the state
+                      checked={formData.email} // Bind to formData.email
+                      onChange={handleCheckboxChange} // Update the state when checkbox is clicked
+                      className="mr-2"
+                    />
+                    <label>Email</label>
+                  </div>
+                  <div className="mb-4 ml-2 flex items-center">
+                    <input
+                      type="checkbox"
+                      name="pushNotification" // Use name attribute to reference the state
+                      checked={formData.pushNotification} // Bind to formData.pushNotification
+                      onChange={handleCheckboxChange} // Update the state when checkbox is clicked
+                      className="mr-2"
+                    />
+                    <label>Push Notifications</label>
+                  </div>
+                </div>
+
+
+
+
+
+
+            <div className="flex justify-end space-x-2 mt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setModalOpen(false);
+                  setFormData(initialFormData)
+
+                }}
+                className="bg-[#E53E3E] text-white px-4 py-2 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                // type="submit"
+                onClick={handleSubmit}
+                className="bg-[#00B56C] text-white px-4 py-2 rounded-lg"
+              >
+                Save
+              </button>
+            </div>
+
+          </div>
+        </div>
       )}
       {confirmModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 bg-opacity-50 backdrop-blur-sm">

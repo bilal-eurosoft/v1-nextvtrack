@@ -109,7 +109,7 @@ export default function Work() {
             })
           );
           setbardata(
-            uniqueData.filter((i) => { return i.tripcount != 0 })
+            uniqueData.filter((i) => { return i.tripcount != 0 && i.tripcount != null })
               .map((item) => {
                 return {
                   name: item.vehicleReg,
@@ -135,7 +135,6 @@ export default function Work() {
     };
   }, [isOnline, session?.clientId]);
   useEffect(() => {
-    
     if (activeTab == null) {
 
       vehicleListData()
@@ -166,12 +165,13 @@ export default function Work() {
               })
             );
             setbardata(
-              uniqueData.map((item) => {
-                return {
-                  name: item.vehicleReg,
-                  tripcount: Number(item?.tripcount) || 0,
-                };
-              })
+              uniqueData.filter((i) => { return i.tripcount != 0 && i.tripcount != null })
+                .map((item) => {
+                  return {
+                    name: item.vehicleReg,
+                    tripcount: Number(item?.tripcount) || 0,
+                  };
+                })
             );
           }
         );
@@ -188,18 +188,17 @@ export default function Work() {
   async function getEventsdata() {
     let data = (await getevents(session?.clientId, session?.accessToken)).data;
 
-    if (data.length == 0) {
-      setlinedata(
-        socketdata.map((item) => {
-          return {
-            name: item.vehicleReg,
-            "Harsh Acceleration": 0,
-            "Harsh Break": 0,
-            "Harsh Cornering": 0,
-          };
-        })
-      );
-    } else {
+    if (data.length != 0) {
+      // setlinedata(
+      //   socketdata.map((item) => {
+      //     return {
+      //       name: item.vehicleReg,
+      //       "Harsh Acceleration": 0,
+      //       "Harsh Break": 0,
+      //       "Harsh Cornering": 0,
+      //     };
+      //   })
+      // );
       setlinedata(data);
     }
   }
@@ -319,7 +318,7 @@ export default function Work() {
     loadsimpleServices();
   }, []);
 
-  
+
 
   // Fetch services on page load (or reload)
   //all table table service,maintenance, documentation
@@ -666,7 +665,7 @@ export default function Work() {
                     />
                   </svg>
 
-                  Attach Documents
+                  Upload Documents
                 </button>
               </div>
 
@@ -838,7 +837,7 @@ export default function Work() {
                               // onClick={() => router.push(`/liveTracking?vehicleReg=${vehicle.vehicleReg}`)}
                               className="flex items-center justify-center p-1 bg-[#f3f4f6] text-black rounded-md gap-2 hover:bg-[#D1FAE5]"
                             >
-                              <FaWrench className="text-black text-xs" />{" "}
+                              <FaCogs className="text-black text-sm" />
                               {vehicle.service ? vehicle.service : "0"}
                             </button>
 
@@ -1010,7 +1009,7 @@ export default function Work() {
             <div className="grid row-span-2 gap-[42px]">
               <div className="p-2 rounded-md bg-white border border-gray p-2 w-[345px] h-[170px]">
                 <h2 className="text-lg font-bold text-gray-700 pb-8">
-                  Vehicle Service Reminder
+                  Vehicles Service Reminder
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
@@ -1042,7 +1041,7 @@ export default function Work() {
 
               <div className="p-2 rounded-md bg-white border border-gray p-2 w-[345px] h-[170px]">
                 <h2 className="text-lg font-bold text-gray-700 pb-8">
-                  Vehicle Renewal Reminders
+                  Documents Renewal Reminder
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
