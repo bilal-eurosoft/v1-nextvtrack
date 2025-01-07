@@ -80,7 +80,10 @@ const LiveSidebar = ({
 
 
 }) => {
-  const { data: session } = useSession();
+  let { data: session } = useSession();
+  if (!session) {
+    session = JSON.parse(localStorage.getItem("user")||"")
+  }
 
   const [searchData, setSearchData] = useState({
     search: "",
