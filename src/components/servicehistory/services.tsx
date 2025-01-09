@@ -560,7 +560,7 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
 
                           {/* Delete Icon */}
                           <svg
-                            className="w-6 h-6 text-red-600 cursor-pointer hover:shadow-lg"
+                            className="w-4 h-4 text-red-600 cursor-pointer hover:shadow-lg"
                             xmlns="http://www.w3.org/2000/svg"
                             version="1.0"
                             width="512.000000pt"

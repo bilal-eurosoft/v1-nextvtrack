@@ -42,8 +42,9 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
         serviceTitle: "",
         issueDate: "",
         expiryDate: "",
-       
-      
+        reminderDate: "",
+        validityPeriod: 0,
+        reminderDay: 0,
         clientId: "",
         vehicleId: "",
         sms: false,
@@ -56,12 +57,15 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
   const [dateforalert, setdateforalert] = useState({ id: null, date: null });
   const [loading, setLoading] = useState(true); // Initial loading state
   const [file, setFile] = useState(null);
+  const [fileName, setFileName] = useState(null);
   const [error, setError] = useState<string | null>(null);
   
+
 
   useEffect(() => {
     const d = documentationdata.filter((item) => item.vehicleId === singleVehicleDetail[0]._id);
     setfetchedDocumentsbyVehicle(d);
+    console.log("asd",d );
     setLoading(false); // Data is loaded, set loading to false
     
     setFormData((prevData) => ({
@@ -81,6 +85,11 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
             (service: any) => service.dataType === 'Documentation' && service.vehicleId === singleVehicleDetail[0]._id
           );
           setfetchedDocumentsbyVehicle(filteredServices);
+          setFormData((prevData) => ({
+            ...prevData,
+            vehicleId: singleVehicleDetail[0]._id,
+          }));
+    
         } else {
           setfetchedDocumentsbyVehicle([]);
         }
@@ -107,7 +116,11 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
         
         setfetchedDocumentsbyVehicle(filteredServices)
-
+        setFormData((prevData) => ({
+            ...prevData,
+            vehicleId: singleVehicleDetail[0]._id,
+          }));
+    
 
 
 
@@ -200,13 +213,16 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
         toast.error("Document title is missing", { position: "top-center" })
         return
       }
+      if (!formData.serviceTitle) {
+        toast.error("Document title is missing", { position: "top-center" })
+        return
+      }
      /*  if (error != "") {
         toast.error(error, { position: "top-center" })
         return
       } */
       if (documentType == "Update") {
     
-       
         const response = await handleServiceHistoryRequest({
             token: session?.accessToken,
             method: "PUT",
@@ -264,10 +280,10 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
       }
       
       else {
-        if (!file) {
+       /*  if (!file) {
           toast.error("Please upload an document", { position: "top-center" })
   
-        }
+        } */
       
         let data = new FormData()
   
@@ -461,12 +477,55 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
   const handleCreatedDateChange = (newDate) => {
 
     const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
+   
+    const date = new Date(formattedDate);
+if(documentType !== "Add"){
+
+
+    
+    // Add reminderDay to the date
+    const reminderDate = new Date(date); // Copy date to avoid mutation
+    reminderDate.setDate(reminderDate.getDate() + formData.reminderDay);  // Add the reminderDay to the date
+    
+    // Convert reminderDate to the correct format for the DatePicker
+    const reminderFormattedDate = reminderDate.toISOString().split("T")[0];  // It's already a Date object, which is what the DatePicker needs
+
+
+    
+    // Add reminderDay to the date
+    const expiryDate = new Date(date); // Copy date to avoid mutation
+    expiryDate.setDate(expiryDate.getDate() + formData.validityPeriod);  // Add the reminderDay to the date
+    
+    // Convert reminderDate to the correct format for the DatePicker
+    const expiryFormattedDate = expiryDate.toISOString().split("T")[0];  // It's already a Date object, which is what the DatePicker needs
+    
+
 
     setFormData((prev) => ({
       ...prev,
       issueDate: formattedDate, // Update state with formatted date or null
+      reminderDate: reminderFormattedDate,
+      expiryDate: expiryFormattedDate
+    }));
+}else{
+    setFormData((prev) => ({
+        ...prev,
+        issueDate: date, // Update state with formatted date or null
+       
+      }));
+}
+  };
+
+  const handleReminderDateChange = (newDate) => {
+
+    const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
+
+    setFormData((prev) => ({
+      ...prev,
+      reminderDate: formattedDate
     }));
   };
+
   const handleExpiryDateChange = (newDate) => {
 
     const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
@@ -479,20 +538,19 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
 
   const handleFileChange = async (e) => {
-
-
     const selectedFile = e.target.files[0];
-    setFile(e.target.files[0]);
 
+    console.log("selectedFile", selectedFile);
+    setFile(selectedFile); // Store the selected file in state
+   setFileName(selectedFile.name)
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
     if (selectedFile && allowedTypes.includes(selectedFile.type)) {
-      setError('');
+      setError(''); // Clear any previous error
     } else {
       setError('Please upload a valid PDF, JPEG, or PNG file.');
-      setFile(null);
+      setFile(null); // Clear the file if it's not valid
     }
   };
-
   return (
     <>
       <button
@@ -567,7 +625,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
                               value={service.reminderDate ? service.reminderDate : dateforalert.id === service._id ? dateforalert.date : null} // Correct value for DatePicker
                               onChange={(date) => handleDateChange(date, service._id)} // Ensure service._id is passed correctly
-                              format="MM/dd/yyyy"
+                              format="yyyy/dd/MM"
                               variant="dialog"
                               placeholder="Trigger Date"
                               minDate={service.issueDate}
@@ -679,14 +737,15 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                                     ...prev,
                               clientId: service.clientId,
                               vehicleId: service.vehicleId,
-
+                              reminderDay: service.reminderDay,
+                              validityPeriod: service.validityPeriod,
                                     id: service._id,
                                     serviceTitle: service.serviceTitle, // Update state with formatted date or null
                                     issueDate: service.issueDate, // Update state with formatted date or null
                                     expiryDate: service.expiryDate, // Update state with formatted date or null
                                     sms: service.sms ? service.sms : false, // Update state with formatted date or null
                                     email: service.email ? service.email : false, // Update state with formatted date or null
-                                
+                                    reminderDate: service.reminderDate,
                                     pushNotification : service.pushNotification ? service.pushNotification : false
 
                                 }));
@@ -728,12 +787,29 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
   onClick={() => {
     setModalOpen(true)
     setdocumentType("Renew")
+ 
+ 
+    setFile(service?.filename)
     setFormData((prev) => ({
         ...prev,
   clientId: service.clientId,
   vehicleId: service.vehicleId,
+  serviceTitle: service.serviceTitle,
   id: service._id,
         status: "renew",
+        reminderDay: service.reminderDay,
+        validityPeriod: service.validityPeriod,
+           
+              serviceTitle: service.serviceTitle, // Update state with formatted date or null
+              issueDate: service.issueDate, // Update state with formatted date or null
+              expiryDate: service.expiryDate, // Update state with formatted date or null
+              reminderDate: service.reminderDate,
+              sms: service.sms ? service.sms : false, // Update state with formatted date or null
+              email: service.email ? service.email : false, // Update state with formatted date or null
+          
+              pushNotification : service.pushNotification ? service.pushNotification : false
+
+              
     }));
   }}
   className="cursor-pointer"
@@ -991,8 +1067,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
               />
             </div>
 
-
-
+          
 
             <label className="block text-sm font-medium">
               Issue Date
@@ -1037,11 +1112,63 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                       height: "458px",
 
                     },
+                  }, 
+                }}
+
+
+              />
+
+<label className="block text-sm font-medium">
+              Reminder Date
+            </label>
+            <DatePicker
+                value={formData.reminderDate || null}
+                onChange={handleReminderDateChange}
+                format="MM/dd/yyyy" // Display format for the date
+                variant="dialog"
+                placeholder="Reminder Date "
+              //  maxDate={new Date()} // Prevent selecting past dates
+
+
+                autoOk
+                inputProps={{ readOnly: true }} // Make input read-only
+                style={{
+                  marginTop: '0%', // Adjust top margin
+                  marginBottom: "2%",
+                  width: '333px', // Adjust width of the input
+                  border: '1px solid #ccc', // Border style
+                  borderRadius: '5px', // Rounded corners
+                  padding: '10px',
+                  fontSize: '14px', // Font size
+
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <EventIcon
+                      style={{ width: "20px", height: "20px" }}
+                      className="text-gray"
+                    />
+                  ),
+                }}
+                DialogProps={{
+                  PaperProps: {
+                    style: {
+                      backgroundColor: '#f4f6f8', // Change background color of the calendar dialog
+                      borderRadius: '10px', // Round corners of the calendar dialog
+                      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)', // Shadow for the dialog
+
+                      height: "458px",
+
+                    },
                   },
                 }}
 
 
               />
+
+
+
+
               <label className="block text-sm font-medium">
                 Expiry Date
               </label>
@@ -1088,22 +1215,46 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
               />
 
             </MuiPickersUtilsProvider>
+
+
             {(documentType == "Add" || documentType == "Renew") &&
               <div className=" mt-4">
                 <h2 className="block text-sm font-medium">Upload PDF, JPEG, or PNG</h2>
 
-                <input
-                  type="file"
-                  accept=".pdf, .jpeg, .jpg, .png"
-                  onChange={handleFileChange}
-                  className="w-full pr-3 py-2  rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-
-                {error && <p className="text-sm "
-                  style={{
-                    color: "red"
-                  }}
-                >{error}</p>}
+              {/*   <input
+        type="file"
+        accept=".pdf, .jpeg, .jpg, .png"
+        onChange={handleFileChange}
+        className="w-full pr-3 py-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+      
+  
+      <div>
+        <p>{file ? `Selected File: ${file}` : "No file chosen"}</p>
+      </div> */}
+  {file ? (
+    // If a file is selected, show file name and cross icon
+    <div className="flex items-center space-x-3">
+      <p className="text-gray">Selected File: {  fileName || file}</p>
+      <button
+        onClick={() => setFile(null)} // Clear the file state
+        className="text-red hover:text-red focus:outline-none"
+      >
+        ✕
+      </button>
+    </div>
+  ) : (
+    // If no file is selected, show file upload input
+    <div className="flex flex-col items-start space-y-2">
+      <input
+         type="file"
+         accept=".pdf, .jpeg, .jpg, .png"
+         onChange={handleFileChange}
+         className="w-full pr-3 py-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+     {/*  <p className="text-gray-500">No file chosen</p> */}
+    </div>
+  )}
 
 
               </div>
@@ -1155,6 +1306,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                 onClick={() => {
                   setModalOpen(false);
                   setFormData(initialFormData)
+                  setFileName(null)
 
                 }}
                 className="bg-[#E53E3E] text-white px-4 py-2 rounded-lg"

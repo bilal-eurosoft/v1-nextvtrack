@@ -1,9 +1,10 @@
 "use client";
-import { vehicleListByClientId } from "@/utils/API_CALLS";
+import { alleventsForNotification, vehicleListByClientId } from "@/utils/API_CALLS";
 import { useSession } from "next-auth/react";
 import { DeviceAttach } from "@/types/vehiclelistreports";
 import { TripsByBucket } from "@/types/TripsByBucket";
 import { IgnitionReport } from "@/types/IgnitionReport";
+import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import EventIcon from "@material-ui/icons/Event";
 import { Toaster, toast } from "react-hot-toast";
@@ -154,17 +155,18 @@ export default function Reports() {
   const firstIndex = currentPage * rowsPerPages;
   const lastIndex = Math.min(firstIndex + rowsPerPages, trisdata.length); // Ensure lastIndex does not exceed trisdata.length
 
-  // Slice the data array to get the data for the current page
+  const searchParams = useSearchParams();
+/*   const vehicleReg = searchParams.get("vehicleReg");
+  const event = searchParams.get("event");
+  const dateTime = searchParams.get("dateTime"); */
+  const params = new URLSearchParams(searchParams.toString()); // Create a mutable copy
 
-  const filterData = trisdata.slice(firstIndex, lastIndex);
-  const handleChangeRowsPerPage = (e: any) => {
-    setCurrentPage(0);
-    setRowsPerPage(parseInt(e.target.value, 10));
-  };
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setCurrentPage(newPage);
-  };
+// Retrieve the values
+const vehicleReg = params.get("vehicleReg");
+const event = params.get("event");
+const dateTime = params.get("dateTime");
 
+  const [dataReady, setDataReady] = useState(false);
   const [Ignitionreport, setIgnitionreport] = useState<IgnitionReport>({
     TimeZone: session?.timezone || "",
     VehicleReg: "",
@@ -176,6 +178,357 @@ export default function Reports() {
     unit: session?.unit || "",
   });
 
+  useEffect(()=>{
+    console.log( vehicleReg , event ,dateTime)
+if(vehicleReg && event && dateTime){
+  console.log("dateTime ", dateTime,"vehicleReg", vehicleReg);
+  
+
+// Get today's date in ISO format (without time part)
+const today = new Date().toISOString().split('T')[0]; 
+let period
+// Check if the result date is today
+if (dateTime === today) {
+    period = "today"
+} else {
+    
+    period = "custom"
+}
+  setIgnitionreport((prevReport: any) => ({
+    ...prevReport,
+    VehicleReg: vehicleReg,
+    fromDateTime: dateTime,
+    toDateTime: dateTime,
+    period: period,
+    reportType: ["ignitionOn","ignitionOff"].includes(event)?"Events":"Events",
+    TimeZone: session?.timezone || "",
+ 
+    clientId: session?.clientId || "",
+   
+ 
+    unit: session?.unit || "",
+
+  }));
+  setDataReady(true); // Set this flag to true when data is available
+  // Remove the parameters from the URL
+/*   params.delete("vehicleReg");
+  params.delete("event");
+  params.delete("dateTime");
+  
+  // Update the URL (without these parameters)
+  window.history.replaceState({}, "", "?" + params.toString()); */
+  handleSubmitCustom()
+}
+  },[ session,vehicleReg , event ,dateTime])
+
+  useEffect(() => {
+    if (dataReady) {
+      handleSubmitCustom(); // Call handleSubmit only when data is ready
+    }
+  }, [dataReady]); // Trigger handleSubmit when the dataReady flag changes
+
+
+  const handleSubmitCustom = async()=>{
+    const { reportType, VehicleReg, period } = Ignitionreport;
+    if (reportType && VehicleReg && period) {
+      let newdata = { ...Ignitionreport };
+console.log("newdata", newdata);
+      const apiFunctions: Record<
+        string,
+        (data: {
+          token: string;
+          clientId: string;
+          payload: any;
+        }) => Promise<any>
+      > = {
+        Trip: IgnitionReportByTrip,
+        DailyActivity: IgnitionReportByDailyactivity,
+        Ignition: IgnitionReportByIgnition,
+        Events: IgnitionReportByEvents,
+        DetailReportByStreet: IgnitionReportByDetailReport,
+        IdlingActivity: IgnitionReportByIdlingActivity,
+      };
+console.log("asca",newdata );
+      if (apiFunctions[newdata.reportType]) {
+        const apiFunction = apiFunctions[newdata.reportType];
+        if (isCustomPeriod) {
+          newdata = {
+            ...newdata,
+            fromDateTime: `${Ignitionreport.fromDateTime}T00:00:00Z`,
+            toDateTime: `${Ignitionreport.toDateTime}T23:59:59Z`,
+          };
+        } else {
+          newdata = {
+            // ...newdata,
+            unit: session?.unit,
+            reportType: 0,
+            period: period,
+            VehicleReg: VehicleReg,
+            TimeZone: session?.timezone,
+            clientId: session?.clientId,
+            fromDateTime: `${Ignitionreport.fromDateTime}T00:00:00Z`,
+            toDateTime: `${Ignitionreport.toDateTime}T23:59:59Z`,
+            // fromDateTime: "2024-02-01T00:00:00Z",
+            // toDateTime: "2024-02-01T23:59:59Z",
+          };
+        }
+        console.log("newdata221312", newdata);
+        try {
+          const response = await toast.promise(
+            alleventsForNotification({
+              token: session.accessToken,
+             
+              payload: newdata,
+            }),
+            {
+              loading: "Loading...",
+              success: "",
+              error: "",
+            },
+            {
+              style: {
+                border: "1px solid #00B56C",
+                padding: "16px",
+                color: "#1A202C",
+              },
+              success: {
+                duration: 10,
+                iconTheme: {
+                  primary: "#00B56C",
+                  secondary: "#FFFAEE",
+                },
+              },
+              error: {
+                duration: 10,
+                iconTheme: {
+                  primary: "#00B56C",
+                  secondary: "#FFFAEE",
+                },
+              },
+            }
+          );
+
+          if (response.success === true) {
+            setTableShow(true);
+           
+            //  setIsFormSubmitted(true);
+            setTrisdata(response.data.tableData);
+
+            let newColumnHeaders: (
+              | "StartDateTime"
+              | "DriverName"
+              | "0"
+              | "1"
+              | "2"
+              | "3"
+              | "4"
+              | "5"
+              | "6"
+              | "7"
+              | "Start Date"
+              | "streetCount"
+              | "End Time"
+              | "Mileage"
+              | "Total Time"
+              | "Max Speed"
+              | "Idling Point"
+              | "Time Duration"
+              | "duration"
+              | "AvgSpeed"
+              | "Millage"
+              | "MaxSpeed"
+              | "TripStart"
+              | "Starting Location"
+              | "InitialLocation"
+              | "EndingDateTime"
+              | "Duration"
+              | "event"
+              | "date"
+              | "Address"
+              | "Start Time"
+              | "StartingPoint"
+              | "TripEnd"
+              | "Final Location"
+              | "TripDuration"
+              | "TotalDistance"
+              | "Avg Speed"
+              | "AverageSpeed"
+              | "MaxSpeed"
+              | "IMEI"
+              | "Status"
+              | "Type"
+            )[] = [];
+            let custom1HeaderTitles: (
+              | "StartDateTime"
+              | "0"
+              | "1"
+              | "2"
+              | "3"
+              | "4"
+              | "5"
+              | "6"
+              | "7"
+              | "Start Date"
+              | "streetCount"
+              | "End Time"
+              | "Mileage"
+              | "Total Time"
+              | "Max Speed"
+              | "Idling Point"
+              | "Time Duration"
+              | "duration"
+              | "AvgSpeed"
+              | "Millage"
+              | "MaxSpeed"
+              | "TripStart"
+              | "InitialLocation"
+              | "Starting Location"
+              | "EndingDateTime"
+              | "Duration"
+              | "event"
+              | "date"
+              | "Address"
+              | "Start Time"
+              | "StartingPoint"
+              | "TripEnd"
+              | "Final Location"
+              | "TripDuration"
+              | "TotalDistance"
+              | "AverageSpeed"
+              | "Avg Speed"
+              | "MaxSpeed"
+              | "IMEI"
+              | "Status"
+              | "Type"
+            )[] = [];
+            if (Ignitionreport.reportType.toString() === "Trip") {
+              if (response.data.clientModelProfile) {
+                newColumnHeaders = [
+                  "AverageSpeed",
+                  "IMEI",
+                  "Status",
+                  "TripDuration",
+                  "TotalDistance",
+                  "DriverName",
+                ];
+              } else {
+                newColumnHeaders = [
+                  "AverageSpeed",
+                  "IMEI",
+                  "Status",
+                  "TripDuration",
+                  "TotalDistance",
+                ];
+              }
+
+              setcustomHeaderTitles(newColumnHeaders);
+            } else if (
+              Ignitionreport.reportType.toString() === "DailyActivity"
+            ) {
+              newColumnHeaders = ["0", "1", "2", "3", "4", "5", "6", "7"];
+              custom1HeaderTitles = [
+                "Start Time",
+                "Starting Location",
+                "End Time",
+                "Final Location",
+                "Total Time",
+                "Mileage",
+                "Avg Speed",
+                "Max Speed",
+              ];
+
+              setcustomHeaderTitles(custom1HeaderTitles);
+            } else if (
+              Ignitionreport.reportType.toString() === "Ignition"
+            ) {
+              newColumnHeaders = ["0", "1", "2", "3", "4", "5"];
+              custom1HeaderTitles = [
+                "event",
+                "date",
+                "Address",
+                "event",
+                "date",
+                "Address",
+              ];
+              setcustomHeaderTitles(custom1HeaderTitles);
+            } else if (Ignitionreport.reportType.toString() === "Events") {
+              const filteredData = response.data.tableData.filter(
+                (eventitem: { event: string }) =>
+                  eventitem
+              );
+              setTrisdata(filteredData);
+              newColumnHeaders = ["event", "date", "Address"];
+              setcustomHeaderTitles(newColumnHeaders);
+            } else if (
+              Ignitionreport.reportType.toString() === "IdlingActivity"
+            ) {
+
+
+              // Constructing new column headers based on the data format
+              newColumnHeaders = ["0", "1", "2"];
+              custom1HeaderTitles = ["date", "Address", "duration"];
+              setcustomHeaderTitles(custom1HeaderTitles);
+            } else if (
+              Ignitionreport.reportType.toString() ===
+              "DetailReportByStreet"
+            ) {
+              newColumnHeaders = ["0", "1", "2", "3", "4", "5", "6", "7"];
+              custom1HeaderTitles = [
+                "StartDateTime",
+                "AvgSpeed",
+                "streetCount",
+                "Millage",
+                "MaxSpeed",
+                "InitialLocation",
+                "EndingDateTime",
+                "Duration",
+              ];
+              setcustomHeaderTitles(custom1HeaderTitles);
+            }
+
+            setColumnHeaders(newColumnHeaders);
+          } else if (response.success === false) {
+            // setTrisdata(response.success);
+            setTableShow(false);
+            toast.error("No Data Found", {
+              style: {
+                border: "1px solid red",
+                padding: "16px",
+                color: "red",
+              },
+              iconTheme: {
+                primary: "red",
+                secondary: "white",
+              },
+            });
+          }
+        } catch (error) {
+          console.error(
+            `Error calling API for ${newdata.reportType}:`,
+            error
+          );
+        }
+      } else {
+        console.error(`API function not found for ${newdata.reportType}`);
+      }
+    } else {
+     
+    }
+  }
+
+
+  // Slice the data array to get the data for the current page
+
+  const filterData = trisdata.slice(firstIndex, lastIndex);
+  const handleChangeRowsPerPage = (e: any) => {
+    setCurrentPage(0);
+    setRowsPerPage(parseInt(e.target.value, 10));
+  };
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+ 
   useEffect(() => {
     const vehicleListData = async () => {
       try {
@@ -267,7 +620,7 @@ export default function Reports() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+console.log("Ignitionreport======",Ignitionreport)
     if (
       Ignitionreport.reportType &&
       Ignitionreport.VehicleReg &&
@@ -343,7 +696,7 @@ export default function Reports() {
             DetailReportByStreet: IgnitionReportByDetailReport,
             IdlingActivity: IgnitionReportByIdlingActivity,
           };
-
+console.log("asca",newdata );
           if (apiFunctions[newdata.reportType]) {
             const apiFunction = apiFunctions[newdata.reportType];
             if (isCustomPeriod) {
@@ -985,7 +1338,7 @@ export default function Reports() {
                     </MenuItem>
                   </Select> */}
                   <Select
-                    // value={Ignitionreport?.vehicleNo}
+                    value={optionsTrip.find(option => option?.value === Ignitionreport?.reportType)}
                     onChange={handleInputChangeTrip}
                     options={optionsTrip}
                     placeholder="Select Report Type"
@@ -1055,7 +1408,8 @@ export default function Reports() {
                 </Select> */}
                 <div className="lg:col-span-8 md:col-span-9 sm:col-span-9  col-span-12 ">
                   <Select
-                    value={Ignitionreport.vehicleNo}
+                //    value={Ignitionreport.vehicleNo}
+                    value={options.find(option => option?.value === Ignitionreport?.VehicleReg)}
                     onChange={handleInputChangeSelect}
                     options={options}
                     placeholder="Select Vehicle"
@@ -1277,6 +1631,7 @@ export default function Reports() {
                         }`}
                 // disabled={customDate}
                 type="submit"
+                //onClick={()=>{ handleSubmit()}}
                 onClick={handleSubmit}
 
                 // disabled={

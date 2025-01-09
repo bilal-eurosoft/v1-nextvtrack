@@ -1,11 +1,8 @@
 "use client";
 import React, { useEffect, useState } from 'react'
-import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
-import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
 import { addDocument, deleteDocuments, editDocuments, getDocuments } from '@/utils/API_CALLS';
 import { useSession } from 'next-auth/react';
-import toast from 'react-hot-toast';
+import { Toaster, toast } from "react-hot-toast";
 import { useRouter } from 'next/navigation';
 
 function Documents() {
@@ -23,16 +20,19 @@ function Documents() {
   const initialFormData: any = {
     id: "",
     title: "",
-    issueDate: "",
-    expiryDate: "",
-    file: "",
-    fileType: "",
-    fileName: "",
-    clientId: "",
+validityperiod: 0,
+validitymileage: 0,
+reminderperiod: 0,
+assigntoallvehicle: false,
+    clientId: session?.clientId,
   };
   const [formData, setFormData] = useState<any[]>(initialFormData);
   const [deleteModal, setDeleteModal] = useState(false)
   const [id, setId] = useState("")
+
+
+
+
   async function loadDocuments() {
     setdocuments((await getDocuments(session?.accessToken)).data)
   }
@@ -55,40 +55,56 @@ function Documents() {
 
   }
   const handleSubmit = async (e: any) => {
+    console.log("form", formData);
     if (!formData.title) {
       toast.error("Document title is missing", { position: "top-center" })
       return
     }
-    if (error != "") {
+   /*  if (error != "") {
       toast.error(error, { position: "top-center" })
       return
-    }
+    } */
     if (documentType == "Update") {
-
-      let response = await editDocuments(formData, session?.accessToken)
+ console.log("edit ", formData);
+ const updatedFormData: any = {
+  id: formData.id,
+  title: formData.title,
+validityPeriod: formData.validityperiod,
+validityMileage: formData.validitymileage,
+reminderPeriod: formData.reminderperiod,
+allVehicle: formData.assigntoallvehicle,
+  clientId: session?.clientId,
+};
+      let response = await editDocuments(updatedFormData, session?.accessToken)
       if (response?.success) {
 
         toast.success(response?.message, { position: "top-center" })
         loadDocuments()
         setFormData(initialFormData)
         setModalOpen(false)
+        setFile(null)
       } else {
         toast.error(response?.message, { position: "top-center" })
 
       }
     } else {
-      if (!file) {
-        toast.error("Please upload an document", { position: "top-center" })
-
-      }
+    
+     
+    
       let data = new FormData()
-
+     
       data.append("file", file)
       data.append("clientId", session?.clientId)
-      data.append("title", formData.title)
-      data.append("issueDate", formData.issueDate)
-      data.append("expiryDate", formData.expiryDate)
+      data.append("title", formData?.title)
+      data.append("validityPeriod", formData.validityperiod)
+      data.append("validityMileage", formData.validitymileage)
+      data.append("reminderDay", formData.reminderperiod)
+      data.append("allVehicle", formData.assigntoallvehicle)
 
+     /*  console.log("FormData contents:");
+      data.forEach((value, key) => {
+        console.log(`${key}: ${value}`);
+      }); */
 
       let response = await addDocument(data, session?.accessToken)
       if (response?.success) {
@@ -97,33 +113,16 @@ function Documents() {
         loadDocuments()
         setFormData(initialFormData)
         setModalOpen(false)
+        setFile(null)
       } else {
         toast.error(response?.message, { position: "top-center" })
 
       }
-    }
-
+    } 
+    
   }
 
-  const handleCreatedDateChange = (newDate) => {
-
-    const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
-
-    setFormData((prev) => ({
-      ...prev,
-      issueDate: formattedDate, // Update state with formatted date or null
-    }));
-  };
-  const handleExpiryDateChange = (newDate) => {
-
-    const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
-
-    setFormData((prev) => ({
-      ...prev,
-      expiryDate: formattedDate, // Update state with formatted date or null
-    }));
-  };
-
+  
 
   const handleFileChange = async (e) => {
 
@@ -139,20 +138,42 @@ function Documents() {
       setFile(null);
     }
   };
-  const handleInputChange = (e: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      title: e.target.value, // Update state with formatted date or null
-    }));
-  }
+
+    const handleInputChange = (e: any) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    };
+    const handleCheckboxChange = (e: any) => {
+      const { checked } = e.target;
+      setFormData((prev) => ({
+        ...prev,
+        assigntoallvehicle: checked,
+      }));
+    };
 
 
 
 
   const openUpdateModal = (document: any) => {
-
+console.log("document", document);
     setdocumentType("Update");
-    setFormData({ ...document, id: document._id });
+    //setFormData({ ...document, id: document._id });
+    setFormData({
+      id: document._id || "",  // Using _id from document
+      title: document.title || "",  // Using title from document
+      validityperiod: document.validityPeriod || 0,  // Map validityPeriod from document
+      validitymileage: document.validityMileage || 0,  // Map validityMileage from document
+      reminderperiod: document.reminderDay || 0,  // Map reminderDay to reminderperiod
+      assigntoallvehicle: document.allVehicle || false,  // Map allVehicle to assigntoallvehicle
+      clientId: session?.clientId || "",  // Using session clientId
+    });
+
+
+
+
     setModalOpen(true);
   }
 
@@ -162,38 +183,13 @@ function Documents() {
     setId(document._id)
     setDeleteModal(true);
   }
-  const data = Array.from({ length: 50 }, (_, i) => ({
-    header1: `Data ${i + 1} - Col 1`,
-    header2: `Data ${i + 1} - Col 2`,
-    header3: `Data ${i + 1} - Col 3`,
-  }));
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
-
-  // Calculate total pages
-  const totalPages = Math.ceil(documents.length / rowsPerPage);
-
-  // Get current page data
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const currentData = documents.slice(startIndex, startIndex + rowsPerPage);
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
-  };
   return (
     <div>
       <p className="bg-green px-4 py-1 border-t  text-center text-2xl text-white font-bold journey_heading">
         Manage Documents
       </p>
+      {/* add docuemt button */}
       <button
         onClick={() => {
           setdocumentType("Add")
@@ -220,25 +216,26 @@ function Documents() {
             d="M12 5v14M5 12h14"
           />
         </svg>
-        Upload Document
+        Add Document
       </button>
 
 
-
+        {/*  table */}
       <div className="relative px-4">
-        <div className="bg-white shadow-md overflow-y-auto"
+        <div className="bg-white shadow-md overflow-y-auto rounded-lg"
           style={{ maxHeight: "40rem" }}>
-          <table className="table-auto border-collapse border border-gray-300 w-full ">
+          <table className="table-auto w-full ">
             {/* Table header and body */}
             <thead className="bg-[#E2E8F0]">
               <tr>
                 <th className="px-2 py-1 text-center">S.No</th>
                 <th className="px-2 py-1 text-left">Document Title</th>
 
-                <th className="px-2 py-1 text-left">Issue Date</th>
-                <th className="px-2 py-1 text-left">Expiry Date</th>
-                <th className="px-2 py-1 text-left">Document Type</th>
-                <th className="px-2 py-1 text-left">Actions</th>
+                <th className="px-2 py-1 text-left">Reminder Days</th>
+                <th className="px-2 py-1 text-left">Validity Period</th>
+                <th className="px-2 py-1 text-left">Validity Mileage</th>
+                <th className="px-2 py-1 text-left">Assign To All Vehicle</th>
+                <th className="px-2 py-1 text-center  pr-8">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -256,40 +253,63 @@ function Documents() {
                         {index + 1}
                       </td>
                       <td className="px-2 py-1 text-left">{document?.title}</td>
-
-
-
-
-
-                      <td className="px-2 py-1 text-left">{document?.issueDate}</td>
-                      <td className="px-2 py-1 text-left">{document?.expiryDate}</td>
-                      <td className="px-2 py-1 text-left">{document?.fileType?.replace("/", "-")}</td>
-
-
+                      <td className="px-2 py-1 text-left">{document?.reminderDay}</td>
+                      <td className="px-2 py-1 text-left">{document?.validityPeriod}</td>
+                  
+                     {/*  <td className="px-2 py-1 text-left">{document?.fileType?.replace("/", "-")}</td> */} 
+                     <td className="px-2 py-1 text-left">{document?.validityMileage}</td>
+                     <td className="pr-28 py-1 pr-8 text-center">
+  {document?.allVehicle ? (
+    <input
+      type="checkbox"
+      checked={document?.allVehicle}
+      readOnly
+      className="h-4 w-4 border-gray-300 rounded"
+    />
+  ) : null}
+</td>
 
                       <td className="px-2 py-1 text-left">
-                        <div className="flex gap-2 justify-start">
+                        <div className="grid grid-cols-3">
                           {/* Eye icon */}
-                          <svg
-                            onClick={() =>
-                              window.open(document.file, "_blank") // Opens the file in a new tab
+<div className='grid grid-cols-1'>
 
-                            }
-                            className="w-6 h-6 text-blue-600 cursor-pointer hover:shadow-lg"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            width="24"
-                            height="24"
-                          >
-                            <path
-                              fill="none"
-                              d="M0 0h24v24H0z"
-                            />
-                            <path
-                              d="M12 4.5C7.15 4.5 3.12 6.68 1.26 9.47c-.22.35-.22.76 0 1.1C3.12 17.32 7.15 19.5 12 19.5c4.85 0 8.88-2.18 10.74-4.97.22-.35.22-.76 0-1.1C20.88 6.68 16.85 4.5 12 4.5zm0 10.5c-2.49 0-4.5-1.5-4.5-3s2.01-3 4.5-3 4.5 1.5 4.5 3-2.01 3-4.5 3zm0-5c-.83 0-1.5.67-1.5 1.5S11.17 12 12 12s1.5-.67 1.5-1.5S12.83 9 12 9z"
-                            />
-                          </svg>
 
+                          {document.file !== null &&document.file !== "null" && document.file !== "" && (
+                         <svg 
+                         xmlns="http://www.w3.org/2000/svg" 
+                         xmlnsXlink="http://www.w3.org/1999/xlink" 
+                         viewBox="0 0 32 32" 
+                         xmlSpace="preserve"
+                         width="23" 
+                         height="23"
+                         onClick={() =>
+                             window.open(document.file, "_blank") // Opens the file in a new tab
+                     
+                           }
+                           className=" cursor-pointer hover:shadow-lg"
+                       >
+                         <style type="text/css">
+                           {`
+                             .st0 {
+                               fill: none;
+                               stroke: #000000;
+                               stroke-width: 2;
+                               stroke-linecap: round;
+                               stroke-linejoin: round;
+                               stroke-miterlimit: 10;
+                             }
+                           `}
+                         </style>
+                         <path 
+                           className="st0" 
+                           d="M29,16c0,0-5.8,8-13,8S3,16,3,16s5.8-8,13-8S29,16,29,16z" 
+                         />
+                         <circle className="st0" cx="16" cy="16" r="4" />
+                       </svg>
+                     
+                        )}
+                        </div>
                           {/* Edit Icon */}
                           <svg
                             onClick={() => openUpdateModal(document)}
@@ -340,6 +360,9 @@ function Documents() {
 
       </div>
 
+
+
+                {/*  modal popup */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-96">
@@ -353,7 +376,7 @@ function Documents() {
               </label>
               <input
                 type="text"
-                name="documentTitle"
+                name="title"
                 value={formData.title}
                 onChange={handleInputChange}
                 className="w-full p-2 border border-[#CBD5E0] rounded-lg"
@@ -362,102 +385,84 @@ function Documents() {
               />
             </div>
 
-
-
-
-            <label className="block text-sm font-medium">
-              Issue Date
-            </label>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <DatePicker
-                value={formData.issueDate || null}
-                onChange={handleCreatedDateChange}
-                format="MM/dd/yyyy" // Display format for the date
-                variant="dialog"
-                placeholder="Issue Date "
-                maxDate={new Date()} // Prevent selecting past dates
-
-
-                autoOk
-                inputProps={{ readOnly: true }} // Make input read-only
-                style={{
-                  marginTop: '0%', // Adjust top margin
-                  marginBottom: "2%",
-                  width: '333px', // Adjust width of the input
-                  border: '1px solid #ccc', // Border style
-                  borderRadius: '5px', // Rounded corners
-                  padding: '10px',
-                  fontSize: '14px', // Font size
-
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <EventIcon
-                      style={{ width: "20px", height: "20px" }}
-                      className="text-gray"
-                    />
-                  ),
-                }}
-                DialogProps={{
-                  PaperProps: {
-                    style: {
-                      backgroundColor: '#f4f6f8', // Change background color of the calendar dialog
-                      borderRadius: '10px', // Round corners of the calendar dialog
-                      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)', // Shadow for the dialog
-
-                      height: "458px",
-
-                    },
-                  },
-                }}
-
-
-              />
+            <div className="mb-4">
               <label className="block text-sm font-medium">
-                Expiry Date
+                Reminder Period
               </label>
-              <DatePicker
-                value={formData.expiryDate || null}
-                onChange={handleExpiryDateChange}
-                format="MM/dd/yyyy" // Display format for the date
-                variant="dialog"
-                placeholder="Expiry Date "
-                minDate={formData.issueDate} // Prevent selecting past dates
-                autoOk
-                inputProps={{ readOnly: true }} // Make input read-only
-                style={{
-                  marginTop: '0%', // Adjust top margin
-                  width: '333px', // Adjust width of the input
-                  border: '1px solid #ccc', // Border style
-                  borderRadius: '5px', // Rounded corners
-                  padding: '10px',
-                  fontSize: '14px', // Font size
-
+              <input
+                type="text"
+                name="reminderperiod"
+                value={formData.reminderperiod > 0 ? formData.reminderperiod : null} 
+                onChange={handleInputChange}
+                onInput={(e) => {
+                  // Ensures that only numeric input is allowed
+                  e.target.value = e.target.value.replace(/[^0-9]/g, "");
                 }}
-                InputProps={{
-                  endAdornment: (
-                    <EventIcon
-                      style={{ width: "20px", height: "20px" }}
-                      className="text-gray"
-                    />
-                  ),
-                }}
-                DialogProps={{
-                  PaperProps: {
-                    style: {
-                      backgroundColor: '#f4f6f8', // Change background color of the calendar dialog
-                      borderRadius: '10px', // Round corners of the calendar dialog
-                      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)', // Shadow for the dialog
-
-                      height: "458px",
-
-                    },
-                  },
-                }}
-
+                className="w-full p-2 border border-[#CBD5E0] rounded-lg"
+                placeholder="Reminder Period in Days"
 
               />
-            </MuiPickersUtilsProvider>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium">
+                Validity Period
+              </label>
+              <input
+                type="text"
+                name="validityperiod"
+            
+                value={formData.validityperiod > 0 ? formData.validityperiod : null} 
+                onChange={handleInputChange}
+                onInput={(e) => {
+                  // Ensures that only numeric input is allowed
+                  e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                }}
+                className="w-full p-2 border border-[#CBD5E0] rounded-lg"
+                placeholder="Validity Period in Days"
+
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium">
+              Validity Mileage
+              </label>
+              <input
+                type="text"
+                name="validitymileage"
+                value={formData.validitymileage > 0 ? formData.validitymileage : null} 
+                onInput={(e) => {
+                  // Ensures that only numeric input is allowed
+                  e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                }}
+                onChange={handleInputChange}
+                className="w-full p-2 border border-[#CBD5E0] rounded-lg"
+                placeholder="Validity Mileage"
+
+              />
+            </div>
+
+
+            <div className="mb-4 flex items-center space-x-2 ml-2">
+  <input
+    type="checkbox"
+    id="assigntoallvehicle"
+    name="assigntoallvehicle"
+    checked={formData.assigntoallvehicle}
+    onChange={handleCheckboxChange}
+    className="h-4 w-4 border-gray-300 rounded"
+  />
+  <label
+    htmlFor="assigntoallvehicle"
+    className="text-sm font-medium cursor-pointer"
+  >
+    Assign to All Vehicle
+  </label>
+</div>
+
+
+
             {documentType == "Add" &&
               <div className=" mt-4">
                 <h2 className="block text-sm font-medium">Upload PDF, JPEG, or PNG</h2>
@@ -489,6 +494,7 @@ function Documents() {
                 onClick={() => {
                   setModalOpen(false);
                   setFormData(initialFormData)
+                  setFile(null)
 
                 }}
                 className="bg-[#E53E3E] text-white px-4 py-2 rounded-lg"
@@ -507,6 +513,9 @@ function Documents() {
           </div>
         </div>
       )}
+
+
+        {/*  delete modal */}
       {deleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-100">
@@ -542,6 +551,7 @@ function Documents() {
       )
 
       }
+          <Toaster position="top-center" reverseOrder={false} />
     </div>
   )
 }

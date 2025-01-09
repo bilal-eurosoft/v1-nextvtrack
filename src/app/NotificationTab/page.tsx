@@ -14,8 +14,10 @@ import EventIcon from "@material-ui/icons/Event";
 import { Toaster } from "react-hot-toast";
 import "./index.css"
 import { ColumnType } from "antd/es/table";
+import { useRouter } from "next/navigation";
 export default function NotificationTab() {
   const { data: session } = useSession();
+  const  router = useRouter()
   const [notifications, setnotifications] = useState([]);
   const [loading, setLoading] = useState(false); // Loading state
   const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
@@ -37,29 +39,20 @@ export default function NotificationTab() {
     setLoading(true); // Set loading to true before the fetch starts
     try {
       if (session && session.userRole === "Admin") {
-
         const NotificationsData = await getallNotifications({
           token: session.accessToken,
-          body: JSON.stringify({ ...payload, "clientId": `${session?.clientId}` })
+          body: JSON.stringify({ ...payload, "timezone": session?.timezone, "clientId": `${session?.clientId}` })
         });
-
         setFilteredNotifications(NotificationsData.data)
         setnotifications(NotificationsData.data); // Assuming the response is an array of notifications
-
-
       }
       else {
-
         const NotificationsData = await getallNotifications({
           token: session?.accessToken,
-          body: `{\"userId\":\"${session?.userId}\"}`
+          body:
+            JSON.stringify({ ...payload, "timezone": session?.timezone, "userId": `${session?.userId}` })
         });
-
-
-
         setnotifications(NotificationsData.data); // Assuming the response is an array of notifications
-
-
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -153,7 +146,6 @@ export default function NotificationTab() {
             .tz(session?.timezone);
           const oneday = moment().subtract(1, "day").endOf("day")
             .tz(session?.timezone);
-
           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
             oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
@@ -162,20 +154,14 @@ export default function NotificationTab() {
           setFilteredNotifications(notifications)
           return
         }
-
+    const start = moment(startDateTime);
+    const end = moment(endDateTime);
     setFilteredNotifications(
-      notifications.filter((i: any) => {
-        if (i.createdAt) {
-          let createdAt = moment(i.createdAt);
-          return createdAt.isBetween(startDateTime, endDateTime, null, "[]");
-
-        } else {
-
-          let createdAt = moment(i.updatedAt);
-          return createdAt.isBetween(startDateTime, endDateTime, null, "[]");
-
-        }
-      })
+      notifications.filter((e: any) => e.createdAt != null)
+        .filter((i: any) => {
+          let createdAt = moment(i.date);
+          return createdAt.isBetween(start, end, null, "[]");
+        })
     )
     setPeriod(e.target.value)
   }
@@ -187,16 +173,8 @@ export default function NotificationTab() {
       const end = moment(toDate);
       setFilteredNotifications(
         notifications.filter((i: any) => {
-          if (i.createdAt) {
-            let createdAt = moment(i.createdAt);
-            return createdAt.isBetween(start, end, null, "[]");
-
-          } else {
-
-            let createdAt = moment(i.updatedAt);
-            return createdAt.isBetween(start, end, null, "[]");
-
-          }
+          let createdAt = moment(i.date);
+          return createdAt.isBetween(start, end, null, "[]");
         })
       )
     }
@@ -242,7 +220,49 @@ export default function NotificationTab() {
       key: "description",
       render: (text, r) => <p>{text.split("has")[0].replace("Your Vehicle ", "")}</p>
     },
-
+    {
+      title: "Action",
+      dataIndex: "action",
+      key: "action",
+      render: (text, r) => (
+        <div className="relative group inline-block">  {/* Make the parent relative to the icon */}
+          {/* SVG icon with hover effect */}
+          <div
+            onClick={() => handleNavigateToReports(r)}
+            className="cursor-pointer p-2 rounded-full bg-gray-200 hover:bg-gray-300 "
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M10 9l4-4 4 4M14 5v14" />
+            </svg>
+          </div>
+          
+          {/* Popup that appears on hover over the SVG */}
+          {/* <div
+            className="absolute left-[110px]  transform -translate-x-1/2  px-2 py-1 bg-white text-black rounded-md opacity-0 group-hover:opacity-100 group-hover:visible visibility-hidden transition-all duration-300 z-10"
+          >
+            Navigate to Reports
+          </div>
+        </div> */}
+           <div
+        className="absolute w-[150px]  left-[110px] top-0  transform -translate-x-1/2  px-2 py-1 bg-white text-black rounded-md opacity-0 group-hover:opacity-100  visibility-hidden transition-all duration-300 z-10"
+      >
+        Navigate to Reports
+      </div>
+    </div>
+      ),
+    }
+ 
+  
     ////////////
 
     // {
@@ -260,6 +280,44 @@ export default function NotificationTab() {
 
 
   ]);
+
+  const handleNavigateToReports = (record: any) => {
+console.log("record", record);
+ /*    const dateObj = new Date(record.dateTime);
+
+// Format the date as YYYY-MM-DD
+const formattedDate = dateObj.toISOString().slice(0, 10);; */
+
+let dateTime = record.dateTime;
+let dateParts = dateTime.split(' ');
+
+// Create a mapping for month names to month numbers
+let monthMapping = {
+    "Jan": "01", "January": "01",
+    "Feb": "02", "February": "02",
+    "Mar": "03", "March": "03",
+    "Apr": "04", "April": "04",
+    "May": "05",
+    "Jun": "06", "June": "06",
+    "Jul": "07", "July": "07",
+    "Aug": "08", "August": "08",
+    "Sep": "09", "September": "09",
+    "Oct": "10", "October": "10",
+    "Nov": "11", "November": "11",
+    "Dec": "12", "December": "12"
+};
+
+// Extract day, month, and year
+let day = dateParts[0];
+let month = monthMapping[dateParts[1]];
+let year = dateParts[2];
+
+// Format date as YYYY-MM-DD
+let formattedDate = `${year}-${month}-${day}`;
+
+    router.push(`/Reports?vehicleReg=${record.vehicleReg}&event=${record.event}&dateTime=${formattedDate}`); // Navigate to Notifications page
+  
+  };
 
 
   return (

@@ -26,7 +26,7 @@ const LiveTracking = () => {
   const carData = useRef<VehicleData[]>([]);
   const [updatedData, setUpdateData] = useState<VehicleData[]>([]);
   const searchParams = useSearchParams();
-  const IMEI = searchParams.get("IMEI");
+ /*  const IMEI = searchParams.get("IMEI"); */
   const vehicleReg = searchParams.get("vehicleReg")?.replaceAll("%", " ");
 
   const [clientSettings, setClientSettings] = useState<ClientSettings[]>([]);
@@ -43,7 +43,7 @@ const LiveTracking = () => {
   //   new Date()
   // );
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleData | null>(
-    {IMEI,vehicleReg}||null
+    {vehicleReg}||null
   );
   // const [selectedOdoVehicle, setSelectedOdoVehicle] = useState(
   //   null
@@ -56,6 +56,12 @@ const LiveTracking = () => {
   const [mapCoordinates, setMapCoordinates] = useState<LatLng | null | []>(
     null
   );
+
+
+
+  const fullparams = searchParams.get("screen");
+
+
   const clientMapSettings = clientSettings?.filter(
     (el) => el?.PropertDesc === "Map"
   )[0]?.PropertyValue;
@@ -273,7 +279,8 @@ useEffect(()=>{
 
   return (
     <>
-      <div className="grid lg:grid-cols-5 sm:grid-cols-5 md:grid-cols-5 grid-cols-1">
+     {/*  <div className="grid lg:grid-cols-6 sm:grid-cols-6 md:grid-cols-6 grid-cols-1"> */}
+     <div className={`${fullparams ? "grid lg:grid-cols-6 sm:grid-cols-6 md:grid-cols-6 grid-cols-1" : "grid lg:grid-cols-5 sm:grid-cols-5 md:grid-cols-5 grid-cols-1"}`}> 
         <LiveSidebar
           carData={carData.current}
           countMoving={countMoving}

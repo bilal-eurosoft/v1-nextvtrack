@@ -189,6 +189,21 @@ const handleMouseLeave = () => {
                         />
                     ))}
                                 </Bar>
+                                {/* <Bar stackId="monotone" dataKey="Over Speeding" fill="#688AE8" barSize={20} > {linedata.map((entry, index) => (
+                        <Cell
+                            key={`cell-${index}`}
+                            fill="#688AE8"
+                            z-index={1}
+                            transform={
+                                index === activeIndex
+                                    ? "scale(1.01)" // Increase the size when hovered
+                                    : "scale(1)"
+                            }
+                            onMouseEnter={() => handleMouseEnter(index)}
+                            onMouseLeave={handleMouseLeave}
+                        />
+                    ))}
+                                </Bar> */}
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
