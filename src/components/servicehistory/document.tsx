@@ -31,26 +31,26 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
   const [confirmModalOpen, setconfirmModalOpen] = useState(false);
 
   const [fetchedDocumentsbyVehicle, setfetchedDocumentsbyVehicle] = useState([]);
- /*  const initialFormData = {
+  /*  const initialFormData = {
+     id: "",
+     sms: false,
+     email: false,
+     pushNotification: false,
+   } */
+  const initialFormData: any = {
     id: "",
+    serviceTitle: "",
+    issueDate: "",
+    expiryDate: "",
+    reminderDate: "",
+    validityPeriod: 0,
+    reminderDay: 0,
+    clientId: "",
+    vehicleId: singleVehicleDetail[0]._id,
     sms: false,
     email: false,
     pushNotification: false,
-  } */
-    const initialFormData: any = {
-        id: "",
-        serviceTitle: "",
-        issueDate: "",
-        expiryDate: "",
-        reminderDate: "",
-        validityPeriod: 0,
-        reminderDay: 0,
-        clientId: "",
-        vehicleId: "",
-        sms: false,
-        email: false,
-        pushNotification: false,
-      };
+  };
 
   const [documentDataforupdate, setdocumentDataforupdate] = useState();
   const [formData, setFormData] = useState(initialFormData);
@@ -59,19 +59,17 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState(null);
   const [error, setError] = useState<string | null>(null);
-  
 
 
   useEffect(() => {
     const d = documentationdata.filter((item) => item.vehicleId === singleVehicleDetail[0]._id);
     setfetchedDocumentsbyVehicle(d);
-    console.log("asd",d );
     setLoading(false); // Data is loaded, set loading to false
-    
+
     setFormData((prevData) => ({
-        ...prevData,
-        vehicleId: singleVehicleDetail[0]._id,
-      }));
+      ...prevData,
+      vehicleId: singleVehicleDetail[0]._id,
+    }));
 
   }, [documentationdata]);
 
@@ -89,7 +87,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
             ...prevData,
             vehicleId: singleVehicleDetail[0]._id,
           }));
-    
+
         } else {
           setfetchedDocumentsbyVehicle([]);
         }
@@ -105,22 +103,22 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
   const loadServices = async () => {
     try {
       const fetchedServices = await fetchServicesFromAPI();
-      
+
       if (fetchedServices.length > 0) {
-      
+
 
 
         const filteredServices = fetchedServices.filter(
           (service: any) => service.dataType === 'Documentation' && service.vehicleId === singleVehicleDetail[0]._id
         );
 
-        
+
         setfetchedDocumentsbyVehicle(filteredServices)
         setFormData((prevData) => ({
-            ...prevData,
-            vehicleId: singleVehicleDetail[0]._id,
-          }));
-    
+          ...prevData,
+          vehicleId: singleVehicleDetail[0]._id,
+        }));
+
 
 
 
@@ -164,7 +162,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
     const loadDocuments = async () => {
       try {
         const fetchedDocuments = await fetchDocumentsFromAPI();
-        
+
         if (fetchedDocuments.length > 0) {
           setSelectedDocuments(fetchedDocuments);
 
@@ -208,160 +206,157 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-   
+
     if (!formData.serviceTitle) {
-        toast.error("Document title is missing", { position: "top-center" })
-        return
-      }
-      if (!formData.serviceTitle) {
-        toast.error("Document title is missing", { position: "top-center" })
-        return
-      }
-     /*  if (error != "") {
-        toast.error(error, { position: "top-center" })
-        return
-      } */
-      if (documentType == "Update") {
-    
-        const response = await handleServiceHistoryRequest({
-            token: session?.accessToken,
-            method: "PUT",
-            body: formData,
-          });
-    
-       //let response = await editDocuments(formData, session?.accessToken)
-        if (response?.success) {
-  
-          toast.success(response?.message, { position: "top-center" })
-        //  loadDocuments()
-        await loadServices()
-          setFormData(initialFormData)
-          setModalOpen(false)
-        } else {
-          toast.error(response?.message, { position: "top-center" })
-  
-        }
-      }
-      else if(documentType =="Renew"){
-       
-        if (!file) {
-            toast.error("Please upload an document", { position: "top-center" })
-    
-          }
-        
-          let data = new FormData()
-    
-          data.append("file", file)
-          data.append("clientId", formData?.clientId)
-          data.append("vehicleId", formData?.vehicleId)
-          data.append("serviceTitle", formData.serviceTitle)
-          data.append("issueDate", formData.issueDate)
-          data.append("expiryDate", formData.expiryDate)
-          data.append("pushNotification", formData.pushNotification)
-          data.append("sms", formData.sms)
-          data.append("email", formData.email)
-          data.append("id", formData.id)
-          data.append("dataType", "Documentation")
-          data.append("status", "renew")
-         
-          const response = await renewServiceHistory(data,session?.accessToken, file);
-  
-          if (response?.success) {
-    
-            toast.success(response?.message, { position: "top-center" })
-            await loadServices()
-        //    loadDocuments()
-            setFormData(initialFormData)
-            setModalOpen(false)
-          } else {
-            toast.error(response?.message, { position: "top-center" })
-    
-          }
-      }
-      
-      else {
-       /*  if (!file) {
-          toast.error("Please upload an document", { position: "top-center" })
-  
-        } */
-      
-        let data = new FormData()
-  
-        data.append("file", file)
-        data.append("clientId", session?.clientId)
-        data.append("vehicleId", formData?.vehicleId)
-        data.append("serviceTitle", formData.serviceTitle)
-        data.append("issueDate", formData.issueDate)
-        data.append("expiryDate", formData.expiryDate)
-        data.append("pushNotification", formData.pushNotification)
-        data.append("sms", formData.sms)
-        data.append("email", formData.email)
-        data.append("dataType", "Documentation")
-  
-        
-        const response = await addServiceHistory(data,session?.accessToken, file);
+      toast.error("Document title is missing", { position: "top-center" })
+      return
+    }
+    /*  if (error != "") {
+       toast.error(error, { position: "top-center" })
+       return
+     } */
+    if (documentType == "Update") {
 
-        if (response?.success) {
-  
-          toast.success(response?.message, { position: "top-center" })
-          await loadServices()
-      //    loadDocuments()
-          setFormData(initialFormData)
-          setModalOpen(false)
-        } else {
-          toast.error(response?.message, { position: "top-center" })
-  
-        }
-      }
 
-  /*   if (EditmodalOpen) {
-    
-
-      const updatepayload = {
-
-        clientId: singleVehicleDetail[0].clientId,
-        vehicleId: singleVehicleDetail[0]._id,
-        dataType: "Documentation", serviceTitle: selectedDocumentForAttach?.serviceTitle,
-        filename: selectedDocumentForAttach?.filename, file: selectedDocumentForAttach?.file, documentType: selectedDocumentForAttach?.documentType,
-        issueDate: selectedDocumentForAttach?.issueDate,
-        expiryDate: selectedDocumentForAttach?.expiryDate,
-        ...formData
-
-      }
-
-      
-      
-      const Data = await handleServiceHistoryRequest({
+      const response = await handleServiceHistoryRequest({
         token: session?.accessToken,
         method: "PUT",
-        body: updatepayload,
+        body: formData,
       });
 
-      if (Data.success == true) {
-        toast.success(Data.message);
-        setModalOpen(false);
-        setEditmodalOpen(false)
-        setFormData(initialFormData)
-        setSelectedDocumentForAttach({
+      //let response = await editDocuments(formData, session?.accessToken)
+      if (response?.success) {
 
-          id: "",
-          serviceTitle: "",
-          filename: "", file: "", documentType: "", issueDate: "", expiryDate: ""
-
-        })
+        toast.success(response?.message, { position: "top-center" })
+        //  loadDocuments()
         await loadServices()
-      }
-      return
-    } */
+        setFormData(initialFormData)
+        setModalOpen(false)
+      } else {
+        toast.error(response?.message, { position: "top-center" })
 
-  /*   const documentData = selectedDocumentsForAttach.map(item => ({
-      serviceTitle: item.title,
-      file: item.file,
-      filename: item.fileName,
-      documentType: item.fileType,
-      issueDate: item.issueDate,
-      expiryDate: item.expiryDate
-    })); */
+      }
+    }
+    else if (documentType == "Renew") {
+
+      if (!file) {
+        toast.error("Please upload an document", { position: "top-center" })
+
+      }
+
+      let data = new FormData()
+
+      data.append("file", file)
+      data.append("clientId", formData?.clientId)
+      data.append("vehicleId", formData?.vehicleId)
+      data.append("serviceTitle", formData.serviceTitle)
+      data.append("issueDate", formData.issueDate)
+      data.append("expiryDate", formData.expiryDate)
+      data.append("pushNotification", formData.pushNotification)
+      data.append("sms", formData.sms)
+      data.append("email", formData.email)
+      data.append("id", formData.id)
+      data.append("dataType", "Documentation")
+      data.append("status", "renew")
+
+      const response = await renewServiceHistory(data, session?.accessToken, file);
+
+      if (response?.success) {
+
+        toast.success(response?.message, { position: "top-center" })
+        await loadServices()
+        //    loadDocuments()
+        setFormData(initialFormData)
+        setModalOpen(false)
+      } else {
+        toast.error(response?.message, { position: "top-center" })
+
+      }
+    }
+
+    else {
+      // if (!file) {
+      //   toast.error("Please upload an document", { position: "top-center" })
+
+      // }
+
+      let data = new FormData()
+
+      data.append("file", file)
+      data.append("clientId", session?.clientId)
+      data.append("vehicleId", formData?.vehicleId)
+      data.append("serviceTitle", formData.serviceTitle)
+      data.append("issueDate", formData.issueDate)
+      data.append("expiryDate", formData.expiryDate)
+      data.append("pushNotification", formData.pushNotification)
+      data.append("sms", formData.sms)
+      data.append("email", formData.email)
+      data.append("dataType", "Documentation")
+
+
+      const response = await addServiceHistory(data, session?.accessToken, file);
+
+      if (response?.success) {
+
+        toast.success(response?.message, { position: "top-center" })
+        await loadServices()
+        //    loadDocuments()
+        setFormData(initialFormData)
+        setModalOpen(false)
+      } else {
+        toast.error(response?.message, { position: "top-center" })
+
+      }
+    }
+
+    /*   if (EditmodalOpen) {
+      
+  
+        const updatepayload = {
+  
+          clientId: singleVehicleDetail[0].clientId,
+          vehicleId: singleVehicleDetail[0]._id,
+          dataType: "Documentation", serviceTitle: selectedDocumentForAttach?.serviceTitle,
+          filename: selectedDocumentForAttach?.filename, file: selectedDocumentForAttach?.file, documentType: selectedDocumentForAttach?.documentType,
+          issueDate: selectedDocumentForAttach?.issueDate,
+          expiryDate: selectedDocumentForAttach?.expiryDate,
+          ...formData
+  
+        }
+  
+        
+        
+        const Data = await handleServiceHistoryRequest({
+          token: session?.accessToken,
+          method: "PUT",
+          body: updatepayload,
+        });
+  
+        if (Data.success == true) {
+          toast.success(Data.message);
+          setModalOpen(false);
+          setEditmodalOpen(false)
+          setFormData(initialFormData)
+          setSelectedDocumentForAttach({
+  
+            id: "",
+            serviceTitle: "",
+            filename: "", file: "", documentType: "", issueDate: "", expiryDate: ""
+  
+          })
+          await loadServices()
+        }
+        return
+      } */
+
+    /*   const documentData = selectedDocumentsForAttach.map(item => ({
+        serviceTitle: item.title,
+        file: item.file,
+        filename: item.fileName,
+        documentType: item.fileType,
+        issueDate: item.issueDate,
+        expiryDate: item.expiryDate
+      })); */
 
     /* const payload = {
 
@@ -390,7 +385,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
 
   const handledelete = async (id) => {
-    
+
     const Data = await handleServiceHistoryRequest({
       token: session?.accessToken,
       method: "DELETE",
@@ -409,7 +404,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
     // Ensure that the selected date is either valid or null
     const formattedDate = format(newDate, 'dd-MM-yyyy'); // use date-fns to format it
 
-    
+
     setdateforalert((prevData) => ({
       ...prevData,
       id: id,
@@ -477,45 +472,44 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
   const handleCreatedDateChange = (newDate) => {
 
     const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
-   
+
     const date = new Date(formattedDate);
-if(documentType !== "Add"){
+    if (documentType !== "Add") {
 
 
-    
-    // Add reminderDay to the date
-    const reminderDate = new Date(date); // Copy date to avoid mutation
-    reminderDate.setDate(reminderDate.getDate() + formData.reminderDay);  // Add the reminderDay to the date
-    
-    // Convert reminderDate to the correct format for the DatePicker
-    const reminderFormattedDate = reminderDate.toISOString().split("T")[0];  // It's already a Date object, which is what the DatePicker needs
+
+      // Add reminderDay to the date
+      const reminderDate = new Date(date); // Copy date to avoid mutation
+      reminderDate.setDate(reminderDate.getDate() + formData.reminderDay);  // Add the reminderDay to the date
+
+      // Convert reminderDate to the correct format for the DatePicker
+      const reminderFormattedDate = reminderDate.toISOString().split("T")[0];  // It's already a Date object, which is what the DatePicker needs
 
 
-    
-    // Add reminderDay to the date
-    const expiryDate = new Date(date); // Copy date to avoid mutation
-    expiryDate.setDate(expiryDate.getDate() + formData.validityPeriod);  // Add the reminderDay to the date
-    
-    // Convert reminderDate to the correct format for the DatePicker
-    const expiryFormattedDate = expiryDate.toISOString().split("T")[0];  // It's already a Date object, which is what the DatePicker needs
-    
+
+      // Add reminderDay to the date
+      const expiryDate = new Date(date); // Copy date to avoid mutation
+      expiryDate.setDate(expiryDate.getDate() + formData.validityPeriod);  // Add the reminderDay to the date
+
+      // Convert reminderDate to the correct format for the DatePicker
+      const expiryFormattedDate = expiryDate.toISOString().split("T")[0];  // It's already a Date object, which is what the DatePicker needs
 
 
-    setFormData((prev) => ({
-      ...prev,
-      issueDate: formattedDate, // Update state with formatted date or null
-      reminderDate: reminderFormattedDate,
-      expiryDate: expiryFormattedDate
-    }));
-}else{
-    setFormData((prev) => ({
+
+      setFormData((prev) => ({
+        ...prev,
+        issueDate: formattedDate, // Update state with formatted date or null
+        reminderDate: reminderFormattedDate,
+        expiryDate: expiryFormattedDate
+      }));
+    } else {
+      setFormData((prev) => ({
         ...prev,
         issueDate: date, // Update state with formatted date or null
-       
-      }));
-}
-  };
 
+      }));
+    }
+  };
   const handleReminderDateChange = (newDate) => {
 
     const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
@@ -525,7 +519,6 @@ if(documentType !== "Add"){
       reminderDate: formattedDate
     }));
   };
-
   const handleExpiryDateChange = (newDate) => {
 
     const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
@@ -538,23 +531,25 @@ if(documentType !== "Add"){
 
 
   const handleFileChange = async (e) => {
-    const selectedFile = e.target.files[0];
 
-    console.log("selectedFile", selectedFile);
-    setFile(selectedFile); // Store the selected file in state
-   setFileName(selectedFile.name)
+
+    const selectedFile = e.target.files[0];
+    setFile(e.target.files[0]);
+    setFileName(selectedFile.name)
+
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
     if (selectedFile && allowedTypes.includes(selectedFile.type)) {
-      setError(''); // Clear any previous error
+      setError('');
     } else {
       setError('Please upload a valid PDF, JPEG, or PNG file.');
-      setFile(null); // Clear the file if it's not valid
+      setFile(null);
     }
   };
+
   return (
     <>
       <button
-      onClick={() => {
+        onClick={() => {
           setdocumentType("Add")
           setModalOpen(true)
         }}
@@ -596,7 +591,7 @@ if(documentType !== "Add"){
                     <th className="px-2 py-1 text-left">Document Title</th>
                     <th className="px-2 py-1 text-left">Issue Date</th>
                     <th className="px-2 py-1 text-left">Expiry Date</th>
-                  {/*   <th className="px-2 py-1 text-left">Documentation Type</th> */}
+                    {/*   <th className="px-2 py-1 text-left">Documentation Type</th> */}
                     <th className="px-2 py-1 text-left">When to Trigger Alert</th>
                     <th className="px-2 py-1 text-left">Status</th>
                     <th className="px-2 pr-[45px] py-1 text-center">Actions</th>
@@ -616,7 +611,7 @@ if(documentType !== "Add"){
                         <td className="px-2 py-1">{service.serviceTitle}</td>
                         <td className="px-2 py-1">{service.issueDate}</td>
                         <td className="px-2 py-1">{service.expiryDate}</td>
-                  {/*       <td className="px-2 py-1">{service.documentType?.replace(/\/[^/]+$/, '')}</td> */}
+                        {/*       <td className="px-2 py-1">{service.documentType?.replace(/\/[^/]+$/, '')}</td> */}
                         <td className="px-2 py-1">
                           {/* Date picker component for alertTime */}
                           <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -650,60 +645,38 @@ if(documentType !== "Add"){
                             />
                           </MuiPickersUtilsProvider>
                         </td>
-                        <td className="px-2 py-1"
-                          /* className={`px-2 py-1 ${service.status === "pending" ? "text-[#808080]" :
+                        <td
+                          className={`px-2 py-1 ${service.status === "pending" ? "text-green" :
                             service.status === "due soon" ? "text-[#FFA500]" :
-                              service.status === "due" ? "text-[#FF0000]" :
-                                service.status === "renew" ? "text-[#008000]" : ""}`}
-                          style={{ cursor: service.status === "renew" ? 'not-allowed' : 'pointer' }}
-                          onClick={() => {
-                            if (service.status !== "complete") {
-                              setdocumentDataforupdate(service);
-                              setconfirmModalOpen(true);
-                            }
-                          }} */
+                              service.status === "due" ? "text-red" :
+                                service.status === "renew" ? "text-[#007BFF]" : ""}`}
+
                         >
-                          {service.status}
+                          {service.status === "pending" ? "Valid" :
+                            service.status === "due soon" ? "Due Soon" :
+                              service.status === "due" ? "Due" :
+                                service.status === "renew" ? "Renew" : ""}
                         </td>
 
-                        <td className="px-2 py-1 pl-[15px] pr-0 text-center m-0 w-[200px]">
-                        <div className="flex justify-start gap-2 m-0 items-center">
-                            {/* view button */}
-{/* 
+                        <td className=" pr-0 text-end m-0 w-[200px]">
+                          <div className="flex justify-center gap-2 m-0 items-end">
+
                             <svg
-                            onClick={() =>
-                              window.open(service.file, "_blank") // Opens the file in a new tab
+                              xmlns="http://www.w3.org/2000/svg"
+                              xmlnsXlink="http://www.w3.org/1999/xlink"
+                              viewBox="0 0 32 32"
+                              xmlSpace="preserve"
+                              width="23"
+                              height="23"
+                              onClick={() =>
+                                window.open(service.file, "_blank") // Opens the file in a new tab
 
-                            }
-                            className="w-6 h-6 text-blue-600 cursor-pointer hover:shadow-lg"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            width="24"
-                            height="24"
-                          >
-                            <path
-                              fill="none"
-                              d="M0 0h24v24H0z"
-                            />
-                            <path
-                              d="M12 4.5C7.15 4.5 3.12 6.68 1.26 9.47c-.22.35-.22.76 0 1.1C3.12 17.32 7.15 19.5 12 19.5c4.85 0 8.88-2.18 10.74-4.97.22-.35.22-.76 0-1.1C20.88 6.68 16.85 4.5 12 4.5zm0 10.5c-2.49 0-4.5-1.5-4.5-3s2.01-3 4.5-3 4.5 1.5 4.5 3-2.01 3-4.5 3zm0-5c-.83 0-1.5.67-1.5 1.5S11.17 12 12 12s1.5-.67 1.5-1.5S12.83 9 12 9z"
-                            />
-                          </svg> */}
- <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    xmlnsXlink="http://www.w3.org/1999/xlink" 
-    viewBox="0 0 32 32" 
-    xmlSpace="preserve"
-    width="23" 
-    height="23"
-    onClick={() =>
-        window.open(service.file, "_blank") // Opens the file in a new tab
-
-      }
-      className="cursor-pointer hover:shadow-lg"
-  >
-    <style type="text/css">
-      {`
+                              }
+                              className="cursor-pointer hover:shadow-lg"
+                              style={{ display: `${!service.file && "none"}` }}
+                            >
+                              <style type="text/css">
+                                {`
         .st0 {
           fill: none;
           stroke: #000000;
@@ -713,13 +686,13 @@ if(documentType !== "Add"){
           stroke-miterlimit: 10;
         }
       `}
-    </style>
-    <path 
-      className="st0" 
-      d="M29,16c0,0-5.8,8-13,8S3,16,3,16s5.8-8,13-8S29,16,29,16z" 
-    />
-    <circle className="st0" cx="16" cy="16" r="4" />
-  </svg>
+                              </style>
+                              <path
+                                className="st0"
+                                d="M29,16c0,0-5.8,8-13,8S3,16,3,16s5.8-8,13-8S29,16,29,16z"
+                              />
+                              <circle className="st0" cx="16" cy="16" r="4" />
+                            </svg>
 
 
 
@@ -734,19 +707,19 @@ if(documentType !== "Add"){
                                 setdocumentType("Update")
                                 setEditmodalOpen(true)
                                 setFormData((prev) => ({
-                                    ...prev,
-                              clientId: service.clientId,
-                              vehicleId: service.vehicleId,
-                              reminderDay: service.reminderDay,
-                              validityPeriod: service.validityPeriod,
-                                    id: service._id,
-                                    serviceTitle: service.serviceTitle, // Update state with formatted date or null
-                                    issueDate: service.issueDate, // Update state with formatted date or null
-                                    expiryDate: service.expiryDate, // Update state with formatted date or null
-                                    sms: service.sms ? service.sms : false, // Update state with formatted date or null
-                                    email: service.email ? service.email : false, // Update state with formatted date or null
-                                    reminderDate: service.reminderDate,
-                                    pushNotification : service.pushNotification ? service.pushNotification : false
+                                  ...prev,
+                                  clientId: service.clientId,
+                                  vehicleId: service.vehicleId,
+                                  reminderDay: service.reminderDay,
+                                  validityPeriod: service.validityPeriod,
+                                  id: service._id,
+                                  serviceTitle: service.serviceTitle, // Update state with formatted date or null
+                                  issueDate: service.issueDate, // Update state with formatted date or null
+                                  expiryDate: service.expiryDate, // Update state with formatted date or null
+                                  sms: service.sms ? service.sms : false, // Update state with formatted date or null
+                                  email: service.email ? service.email : false, // Update state with formatted date or null
+                                  reminderDate: service.reminderDate,
+                                  pushNotification: service.pushNotification ? service.pushNotification : false
 
                                 }));
                               }}
@@ -779,51 +752,47 @@ if(documentType !== "Add"){
 
                             {/* renew */}
                             <svg
-  fill="#000000"
-  width="23px" // Smaller width
-  height="23px" // Smaller height
-  viewBox="0 0 32 32"
-  xmlns="http://www.w3.org/2000/svg"
-  onClick={() => {
-    setModalOpen(true)
-    setdocumentType("Renew")
- 
- 
-    setFile(service?.filename)
-    setFormData((prev) => ({
-        ...prev,
-  clientId: service.clientId,
-  vehicleId: service.vehicleId,
+                              fill="#000000"
+                              width="23px" // Smaller width
+                              height="23px" // Smaller height
+                              viewBox="0 0 32 32"
+                              xmlns="http://www.w3.org/2000/svg"
+                              onClick={() => {
+                                setModalOpen(true)
+                                setdocumentType("Renew")
+                                setFile(service?.filename)
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  clientId: service.clientId,
+                                  vehicleId: service.vehicleId,
   serviceTitle: service.serviceTitle,
-  id: service._id,
-        status: "renew",
-        reminderDay: service.reminderDay,
-        validityPeriod: service.validityPeriod,
-           
-              serviceTitle: service.serviceTitle, // Update state with formatted date or null
-              issueDate: service.issueDate, // Update state with formatted date or null
-              expiryDate: service.expiryDate, // Update state with formatted date or null
-              reminderDate: service.reminderDate,
-              sms: service.sms ? service.sms : false, // Update state with formatted date or null
-              email: service.email ? service.email : false, // Update state with formatted date or null
-          
-              pushNotification : service.pushNotification ? service.pushNotification : false
-
-              
-    }));
-  }}
-  className="cursor-pointer"
->
-  <defs>
-    <style>{`.cls-1{fill:none;}`}</style>
-  </defs>
-  <title>renew</title>
-  <path d="M12,10H6.78A11,11,0,0,1,27,16h2A13,13,0,0,0,6,7.68V4H4v8h8Z" />
-  <path d="M20,22h5.22A11,11,0,0,1,5,16H3a13,13,0,0,0,23,8.32V28h2V20H20Z" />
-  <g id="_Transparent_Rectangle_" data-name="<Transparent Rectangle>">
-    <rect className="cls-1" width="4" height="4" />
-  </g>
-</svg>
+                                  id: service._id,
+                                  status: "renew",
+                                  reminderDay: service.reminderDay,
+                                  validityPeriod: service.validityPeriod,
+                                     
+                                        serviceTitle: service.serviceTitle, // Update state with formatted date or null
+                                        issueDate: service.issueDate, // Update state with formatted date or null
+                                        expiryDate: service.expiryDate, // Update state with formatted date or null
+                                        reminderDate: service.reminderDate,
+                                        sms: service.sms ? service.sms : false, // Update state with formatted date or null
+                                        email: service.email ? service.email : false, // Update state with formatted date or null
+                                    
+                                        pushNotification : service.pushNotification ? service.pushNotification : false
+                                }));
+                              }}
+                              className="cursor-pointer"
+                            >
+                              <defs>
+                                <style>{`.cls-1{fill:none;}`}</style>
+                              </defs>
+                              <title>renew</title>
+                              <path d="M12,10H6.78A11,11,0,0,1,27,16h2A13,13,0,0,0,6,7.68V4H4v8h8Z" />
+                              <path d="M20,22h5.22A11,11,0,0,1,5,16H3a13,13,0,0,0,23,8.32V28h2V20H20Z" />
+                              <g id="_Transparent_Rectangle_" data-name="<Transparent Rectangle>">
+                                <rect className="cls-1" width="4" height="4" />
+                              </g>
+                            </svg>
 
 
 
@@ -841,7 +810,7 @@ if(documentType !== "Add"){
         </div>
       </div>
 
-    {/*   {modalOpen && (
+      {/*   {modalOpen && (
         <>
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className={`bg-white p-6 rounded-lg w-[45rem]`}>
@@ -1045,7 +1014,7 @@ if(documentType !== "Add"){
           </div>
         </>
       )} */}
-        {modalOpen && (
+      {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-96">
             <h3 className="text-xl font-bold mb-4 text-center">
@@ -1067,7 +1036,8 @@ if(documentType !== "Add"){
               />
             </div>
 
-          
+
+
 
             <label className="block text-sm font-medium">
               Issue Date
@@ -1112,13 +1082,12 @@ if(documentType !== "Add"){
                       height: "458px",
 
                     },
-                  }, 
+                  },
                 }}
 
 
               />
-
-<label className="block text-sm font-medium">
+              <label className="block text-sm font-medium">
               Reminder Date
             </label>
             <DatePicker
@@ -1165,10 +1134,6 @@ if(documentType !== "Add"){
 
 
               />
-
-
-
-
               <label className="block text-sm font-medium">
                 Expiry Date
               </label>
@@ -1178,7 +1143,7 @@ if(documentType !== "Add"){
                 format="MM/dd/yyyy" // Display format for the date
                 variant="dialog"
                 placeholder="Expiry Date "
-                minDate={formData.issueDate} // Prevent selecting past dates
+                minDate={new Date()} // Prevent selecting past dates
                 autoOk
                 inputProps={{ readOnly: true }} // Make input read-only
                 style={{
@@ -1215,85 +1180,71 @@ if(documentType !== "Add"){
               />
 
             </MuiPickersUtilsProvider>
-
-
             {(documentType == "Add" || documentType == "Renew") &&
               <div className=" mt-4">
                 <h2 className="block text-sm font-medium">Upload PDF, JPEG, or PNG</h2>
-
-              {/*   <input
-        type="file"
-        accept=".pdf, .jpeg, .jpg, .png"
-        onChange={handleFileChange}
-        className="w-full pr-3 py-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      />
-      
-  
-      <div>
-        <p>{file ? `Selected File: ${file}` : "No file chosen"}</p>
-      </div> */}
-  {file ? (
-    // If a file is selected, show file name and cross icon
-    <div className="flex items-center space-x-3">
-      <p className="text-gray">Selected File: {  fileName || file}</p>
-      <button
-        onClick={() => setFile(null)} // Clear the file state
-        className="text-red hover:text-red focus:outline-none"
-      >
-        ✕
-      </button>
-    </div>
-  ) : (
-    // If no file is selected, show file upload input
-    <div className="flex flex-col items-start space-y-2">
-      <input
-         type="file"
-         accept=".pdf, .jpeg, .jpg, .png"
-         onChange={handleFileChange}
-         className="w-full pr-3 py-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      />
-     {/*  <p className="text-gray-500">No file chosen</p> */}
-    </div>
-  )}
+                {file ? (
+                  // If a file is selected, show file name and cross icon
+                  <div className="flex items-center space-x-3">
+                    <p className="text-gray">Selected File: {fileName || file}</p>
+                    <button
+                      onClick={() => setFile(null)} // Clear the file state
+                      className="text-red hover:text-red focus:outline-none"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  // If no file is selected, show file upload input
+                  <div className="flex flex-col items-start space-y-2">
+                    <input
+                      type="file"
+                      accept=".pdf, .jpeg, .jpg, .png"
+                      onChange={handleFileChange}
+                      className="w-full pr-3 py-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                    {/*  <p className="text-gray-500">No file chosen</p> */}
+                  </div>
+                )}
 
 
               </div>
             }
             <div>
-                  <label className="block text-sm font-medium mb-2 ml-2">
-                    Alert types
-                  </label>
-                  <div className="mb-2 ml-2 flex items-center">
-                    <input
-                      type="checkbox"
-                      name="sms" // Use name attribute to reference the state
-                      checked={formData.sms} // Bind to formData.sms
-                      onChange={handleCheckboxChange} // Update the state when checkbox is clicked
-                      className="mr-2"
-                    />
-                    <label>SMS</label>
-                  </div>
-                  <div className="mb-2 ml-2 flex items-center">
-                    <input
-                      type="checkbox"
-                      name="email" // Use name attribute to reference the state
-                      checked={formData.email} // Bind to formData.email
-                      onChange={handleCheckboxChange} // Update the state when checkbox is clicked
-                      className="mr-2"
-                    />
-                    <label>Email</label>
-                  </div>
-                  <div className="mb-4 ml-2 flex items-center">
-                    <input
-                      type="checkbox"
-                      name="pushNotification" // Use name attribute to reference the state
-                      checked={formData.pushNotification} // Bind to formData.pushNotification
-                      onChange={handleCheckboxChange} // Update the state when checkbox is clicked
-                      className="mr-2"
-                    />
-                    <label>Push Notifications</label>
-                  </div>
-                </div>
+              <label className="block text-sm font-medium mb-2 ml-2">
+                Alert types
+              </label>
+              <div className="mb-2 ml-2 flex items-center">
+                <input
+                  type="checkbox"
+                  name="sms" // Use name attribute to reference the state
+                  checked={formData.sms} // Bind to formData.sms
+                  onChange={handleCheckboxChange} // Update the state when checkbox is clicked
+                  className="mr-2"
+                />
+                <label>SMS</label>
+              </div>
+              <div className="mb-2 ml-2 flex items-center">
+                <input
+                  type="checkbox"
+                  name="email" // Use name attribute to reference the state
+                  checked={formData.email} // Bind to formData.email
+                  onChange={handleCheckboxChange} // Update the state when checkbox is clicked
+                  className="mr-2"
+                />
+                <label>Email</label>
+              </div>
+              <div className="mb-4 ml-2 flex items-center">
+                <input
+                  type="checkbox"
+                  name="pushNotification" // Use name attribute to reference the state
+                  checked={formData.pushNotification} // Bind to formData.pushNotification
+                  onChange={handleCheckboxChange} // Update the state when checkbox is clicked
+                  className="mr-2"
+                />
+                <label>Push Notifications</label>
+              </div>
+            </div>
 
 
 

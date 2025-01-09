@@ -91,8 +91,8 @@ export default function Work() {
 
             if (existing) {
               // Update the existing entry with the maximum values
-              existing.service = Math.max(existing.service||0, curr.service);
-              existing.document = Math.max(existing.document||0, curr.document);
+              existing.service = Math.max(existing.service, curr.service);
+              existing.document = Math.max(existing.document, curr.document);
             } else {
               // Add a new entry if it doesn't exist
               acc.push({ ...curr });
@@ -330,10 +330,10 @@ export default function Work() {
         setServices(fetchedServices)
         if (fetchedServices.length > 0) {
           // setserviceHistory(fetchedServices);
-          setalldataofdocumentation(fetchedServices?.filter((i) => { return i.dataType === 'Documentation' }))
-          setalldataofmaintenance(fetchedServices?.filter((i) => { return i.dataType === 'Maintenance' }))
+          setalldataofdocumentation(fetchedServices.filter((i) => { return i.dataType === 'Documentation' }))
+          setalldataofmaintenance(fetchedServices.filter((i) => { return i.dataType === 'Maintenance' }))
 
-          setalldataofservices(fetchedServices?.filter((i) => { return i.dataType === 'Service' }))
+          setalldataofservices(fetchedServices.filter((i) => { return i.dataType === 'Service' }))
 
           // fetchedServices.forEach((service: any) => {
           //   if (service.dataType === 'Documentation') {
@@ -1047,26 +1047,26 @@ export default function Work() {
                   <div className="text-center">
                     <p className="text-4xl font-bold text-red">
                       {
-                        services?.filter(
+                        services.filter(
                           (item) =>
                             item.dataType === "Documentation" &&
                             item.status == "due"
                         ).length
                       }
                     </p>
-                    <p className="text-sm font-medium">Over Due</p>
+                    <p className="text-sm font-medium">Expire</p>
                   </div>
                   <div className="text-center">
                     <p className="text-4xl font-bold text-yellow">
                       {
-                        services?.filter(
+                        services.filter(
                           (item) =>
                             item.dataType === "Documentation" &&
                             item.status == "due soon"
                         ).length
                       }
                     </p>
-                    <p className="text-sm font-medium">Due Soon</p>
+                    <p className="text-sm font-medium">Expire Soon</p>
                   </div>
                 </div>
               </div>

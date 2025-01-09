@@ -218,7 +218,7 @@ export default function NotificationTab() {
       title: "Vehicle Reg",
       dataIndex: "description",
       key: "description",
-      render: (text, r) => <p>{text.split("has")[0].replace("Your Vehicle ", "")}</p>
+      render: (text, r) => <p>{text?.split("has")[0].replace("Your Vehicle ", "")}</p>
     },
     {
       title: "Action",

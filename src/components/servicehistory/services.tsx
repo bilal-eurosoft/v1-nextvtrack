@@ -528,10 +528,10 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
                       <td className="px-2 py-1">{service.expiryMilage}</td>
 
                       <td
-                        className={`px-2 py-1 ${service.status === "pending" ? "text-[#808080]" :
+                        className={`px-2 py-1 ${service.status === "pending" ? "text-green" :
                           service.status === "due soon" ? "text-[#FFA500]" :
-                            service.status === "due" ? "text-[#FF0000]" :
-                              service.status === "complete" ? "text-[#008000]" : ""}`}
+                            service.status === "due" ? "text-red" :
+                              service.status === "complete" ? "text-[#007BFF]" : ""}`}
                         style={{ cursor: service.status === "complete" ? 'not-allowed' : 'pointer' }}
                         onClick={() => {
                           if (service.status !== "complete") {
@@ -540,7 +540,10 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
                           }
                         }}
                       >
-                        {service.status}
+                        {service.status === "pending" ? "Valid" :
+                          service.status === "due soon" ? "Due Soon" :
+                            service.status === "due" ? "Due" :
+                              service.status === "complete" ? "Complete" : ""}
                       </td>
 
                       <td className="px-2 py-1 text-left">
@@ -560,7 +563,7 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
 
                           {/* Delete Icon */}
                           <svg
-                            className="w-4 h-4 text-red-600 cursor-pointer hover:shadow-lg"
+                            className="w-6 h-6 text-red-600 cursor-pointer hover:shadow-lg"
                             xmlns="http://www.w3.org/2000/svg"
                             version="1.0"
                             width="512.000000pt"
