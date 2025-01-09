@@ -4,11 +4,6 @@ import React, { useEffect, useRef, useState } from "react";
 import "leaflet-draw/dist/leaflet.draw.css"; */
 import dynamic from "next/dynamic"; // Import dynamic from Next.js
 import { useSession } from "next-auth/react";
-import {
-  GoogleMap, useLoadScript,LoadScript,
-  // InfoWindow,
-  DrawingManager
-} from '@react-google-maps/api';
 import { ClientSettings } from "@/types/clientSettings";
 import { useMap } from "react-leaflet";
 import Select from "react-select";
@@ -45,23 +40,12 @@ const FeatureGroup = dynamic(
   () => import("react-leaflet").then((module) => module.FeatureGroup),
   { ssr: false }
 );
-const libraries = ["drawing", "geometry", "places"];
+
 export default function AddZoneComp() {
   const { data: session } = useSession();
   const [polygondataById, setPolygondataById] = useState<[number, number][]>(
     []
   );
-  const GOOGLE_MAPS_API_KEY = 'AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo';
-  const containerStyle = {
-    width: '100%',
-    height: '650px',
-  };
-  const mapRef = useRef(null);
-  const circleRef = useRef(null);
-  const polygonRef = useRef(null);
-  const onLoad = (map) => {
-    mapRef.current = map
-  };
   const [circleDataById, setCircleDataById] = useState<{
     radius: string;
   } | null>(null);
@@ -97,44 +81,39 @@ export default function AddZoneComp() {
     return null;
   }
   const dispatch = useDispatch();
-  
-// //   const { isLoaded } = useLoadScript({
-// //     googleMapsApiKey: GOOGLE_MAPS_API_KEY, libraries
-// // });
-  
-// const { isLoaded }  =useGoogleMaps();
-
   useEffect(() => {
+    // if (typeof window !== "undefined") {
+    // }
     (async function () {
       if (session) {
+        // const clientSettingData = await getClientSettingByClinetIdAndToken({
+        //   token: session?.accessToken,
+        //   clientId: session?.clientId,
+        // });
 
-        const mapObject = session?.clientSetting.find(
-          (obj: { PropertDesc: string }) => obj.PropertDesc === "Map"
-        );
-        // Get the PropertyValue from the found object
-        const centervalue = mapObject ? mapObject.PropertyValue : null;
-        if (centervalue) {
-          const match = centervalue.match(/\{lat:([^,]+),lng:([^}]+)\}/);
-          if (match) {
-            const lat = parseFloat(match[1]);
-            const lng = parseFloat(match[2]);
+        if (session) {
+          //   const centervalue = await clientSettingData?.[0].PropertyValue;
+          const mapObject = session?.clientSetting.find(
+            (obj: { PropertDesc: string }) => obj.PropertDesc === "Map"
+          );
 
-            if (!isNaN(lat) && !isNaN(lng)) {
-              setMapcenter([lat, lng]);
+          // Get the PropertyValue from the found object
+          const centervalue = mapObject ? mapObject.PropertyValue : null;
+          if (centervalue) {
+            const match = centervalue.match(/\{lat:([^,]+),lng:([^}]+)\}/);
+            if (match) {
+              const lat = parseFloat(match[1]);
+              const lng = parseFloat(match[2]);
+
+              if (!isNaN(lat) && !isNaN(lng)) {
+                setMapcenter([lat, lng]);
+              }
             }
           }
+          setClientsetting(session?.clientSetting);
         }
-        setClientsetting(session?.clientSetting); 
-        
       }
     })();
-    return () => {
-      // Cleanup map instance
-      if (mapRef.current) {
-        mapRef.current = null;
-        delete window.google;
-      }
-    };
   }, []);
   const clientZoomSettings = clientsetting?.filter(
     (el) => el?.PropertDesc === "Zoom"
@@ -170,23 +149,13 @@ export default function AddZoneComp() {
         }));
       }
     }
-
   }, [polygondata, circleData]);
 
   const handlePolygonSave = (coordinates: [number, number][]) => {
-    let zoneCoords:any;
-    if(session.MapType=="Google1"){
-      zoneCoords = coordinates.map(([lat, lng]) => ({
-        latitude: lat,
-        longitude: lng
-      }));
-    }else{
-
-      zoneCoords = coordinates.slice(0, -1).map(([lat, lng]) => ({
-        latitude: lat,
-        longitude: lng
-      }));
-    }
+    const zoneCoords = coordinates.slice(0, -1).map(([lat, lng]) => ({
+      latitude: lat,
+      longitude: lng
+    }));
 
     if (drawShape == true) {
       const formattedCoordinate: [number, number][] = zoneCoords.map(
@@ -250,10 +219,21 @@ export default function AddZoneComp() {
         .then((response) => {
           setAddresses(response);
         })
-        .catch((error) => { });
+        .catch((error) => {});
     }
   };
 
+  // const handleAAdressSearch = async (inputValue: any) => {
+  //
+  //   let query: string = inputValue.target.value;
+  //   if (session) {
+  //     const getAddress = await getSearchAddress({
+  //       query: query,
+  //       country: session?.country,
+  //     });
+  //     setAddresses(getAddress);
+  //   }
+  // };
 
   const SetViewfly = () => {
     const map = useMap();
@@ -270,11 +250,12 @@ export default function AddZoneComp() {
   const handleChangeSelectValue = (e: any) => {
     if (e.value) {
       setForm({ ...Form, GeoFenceType: e.value });
-    }
+    }    
   };
-
+  
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     // Check if any of the required fields are empty
     if (
       !Form.latlngCordinates ||
@@ -295,7 +276,6 @@ export default function AddZoneComp() {
           clientId: session?.clientId
         };
 
-     
         const response = await toast.promise(
           postZoneDataByClientId({
             token: session?.accessToken,
@@ -328,13 +308,19 @@ export default function AddZoneComp() {
             }
           }
         );
+
+        // if (response.id !== null) {
+
+        //   setTimeout(() => {
+        //     router.push("/Zone");
+        //   }, 2000);
+        // }
         dispatch(
           fetchZone({
             clientId: session?.clientId,
             token: session?.accessToken
           })
         );
-
       }
     } catch (error) {
       console.error("Error fetching zone data:", error);
@@ -397,14 +383,11 @@ export default function AddZoneComp() {
       setPolygondataById([]);
       setPolygondata([]);
       setForm({ ...Form, zoneType: "" });
-      polygonRef.current?.setMap(null)
     } else if (circleDataById !== null) {
       setCircleDataById(null);
       setCircleData({ radius: "", latlng: "" });
       setForm({ ...Form, zoneType: "" });
       setDrawShape(true);
-      circleRef.current?.setMap(null)
-
     } else {
       setDrawShape(drawShape);
     }
@@ -424,78 +407,11 @@ export default function AddZoneComp() {
       value: JSON.stringify(item),
       label: item.display_name
     })) || [];
-
-  const handleCircleComplete = (circle: any) => {
-    setShapeType("Circle");
-    const latlng = circle.getCenter().toJSON();
-    const radius = circle.getRadius();
-    setPolygondata([])
-    setPolygondataById([])
-    handleCircleSave(latlng, radius)
-    // setCircleData({latlng:latlng.lat+","+latlng.lng,radius})
-    // handleCircleSave([latlng.lat,latlng.lng], radius);     
-    circle.setMap(null); // Remove the temporary circle
-    circleRef.current?.setMap(null)
-    polygonRef.current?.setMap(null)
-    circleRef.current=new google.maps.Circle({
-      center: { lat: Number(latlng.lat), lng: Number(latlng.lng) }, // Circle center
-      radius: Number(radius), // Radius in meters
-      strokeColor: Form.GeoFenceType == "City-Area"
-        ? "green"
-        : Form.GeoFenceType == "Restricted-Area"
-          ? "red"
-          : "blue", // Red border color
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: Form.GeoFenceType == "City-Area"
-        ? "green"
-        : Form.GeoFenceType == "Restricted-Area"
-          ? "red"
-          : "blue", // Red fill color
-      fillOpacity: 0.35,
-      map: mapRef.current, // Attach to the map instance          
-    })
-   
-
-  };
-
-
-  const handlePolygonComplete = (polygon: any) => {
-    setShapeType("Polygon");
-    let latlngs = polygon.getPath().getArray().map((path) => path.toJSON())
-    setCircleData({
-      latlng: "",
-      radius: ""
-    });
-    setCircleDataById({ radius: "" })
-    handlePolygonSave(latlngs.map((coord: any) => [coord.lat, coord.lng]))
-
-    // setPolygondata(latlngs.map((coord: any) => [coord.lat, coord.lng]))
-    polygon.setMap(null);
-    polygonRef.current?.setMap(null)
-    circleRef.current?.setMap(null)
-
-    polygonRef.current =new google.maps.Polygon({
-      paths: latlngs,
-      strokeColor: Form.GeoFenceType == "City-Area"
-        ? "green"
-        : Form.GeoFenceType == "Restricted-Area"
-          ? "red"
-          : "blue", // Red border color
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: Form.GeoFenceType == "City-Area"
-        ? "green"
-        : Form.GeoFenceType == "Restricted-Area"
-          ? "red"
-          : "blue", // Red fill color
-      fillOpacity: 0.35,
-      map: mapRef.current, // Attach to the map instance          
-    });
-  };
-
-
-
+  // {addresses.map((address, index) => (
+  //   <option key={address.place_id} value={JSON.stringify(address)}>
+  //     {address.display_name}
+  //   </option>
+  // ))}
 
   return (
     <div className="shadow-lg bg-bgLight h-5/6  border-t text-white edit_zone_main ">
@@ -549,13 +465,13 @@ export default function AddZoneComp() {
                     backgroundColor: state.isSelected
                       ? "#00B56C"
                       : state.isFocused
-                        ? "#e1f0e3"
-                        : "transparent",
+                      ? "#e1f0e3"
+                      : "transparent",
                     color: state.isSelected
                       ? "white"
                       : state.isFocused
-                        ? "black"
-                        : "black",
+                      ? "black"
+                      : "black",
                     "&:hover": {
                       backgroundColor: "#e1f0e3",
                       color: "black"
@@ -585,13 +501,13 @@ export default function AddZoneComp() {
                     backgroundColor: state.isSelected
                       ? "#00B56C"
                       : state.isFocused
-                        ? "#e1f0e3"
-                        : "transparent",
+                      ? "#e1f0e3"
+                      : "transparent",
                     color: state.isSelected
                       ? "white"
                       : state.isFocused
-                        ? "black"
-                        : "black",
+                      ? "black"
+                      : "black",
                     "&:hover": {
                       backgroundColor: "#e1f0e3",
                       color: "black"
@@ -795,13 +711,13 @@ export default function AddZoneComp() {
                   backgroundColor: state.isSelected
                     ? "#00B56C"
                     : state.isFocused
-                      ? "#e1f0e3"
-                      : "transparent",
+                    ? "#e1f0e3"
+                    : "transparent",
                   color: state.isSelected
                     ? "white"
                     : state.isFocused
-                      ? "black"
-                      : "black",
+                    ? "black"
+                    : "black",
                   "&:hover": {
                     backgroundColor: "#e1f0e3",
                     color: "black"
@@ -839,7 +755,6 @@ export default function AddZoneComp() {
               <b>edraw</b>
             </span>
           </Button>
-
           {/* <div
             className="grid lg:grid-cols-3 grid-cols-3  bg-green lg:w-28 md:w-28 sm:w-28
             w-32
@@ -870,139 +785,115 @@ export default function AddZoneComp() {
               </button>
             </div>
           </div> */}
-
           <div className="flex justify-start"></div>
           <div className="lg:col-span-5  md:col-span-4  sm:col-span-5 col-span-4 mx-3">
             <div className="flex justify-start"></div>
             <div className="w-full  mt-4 overflow-hidden">
               {mapcenter !== null && (
-                session?.MapType == "Google1"?
-                  (
-                    <div className="edit_zone_map_main">
+                <MapContainer
+                  zoom={15}
+                  center={mapcenter}
+                  className="z-0 edit_zone_map_main"
+                >
+                  {/* <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
+                  /> */}
+                  {session?.MapType == "Google"?(
+                <TileLayer
+                url={`https://{s}.googleapis.com/maps/vt?lyrs=m&x={x}&y={y}&z={z}&key=AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo`}
+              subdomains={['mt0', 'mt1', 'mt2', 'mt3']} // Google tile servers
+              attribution="Google Maps"
+            />
+              ):(
+                <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
+              />
 
-                      <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={libraries}>
-                        <GoogleMap
-                          clickableIcons={false}
-                          mapContainerStyle={containerStyle}
-                          // center={{ lat, lng }}
-                          center={{ lat: mapcenter[0], lng: mapcenter[1] }}
+              )}
 
-                          zoom={zoom}
-                          onLoad={onLoad}
-                          options={{
-                            draggable: true, // Make map draggable                            
-                            disableDoubleClickZoom: true, //disable zoom in double click
-                            disableDefaultUI: true,  //disable all options
-                          }}                           
-                        >
-                          <DrawingManager
-                            onCircleComplete={handleCircleComplete}
-                            onPolygonComplete={handlePolygonComplete}
-                            options={{
-                              drawingControl: true,
-                              drawingControlOptions: {
-                                position: window.google?.maps?.ControlPosition?.TOP_CENTER,
-                                drawingModes: ["circle", "polygon"],
-                              }
-                            }}
-                          />
-                          
-                        </GoogleMap>
-                      </LoadScript>
-                    </div>
-                  ) : (
-                    <MapContainer
-                      zoom={15}
-                      center={mapcenter}
-                      className="z-0 edit_zone_map_main"
-                    >
-                      <TileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
+                  <SetViewfly />
+                  {drawShape == false && (
+                    <FeatureGroup>
+                      <EditControl
+                        position="topright"
+                        onEdited={handleEdited}
+                        // edit={true}
+                        onCreated={handleCreated}
+                        draw={{
+                          polyline: false,
+                          polygon: drawShape,
+                          circle: drawShape,
+                          marker: false,
+                          circlemarker: false,
+                          rectangle: false
+                        }}
                       />
+                      {shapeType === "Polygon" && polygondataById.length > 0 ? (
+                        <Polygon
+                          positions={polygondataById}
+                          color={
+                            Form.GeoFenceType == "City-Area"
+                              ? "green"
+                              : Form.GeoFenceType == "Restricted-Area"
+                              ? "red"
+                              : "blue"
+                          }
+                        />
+                      ) : null}
 
-                      <SetViewfly />
-                      {drawShape == false && (
-                        <FeatureGroup>
-                          <EditControl
-                            position="topright"
-                            onEdited={handleEdited}
-                            // edit={true}
-                            onCreated={handleCreated}
-                            draw={{
-                              polyline: false,
-                              polygon: drawShape,
-                              circle: drawShape,
-                              marker: false,
-                              circlemarker: false,
-                              rectangle: false
-                            }}
-                          />
-                          {shapeType === "Polygon" && polygondataById.length > 0 ? (
-                            <Polygon
-                              positions={polygondataById}
-                              color={
-                                Form.GeoFenceType == "City-Area"
-                                  ? "green"
-                                  : Form.GeoFenceType == "Restricted-Area"
-                                    ? "red"
-                                    : "blue"
-                              }
-                            />
-                          ) : null}
+                      {shapeType === "Circle" &&
+                      !isNaN(mapcenter[0]) &&
+                      !isNaN(mapcenter[1]) &&
+                      !isNaN(Number(circleDataById?.radius)) ? (
+                        <Circle
+                          radius={Number(circleDataById?.radius)}
+                          center={mapcenter}
+                          color={
+                            Form.GeoFenceType == "City-Area"
+                              ? "green"
+                              : Form.GeoFenceType == "Restricted-Area"
+                              ? "red"
+                              : "blue"
+                          }
+                        />
+                      ) : null}
+                    </FeatureGroup>
+                  )}
+                  {drawShape == true && (
+                    <FeatureGroup>
+                      <EditControl
+                        position="topright"
+                        onEdited={handleEdited}
+                        // edit={true}
+                        onCreated={handleCreated}
+                        draw={{
+                          polyline: false,
+                          polygon: true,
+                          circle: true,
+                          marker: false,
+                          circlemarker: false,
+                          rectangle: false
+                        }}
+                      />
+                      {shapeType === "Polygon" && polygondataById.length > 0 ? (
+                        <Polygon positions={polygondataById} color="#97009c" />
+                      ) : null}
 
-                          {shapeType === "Circle" &&
-                            !isNaN(mapcenter[0]) &&
-                            !isNaN(mapcenter[1]) &&
-                            !isNaN(Number(circleDataById?.radius)) ? (
-                            <Circle
-                              radius={Number(circleDataById?.radius)}
-                              center={mapcenter}
-                              color={
-                                Form.GeoFenceType == "City-Area"
-                                  ? "green"
-                                  : Form.GeoFenceType == "Restricted-Area"
-                                    ? "red"
-                                    : "blue"
-                              }
-                            />
-                          ) : null}
-                        </FeatureGroup>
-                      )}
-                      {drawShape == true && (
-                        <FeatureGroup>
-                          <EditControl
-                            position="topright"
-                            onEdited={handleEdited}
-                            // edit={true}
-                            onCreated={handleCreated}
-                            draw={{
-                              polyline: false,
-                              polygon: true,
-                              circle: true,
-                              marker: false,
-                              circlemarker: false,
-                              rectangle: false
-                            }}
-                          />
-                          {shapeType === "Polygon" && polygondataById.length > 0 ? (
-                            <Polygon positions={polygondataById} color="#97009c" />
-                          ) : null}
-
-                          {shapeType === "Circle" &&
-                            !isNaN(mapcenter[0]) &&
-                            !isNaN(mapcenter[1]) &&
-                            !isNaN(Number(circleDataById?.radius)) ? (
-                            <Circle
-                              radius={Number(circleDataById?.radius)}
-                              center={mapcenter}
-                              color="#97009c"
-                            />
-                          ) : null}
-                        </FeatureGroup>
-                      )}
-                    </MapContainer>)
-
+                      {shapeType === "Circle" &&
+                      !isNaN(mapcenter[0]) &&
+                      !isNaN(mapcenter[1]) &&
+                      !isNaN(Number(circleDataById?.radius)) ? (
+                        <Circle
+                          radius={Number(circleDataById?.radius)}
+                          center={mapcenter}
+                          color="#97009c"
+                        />
+                      ) : null}
+                    </FeatureGroup>
+                  )}
+                </MapContainer>
               )}
             </div>
           </div>

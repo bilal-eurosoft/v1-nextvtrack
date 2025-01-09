@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Loading from "@/app/loading";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -25,6 +25,9 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { getNotificationsData, getNotificationsDataByUserId, getZoneListByClientId } from "@/utils/API_CALLS";
 import { fetchZone } from "@/lib/slices/zoneSlice";
 import { useSelector } from "react-redux";
+import toast from 'react-hot-toast';
+
+
 import { FaBell } from 'react-icons/fa'; // Using React Icons for the bell icon
 
 import {
@@ -36,7 +39,6 @@ import {
 } from "@material-tailwind/react";
 import "./layout.css";
 import BlinkingTime from "../General/BlinkingTime";
-import { stringify } from "querystring";
 import NotificationDropdown from "./notifications";
 import { socket } from "@/utils/socket";
 // const inter = Inter({ subsets: ["latin"] });
@@ -196,13 +198,12 @@ export default function RootLayout({
 
           setFilterId(filteredIds?.id);
           // Use filteredIds as needed
-        } catch (error) {}
+        } catch (error) { }
       }
     };
 
     filterZoneIds();
   }, [zoneList]);
-  
   const [loading, setLoading] = useState(false); // Loading state
 
   const BellButton = ({ toggleNotifications }) => {
@@ -229,8 +230,28 @@ export default function RootLayout({
           onMouseLeave={() => setHovered(false)} // Reset hover state
         >
           <FaBell size={24} />
-        </button>
-  
+        </button>  {notificationCount > 0 && (
+          <span
+            style={{
+              position: "absolute",
+              top: "0",
+              right: "0",
+              backgroundColor: "red",
+              color: "white",
+              borderRadius: "50%",
+              padding: "0.2rem 0.5rem",
+              fontSize: "0.75rem",
+              fontWeight: "bold",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              transform: "translate(50%, -50%)",
+            }}
+          >
+            {notificationCount}
+          </span>
+        )}
+
         <style>
           {`
             @keyframes ringing {
@@ -253,16 +274,37 @@ export default function RootLayout({
     );
   };
 
-  
+
 
   const [showNotifications, setShowNotifications] = useState(false);
-  
+  const [notificationCount, setNotificationCount] = useState(0);
+  const notificationRef = useRef(null);
   const [notifications, setnotifications] = useState([]);
- 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener("mouseclick", handleClickOutside);
+    // Add event listener
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      // Cleanup event listener
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Toggle the visibility of the notifications dropdown
   const toggleNotifications = () => {
     setShowNotifications((prev) => !prev);
+    setNotificationCount(0)
   };
 
   useEffect(() => {
@@ -271,29 +313,29 @@ export default function RootLayout({
         setLoading(true); // Set loading to true before the fetch starts
         try {
           if (session && session.userRole === "Admin") {
-            
+
             const NotificationsData = await getNotificationsData({
               token: session.accessToken,
               clientId: session?.clientId,
             });
-          
-            
+
+
             setnotifications(NotificationsData.data); // Assuming the response is an array of notifications
-         
-        
+
+
           }
           else {
-             
+
             const NotificationsData = await getNotificationsDataByUserId({
               token: session?.accessToken,
               userId: session?.userId,
             });
-           
 
-            
+
+
             setnotifications(NotificationsData.data); // Assuming the response is an array of notifications
-        
-        
+
+
           }
         } catch (error) {
           console.error('Error fetching notifications:', error);
@@ -305,75 +347,83 @@ export default function RootLayout({
       fetchNotifications();
     }
   }, [showNotifications]);
-  useEffect(() => { 
-      try {
-        socket.io.opts.query = { clientId: session?.clientId };
-        socket.connect();
-        socket.on(
-          "notification",
-          async (data) => {
-            if (data === null || data === undefined) {
-              return;
-            }
-            
-          }
-        );
-      } catch (err) {
+  useEffect(() => {
 
-      }
-    
-   
+    try {
+      socket.io.opts.query = { clientId: session?.clientId };
+      socket.connect();
+      socket.on(
+        "notification",
+        async (data) => {
+
+          toast(data.description, {position:"top-center"})
+
+          setNotificationCount((prevCount) => prevCount + 1)
+          if (data === null || data === undefined) {
+            return;
+          }
+
+        }
+      );
+    } catch (err) {
+    }
+
+    return () => {
+      socket.off("notification")
+      socket.disconnect();
+    };
+
   }, []);
 
-  
- 
 
- /*  const notifications = [
-    {
-      dateTime: "October 16 2024 07:50:00 PM",
-      event: "ignitionOn",
-      clientId: "",
-      title: "ignitionOn Alert",
-      description: `Your Vehicle AXF-398 (R) has Ignition On at October 16 2024 07:50:00 PM`
-      },
-      {
-        dateTime: "October 16 2024 07:50:00 PM",
-        event: "ignitionOff",
-        clientId: "",
-        title: "ignitionOff Alert",
-        description: `Your Vehicle AXF-398 (R) has Ignition Off at October 16 2024 07:50:00 PM`
-        },
-        {
-          dateTime: "October 16 2024 07:50:00 PM",
-          event: "geofenceEntered",
-          clientId: "",
-          title: "geofenceEntered Alert",
-          description: `Your Vehicle AXF-398 (R) has geofenceEntered at October 16 2024 07:50:00 PM`
-          },
-          {
-            dateTime: "October 16 2024 07:50:00 PM",
-            event: "geofenceLeft",
-            clientId: "",
-            title: "geofenceLeft Alert",
-            description: `Your Vehicle AXF-398 (R) has geofenceLeft at October 16 2024 07:50:00 PM`
-            },
-            {
-              dateTime: "October 16 2024 07:50:00 PM",
-              event: "harshacceleration",
-              clientId: "",
-              title: "harshacceleration Alert",
-              description: `Your Vehicle AXF-398 (R) has harshacceleration at October 16 2024 07:50:00 PM`
-              },
-              {
-                dateTime: "October 16 2024 07:50:00 PM",
-                event: "harshcorning",
-                clientId: "",
-                title: "harshcorning Alert",
-                description: `Your Vehicle AXF-398 (R) has harshcorning at October 16 2024 07:50:00 PM`
-                },
-  ]; */
 
-  
+
+  /*  const notifications = [
+     {
+       dateTime: "October 16 2024 07:50:00 PM",
+       event: "ignitionOn",
+       clientId: "",
+       title: "ignitionOn Alert",
+       description: `Your Vehicle AXF-398 (R) has Ignition On at October 16 2024 07:50:00 PM`
+       },
+       {
+         dateTime: "October 16 2024 07:50:00 PM",
+         event: "ignitionOff",
+         clientId: "",
+         title: "ignitionOff Alert",
+         description: `Your Vehicle AXF-398 (R) has Ignition Off at October 16 2024 07:50:00 PM`
+         },
+         {
+           dateTime: "October 16 2024 07:50:00 PM",
+           event: "geofenceEntered",
+           clientId: "",
+           title: "geofenceEntered Alert",
+           description: `Your Vehicle AXF-398 (R) has geofenceEntered at October 16 2024 07:50:00 PM`
+           },
+           {
+             dateTime: "October 16 2024 07:50:00 PM",
+             event: "geofenceLeft",
+             clientId: "",
+             title: "geofenceLeft Alert",
+             description: `Your Vehicle AXF-398 (R) has geofenceLeft at October 16 2024 07:50:00 PM`
+             },
+             {
+               dateTime: "October 16 2024 07:50:00 PM",
+               event: "harshacceleration",
+               clientId: "",
+               title: "harshacceleration Alert",
+               description: `Your Vehicle AXF-398 (R) has harshacceleration at October 16 2024 07:50:00 PM`
+               },
+               {
+                 dateTime: "October 16 2024 07:50:00 PM",
+                 event: "harshcorning",
+                 clientId: "",
+                 title: "harshcorning Alert",
+                 description: `Your Vehicle AXF-398 (R) has harshcorning at October 16 2024 07:50:00 PM`
+                 },
+   ]; */
+
+
   return (
     // <div className={inter.className}>
     <div>
@@ -407,11 +457,10 @@ export default function RootLayout({
                 content="Live Map"
               >
                 <svg
-                  className={`w-20 h-14 py-3 mt-12   text-white text-white-10 dark:text-white ${
-                    pathname === "/liveTracking"
-                      ? "border-r-2 border-#29303b"
-                      : "border-y-2"
-                  }`}
+                  className={`w-20 h-14 py-3 mt-12   text-white text-white-10 dark:text-white ${pathname === "/liveTracking"
+                    ? "border-r-2 border-#29303b"
+                    : "border-y-2"
+                    }`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -442,15 +491,13 @@ export default function RootLayout({
                 content="Journey Replay"
               >
                 <svg
-                  className={`w-20 h-14 py-3  -my-1   text-white-10  dark:text-white ${
-                    session?.userRole === "Controller"
-                      ? "border-b-2 border-white"
-                      : ""
-                  } ${
-                    pathname === "/journeyReplay"
+                  className={`w-20 h-14 py-3  -my-1   text-white-10  dark:text-white ${session?.userRole === "Controller"
+                    ? "border-b-2 border-white"
+                    : ""
+                    } ${pathname === "/journeyReplay"
                       ? "border-r-2 border-#29303b"
                       : "border-b-2"
-                  }`}
+                    }`}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -477,13 +524,12 @@ export default function RootLayout({
                   content="Zones"
                 >
                   <svg
-                    className={`w-20 h-14 py-3    text-[white]  text-white-10  dark:text-white  ${
-                      pathname == "/Zone" ||
+                    className={`w-20 h-14 py-3    text-[white]  text-white-10  dark:text-white  ${pathname == "/Zone" ||
                       pathname == "/AddZone" ||
                       `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
-                        ? "border-r-2 #29303b"
-                        : "border-b-2"
-                    }`}
+                      ? "border-r-2 #29303b"
+                      : "border-b-2"
+                      }`}
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"
@@ -495,14 +541,14 @@ export default function RootLayout({
                     style={{
                       color:
                         pathname == "/Zone" ||
-                        pathname == "/AddZone" ||
-                        `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
+                          pathname == "/AddZone" ||
+                          `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
                           ? "green"
                           : "white",
                       backgroundColor:
                         pathname == "/Zone" ||
-                        pathname == "/AddZone" ||
-                        `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
+                          pathname == "/AddZone" ||
+                          `EditZone?id=${filterId}` == `EditZone?id=${pathName}`
                           ? "white"
                           : ""
                     }}
@@ -522,49 +568,48 @@ export default function RootLayout({
 
             {(session?.userRole == "SuperAdmin" ||
               session?.userRole == "Admin") && (
-              <div>
-                {session?.cameraProfile && (
-                  <Link href="/DualCam">
-                    <Tooltip
-                      className="bg-[#00B56C] text-white shadow-lg rounded"
-                      placement="right"
-                      content="Camera"
-                    >
-                      <svg
-                        className={`w-20 h-14 py-3  text-white-10  dark:text-white 
+                <div>
+                  {session?.cameraProfile && (
+                    <Link href="/DualCam">
+                      <Tooltip
+                        className="bg-[#00B56C] text-white shadow-lg rounded"
+                        placement="right"
+                        content="Camera"
+                      >
+                        <svg
+                          className={`w-20 h-14 py-3  text-white-10  dark:text-white 
                 
-                          ${
-                            pathname === "/DualCam"
+                          ${pathname === "/DualCam"
                               ? "border-r-2 border-#29303b -my-1"
                               : "border-y-1 border-b-2"
-                          }`}
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        style={{
-                          color: pathname == "/DualCam" ? "green" : "white",
-                          backgroundColor: pathname == "/DualCam" ? "white" : ""
-                        }}
-                      >
-                        {" "}
-                        <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                        <circle cx="6" cy="6" r="2" />{" "}
-                        <circle cx="18" cy="18" r="2" />{" "}
-                        <path d="M11 6h5a2 2 0 0 1 2 2v8" />{" "}
-                        <polyline points="14 9 11 6 14 3" />{" "}
-                        <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />{" "}
-                        <polyline points="10 15 13 18 10 21" />
-                      </svg>
-                    </Tooltip>
-                  </Link>
-                )}
-              </div>
-            )}
+                            }`}
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          strokeWidth="2"
+                          stroke="currentColor"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          style={{
+                            color: pathname == "/DualCam" ? "green" : "white",
+                            backgroundColor: pathname == "/DualCam" ? "white" : ""
+                          }}
+                        >
+                          {" "}
+                          <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                          <circle cx="6" cy="6" r="2" />{" "}
+                          <circle cx="18" cy="18" r="2" />{" "}
+                          <path d="M11 6h5a2 2 0 0 1 2 2v8" />{" "}
+                          <polyline points="14 9 11 6 14 3" />{" "}
+                          <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />{" "}
+                          <polyline points="10 15 13 18 10 21" />
+                        </svg>
+                      </Tooltip>
+                    </Link>
+                  )}
+                </div>
+              )}
 
             <Link href="/Reports">
               <Tooltip
@@ -576,11 +621,10 @@ export default function RootLayout({
                   className={`w-20 h-14 py-3 
                   text-white-10  dark:text-white 
         
-                  ${
-                    pathname === "/Reports"
+                  ${pathname === "/Reports"
                       ? "border-r-2 border-#29303b -my-1"
                       : "border-y-1 border-b-2"
-                  }`}
+                    }`}
                   width="24"
                   height="24"
                   viewBox="0 0 24 24"
@@ -600,259 +644,305 @@ export default function RootLayout({
               </Tooltip>
             </Link>
             <Link href="/Notifications">
-  <Tooltip
-    className="bg-[#00B56C] text-white shadow-lg rounded"
-    placement="right"
-    content="Events and Notifications"
+              <Tooltip
+                className="bg-[#00B56C] text-white shadow-lg rounded"
+                placement="right"
+                content="Events and Notifications"
 
-  >
-    <svg
-      className={`w-20 h-14 py-3 text-white-10 dark:text-white ${
-        pathname === "/Notifications"
-          ? "border-r-2 border-#29303b -my-1"
-          : "border-y-1 border-b-2"
-      }`}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      style={{
-        color: pathname === "/Notifications" ? "green" : "white",
-        backgroundColor:
-          pathname === "/Notifications" ? "white" : "",
-      }}
-    >
-      {/* Bell Icon */}
-      <path
-        d="M12 22C13.1046 22 14 21.1046 14 20C14 19.4477 13.5523 19 13 19H11C10.4477 19 10 19.4477 10 20C10 21.1046 10.8954 22 12 22ZM18 16V11C18 7.13401 15.866 4 12 4C8.13401 4 6 7.13401 6 11V16L4 18V19H20V18L18 16Z"
-      />
-      {/* Gear Icon next to Bell */}
-      <circle cx="17" cy="7" r="3" stroke="currentColor" strokeWidth="2" fill="none" />
-      <path
+              >
+
+                <svg className={`w-20 h-14 py-3  text-white-10 dark:text-white ${pathname === "/Notifications"
+                  ? "border-r-2 border-#29303b -my-1"
+                  : "border-y-1 border-b-2"
+                  }`}
+                  viewBox="0 0 720 720"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="20"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    color: pathname === "/Notifications" ? "green" : "white",
+                    backgroundColor:
+                      pathname === "/Notifications" ? "white" : "",
+                  }}>
+                  <path d="M70.3,205.7c-7.5,0-13.8,0-21.1,0c0,2.7,0,5.2,0,7.6c0,115.5,0.4,230.9-0.3,346.4c-0.2,26.8,17.5,44.6,44.5,44.4
+		c97.3-0.7,194.6-0.3,291.9-0.3c3,0,6.1-0.1,9.1,0.1c7.2,0.4,12.1,5.2,12.2,11.8c0.1,6.6-4.7,11.9-11.8,12.3
+		c-6.5,0.4-13.1,0.1-19.7,0.1c-94.5,0-189,0.1-283.6,0c-40.6-0.1-66.5-26.3-66.5-66.8c0-138.4-0.1-276.8,0-415.2
+		c0-33.1,18.9-58,49.2-64.6c5.8-1.3,12-1.2,18-1.4c6.5-0.2,13-0.1,20.4-0.1c0-6-0.1-11.2,0-16.4c0.4-22.4,17.2-39.9,38.7-40.4
+		c25.1-0.6,42.9,15,44.1,38.8c0.3,5.5,0,11,0,17.2c98,0,195.4,0,294,0c0-4.2,0-8.6,0-13c0.1-24.3,18-42.8,41.5-43
+		c23.3-0.2,41.5,18.6,41.6,42.8c0,4.3,0,8.5,0,14c7.6,0,14.8,0,22,0c39.2,0.2,65.5,26.2,65.5,65.5c0.1,107.9,0.1,215.8,0,323.7
+		c0,4.7,0.8,8.2,4.7,11.8c4.1,3.8,6.7,9.3,9.6,14.3c6.3,10.6,12.6,21.3,18.5,32.1c7.2,12.9,3.9,24.6-8.8,32.3
+		c-4.1,2.5-8.4,4.5-12.4,7.2c-4.7,3.3-4.7,6.9,0.3,10c4.3,2.6,8.8,5,13,7.6c11.5,7.1,14.9,18.8,8.4,30.6
+		c-7.9,14.3-16.1,28.5-24.5,42.6c-6.7,11.2-18.5,14.3-30.1,8.1c-4.7-2.5-9.1-5.5-13.8-7.8c-5.1-2.5-8.3-0.7-8.6,5.1
+		c-0.3,5.3,0,10.6-0.2,15.9c-0.5,12.9-9.3,21.7-22.2,21.9c-16.4,0.2-32.8,0.2-49.2,0c-13-0.2-21.7-9-22.2-21.9
+		c-0.2-5,0.1-10.1-0.1-15.1c-0.3-6.7-3.5-8.6-9.3-5.5c-4.5,2.3-8.7,5.1-13.1,7.5c-11.5,6.1-23.4,3.1-30.1-8
+		c-8.4-14-16.6-28.2-24.6-42.5c-6.5-11.7-3.2-23.6,8.3-30.7c4.1-2.5,8.4-4.7,12.4-7.2c5.9-3.7,5.8-7.5-0.2-11.3
+		c-4.1-2.5-8.3-4.7-12.4-7.3c-11.1-6.9-14.5-18.7-8.2-30c8.1-14.5,16.3-29,24.9-43.2c6.5-10.8,18.3-13.8,29.6-8
+		c4.7,2.4,9.1,5.5,13.8,7.8c5.6,2.8,8.7,1,9-5.2c0.3-5.3,0-10.6,0.2-15.9c0.4-12.1,8.8-21.3,20.9-21.6c17.1-0.5,34.3-0.5,51.4,0
+		c12.1,0.3,20.6,9.3,21.2,21.4c0.3,5.5,0,11.1,0.1,16.6c0.1,5.7,3.4,6.9,8.2,5.1c9.9-3.6,11.5-6,11.5-16.4c0-85,0-169.9,0-254.9
+		c0-2.7,0-5.4,0-8.5c-180.8,0-360.6,0-541,0c0,83.5,0,166.8,0,251c3.5,0,6.7,0,9.9,0c22.2,0,44.4,0,66.5,0c11.4,0,15.3,4,15.3,15.6
+		c0,25.2,0,50.4,0,76.8c3.1,0,5.8,0,8.4,0c64.5,0,129.1,0,193.6,0c2.8,0,5.6-0.1,8.3,0.1c7.2,0.5,12.1,5.4,12.1,12
+		c0,6.5-5,11.8-12.1,12c-11.8,0.3-23.7,0.2-35.5,0.2c-60.5,0-121-0.1-181.5,0.1c-7.4,0-12.8-2.3-18-7.5
+		c-28.3-28.7-56.8-57.2-85.5-85.6c-4.9-4.9-6.4-10.3-6.4-17c0.1-82.7,0.1-165.4,0.1-248.1C70.3,212.4,70.3,209.5,70.3,205.7z
+		 M49.5,180.5c195.9,0,391.1,0,586.6,0c0-11.8,0-22.9,0-33.9c0-2.3,0-4.5-0.1-6.8c-1.2-15.8-11.1-30-26.2-33.4
+		c-11.7-2.7-24.2-2.2-37.1-3.1c0,6.5,0.1,11,0,15.5c-0.4,23.7-18.6,42-41.8,41.8c-22.7-0.1-40.8-18.4-41.2-41.6
+		c-0.1-4.7,0-9.4,0-14.6c-98.3,0-195.7,0-294,0c0,5.4,0.1,10.4,0,15.4c-0.7,24.8-17.8,41.1-42.9,40.9c-22.9-0.2-39.7-17.6-40.1-41.3
+		c-0.1-4.9,0-9.8,0-14.9c-10.8,0-20.4-0.7-29.9,0.1c-17.7,1.5-32.1,16-33.1,33.8C48.8,152.2,49.5,166,49.5,180.5z M649.3,499.9
+		c-13.7,7.5-26.6,16.2-42.6,7.1c-16-9.1-14.4-25-14.8-39.9c-15.3,0-29.8,0-44.3,0c3.8,42-27.3,55.3-57.8,32.8
+		c-7.4,12.8-14.7,25.6-22.4,38.8c14.2,7.4,27.2,15,27.3,32.8c0.1,18.2-13.5,25.6-27.2,33.1c7.7,13.3,15,25.9,22.5,39
+		c13.3-8.6,26.5-16.3,42.3-7.2c15.7,9.1,15,24.7,14.9,40.1c8.2,0,15.5,0,22.8,0c7.2,0,14.4,0,21.7,0c-4.6-40.7,26-56.5,57.7-33.4
+		c7.3-12.8,14.7-25.5,22.1-38.5c-13.7-8-27.4-14.9-27.4-33c0-18.4,14.2-25.2,27.4-33.2C664,525.4,656.7,512.8,649.3,499.9z
+		 M513.8,91.5c0,4.5,0,9,0,13.6c0,4.8-0.1,9.6,0,14.3c0.3,11,6.7,17,17.7,17.1c10,0.1,16.7-6.6,16.8-17.2c0.2-18.3,0.2-36.7,0-55.1
+		c-0.1-10.5-7-17.2-17-17.1c-11,0.1-17.4,6.2-17.6,17.2C513.7,73.4,513.8,82.5,513.8,91.5z M136.9,91.6c0,9.5-0.2,19.1,0,28.6
+		c0.2,9.6,6.8,16.1,16.1,16.3c10.4,0.2,17.9-5.4,18.2-15c0.5-19.6,0.5-39.2,0-58.8c-0.2-9.9-7.8-15.9-17.7-15.5
+		c-10.4,0.4-16.5,6.3-16.7,16.4C136.7,73,136.9,82.3,136.9,91.6z M116.2,481.5c15.3,15.3,31.3,31.2,46,46c0-13.8,0-29.8,0-46
+		C145.8,481.5,129.9,481.5,116.2,481.5z"/>
+                  <path d="M351.4,411.7c25.8,0.1,45.3,19.6,45.4,45.5c0.2,26.5-19.8,46.7-46,46.6c-24.4-0.2-44.9-20.9-45-45.6
+		C305.6,432.6,326.2,411.7,351.4,411.7z M372.7,457.3c-0.2-11.8-10.1-21.5-21.9-21.3c-11.8,0.2-21.4,10.3-21.1,22.1
+		c0.3,11.9,10.3,21.6,21.9,21.4C363.3,479.3,372.9,469.1,372.7,457.3z"/>
+                  <path d="M521.8,333.3c-24.8,0.1-45.7-20.9-45.5-46c0.1-25.1,20.8-46,45.6-46.1c24.5-0.1,45.1,20.6,45.5,45.4
+		C567.8,312.2,547.2,333.2,521.8,333.3z M543.4,287.5c0.1-11.8-9.8-21.9-21.4-21.9c-11.7,0-21.6,10-21.6,21.7
+		c0,12,9.6,21.7,21.5,21.8C533.6,309.2,543.3,299.4,543.4,287.5z"/>
+                  <path d="M226.5,287.7c-0.2,25-21,45.3-46.2,45.3c-24.9,0-46.1-21.3-45.8-45.8c0.4-25.4,21.4-45.5,47.1-45.1
+		C206.5,242.3,226.8,263,226.5,287.7z M180.4,265.9c-12,0.1-21.8,10-21.6,21.7c0.2,11.8,10.1,21.3,22,21.3
+		c11.9,0,21.5-9.8,21.4-21.7C202.2,275.3,192.4,265.8,180.4,265.9z"/>
+                  <path d="M350.1,333.3c-24.4-0.4-44.7-21.6-44.3-46.3c0.4-25.3,21-45.9,45.9-45.7c24.7,0.2,45.6,21.6,45.2,46.5
+		C396.4,313.4,375.5,333.7,350.1,333.3z M372.8,287.2c-0.1-11.8-10-21.8-21.7-21.7c-11.8,0.1-21.5,10.1-21.4,21.9
+		c0.1,12,9.8,21.6,21.7,21.6C363.2,309.1,372.9,299.2,372.8,287.2z"/>
+                  <path d="M569.6,520.5c27.9,0,50.6,22.8,50.7,51.1c0.2,27.9-23.1,51.3-50.8,51.2c-27.9-0.1-50.8-23.2-50.8-51.2
+		C518.7,543.5,541.6,520.5,569.6,520.5z M569.7,598.5c14.7-0.1,26.8-12.6,26.5-27.3c-0.3-14.9-12.5-26.8-27.3-26.5
+		c-14.4,0.3-26.2,12.4-26.2,26.9C542.7,586.4,555.1,598.7,569.7,598.5z"/>
+
+                </svg>
+
+
+              </Tooltip>
+            </Link>
+
+            {session?.PortalNotification && (
+              <Link href="/NotificationTab">
+                <Tooltip
+                  className="bg-[#00B56C] text-white shadow-lg rounded"
+                  placement="right"
+                  content="Notifications"
+
+                >
+                  <svg
+                    className={`w-20 h-14 py-3 text-white-10 dark:text-white ${pathname === "/NotificationTab"
+                      ? "border-r-2 border-#29303b -my-1"
+                      : "border-y-1 border-b-2"
+                      }`}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{
+                      color: pathname === "/NotificationTab" ? "green" : "white",
+                      backgroundColor:
+                        pathname === "/NotificationTab" ? "white" : "",
+                    }}
+                  >
+
+                    <path
+                      d="M12 22C13.1046 22 14 21.1046 14 20C14 19.4477 13.5523 19 13 19H11C10.4477 19 10 19.4477 10 20C10 21.1046 10.8954 22 12 22ZM18 16V11C18 7.13401 15.866 4 12 4C8.13401 4 6 7.13401 6 11V16L4 18V19H20V18L18 16Z"
+                    />
+
+                    {/* <circle cx="17" cy="7" r="3" stroke="currentColor" strokeWidth="2" fill="none" /> */}
+                    {/* <path
         d="M17 4V3M17 10V11M14.5 7.5L13.7 6.7M19.5 7.5L20.3 6.7M14.5 9.5L13.7 10.3M19.5 9.5L20.3 10.3M15 3H19"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-      />
-    </svg>
-  </Tooltip>
-</Link>
+      /> */}
+                  </svg>
+
+
+                </Tooltip>
+              </Link>
+            )}
             {(session?.userRole == "SuperAdmin" ||
               session?.userRole == "Admin") && (
-              <div>
-                {session?.driverProfile && (
-                  <Popover placement="right-start">
-                    {/* <Link href="/DriverProfile"> */}
-                    {/* <Link href={pathname ? "/DriverProfile" : "/DriverAssign"}> */}
-                    <Tooltip
-                      className={`bg-[#00B56C]  z-50 text-white shadow-lg rounded border-none`}
-                      placement="right"
-                      content="Driver"
-                    >
-                      <PopoverHandler>
+                <div>
+                  {session?.driverProfile && (
+                    <Popover placement="right-start">
+                      {/* <Link href="/DriverProfile"> */}
+                      {/* <Link href={pathname ? "/DriverProfile" : "/DriverAssign"}> */}
+                      <Tooltip
+                        className={`bg-[#00B56C]  z-50 text-white shadow-lg rounded border-none`}
+                        placement="right"
+                        content="Driver"
+                      >
+                        <PopoverHandler>
+                          <svg
+                            className={`w-20 h-14 py-3  text-[white] text-white-10  dark:text-white
+                          ${pathname == "/DriverAssign" ||
+                                pathname == "/DriverProfile" ||
+                                pathname == "/ActiveDriver"
+                                ? "border-r-2 border-#29303b -mt-1"
+                                : "border-b-2"
+                              }`}
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            strokeWidth="2"
+                            stroke="currentColor"
+                            fill="none"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{
+                              color:
+                                pathname == "/DriverAssign" ||
+                                  pathname == "/DriverProfile" ||
+                                  pathname == "/ActiveDriver"
+                                  ? "green"
+                                  : "white",
+                              backgroundColor:
+                                pathname == "/DriverAssign" ||
+                                  pathname == "/DriverProfile" ||
+                                  pathname == "/ActiveDriver"
+                                  ? "white"
+                                  : ""
+                            }}
+                          >
+                            {" "}
+                            <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                            <circle cx="7" cy="17" r="2" />{" "}
+                            <circle cx="17" cy="17" r="2" />{" "}
+                            <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" />
+                          </svg>
+                        </PopoverHandler>
+                      </Tooltip>
+                      <PopoverContent className="border-none cursor-pointer bg-green z-50">
+                        {/* <Link className="w-full text-white" href="/DriverProfile">
+                  Driver Profile
+                </Link> */}
+                        <Link
+                          className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
+                          href="/DriverProfile"
+                          style={{
+                            color:
+                              pathname == "/DriverProfile" ? "black" : "white",
+                            backgroundColor:
+                              pathname == "/DriverProfile" ? "white" : ""
+                          }}
+                        >
+                          Driver Profile
+                        </Link>
+                        <br></br>
+                        <br></br>
+
+                        <Link
+                          className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
+                          href="/DriverAssign"
+                          style={{
+                            color:
+                              pathname == "/DriverAssign" ? "black" : "white",
+                            backgroundColor:
+                              pathname == "/DriverAssign" ? "white" : ""
+                          }}
+                        >
+                          Assign Driver
+                        </Link>
+
+                        <br></br>
+                      </PopoverContent>
+
+                      {/* </Link> */}
+                    </Popover>
+                  )}
+                </div>
+              )}
+
+            {(session?.userRole == "SuperAdmin" ||
+              session?.userRole == "Admin") && (
+                <div>
+                  {session?.immobilising && (
+                    <Link href="/Immobilize">
+                      <Tooltip
+                        className="bg-[#00B56C] text-white rounded shadow-lg"
+                        placement="right"
+                        content="Immobilize"
+                      >
                         <svg
-                          className={`w-20 h-14 py-3  text-[white] text-white-10  dark:text-white
-                          ${
-                            pathname == "/DriverAssign" ||
-                            pathname == "/DriverProfile" ||
-                            pathname == "/ActiveDriver"
-                              ? "border-r-2 border-#29303b -mt-1"
-                              : "border-b-2"
-                          }`}
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          strokeWidth="2"
+                          id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"
+
+                          className={`w-20 h-14 py-3   text-[white]  text-white-10  dark:text-white  ${pathname == "/Immobilize"
+                            ? "border-r-2 #29303b"
+                            : "border-b-2"
+                            }`}
+                          // width="140px"
+                          // height="140px"
+                          // viewBox="0 0 121.92 73.9"
+                          viewBox="0 0 115 80"
+
+
+                          strokeWidth="5"
                           stroke="currentColor"
                           fill="none"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           style={{
-                            color:
-                              pathname == "/DriverAssign" ||
-                              pathname == "/DriverProfile" ||
-                              pathname == "/ActiveDriver"
-                                ? "green"
-                                : "white",
-                            backgroundColor:
-                              pathname == "/DriverAssign" ||
-                              pathname == "/DriverProfile" ||
-                              pathname == "/ActiveDriver"
-                                ? "white"
-                                : ""
+                            color: pathname == "/Immobilize" ? "green" : "white",
+                            backgroundColor: pathname == "/Immobilize" ? "white" : ""
                           }}
                         >
-                          {" "}
-                          <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                          <circle cx="7" cy="17" r="2" />{" "}
-                          <circle cx="17" cy="17" r="2" />{" "}
-                          <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" />
-                        </svg>
-                      </PopoverHandler>
-                    </Tooltip>
-                    <PopoverContent className="border-none cursor-pointer bg-green z-50">
-                      {/* <Link className="w-full text-white" href="/DriverProfile">
-                  Driver Profile
-                </Link> */}
-                      <Link
-                        className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
-                        href="/DriverProfile"
-                        style={{
-                          color:
-                            pathname == "/DriverProfile" ? "black" : "white",
-                          backgroundColor:
-                            pathname == "/DriverProfile" ? "white" : ""
-                        }}
-                      >
-                        Driver Profile
-                      </Link>
-                      <br></br>
-                      <br></br>
-                      {/* <Link href="/Notifications">
-                        <Tooltip
-                          className="bg-white  text-[#00B56C] shadow-lg rounded"
-                          placement="right"
-                          content="Notifications"
-                        >
-                          <svg
-                            className={`w-20 h-14 py-3  -my-1      text-white-10  dark:text-white ${
-                              session?.userRole === "Controller"
-                                ? "border-b-2 border-white"
-                                : ""
-                            }`}
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            style={{
-                              color:
-                                pathname == "/Notifications"
-                                  ? "green"
-                                  : "white",
-                              backgroundColor:
-                                pathname == "/Notifications" ? "white" : "",
-                            }}
-                          >
-                            {" "}
-                            <circle cx="12" cy="12" r="10" />{" "}
-                            <polygon points="10 8 16 12 10 16 10 8" />
-                          </svg>
-                        </Tooltip>
-                      </Link> */}
-                      <Link
-                        className="w-full text-white m-0 px-4 py-2 font-popins font-bold rounded-sm p-1 shadow-md"
-                        href="/DriverAssign"
-                        style={{
-                          color:
-                            pathname == "/DriverAssign" ? "black" : "white",
-                          backgroundColor:
-                            pathname == "/DriverAssign" ? "white" : ""
-                        }}
-                      >
-                        Assign Driver
-                      </Link>
-
-                      <br></br>
-                    </PopoverContent>
-
-                    {/* </Link> */}
-                  </Popover>
-                )}
-              </div>
-            )}
-
-            {(session?.userRole == "SuperAdmin" ||
-              session?.userRole == "Admin") && (
-              <div>
-                {session?.immobilising && (
-                  <Link href="/Immobilize">
-                    <Tooltip
-                      className="bg-[#00B56C] text-white rounded shadow-lg"
-                      placement="right"
-                      content="Immobilize"
-                    >
-                     <svg
- id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" 
-
-                        className={`w-20 h-14 py-3   text-[white]  text-white-10  dark:text-white  ${
-                          pathname == "/Immobilize"
-                            ? "border-r-2 #29303b"
-                            : "border-b-2"
-                        }`}
-                        // width="140px"
-                        // height="140px"
-                        // viewBox="0 0 121.92 73.9"
-                        viewBox="0 0 115 80"
-
-                        
-                        strokeWidth="5"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        style={{
-                          color: pathname == "/Immobilize" ? "green" : "white",
-                          backgroundColor: pathname == "/Immobilize" ? "white" : ""
-                        }}
-                      >
- <g>
-	<path class="st0" d="M67.9,0H28.3L14,15.7l-0.4,0.5h-7c0,0-2.1,0-2.5,2.7c-0.3,1.5,0.3,3,1.5,3.8c1.1,0,2.1,0.1,3.1,0.3
+                          <g>
+                            <path class="st0" d="M67.9,0H28.3L14,15.7l-0.4,0.5h-7c0,0-2.1,0-2.5,2.7c-0.3,1.5,0.3,3,1.5,3.8c1.1,0,2.1,0.1,3.1,0.3
 		c1.6,0.3,1.2,1.6,1.2,1.6c-6.2,3.9-9.7,11.3-9.7,11.3L0,65l2.1,2.5h13.4l2.6-6.2h56.5V37c-0.2-1.8,1.2-3.4,3-3.6c0.1,0,0.3,0,0.4,0
 		V17l1.3-2.8L67.9,0z M11.3,40C7.2,40,4,38.2,4,36.1s3.3-3.8,7.3-3.8s7.3,1.7,7.3,3.8S15.3,40,11.3,40z M74.3,54.7
 		c0,1.7-1.4,3.2-3.1,3.2c0,0,0,0-0.1,0H23.5c-1.7,0-3.1-1.4-3.1-3.2l0,0v-0.6c0-1.7,1.4-3.2,3.1-3.2c0,0,0,0,0,0h47.6
 		c1.7,0,3.2,1.4,3.2,3.1c0,0,0,0,0,0L74.3,54.7z M77,19.2H18.6v-2.8l9.6-12.6h39.5L77,16V19.2z"/>
-	<path class="st0" d="M118.4,34.7V19.2c0,0-3-13.8-19.6-14c0,0-14.2-0.4-18.7,14l0.2,15.3c0,0-3,1-3.3,3.5v32.7
+                            <path class="st0" d="M118.4,34.7V19.2c0,0-3-13.8-19.6-14c0,0-14.2-0.4-18.7,14l0.2,15.3c0,0-3,1-3.3,3.5v32.7
 		c0.1,1.8,1.5,3.1,3.3,3.2c3.1,0.2,38.2,0,38.2,0s3.6-0.8,3.5-4.3V37.3C121.9,37.3,121,34.5,118.4,34.7z M102,61h-5.4l0.8-7.5
 		c-1.2-0.6-2-1.8-2.1-3.2c0.3-2.2,2.4-3.7,4.6-3.3c1.7,0.3,3.1,1.6,3.3,3.3c0,1.4-0.8,2.6-2.1,3.2L102,61z M113.1,34.5H84.6V19.2
 		c0,0,2.4-9.8,14.8-10.2c0,0,11.6,0.8,13.8,9.3L113.1,34.5z"/>
-</g>
+                          </g>
 
-                      </svg>
- 
-                    </Tooltip>
-                  </Link>
-                )}
-              </div>
-            )}
+                        </svg>
 
-{(session?.userRole == "SuperAdmin" ||
+                      </Tooltip>
+                    </Link>
+                  )}
+                </div>
+              )}
+
+            {(session?.userRole == "SuperAdmin" ||
               session?.userRole == "Admin") && (
-              <div>
-{session?.ServiceHistory && (
-  <Link href="/ServiceHistory">
-    <Tooltip
-      className="bg-[#00B56C] text-white rounded shadow-lg"
-      placement="right"
-      content="Service History"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className={`py-2 text-white-10 dark:text-white ${pathname == "/ServiceHistory" ? "border-b-2 mr-[1.5px] border-green-500" : "border-b-2  border-white"}`}
-        width="80px"
-        height="50px"
-        viewBox="0 0 512 512"
-        style={{
-          backgroundColor: pathname == "/ServiceHistory" ? "white" : "",  // White bg when active, black when not
-          borderRadius: "0",  // Ensure no rounding, so it stays as a square
-        }}
-      >
-        <g transform="translate(1 1)">
-          <g>
-            <g>
-              <path
-                d="M379.16,289.987c-32.427,0-63.147,12.8-83.627,36.693c-3.413,3.413-2.56,8.533,0.853,11.947
+                <div>
+                  {session?.ServiceHistory && (
+                    <Link href="/ServiceHistory">
+                      <Tooltip
+                        className="bg-[#00B56C] text-white rounded shadow-lg"
+                        placement="right"
+                        content="Service History"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className={`py-2 text-white-10 dark:text-white ${pathname == "/ServiceHistory" ? "border-b-2 mr-[1.5px] border-green-500" : "border-b-2  border-white"}`}
+                          width="80px"
+                          height="50px"
+                          viewBox="0 0 512 512"
+                          style={{
+                            backgroundColor: pathname == "/ServiceHistory" ? "white" : "",  // White bg when active, black when not
+                            borderRadius: "0",  // Ensure no rounding, so it stays as a square
+                          }}
+                        >
+                          <g transform="translate(1 1)">
+                            <g>
+                              <g>
+                                <path
+                                  d="M379.16,289.987c-32.427,0-63.147,12.8-83.627,36.693c-3.413,3.413-2.56,8.533,0.853,11.947
                 c3.413,3.413,8.533,2.56,11.947-0.853C325.4,317.293,351,306.2,378.307,306.2c52.053,0,93.867,41.813,93.867,93.867
                 c0,52.053-41.813,93.867-93.867,93.867c-42.463,0-79.831-28.994-91.449-68.267h40.249V408.6h-50.179
                 c-0.916-0.161-1.84-0.178-2.728,0h-15.36v68.267h17.067v-30.611C293.778,484.327,333.771,511,378.307,511
                 c61.44,0,111.787-48.64,111.787-110.08S440.6,289.987,379.16,289.987z"
-                fill={pathname == "/ServiceHistory" ? "green" : "white"}
-              />
-              <path
-                d="M71.107,50.2c-9.387,0-17.067,7.68-17.067,17.067V459.8c0,9.387,7.68,17.067,17.067,17.067H233.24
+                                  fill={pathname == "/ServiceHistory" ? "green" : "white"}
+                                />
+                                <path
+                                  d="M71.107,50.2c-9.387,0-17.067,7.68-17.067,17.067V459.8c0,9.387,7.68,17.067,17.067,17.067H233.24
                 c5.12,0,8.533-3.413,8.533-8.533s-3.413-8.533-8.533-8.533H71.107V67.267h85.333c0,9.387,7.68,17.067,17.067,17.067h119.467
                 c9.387,0,17.067-7.68,17.067-17.067h85.333v196.267c0,5.12,3.413,8.533,8.533,8.533c5.12,0,8.533-3.413,8.533-8.533V67.267
                 c0-9.387-7.68-17.067-17.067-17.067H310.04V33.133h110.933c5.12,0,8.533,3.413,8.533,8.533v221.867
@@ -861,55 +951,99 @@ export default function RootLayout({
                 c0,14.507,11.093,25.6,25.6,25.6H233.24c5.12,0,8.533-3.413,8.533-8.533s-3.413-8.533-8.533-8.533H45.507
                 c-5.12,0-8.533-3.413-8.533-8.533V41.667c0-5.12,3.413-8.533,8.533-8.533H156.44V50.2H71.107z M173.507,16.067h119.467V24.6
                 v34.133v8.533H173.507v-8.533V24.6V16.067z"
-                fill={pathname == "/ServiceHistory" ? "green" : "white"}
-              />
-              <path
-                d="M330.264,177.347l-33.024-46.08c-5.12-7.68-13.653-11.947-23.04-11.947h-36.925c-1.169-0.55-2.525-0.853-4.035-0.853
+                                  fill={pathname == "/ServiceHistory" ? "green" : "white"}
+                                />
+                                <path
+                                  d="M330.264,177.347l-33.024-46.08c-5.12-7.68-13.653-11.947-23.04-11.947h-36.925c-1.169-0.55-2.525-0.853-4.035-0.853
                 s-2.865,0.304-4.035,0.853H192.28c-9.387,0-17.92,4.267-23.04,11.947l-33.024,46.08h-17.323c-12.8,0-22.187,10.24-22.187,22.187
                 v33.28c0,12.8,9.387,22.187,22.187,22.187h13.034c3.814,14.679,17.216,25.6,33.046,25.6c15.829,0,29.232-10.921,33.046-25.6
                 h70.442c3.814,14.679,17.216,25.6,33.046,25.6c15.829,0,29.232-10.921,33.046-25.6h13.034c12.8,0,22.187-9.387,23.04-22.187
                 v-33.28c0-12.8-10.24-22.187-22.187-22.187H330.264z M282.733,139.8l26.7,37.547h-67.66v-41.813h31.573
                 C277.613,135.533,281.027,137.24,282.733,139.8z M182.04,139.8c2.56-2.56,5.973-4.267,9.387-4.267h33.28v41.813h-68.532
                 L182.04,139.8z"
-                fill={pathname == "/ServiceHistory" ? "green" : "white"}
-              />
-              <path
-                d="M233.24,323.267h-128c-5.12,0-8.533,3.413-8.533,8.533c0,5.12,3.413,8.533,8.533,8.533h128
+                                  fill={pathname == "/ServiceHistory" ? "green" : "white"}
+                                />
+                                <path
+                                  d="M233.24,323.267h-128c-5.12,0-8.533,3.413-8.533,8.533c0,5.12,3.413,8.533,8.533,8.533h128
                 c5.12,0,8.533-3.413,8.533-8.533C241.773,326.68,238.36,323.267,233.24,323.267z"
-                fill={pathname == "/ServiceHistory" ? "green" : "white"}
-              />
-              <path
-                d="M233.24,365.933h-128c-5.12,0-8.533,3.413-8.533,8.533S100.12,383,105.24,383h128c5.12,0,8.533-3.413,8.533-8.533
+                                  fill={pathname == "/ServiceHistory" ? "green" : "white"}
+                                />
+                                <path
+                                  d="M233.24,365.933h-128c-5.12,0-8.533,3.413-8.533,8.533S100.12,383,105.24,383h128c5.12,0,8.533-3.413,8.533-8.533
                 S238.36,365.933,233.24,365.933z"
-                fill={pathname == "/ServiceHistory" ? "green" : "white"}
-              />
-              <path
-                d="M233.24,408.6h-128c-5.12,0-8.533,3.413-8.533,8.533s3.413,8.533,8.533,8.533h128c5.12,0,8.533-3.413,8.533-8.533
+                                  fill={pathname == "/ServiceHistory" ? "green" : "white"}
+                                />
+                                <path
+                                  d="M233.24,408.6h-128c-5.12,0-8.533,3.413-8.533,8.533s3.413,8.533,8.533,8.533h128c5.12,0,8.533-3.413,8.533-8.533
                 S238.36,408.6,233.24,408.6z"
-                fill={pathname == "/ServiceHistory" ? "green" : "white"}
-              />
-            </g>
+                                  fill={pathname == "/ServiceHistory" ? "green" : "white"}
+                                />
+                              </g>
+                            </g>
+                          </g>
+                        </svg>
+                      </Tooltip>
+                    </Link>
+                  )}
+                  </div>
+                )}
+    
+    
+    {(session?.userRole == "SuperAdmin" ||
+                  session?.userRole == "Admin") && (
+                    <div>
+    {session?.ServiceHistory && (
+      <Link href="/Documents">
+      <Tooltip
+        className="bg-[#00B56C] text-white rounded shadow-lg"
+        placement="right"
+        content="Manage Documents"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg"
+          className={`py-2 text-white-10 dark:text-white ${pathname == "/Documents" ? "border-b-2 mr-[1.5px] border-green-500" : "border-b-2 border-white"}`}
+          width="80px"
+          height="50px"
+          viewBox="0 0 482.14 482.14"
+          style={{
+            backgroundColor: pathname == "/Documents" ? "white" : "",  // White bg when active, black when not
+            borderRadius: "0",  // Ensure no rounding, so it stays as a square
+          }}
+        >
+          <g>
+            <path 
+              d="M302.599,0H108.966C80.66,0,57.652,23.025,57.652,51.315v379.509c0,28.289,23.008,51.315,51.314,51.315h264.205
+              c28.275,0,51.316-23.026,51.316-51.315V121.449L302.599,0z M373.171,450.698H108.966c-10.969,0-19.89-8.905-19.89-19.874V51.315
+              c0-10.953,8.921-19.858,19.89-19.858l181.875-0.189v67.218c0,19.653,15.949,35.603,35.588,35.603l65.877-0.189l0.725,296.925
+              C393.03,441.793,384.142,450.698,373.171,450.698z"
+              fill={pathname == "/Documents" ? "green" : "white"}
+            />
+            <path 
+              d="M241.054,150.96c-49.756,0-90.102,40.347-90.102,90.109c0,49.764,40.346,90.11,90.102,90.11
+              c49.771,0,90.117-40.347,90.117-90.11C331.171,191.307,290.825,150.96,241.054,150.96z M273.915,253.087h-20.838v20.835
+              c0,6.636-5.373,12.017-12.023,12.017c-6.619,0-12.01-5.382-12.01-12.017v-20.835H208.21c-6.637,0-12.012-5.383-12.012-12.018
+              c0-6.634,5.375-12.017,12.012-12.017h20.834v-20.835c0-6.636,5.391-12.018,12.01-12.018c6.65,0,12.023,5.382,12.023,12.018v20.835
+              h20.838c6.635,0,12.008,5.383,12.008,12.017C285.923,247.704,280.55,253.087,273.915,253.087z"
+              fill={pathname == "/Documents" ? "green" : "white"}
+            />
           </g>
-        </g>
-      </svg>
-    </Tooltip>
-  </Link>
-)}
+        </svg>
+      </Tooltip>
+    </Link>
+                  )}
 
 
-              </div>
-            )}
+                </div>
+              )}
 
           </div>
 
           <hr></hr>
           <div className="basis-1/1 w-screen  ">
             <nav
-              className={`${
-                fullparams == "full"
-                  ? "hidden"
-                  : "flex items-center justify-between  lg:mt-0 md:mt-14 sm:mt-14   flex-wrap bg-green px-5 py-2 sticky top-0 z-10 w-full"
-              }`}
+              className={`${fullparams == "full"
+                ? "hidden"
+                : "flex items-center justify-between  lg:mt-0 md:mt-14 sm:mt-14   flex-wrap bg-green px-5 py-2 sticky top-0 z-10 w-full"
+                }`}
               // style={{ height: "7vh" }}
               id="nav_height"
             >
@@ -948,14 +1082,14 @@ export default function RootLayout({
                           {session?.clientName}
                         </div>
                         <div className="md:col-span-3 sm:col-span-4 col-span-3 flex items-center text-end md:justify-end sm:justify-center client_name_popup">
-                          <BlinkingTime timezone={session?.timezone} dateFormat={session?.dateFormat||"DD MM YYYY"} timeFormat={session?.timeFormat||"hh:mm:ss A"}/>
+                          <BlinkingTime timezone={session?.timezone} dateFormat={session?.dateFormat || "DD MM YYYY"} timeFormat={session?.timeFormat || "hh:mm:ss A"} />
                         </div>
 
                         <div className="lg:col-span-2 md:col-span-1 sm:col-span-1 flex justify-end user_icon_top_header">
                           <Popover>
                             <PopoverHandler {...triggers}>
                               {session?.image !== "" &&
-                              session?.image !== "null" ? (
+                                session?.image !== "null" ? (
                                 <img
                                   className="cursor-pointer user_avator_image"
                                   src={session?.image}
@@ -1083,11 +1217,10 @@ export default function RootLayout({
                           content="Journey Replay"
                         >
                           <svg
-                            className={`w-20 h-14 py-3  -my-1  -ms-3  text-white-10  dark:text-white ${
-                              session?.userRole === "Controller"
-                                ? "border-b-2 border-white"
-                                : ""
-                            }`}
+                            className={`w-20 h-14 py-3  -my-1  -ms-3  text-white-10  dark:text-white ${session?.userRole === "Controller"
+                              ? "border-b-2 border-white"
+                              : ""
+                              }`}
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -1129,22 +1262,22 @@ export default function RootLayout({
                               style={{
                                 color:
                                   pathname == "/Zone" ||
-                                  pathname == "/AddZone" ||
-                                  `EditZone?id=${filterId}` ==
+                                    pathname == "/AddZone" ||
+                                    `EditZone?id=${filterId}` ==
                                     `EditZone?id=${pathName}`
                                     ? "green"
                                     : "white",
                                 backgroundColor:
                                   pathname == "/Zone" ||
-                                  pathname == "/AddZone" ||
-                                  `EditZone?id=${filterId}` ==
+                                    pathname == "/AddZone" ||
+                                    `EditZone?id=${filterId}` ==
                                     `EditZone?id=${pathName}`
                                     ? "white"
                                     : "",
                                 border:
                                   pathname == "/Zone" ||
-                                  pathname == "/AddZone" ||
-                                  `EditZone?id=${filterId}` ==
+                                    pathname == "/AddZone" ||
+                                    `EditZone?id=${filterId}` ==
                                     `EditZone?id=${pathName}`
                                     ? "none"
                                     : ""
@@ -1170,39 +1303,39 @@ export default function RootLayout({
 
                       {(session?.userRole == "SuperAdmin" ||
                         session?.userRole == "Admin") && (
-                        <div>
-                          {session?.cameraProfile && (
-                            <Link href="/DualCam">
-                              <Tooltip
-                                className="bg-[#00B56C] text-white shadow-lg rounded"
-                                placement="right"
-                                content="Camera"
-                              >
-                                <svg
-                                  className="w-14 h-12 py-2  text-[white]  text-white-10  dark:text-white cursor-pointer"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="2"
-                                  stroke="currentColor"
-                                  fill="none"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
+                          <div>
+                            {session?.cameraProfile && (
+                              <Link href="/DualCam">
+                                <Tooltip
+                                  className="bg-[#00B56C] text-white shadow-lg rounded"
+                                  placement="right"
+                                  content="Camera"
                                 >
-                                  {" "}
-                                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                                  <circle cx="6" cy="6" r="2" />{" "}
-                                  <circle cx="18" cy="18" r="2" />{" "}
-                                  <path d="M11 6h5a2 2 0 0 1 2 2v8" />{" "}
-                                  <polyline points="14 9 11 6 14 3" />{" "}
-                                  <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />{" "}
-                                  <polyline points="10 15 13 18 10 21" />
-                                </svg>
-                              </Tooltip>
-                            </Link>
-                          )}
-                        </div>
-                      )}
+                                  <svg
+                                    className="w-14 h-12 py-2  text-[white]  text-white-10  dark:text-white cursor-pointer"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth="2"
+                                    stroke="currentColor"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    {" "}
+                                    <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                                    <circle cx="6" cy="6" r="2" />{" "}
+                                    <circle cx="18" cy="18" r="2" />{" "}
+                                    <path d="M11 6h5a2 2 0 0 1 2 2v8" />{" "}
+                                    <polyline points="14 9 11 6 14 3" />{" "}
+                                    <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />{" "}
+                                    <polyline points="10 15 13 18 10 21" />
+                                  </svg>
+                                </Tooltip>
+                              </Link>
+                            )}
+                          </div>
+                        )}
 
                       <Link href="/Reports">
                         <Tooltip
@@ -1212,9 +1345,8 @@ export default function RootLayout({
                         >
                           <svg
                             className={`w-20 h-14 py-3 border-b-2 -ms-3
-                  text-white-10  dark:text-white ${
-                    session?.cameraProfile ? "border-y-2" : "border-b-2"
-                  }`}
+                  text-white-10  dark:text-white ${session?.cameraProfile ? "border-y-2" : "border-b-2"
+                              }`}
                             width="24"
                             height="24"
                             viewBox="0 0 24 24"
@@ -1241,40 +1373,110 @@ export default function RootLayout({
                           placement="right"
                           content="Events and Notifications"
                         >
-                           <svg
-      className={`w-14 h-14 py-3 text-white-10 dark:text-white ${
-        pathname === "/Notifications"
-          ? "border-r-2 border-#29303b -my-1"
-          : "border-y-1 border-b-2"
-      }`}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      style={{
-        color: pathname === "/Notifications" ? "green" : "white",
-        backgroundColor:
-          pathname === "/Notifications" ? "white" : "",
-      }}
-    >
-      {/* Bell Icon */}
-      <path
-        d="M12 22C13.1046 22 14 21.1046 14 20C14 19.4477 13.5523 19 13 19H11C10.4477 19 10 19.4477 10 20C10 21.1046 10.8954 22 12 22ZM18 16V11C18 7.13401 15.866 4 12 4C8.13401 4 6 7.13401 6 11V16L4 18V19H20V18L18 16Z"
-      />
-      {/* Gear Icon next to Bell */}
-      <circle cx="17" cy="7" r="3" stroke="currentColor" strokeWidth="2" fill="none" />
-      <path
-        d="M17 4V3M17 10V11M14.5 7.5L13.7 6.7M19.5 7.5L20.3 6.7M14.5 9.5L13.7 10.3M19.5 9.5L20.3 10.3M15 3H19"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
+                          <svg className={`w-14 h-14 py-3  text-white-10 dark:text-white ${pathname === "/Notifications"
+                            ? "border-r-2 border-#29303b -my-1"
+                            : "border-y-1 border-b-2"
+                            }`}
+                            viewBox="0 0 710 720"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="20"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{
+                              color: pathname === "/Notifications" ? "green" : "white",
+                              backgroundColor:
+                                pathname === "/Notifications" ? "white" : "",
+                            }}>
+                            <path d="M70.3,205.7c-7.5,0-13.8,0-21.1,0c0,2.7,0,5.2,0,7.6c0,115.5,0.4,230.9-0.3,346.4c-0.2,26.8,17.5,44.6,44.5,44.4
+		c97.3-0.7,194.6-0.3,291.9-0.3c3,0,6.1-0.1,9.1,0.1c7.2,0.4,12.1,5.2,12.2,11.8c0.1,6.6-4.7,11.9-11.8,12.3
+		c-6.5,0.4-13.1,0.1-19.7,0.1c-94.5,0-189,0.1-283.6,0c-40.6-0.1-66.5-26.3-66.5-66.8c0-138.4-0.1-276.8,0-415.2
+		c0-33.1,18.9-58,49.2-64.6c5.8-1.3,12-1.2,18-1.4c6.5-0.2,13-0.1,20.4-0.1c0-6-0.1-11.2,0-16.4c0.4-22.4,17.2-39.9,38.7-40.4
+		c25.1-0.6,42.9,15,44.1,38.8c0.3,5.5,0,11,0,17.2c98,0,195.4,0,294,0c0-4.2,0-8.6,0-13c0.1-24.3,18-42.8,41.5-43
+		c23.3-0.2,41.5,18.6,41.6,42.8c0,4.3,0,8.5,0,14c7.6,0,14.8,0,22,0c39.2,0.2,65.5,26.2,65.5,65.5c0.1,107.9,0.1,215.8,0,323.7
+		c0,4.7,0.8,8.2,4.7,11.8c4.1,3.8,6.7,9.3,9.6,14.3c6.3,10.6,12.6,21.3,18.5,32.1c7.2,12.9,3.9,24.6-8.8,32.3
+		c-4.1,2.5-8.4,4.5-12.4,7.2c-4.7,3.3-4.7,6.9,0.3,10c4.3,2.6,8.8,5,13,7.6c11.5,7.1,14.9,18.8,8.4,30.6
+		c-7.9,14.3-16.1,28.5-24.5,42.6c-6.7,11.2-18.5,14.3-30.1,8.1c-4.7-2.5-9.1-5.5-13.8-7.8c-5.1-2.5-8.3-0.7-8.6,5.1
+		c-0.3,5.3,0,10.6-0.2,15.9c-0.5,12.9-9.3,21.7-22.2,21.9c-16.4,0.2-32.8,0.2-49.2,0c-13-0.2-21.7-9-22.2-21.9
+		c-0.2-5,0.1-10.1-0.1-15.1c-0.3-6.7-3.5-8.6-9.3-5.5c-4.5,2.3-8.7,5.1-13.1,7.5c-11.5,6.1-23.4,3.1-30.1-8
+		c-8.4-14-16.6-28.2-24.6-42.5c-6.5-11.7-3.2-23.6,8.3-30.7c4.1-2.5,8.4-4.7,12.4-7.2c5.9-3.7,5.8-7.5-0.2-11.3
+		c-4.1-2.5-8.3-4.7-12.4-7.3c-11.1-6.9-14.5-18.7-8.2-30c8.1-14.5,16.3-29,24.9-43.2c6.5-10.8,18.3-13.8,29.6-8
+		c4.7,2.4,9.1,5.5,13.8,7.8c5.6,2.8,8.7,1,9-5.2c0.3-5.3,0-10.6,0.2-15.9c0.4-12.1,8.8-21.3,20.9-21.6c17.1-0.5,34.3-0.5,51.4,0
+		c12.1,0.3,20.6,9.3,21.2,21.4c0.3,5.5,0,11.1,0.1,16.6c0.1,5.7,3.4,6.9,8.2,5.1c9.9-3.6,11.5-6,11.5-16.4c0-85,0-169.9,0-254.9
+		c0-2.7,0-5.4,0-8.5c-180.8,0-360.6,0-541,0c0,83.5,0,166.8,0,251c3.5,0,6.7,0,9.9,0c22.2,0,44.4,0,66.5,0c11.4,0,15.3,4,15.3,15.6
+		c0,25.2,0,50.4,0,76.8c3.1,0,5.8,0,8.4,0c64.5,0,129.1,0,193.6,0c2.8,0,5.6-0.1,8.3,0.1c7.2,0.5,12.1,5.4,12.1,12
+		c0,6.5-5,11.8-12.1,12c-11.8,0.3-23.7,0.2-35.5,0.2c-60.5,0-121-0.1-181.5,0.1c-7.4,0-12.8-2.3-18-7.5
+		c-28.3-28.7-56.8-57.2-85.5-85.6c-4.9-4.9-6.4-10.3-6.4-17c0.1-82.7,0.1-165.4,0.1-248.1C70.3,212.4,70.3,209.5,70.3,205.7z
+		 M49.5,180.5c195.9,0,391.1,0,586.6,0c0-11.8,0-22.9,0-33.9c0-2.3,0-4.5-0.1-6.8c-1.2-15.8-11.1-30-26.2-33.4
+		c-11.7-2.7-24.2-2.2-37.1-3.1c0,6.5,0.1,11,0,15.5c-0.4,23.7-18.6,42-41.8,41.8c-22.7-0.1-40.8-18.4-41.2-41.6
+		c-0.1-4.7,0-9.4,0-14.6c-98.3,0-195.7,0-294,0c0,5.4,0.1,10.4,0,15.4c-0.7,24.8-17.8,41.1-42.9,40.9c-22.9-0.2-39.7-17.6-40.1-41.3
+		c-0.1-4.9,0-9.8,0-14.9c-10.8,0-20.4-0.7-29.9,0.1c-17.7,1.5-32.1,16-33.1,33.8C48.8,152.2,49.5,166,49.5,180.5z M649.3,499.9
+		c-13.7,7.5-26.6,16.2-42.6,7.1c-16-9.1-14.4-25-14.8-39.9c-15.3,0-29.8,0-44.3,0c3.8,42-27.3,55.3-57.8,32.8
+		c-7.4,12.8-14.7,25.6-22.4,38.8c14.2,7.4,27.2,15,27.3,32.8c0.1,18.2-13.5,25.6-27.2,33.1c7.7,13.3,15,25.9,22.5,39
+		c13.3-8.6,26.5-16.3,42.3-7.2c15.7,9.1,15,24.7,14.9,40.1c8.2,0,15.5,0,22.8,0c7.2,0,14.4,0,21.7,0c-4.6-40.7,26-56.5,57.7-33.4
+		c7.3-12.8,14.7-25.5,22.1-38.5c-13.7-8-27.4-14.9-27.4-33c0-18.4,14.2-25.2,27.4-33.2C664,525.4,656.7,512.8,649.3,499.9z
+		 M513.8,91.5c0,4.5,0,9,0,13.6c0,4.8-0.1,9.6,0,14.3c0.3,11,6.7,17,17.7,17.1c10,0.1,16.7-6.6,16.8-17.2c0.2-18.3,0.2-36.7,0-55.1
+		c-0.1-10.5-7-17.2-17-17.1c-11,0.1-17.4,6.2-17.6,17.2C513.7,73.4,513.8,82.5,513.8,91.5z M136.9,91.6c0,9.5-0.2,19.1,0,28.6
+		c0.2,9.6,6.8,16.1,16.1,16.3c10.4,0.2,17.9-5.4,18.2-15c0.5-19.6,0.5-39.2,0-58.8c-0.2-9.9-7.8-15.9-17.7-15.5
+		c-10.4,0.4-16.5,6.3-16.7,16.4C136.7,73,136.9,82.3,136.9,91.6z M116.2,481.5c15.3,15.3,31.3,31.2,46,46c0-13.8,0-29.8,0-46
+		C145.8,481.5,129.9,481.5,116.2,481.5z"/>
+                            <path d="M351.4,411.7c25.8,0.1,45.3,19.6,45.4,45.5c0.2,26.5-19.8,46.7-46,46.6c-24.4-0.2-44.9-20.9-45-45.6
+		C305.6,432.6,326.2,411.7,351.4,411.7z M372.7,457.3c-0.2-11.8-10.1-21.5-21.9-21.3c-11.8,0.2-21.4,10.3-21.1,22.1
+		c0.3,11.9,10.3,21.6,21.9,21.4C363.3,479.3,372.9,469.1,372.7,457.3z"/>
+                            <path d="M521.8,333.3c-24.8,0.1-45.7-20.9-45.5-46c0.1-25.1,20.8-46,45.6-46.1c24.5-0.1,45.1,20.6,45.5,45.4
+		C567.8,312.2,547.2,333.2,521.8,333.3z M543.4,287.5c0.1-11.8-9.8-21.9-21.4-21.9c-11.7,0-21.6,10-21.6,21.7
+		c0,12,9.6,21.7,21.5,21.8C533.6,309.2,543.3,299.4,543.4,287.5z"/>
+                            <path d="M226.5,287.7c-0.2,25-21,45.3-46.2,45.3c-24.9,0-46.1-21.3-45.8-45.8c0.4-25.4,21.4-45.5,47.1-45.1
+		C206.5,242.3,226.8,263,226.5,287.7z M180.4,265.9c-12,0.1-21.8,10-21.6,21.7c0.2,11.8,10.1,21.3,22,21.3
+		c11.9,0,21.5-9.8,21.4-21.7C202.2,275.3,192.4,265.8,180.4,265.9z"/>
+                            <path d="M350.1,333.3c-24.4-0.4-44.7-21.6-44.3-46.3c0.4-25.3,21-45.9,45.9-45.7c24.7,0.2,45.6,21.6,45.2,46.5
+		C396.4,313.4,375.5,333.7,350.1,333.3z M372.8,287.2c-0.1-11.8-10-21.8-21.7-21.7c-11.8,0.1-21.5,10.1-21.4,21.9
+		c0.1,12,9.8,21.6,21.7,21.6C363.2,309.1,372.9,299.2,372.8,287.2z"/>
+                            <path d="M569.6,520.5c27.9,0,50.6,22.8,50.7,51.1c0.2,27.9-23.1,51.3-50.8,51.2c-27.9-0.1-50.8-23.2-50.8-51.2
+		C518.7,543.5,541.6,520.5,569.6,520.5z M569.7,598.5c14.7-0.1,26.8-12.6,26.5-27.3c-0.3-14.9-12.5-26.8-27.3-26.5
+		c-14.4,0.3-26.2,12.4-26.2,26.9C542.7,586.4,555.1,598.7,569.7,598.5z"/>
+
+                          </svg>
+
                         </Tooltip>
                       </Link>
-                      
+                      {session?.PortalNotification && (
+                        <Link href="/NotificationTab">
+                          <Tooltip
+                            className="bg-[#00B56C] text-white shadow-lg rounded"
+                            placement="right"
+                            content="Notifications"
+
+                          >
+                            <svg
+                              className={`w-14 h-14 py-3 text-white-10 dark:text-white ${pathname === "/NotificationTab"
+                                ? "border-r-2 border-#29303b -my-1"
+                                : "border-y-1 border-b-2"
+                                }`}
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              style={{
+                                color: pathname === "/NotificationTab" ? "green" : "white",
+                                backgroundColor:
+                                  pathname === "/NotificationTab" ? "white" : "",
+                              }}
+                            >
+
+                              <path
+                                d="M12 22C13.1046 22 14 21.1046 14 20C14 19.4477 13.5523 19 13 19H11C10.4477 19 10 19.4477 10 20C10 21.1046 10.8954 22 12 22ZM18 16V11C18 7.13401 15.866 4 12 4C8.13401 4 6 7.13401 6 11V16L4 18V19H20V18L18 16Z"
+                              />
+
+
+                            </svg>
+
+
+                          </Tooltip>
+                        </Link>
+                      )}
                       <Popover placement="right-start">
                         <Tooltip
                           className="bg-white text-green shadow-lg rounded border-none"
@@ -1321,91 +1523,90 @@ export default function RootLayout({
                       </Popover>
                       {(session?.userRole == "SuperAdmin" ||
                         session?.userRole == "Admin") && (
-                        <div>
-                          {session?.immobilising && (
-                            <Link href="/Immobilize">
-                              <Tooltip
-                                className="bg-[#00B56C] text-white shadow-lg rounded"
-                                placement="right"
-                                content="Immobilize"
-                              >
-                              <svg
- id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" 
+                          <div>
+                            {session?.immobilising && (
+                              <Link href="/Immobilize">
+                                <Tooltip
+                                  className="bg-[#00B56C] text-white shadow-lg rounded"
+                                  placement="right"
+                                  content="Immobilize"
+                                >
+                                  <svg
+                                    id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"
 
-                        className={`w-14 h-14 py-3   text-[white]  text-white-10  dark:text-white  ${
-                          pathname == "/Immobilize"
-                            ? "border-r-2 #29303b"
-                            : "border-b-2"
-                        }`}
-                        // width="140px"
-                        // height="140px"
-                        // viewBox="0 0 121.92 73.9"
-                        viewBox="0 0 115 80"
+                                    className={`w-14 h-14 py-3   text-[white]  text-white-10  dark:text-white  ${pathname == "/Immobilize"
+                                      ? "border-r-2 #29303b"
+                                      : "border-b-2"
+                                      }`}
+                                    // width="140px"
+                                    // height="140px"
+                                    // viewBox="0 0 121.92 73.9"
+                                    viewBox="0 0 115 80"
 
-                        
-                        strokeWidth="5"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        style={{
-                          color: pathname == "/Immobilize" ? "green" : "white",
-                          backgroundColor: pathname == "/Immobilize" ? "white" : ""
-                        }}
-                      >
- <g>
-	<path class="st0" d="M67.9,0H28.3L14,15.7l-0.4,0.5h-7c0,0-2.1,0-2.5,2.7c-0.3,1.5,0.3,3,1.5,3.8c1.1,0,2.1,0.1,3.1,0.3
+
+                                    strokeWidth="5"
+                                    stroke="currentColor"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    style={{
+                                      color: pathname == "/Immobilize" ? "green" : "white",
+                                      backgroundColor: pathname == "/Immobilize" ? "white" : ""
+                                    }}
+                                  >
+                                    <g>
+                                      <path class="st0" d="M67.9,0H28.3L14,15.7l-0.4,0.5h-7c0,0-2.1,0-2.5,2.7c-0.3,1.5,0.3,3,1.5,3.8c1.1,0,2.1,0.1,3.1,0.3
 		c1.6,0.3,1.2,1.6,1.2,1.6c-6.2,3.9-9.7,11.3-9.7,11.3L0,65l2.1,2.5h13.4l2.6-6.2h56.5V37c-0.2-1.8,1.2-3.4,3-3.6c0.1,0,0.3,0,0.4,0
 		V17l1.3-2.8L67.9,0z M11.3,40C7.2,40,4,38.2,4,36.1s3.3-3.8,7.3-3.8s7.3,1.7,7.3,3.8S15.3,40,11.3,40z M74.3,54.7
 		c0,1.7-1.4,3.2-3.1,3.2c0,0,0,0-0.1,0H23.5c-1.7,0-3.1-1.4-3.1-3.2l0,0v-0.6c0-1.7,1.4-3.2,3.1-3.2c0,0,0,0,0,0h47.6
 		c1.7,0,3.2,1.4,3.2,3.1c0,0,0,0,0,0L74.3,54.7z M77,19.2H18.6v-2.8l9.6-12.6h39.5L77,16V19.2z"/>
-	<path class="st0" d="M118.4,34.7V19.2c0,0-3-13.8-19.6-14c0,0-14.2-0.4-18.7,14l0.2,15.3c0,0-3,1-3.3,3.5v32.7
+                                      <path class="st0" d="M118.4,34.7V19.2c0,0-3-13.8-19.6-14c0,0-14.2-0.4-18.7,14l0.2,15.3c0,0-3,1-3.3,3.5v32.7
 		c0.1,1.8,1.5,3.1,3.3,3.2c3.1,0.2,38.2,0,38.2,0s3.6-0.8,3.5-4.3V37.3C121.9,37.3,121,34.5,118.4,34.7z M102,61h-5.4l0.8-7.5
 		c-1.2-0.6-2-1.8-2.1-3.2c0.3-2.2,2.4-3.7,4.6-3.3c1.7,0.3,3.1,1.6,3.3,3.3c0,1.4-0.8,2.6-2.1,3.2L102,61z M113.1,34.5H84.6V19.2
 		c0,0,2.4-9.8,14.8-10.2c0,0,11.6,0.8,13.8,9.3L113.1,34.5z"/>
-</g>
+                                    </g>
 
-                      </svg>
-                              </Tooltip>
-                            </Link>
-                          )}
-                        </div>
-                      )}
-                      
-{(session?.userRole == "SuperAdmin" ||
-              session?.userRole == "Admin") && (
-              <div>
-{session?.ServiceHistory && (
-  <Link href="/ServiceHistory">
-    <Tooltip
-      className="bg-[#00B56C] text-white rounded shadow-lg"
-      placement="right"
-      content="Service History"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className={`py-2 text-white-10 dark:text-white ${pathname == "/ServiceHistory" ? "border-b-2 mr-[1.5px] border-green-500" : "border-b-2  border-white"}`}
-        width="80px"
-        height="50px"
-        viewBox="0 0 512 512"
-        style={{
-          backgroundColor: pathname == "/ServiceHistory" ? "white" : "",  // White bg when active, black when not
-          borderRadius: "0",  // Ensure no rounding, so it stays as a square
-        }}
-      >
-        <g transform="translate(1 1)">
-          <g>
-            <g>
-              <path
-                d="M379.16,289.987c-32.427,0-63.147,12.8-83.627,36.693c-3.413,3.413-2.56,8.533,0.853,11.947
+                                  </svg>
+                                </Tooltip>
+                              </Link>
+                            )}
+                          </div>
+                        )}
+
+                      {(session?.userRole == "SuperAdmin" ||
+                        session?.userRole == "Admin") && (
+                          <div>
+                            {session?.ServiceHistory && (
+                              <Link href="/ServiceHistory">
+                                <Tooltip
+                                  className="bg-[#00B56C] text-white rounded shadow-lg"
+                                  placement="right"
+                                  content="Service History"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className={`py-2 text-white-10 dark:text-white ${pathname == "/ServiceHistory" ? "border-b-2 mr-[1.5px] border-green-500" : "border-b-2  border-white"}`}
+                                    width="60px"
+                                    height="50px"
+                                    viewBox="0 0 512 512"
+                                    style={{
+                                      backgroundColor: pathname == "/ServiceHistory" ? "white" : "",  // White bg when active, black when not
+                                      borderRadius: "0",  // Ensure no rounding, so it stays as a square
+                                    }}
+                                  >
+                                    <g transform="translate(1 1)">
+                                      <g>
+                                        <g>
+                                          <path
+                                            d="M379.16,289.987c-32.427,0-63.147,12.8-83.627,36.693c-3.413,3.413-2.56,8.533,0.853,11.947
                 c3.413,3.413,8.533,2.56,11.947-0.853C325.4,317.293,351,306.2,378.307,306.2c52.053,0,93.867,41.813,93.867,93.867
                 c0,52.053-41.813,93.867-93.867,93.867c-42.463,0-79.831-28.994-91.449-68.267h40.249V408.6h-50.179
                 c-0.916-0.161-1.84-0.178-2.728,0h-15.36v68.267h17.067v-30.611C293.778,484.327,333.771,511,378.307,511
                 c61.44,0,111.787-48.64,111.787-110.08S440.6,289.987,379.16,289.987z"
-                fill={pathname == "/ServiceHistory" ? "green" : "white"}
-              />
-              <path
-                d="M71.107,50.2c-9.387,0-17.067,7.68-17.067,17.067V459.8c0,9.387,7.68,17.067,17.067,17.067H233.24
+                                            fill={pathname == "/ServiceHistory" ? "green" : "white"}
+                                          />
+                                          <path
+                                            d="M71.107,50.2c-9.387,0-17.067,7.68-17.067,17.067V459.8c0,9.387,7.68,17.067,17.067,17.067H233.24
                 c5.12,0,8.533-3.413,8.533-8.533s-3.413-8.533-8.533-8.533H71.107V67.267h85.333c0,9.387,7.68,17.067,17.067,17.067h119.467
                 c9.387,0,17.067-7.68,17.067-17.067h85.333v196.267c0,5.12,3.413,8.533,8.533,8.533c5.12,0,8.533-3.413,8.533-8.533V67.267
                 c0-9.387-7.68-17.067-17.067-17.067H310.04V33.133h110.933c5.12,0,8.533,3.413,8.533,8.533v221.867
@@ -1414,73 +1615,119 @@ export default function RootLayout({
                 c0,14.507,11.093,25.6,25.6,25.6H233.24c5.12,0,8.533-3.413,8.533-8.533s-3.413-8.533-8.533-8.533H45.507
                 c-5.12,0-8.533-3.413-8.533-8.533V41.667c0-5.12,3.413-8.533,8.533-8.533H156.44V50.2H71.107z M173.507,16.067h119.467V24.6
                 v34.133v8.533H173.507v-8.533V24.6V16.067z"
-                fill={pathname == "/ServiceHistory" ? "green" : "white"}
-              />
-              <path
-                d="M330.264,177.347l-33.024-46.08c-5.12-7.68-13.653-11.947-23.04-11.947h-36.925c-1.169-0.55-2.525-0.853-4.035-0.853
+                                            fill={pathname == "/ServiceHistory" ? "green" : "white"}
+                                          />
+                                          <path
+                                            d="M330.264,177.347l-33.024-46.08c-5.12-7.68-13.653-11.947-23.04-11.947h-36.925c-1.169-0.55-2.525-0.853-4.035-0.853
                 s-2.865,0.304-4.035,0.853H192.28c-9.387,0-17.92,4.267-23.04,11.947l-33.024,46.08h-17.323c-12.8,0-22.187,10.24-22.187,22.187
                 v33.28c0,12.8,9.387,22.187,22.187,22.187h13.034c3.814,14.679,17.216,25.6,33.046,25.6c15.829,0,29.232-10.921,33.046-25.6
                 h70.442c3.814,14.679,17.216,25.6,33.046,25.6c15.829,0,29.232-10.921,33.046-25.6h13.034c12.8,0,22.187-9.387,23.04-22.187
                 v-33.28c0-12.8-10.24-22.187-22.187-22.187H330.264z M282.733,139.8l26.7,37.547h-67.66v-41.813h31.573
                 C277.613,135.533,281.027,137.24,282.733,139.8z M182.04,139.8c2.56-2.56,5.973-4.267,9.387-4.267h33.28v41.813h-68.532
                 L182.04,139.8z"
-                fill={pathname == "/ServiceHistory" ? "green" : "white"}
-              />
-              <path
-                d="M233.24,323.267h-128c-5.12,0-8.533,3.413-8.533,8.533c0,5.12,3.413,8.533,8.533,8.533h128
+                                            fill={pathname == "/ServiceHistory" ? "green" : "white"}
+                                          />
+                                          <path
+                                            d="M233.24,323.267h-128c-5.12,0-8.533,3.413-8.533,8.533c0,5.12,3.413,8.533,8.533,8.533h128
                 c5.12,0,8.533-3.413,8.533-8.533C241.773,326.68,238.36,323.267,233.24,323.267z"
-                fill={pathname == "/ServiceHistory" ? "green" : "white"}
-              />
-              <path
-                d="M233.24,365.933h-128c-5.12,0-8.533,3.413-8.533,8.533S100.12,383,105.24,383h128c5.12,0,8.533-3.413,8.533-8.533
+                                            fill={pathname == "/ServiceHistory" ? "green" : "white"}
+                                          />
+                                          <path
+                                            d="M233.24,365.933h-128c-5.12,0-8.533,3.413-8.533,8.533S100.12,383,105.24,383h128c5.12,0,8.533-3.413,8.533-8.533
                 S238.36,365.933,233.24,365.933z"
-                fill={pathname == "/ServiceHistory" ? "green" : "white"}
-              />
-              <path
-                d="M233.24,408.6h-128c-5.12,0-8.533,3.413-8.533,8.533s3.413,8.533,8.533,8.533h128c5.12,0,8.533-3.413,8.533-8.533
+                                            fill={pathname == "/ServiceHistory" ? "green" : "white"}
+                                          />
+                                          <path
+                                            d="M233.24,408.6h-128c-5.12,0-8.533,3.413-8.533,8.533s3.413,8.533,8.533,8.533h128c5.12,0,8.533-3.413,8.533-8.533
                 S238.36,408.6,233.24,408.6z"
-                fill={pathname == "/ServiceHistory" ? "green" : "white"}
-              />
-            </g>
+                                            fill={pathname == "/ServiceHistory" ? "green" : "white"}
+                                          />
+                                        </g>
+                                      </g>
+                                    </g>
+                                  </svg>
+                                </Tooltip>
+                              </Link>
+                            )}
+
+
+                          </div>
+                        )}
+                         {(session?.userRole == "SuperAdmin" ||
+                  session?.userRole == "Admin") && (
+                    <div>
+    {session?.ServiceHistory && (
+      <Link href="/Documents">
+      <Tooltip
+        className="bg-[#00B56C] text-white rounded shadow-lg"
+        placement="right"
+        content="Manage Documents"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg"
+          className={`py-2 text-white-10 dark:text-white ${pathname == "/Documents" ? "border-b-2 mr-[1.5px] border-green-500" : "border-b-2 border-white"}`}          
+
+          width="60px"
+          height="50px"
+          viewBox="0 0 482.14 482.14"
+          style={{
+            backgroundColor: pathname == "/Documents" ? "white" : "",  // White bg when active, black when not
+            borderRadius: "0",  // Ensure no rounding, so it stays as a square
+          }}
+        >
+          <g>
+            <path 
+              d="M302.599,0H108.966C80.66,0,57.652,23.025,57.652,51.315v379.509c0,28.289,23.008,51.315,51.314,51.315h264.205
+              c28.275,0,51.316-23.026,51.316-51.315V121.449L302.599,0z M373.171,450.698H108.966c-10.969,0-19.89-8.905-19.89-19.874V51.315
+              c0-10.953,8.921-19.858,19.89-19.858l181.875-0.189v67.218c0,19.653,15.949,35.603,35.588,35.603l65.877-0.189l0.725,296.925
+              C393.03,441.793,384.142,450.698,373.171,450.698z"
+              fill={pathname == "/Documents" ? "green" : "white"}
+            />
+            <path 
+              d="M241.054,150.96c-49.756,0-90.102,40.347-90.102,90.109c0,49.764,40.346,90.11,90.102,90.11
+              c49.771,0,90.117-40.347,90.117-90.11C331.171,191.307,290.825,150.96,241.054,150.96z M273.915,253.087h-20.838v20.835
+              c0,6.636-5.373,12.017-12.023,12.017c-6.619,0-12.01-5.382-12.01-12.017v-20.835H208.21c-6.637,0-12.012-5.383-12.012-12.018
+              c0-6.634,5.375-12.017,12.012-12.017h20.834v-20.835c0-6.636,5.391-12.018,12.01-12.018c6.65,0,12.023,5.382,12.023,12.018v20.835
+              h20.838c6.635,0,12.008,5.383,12.008,12.017C285.923,247.704,280.55,253.087,273.915,253.087z"
+              fill={pathname == "/Documents" ? "green" : "white"}
+            />
           </g>
-        </g>
-      </svg>
-    </Tooltip>
-  </Link>
-)}
+        </svg>
+      </Tooltip>
+    </Link>
+                  )}
 
 
-              </div>
-            )}
+                </div>
+              )}
                     </List>
                     <Divider />
                   </Drawer>
                 </Box>
               </div>
               <div className="grid lg:grid-cols-12 grid-cols-12 lg:gap-5 px-4 header_client_name">
-      {/* Client Name */}
-      <div className="lg:col-span-2 col-span-12">
-        <p className="text-white lg:text-start md:text-start text-center font-popins lg:text-2xl md:text-xl sm:text-md">
-          {session?.clientName}
-        </p>
-      </div>
+                {/* Client Name */}
+                <div className="lg:col-span-2 col-span-12">
+                  <p className="text-white lg:text-start md:text-start text-center font-popins lg:text-2xl md:text-xl sm:text-md">
+                    {session?.clientName}
+                  </p>
+                </div>
 
-      {/* Time */}
-      <div className="lg:col-span-4 md:col-span-4 sm:col-span-10 col-span-12 lg:mx-0 md:mx-4 sm:mx-4 mx-4 lg:mt-2 flex items-center">
-        <a className="text-white text-center font-popins text-xl sm:text-md">
-        <BlinkingTime timezone={session?.timezone} dateFormat={session?.dateFormat||"DD MM YYYY"} timeFormat={session?.timeFormat||"hh:mm:ss A"}/>
-        </a>
-      </div>
-      {session?.PortalNotification && ( 
-      <div className="relative">
-     <BellButton toggleNotifications={toggleNotifications} />
-    
-      {showNotifications && (
-        <NotificationDropdown notifications={notifications} loading={loading} />
-      )}
-    </div>
- 
-  )}
+                {/* Time */}
+                <div className="lg:col-span-4 md:col-span-4 sm:col-span-10 col-span-12 lg:mx-0 md:mx-4 sm:mx-4 mx-4 lg:mt-2 flex items-center">
+                  <a className="text-white text-center font-popins text-xl sm:text-md">
+                    <BlinkingTime timezone={session?.timezone} dateFormat={session?.dateFormat || "DD MM YYYY"} timeFormat={session?.timeFormat || "hh:mm:ss A"} />
+                  </a>
+                </div>
+                {session?.PortalNotification && (
+                  <div className="relative" ref={notificationRef}>
+                    <BellButton toggleNotifications={toggleNotifications} />
+
+                    {showNotifications && (
+                      <NotificationDropdown notifications={notifications} loading={loading} toggleNotifications={toggleNotifications} />
+                    )}
+                  </div>
+
+                )}
                 <div className="lg:col-span-2  md:col-span-1 sm:col-span-1 col-span-1  popup_mob_screen">
                   <Popover>
                     {/* <PopoverHandler {...triggers}>
@@ -1567,6 +1814,7 @@ export default function RootLayout({
           </div>
         </div>
       </div>
+      
     </div>
   );
 }

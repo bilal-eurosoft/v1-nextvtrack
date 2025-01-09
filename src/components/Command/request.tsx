@@ -297,7 +297,6 @@ export default function Request({setgprsdataget}:any) {
         document.body.style.filter = 'blur(5px)';
         let a = document.getElementById("aaaa")
         if(a){
-          console.log("object");
           document.body.style.filter = 'none';
         }
       } else {

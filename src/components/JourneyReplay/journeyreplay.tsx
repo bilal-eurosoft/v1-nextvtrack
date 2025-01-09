@@ -136,7 +136,6 @@ export default function JourneyReplayComp() {
   const [zoomToFly, setzoomToFly] = useState(10);
   const [zoom, setzoom] = useState(10);
   const [polylinedata, setPolylinedata] = useState<[number, number][]>([]);
-  const [vehicleType,setvehicleType] = useState("Car")
   const [Ignitionreport, setIgnitionreport] = useState<any>({
     TimeZone: session?.timezone || "",
     VehicleReg: "",
@@ -153,8 +152,8 @@ export default function JourneyReplayComp() {
     NodeJS.Timeout | undefined
   >(undefined);
   const [speedFactor, setSpeedFactor] = useState<any>(4);
+  // const [showZones, setShowZones] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [coordsforgoogle,setcoordsforgoogle] = useState(null)
   const [isPauseColor, setIsPauseColor] = useState(false);
   // const [TripAddressData, setTripAddressData] = useState("");
   // const [stopDetails, setStopDetails] = useState<StopAddressData[]>([]);
@@ -183,15 +182,15 @@ export default function JourneyReplayComp() {
   const [expanded, setExpanded] = useState(null);
 
   const [seacrhLoading, setSearchLoading] = useState(true);
-  const [minzoom, setminzoom] = useState(1);
+  const [minzoom, setminzoom] = useState(6);
   const [maxzoom, setmaxzoom] = useState(18);
   const [harshPopUp, setHarshPopUp] = useState(true);
-
+  const [harshAccPopUp, setAccHarshPopUp] = useState(true);
   const [addressTravelHistory, setAddressTravelHistory] = useState([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  // const [isPickerOpenFromDate, setIsPickerOpenFromDate] = useState(true);
+  const [isPickerOpenFromDate, setIsPickerOpenFromDate] = useState(true);
   const [travelV2, setTravelV2] = useState(false);
-  // const [travelV3, setTravelV3] = useState(false);
+  const [travelV3, setTravelV3] = useState(false);
   const [userclick, setuserclick] = useState(false);
   const [stopWithSecond, setStopWithSecond] = useState([]);
 
@@ -226,26 +225,26 @@ export default function JourneyReplayComp() {
     }
 
     if (coords) {
-      if (speedFactor == 2) {
-        map.setView(coords, 18);
-      } else if (speedFactor == 1) {
-        map.setView(coords, 18);
-      } else if (speedFactor == 4) {
+      if (coords) {
+        if (speedFactor == 2) {
+          map.setView(coords, 18);
+        } else if (speedFactor == 1) {
+          map.setView(coords, 18);
+        } else if (speedFactor == 4) {
 
-        map.setView(coords, 18);
-      } else if (speedFactor == 6) {
-        map.setView(coords, 18);
-      } else {
-        map.setView(coords, 18);
+          map.setView(coords, 18);
+        } else if (speedFactor == 6) {
+          map.setView(coords, 18);
+        } else {
+          map.setView(coords, 18);
+        }
       }
-      setcoordsforgoogle(coords)
     }
     return null;
   };
 
   const SetViewfly = ({ coords, zoom }: { coords: any; zoom: number }) => {
     const map = useMap();
-
     if (selectedItemId) {
       return null
     }
@@ -268,7 +267,7 @@ export default function JourneyReplayComp() {
     setstopVehicle(false);
     setIsPauseColor(false);
     setHarshPopUp(false);
-
+    setAccHarshPopUp(false);
     /* 
         if (!carMovementInterval) {
           if (currentPositionIndex >= polylinedata.length) {
@@ -290,6 +289,7 @@ export default function JourneyReplayComp() {
     setIsPaused(true);
     setuserclick(false)
     setHarshPopUp(true);
+    setAccHarshPopUp(true);
 
     /* if (carMovementInterval) {
       clearInterval(carMovementInterval);
@@ -317,13 +317,11 @@ export default function JourneyReplayComp() {
     setStopBtn(false);
     setstopVehicle(true);
     setHarshPopUp(true);
-
+    setAccHarshPopUp(true);
     setProgressWidth(0);
     if (polylinedata.length > 0) {
 
-
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
-
       const { zoomlevel, centerLat, centerLng } = calculateZoomCenter(
         TravelHistoryresponse
       );
@@ -388,7 +386,6 @@ export default function JourneyReplayComp() {
 
             animationId = requestAnimationFrame(updatePosition);
             setCarPosition(interpolatedLatLng);
-
             const newProgress = Math.round(
               ((currentPositionIndex + 1.8) / totalObjects) * 100
             );
@@ -437,8 +434,8 @@ export default function JourneyReplayComp() {
 
   useEffect(() => {
     if (polylinedata.length > 0) {
-
       setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][1]));
+      // setMapcenter([polylinedata[0][0], polylinedata[0][1]]);
     }
   }, [polylinedata]);
 
@@ -510,7 +507,7 @@ export default function JourneyReplayComp() {
       (el) => el?.PropertDesc === "MinZoom"
     )[0]?.PropertyValue;
 
-    const minzoomLevel = clientMinZoomSettings ? parseInt(clientMinZoomSettings) : 1;
+    const minzoomLevel = clientMinZoomSettings ? parseInt(clientMinZoomSettings) : 6;
 
     setminzoom(minzoomLevel);
     const clientMaxZoomSettings = session?.clientSetting?.filter(
@@ -565,7 +562,7 @@ export default function JourneyReplayComp() {
     .slice(0, 10)}TO${timeOnly}`;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // setTravelV3(false);
+    setTravelV3(false);
     setTravelV2(true);
     setIsDynamicTime("");
     setlat("");
@@ -632,7 +629,7 @@ export default function JourneyReplayComp() {
             .startOf("day")
             .tz(session?.timezone);
           const oneday = moment().subtract(1, "day").endOf("day")
-         .tz(session?.timezone);
+            .tz(session?.timezone);
 
           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
           endDateTime =
@@ -649,6 +646,40 @@ export default function JourneyReplayComp() {
           let newdata = {
             ...Ignitionreport,
           };
+          // const timestart: string = "00:00:00";
+          // const timeend: string = "23:59:59";
+          // const currentDayOfWeek = new Date().getDay();
+          // const currentDay = new Date().getDay();
+          // const daysUntilMonday =
+          //   currentDayOfWeek === currentDay ? 7 : currentDayOfWeek - 1;
+          // const fromDateTime = new Date();
+          // fromDateTime.setDate(fromDateTime.getDate() - daysUntilMonday);
+          // const toDateTime = new Date(fromDateTime);
+          // toDateTime.setDate(toDateTime.getDate() + 6);
+          // const formattedFromDateTime = formatDate(fromDateTime);
+          // const formattedToDateTime = formatDate(toDateTime);
+          // if (isCustomPeriod) {
+          //   newdata = {
+          //     ...newdata,
+          //     fromDateTime: `${
+          //       weekData ? formattedFromDateTime : Ignitionreport.fromDateTime
+          //     }T${timestart}Z`,
+          //     toDateTime: `${
+          //       weekData ? formattedToDateTime : Ignitionreport.toDateTime
+          //     }T${timeend}Z`,
+          //   };
+          // } else {
+          //   newdata = {
+          //     ...newdata,
+          //     fromDateTime: `${
+          //       weekData ? formattedFromDateTime : currentDate
+          //     }T${timestart}Z`,
+          //     toDateTime: `${
+          //       weekData ? formattedToDateTime : currentDate
+          //     }T${timeend}Z`,
+          //   };
+          // }
+
           if (isCustomPeriod) {
             newdata = {
               ...newdata,
@@ -665,7 +696,8 @@ export default function JourneyReplayComp() {
               clientId: session?.clientId,
               fromDateTime: startDateTime,
               toDateTime: endDateTime,
-
+              // fromDateTime: "2024-02-01T00:00:00Z",
+              // toDateTime: "2024-02-01T23:59:59Z",
             };
           }
           const fromDate: any = new Date(Ignitionreport?.fromDateTime);
@@ -673,7 +705,19 @@ export default function JourneyReplayComp() {
 
           const differenceMs = toDate - fromDate;
           const differenceDays = differenceMs / (1000 * 60 * 60 * 24);
-
+          // setIgnitionreport(newdata);
+          // if (
+          //   Ignitionreport.period == "today" ||
+          //   Ignitionreport.period == "yesterday"
+          // ) {
+          //   setTimeout(() => setweekDataGrouped(false), 1000);
+          // }
+          // if (
+          //   Ignitionreport.period == "week" ||
+          //   Ignitionreport.period == "custom"
+          // ) {
+          //   setTimeout(() => setweekDataGrouped(true), 3000);
+          // }
           if (differenceDays > 5 || differenceDays < 0) {
             toast.error("please Select 0nly Five Days");
           } else {
@@ -763,18 +807,58 @@ export default function JourneyReplayComp() {
     setLoading(false);
   };
 
+  function formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  // var stopPoints = [];
+  // const result = TravelHistoryresponse.map((item) => {
+  //   if (item.speed === "0 Kph") return item;
+  // });
+
+  // if (TravelHistoryresponse.speed == "KM") {
+  //   stopPoints = res.data
+  //     .filter((x: any) => x.speed == "0 Kph")
+  //     .sort((x) => x.date);
+  // } else {
+  //   stopPoints = res.data
+  //     .filter((x: any) => x.speed == "0 Mph")
+  //     .sort((x) => x.date);
+  // }
+
+  const handleClickClear = () => {
+    setPolylinedata([]);
+    setCarPosition(null);
+    setTravelHistoryresponse([]);
+    setIsPlaying(false);
+    setClearMapData(false);
+    setIsDynamicTime("");
+    setstops([]);
+    setPlayBtn(false);
+    setStopBtn(false);
+    setPauseBtn(false);
+    setactiveTripColor("");
+    setProgressWidth(0);
+    if (polylinedata.length > 0) {
+      setCarPosition(new L.LatLng(polylinedata[0][0], polylinedata[0][0]));
+    }
+    setCurrentPositionIndex(0);
+  };
   const handleClick = () => {
     setShowRadioButton(!getShowRadioButton);
   };
 
-
-
+  function getFormattedDate(date: any) {
+    return date.toISOString().slice(0, 10);
+  }
   const handleDivClick = async (
     TripStart: TripsByBucket["TripStart"],
     TripEnd: TripsByBucket["TripEnd"],
     id: any
   ) => {
-
     sethidediv(true)
     setPolylinedata([])
     setCarPosition(null)
@@ -835,7 +919,11 @@ export default function JourneyReplayComp() {
             },
           }
         );
-
+        // if (session?.unit == "Mile") {
+        //   unit = "Mph";
+        // } else {
+        //   unit = "Kph";
+        // }
         var stopPoints = [];
         if (session?.unit == "KM") {
           stopPoints = TravelHistoryresponseapi.data
@@ -846,7 +934,9 @@ export default function JourneyReplayComp() {
             .filter((x: any) => x.speed == "0 Mph")
             .sort((x: any) => x.date);
         }
-
+        // displayName = TravelHistoryresponse.map((item) => {
+        //   return item?.address?.display_name;
+        // });
         var addresses: any = [];
         if (TravelHistoryresponse)
           stopPoints.map(async function (singlePoint: any) {
@@ -951,20 +1041,14 @@ export default function JourneyReplayComp() {
             });
           }
         }
-        setTravelHistoryresponse(TravelHistoryresponseapi.data);
         setStopWithSecond(stopTimesArray);
+        setTravelHistoryresponse(TravelHistoryresponseapi.data);
 
       }
-    } catch (error) {
-
-    }
+    } catch (error) { }
 
     setloadingMap(true);
   };
-
-
-
-
   useEffect(() => {
 
     if (TravelHistoryresponse && TravelHistoryresponse.length > 0) {
@@ -984,6 +1068,54 @@ export default function JourneyReplayComp() {
 
   }, [TravelHistoryresponse]);
 
+  useEffect(() => {
+    (async function () {
+      let unit: string;
+      if (session?.unit == "Mile") {
+        unit = "Mph";
+      } else {
+        unit = "Kph";
+      }
+      const stopPoints = TravelHistoryresponse?.filter((x) => {
+        return x.speed === `0 ${unit}`;
+      });
+
+      const stopDetailsArray: StopAddressData[] = [];
+
+      for (const point of stopPoints) {
+        const { lat, lng } = point;
+        try {
+          if (!point.address) {
+            if (session) {
+              const Data = await getCurrentAddress({
+                token: session.accessToken,
+                lat: lat,
+                lon: lng,
+              });
+
+              stopDetailsArray.push(Data);
+            }
+          } else {
+            stopDetailsArray.push(point?.address);
+          }
+        } catch (error) { }
+      }
+
+      const seen: Record<string | number, boolean> = {};
+
+      const uniqueStopDetailsArray = stopDetailsArray.filter((item) => {
+        const key = item.place_id;
+        if (!seen[key]) {
+          seen[key] = true;
+          return true;
+        }
+        return false;
+      });
+
+      setStopDetails(uniqueStopDetailsArray);
+    })();
+  }, [TravelHistoryresponse]);
+  // const item = TravelHistoryresponse[currentPositionIndex];
   const getSpeedAndDistance = () => {
     if (
       currentPositionIndex >= 0 &&
@@ -1008,6 +1140,13 @@ export default function JourneyReplayComp() {
     return 0;
   };
 
+  // const handleZoneClick = () => {
+  //   if (showZones == false) {
+  //     setShowZones(true);
+  //   } else {
+  //     setShowZones(false);
+  //   }
+  // };
   const handleShowDetails = () => {
     setShowDetails(!getShowdetails);
     setShowIcon(!getShowICon);
@@ -1016,8 +1155,23 @@ export default function JourneyReplayComp() {
     setCheckedInput(!getCheckedInput);
   };
 
+  // const handleCustomDateChange = (fieldName: string, date: any) => {
+  //   setCurrentDateDefaul(true);
+  //   setIgnitionreport((prevReport: any) => ({
+  //     ...prevReport,
+  //     [fieldName]: date,
+  //   }));
+  // };
 
   const handleDateChange = (fieldName: string, newDate: any) => {
+    // if (newDate && moment(newDate, 'MM/DD/yyyy', true).isValid()) {
+    //   const formattedDate = moment(newDate, 'MM/DD/yyyy').toDate()
+    //   setIgnitionreport((prevReport: any) => ({
+    //     ...prevReport,
+    //     [fieldName]: formattedDate?.toISOString(),
+    //   }));
+
+    // }
 
     setCurrentDateDefaul(true);
     setIgnitionreport((prevReport: any) => ({
@@ -1025,7 +1179,8 @@ export default function JourneyReplayComp() {
       [fieldName]: newDate?.toISOString(),
     }));
   };
-
+  // const timeZone =  "Australia/Sydney"
+  //     const currenTDates = moment.tz(timeZone).toDate();
   const currenTDates = new Date();
 
   const isCurrentDate = (date: any) => {
@@ -1048,6 +1203,12 @@ export default function JourneyReplayComp() {
 
   const handleItemClick = (item) => {
 
+    /*  if(selectedItemId){
+       setSelectedItemId(null)
+     }
+     handleClickStopCar(item);
+       setSelectedItemId(item.date); // Assume each item has a unique 'id'
+      */
     handleClickStopCar(item);
 
     // Toggle the selection of the item
@@ -1059,8 +1220,20 @@ export default function JourneyReplayComp() {
 
   };
 
+
+  // const selectOption: Option[] = vehicleList?.map((item: any) => {
+  //   return { value: item.vehicleReg, label: item.vehicleReg };
+  // });
+
+  // const [selectedOption, setSelectedOption] = useState<any>(null);
+
+  // const handleSelectChange = (newValue: any, actionMeta: any) => {
+  //   const name = "period";
+  //   const value = "yesterday";
+  //   setSelectedOption(newValue);
+  // };
   const handleInputChangeSelect = (e: any) => {
-    
+
     if (!e) {
       return setIgnitionreport((prevReport: any) => ({
         ...prevReport,
@@ -1069,8 +1242,6 @@ export default function JourneyReplayComp() {
       }));
     }
     const { value, label } = e;
-    
-    setvehicleType(vehicleList?.data.find((i) => { return i.vehicleReg == value })?.vehicleType)
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
       ["VehicleReg"]: value,
@@ -1081,7 +1252,13 @@ export default function JourneyReplayComp() {
 
   const handleInputChange: any = (e: any) => {
     setClearMapData(false);
-
+    // if (e.target == undefined) {
+    //   const { name, value } = e;
+    //   setIgnitionreport((prevReport: any) => ({
+    //     ...prevReport,
+    //     ["VehicleReg"]: value,
+    //   }));
+    // } else {
     const { name, value } = e.target;
     setIgnitionreport((prevReport: any) => ({
       ...prevReport,
@@ -1127,10 +1304,31 @@ export default function JourneyReplayComp() {
     }
   };
   const handleChangeValueSlider = (value: any) => {
-
+    // if (TravelHistoryresponse.length > 100) {
+    //   setCurrentPositionIndex(value.target.value + currentPositionIndex);
+    // } else {
     setCurrentPositionIndex(value.target.value);
   };
+  // const groupedData: any = {};
+  // dataresponse?.forEach((item: any) => {
+  //   if (!groupedData[item.TripStartDateLabel]) {
+  //     groupedData[date] = [];
+  //   }
+  //   groupedData[date].push(item);
+  // });
 
+  // const renderGroupedData = () => {
+  //   return Object.keys(groupedData).map((date) => (
+  //     <div key={date}>
+  //       <h2>{date}</h2>
+  //       <ul>
+  //         {groupedData[date].map((item: any, index: any) => (
+  //           <li key={index}>{item.TripStartDateLabel}</li>
+  //         ))}
+  //       </ul>
+  //     </div>
+  //   ));
+  // };
   function getDayName(date: any) {
     const days = [
       "Sunday",
@@ -1180,12 +1378,13 @@ export default function JourneyReplayComp() {
 
   const [isChecked, setIsChecked] = useState(false);
 
-  const [isHovered, setIsHovered] = useState(false);
 
   const handleFocus = () => {
     setuserclick(false)
     setIsHovered(false);
+    setIsHovered(false);
   }
+  const [isHovered, setIsHovered] = useState(false);
 
   // Event handlers for hover
   const handleMouseEnter = () => setIsHovered(true);
@@ -1196,14 +1395,42 @@ export default function JourneyReplayComp() {
         <p className="bg-green px-4 py-1 border-t  text-center text-2xl text-white font-bold journey_heading">
           Journey Replay
         </p>
+        {/* {groupedData?.map((item: any) => {
+          return <div>{item?.EndingPoint}</div>;
+        })} */}
+
+        {/* {renderGroupedData()} */}
+        {/* <div>
+          {dataresponse?.map((item: any) => {
+            return (
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <Typography>{item?.TripStart}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography>{item.TotalDistance}</Typography>
+                </AccordionDetails>
+              </Accordion>
+            );
+          })}
+        </div> */}
+        {/* <p className="bg-[#00B56C] px-4 py-1 text-white">JourneyReplay</p> */}
         <div
           className="grid xl:grid-cols-10 lg:grid-cols-10 md:grid-cols-12  gap-2
          lg:px-4 text-start  bg-bgLight select_box_journey"
         >
           <div
-            className="xl:col-span-1 lg:col-span-2 md:col-span-3 col-span-12 select_box_column"
+            className="xl:col-span-1 lg:col-span-2 md:col-span-3   col-span-12
+            select_box_column 
+          "
+          // style={{ gridColumnEnd: "span 1.5" }}
           >
             <Select
+              // value={Ignitionreport}
               onChange={handleInputChangeSelect}
               options={options}
               placeholder="Pick Vehicle"
@@ -1236,12 +1463,118 @@ export default function JourneyReplayComp() {
                 }),
               }}
             />
+
+            {/* <select
+              id="select_box"
+              className="   h-8 text-gray  w-full  outline-green border border-grayLight px-1 hover:border-green"
+              onChange={handleInputChange}
+              name="VehicleReg"
+              value={Ignitionreport.VehicleReg}
+            >
+              <option value="" disabled selected hidden>
+                Select Vehicle
+              </option>
+              {vehicleList.map((item: DeviceAttach) => (
+                <option key={item.id}>{item.vehicleReg}</option>
+              ))}
+            </select> */}
+
+            {/* <Select
+              onChange={handleInputChange}
+              name="VehicleReg"
+              className="Select_box"
+              options={selectOption}
+              value={selectedOption}
+              theme={(theme) => ({
+                ...theme,
+                borderRadius: 0,
+
+                colors: {
+                  ...theme.colors,
+
+                  primary25: "#00B56C",
+                  primary: "gray",
+                },
+              })}
+            /> */}
+            {/* <FormControl sx={{ m: 1, minWidth: 120 }}> */}
+            {/* <Select
+              value={Ignitionreport.VehicleReg}
+              onChange={handleInputChange}
+              MenuProps={MenuProps}
+              disabled={loading}
+              name="VehicleReg"
+              id="select_box_journey"
+              displayEmpty
+              className={`h-8 text-black font-popins font-bold w-full outline-green  ${
+                getShowRadioButton
+                  ? " text-black font-popins font-extrabold"
+                  : " text-black font-popins  "
+              }`}
+              style={{
+                color: getShowRadioButton ? "black" : "",
+                paddingTop: getShowRadioButton ? "4%" : "2%",
+                paddingLeft: getShowRadioButton ? "6%" : "3%",
+                fontWeight: getShowRadioButton ? "bold" : "bold",
+              }}
+            >
+              <MenuItem value="" disabled selected hidden className="text-sm">
+                Select Vehicle
+              </MenuItem>
+              {vehicleList?.data?.map((item: DeviceAttach) => (
+                <MenuItem
+                  // className=" w-full text-start font-semibold "
+                  key={item.id}
+                  value={item.vehicleReg}
+                  id="bg_hover_select_vehicle"
+                >
+                  {item.vehicleReg}
+                </MenuItem>
+              ))}
+            </Select> */}
+
+            {/* <Select
+              value={Ignitionreport.VehicleReg}
+              onChange={handleInputChange}
+              MenuProps={MenuProps}
+              disabled={loading}
+              options={options}
+              isClearable
+              isSearchable  
+              name="VehicleReg"
+              id="select_box_journey"
+              displayEmpty
+              className={`h-8 text-black font-popins font-bold w-full outline-green  ${
+                getShowRadioButton
+                  ? " text-black font-popins font-extrabold"
+                  : " text-black font-popins  "
+              }`}
+              style={{
+                color: getShowRadioButton ? "black" : "",
+                paddingTop: getShowRadioButton ? "4%" : "2%",
+                paddingLeft: getShowRadioButton ? "6%" : "3%",
+                fontWeight: getShowRadioButton ? "bold" : "bold",
+              }}
+            > */}
           </div>
+          {/* <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
+            <KeyboardDatePicker
+              format="MM/DD/yyyy"
+              value={Ignitionreport.fromDateTime}
+              onChange={(newDate: any) =>
+                handleDateChange("fromDateTime", newDate)
+              }
+              variant="inline"
+              maxDate={currenTDates}
+              autoOk
+            />
+          </MuiPickersUtilsProvider> */}
           <div className="xl:col-span-3 lg:col-span-4 md:col-span-6 col-span-12 days_select">
             {getShowRadioButton ? (
               <div className="grid lg:grid-cols-12 md:grid-cols-12  sm:grid-cols-12  -mt-2  grid-cols-12  xl:px-10 lg:px-10 xl:gap-5 lg:gap-5 gap-2 flex justify-center ">
                 <div
                   className="lg:col-span-5 md:col-span-5 sm:col-span-5 col-span-5 lg:mt-0 md:mt-0 sm:mt-0  "
+                // onClick={togglePickerFromDate}
                 >
                   <label className="text-green">From</label>
                   <MuiPickersUtilsProvider utils={DateFnsMomemtUtils}>
@@ -1286,7 +1619,7 @@ export default function JourneyReplayComp() {
                           handleDateChange("toDateTime", newDate)
                         }
                         variant="inline"
-                        // maxDate={currenTDates}
+                        minDate={Ignitionreport.fromDateTime}
                         placeholder="End Date"
                         inputProps={{ readOnly: true }}
                         maxDate={currenTDates}
@@ -1393,10 +1726,93 @@ export default function JourneyReplayComp() {
                   </label>
                 </div>
               </div>
+              // responsive code
+              // <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-1">
+              //   <div>
+              //     <label className="text-sm text-gray">
+              //       <input
+              //         type="radio"
+              //         className="w-5 form-radio"
+              //         name="period"
+              //         disabled={loading}
+              //         value="today"
+              //         checked={Ignitionreport.period === "today"}
+              //         onChange={handleInputChange}
+              //       />
+              //       &nbsp;Today
+              //     </label>
+              //   </div>
 
+              //   <div>
+              //     <label className="text-sm text-gray">
+              //       <input
+              //         type="radio"
+              //         className="w-5 form-radio text-green"
+              //         name="period"
+              //         disabled={loading}
+              //         value="yesterday"
+              //         checked={Ignitionreport.period === "yesterday"}
+              //         onChange={handleInputChange}
+              //       />
+              //       &nbsp;Yesterday
+              //     </label>
+              //   </div>
+
+              //   <div>
+              //     <label className="text-sm text-gray">
+              //       <input
+              //         type="radio"
+              //         className="w-5 form-radio"
+              //         name="period"
+              //         disabled={loading}
+              //         value="week"
+              //         checked={Ignitionreport.period === "week"}
+              //         onChange={handleInputChange}
+              //       />
+              //       &nbsp;Week
+              //     </label>
+              //   </div>
+
+              //   <div>
+              //     <label className="text-sm text-gray">
+              //       <input
+              //         type="radio"
+              //         className="w-5 form-radio"
+              //         disabled={loading}
+              //         name="period"
+              //         value="custom"
+              //         checked={Ignitionreport.period === "custom"}
+              //         onChange={handleInputChange}
+              //         onClick={handleClick}
+              //       />
+              //       &nbsp;Custom
+              //     </label>
+              //   </div>
+              // </div>
             )}
           </div>
           <div className="xl:col-span-1 lg:col-span-1 md:col-span-1 col-span-12 text-white font-bold flex justify-center items-center mt-2 journey_replay_search">
+            {/* {clearMapData ? (
+              <button
+                onClick={handleClickClear}
+                className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
+                ${
+                  (Ignitionreport.VehicleReg &&
+                    Ignitionreport.period === "today") ||
+                  (Ignitionreport.VehicleReg &&
+                    Ignitionreport.period === "yesterday") ||
+                  (Ignitionreport.VehicleReg &&
+                    Ignitionreport.period === "week") ||
+                  (Ignitionreport.VehicleReg &&
+                    Ignitionreport.period === "custom")
+                    ? ""
+                    : "opacity-50 cursor-not-allowed"
+                }`}
+              >
+                Search
+              </button>
+            ) : (           
+            )} */}
             <div
               onClick={(e) => seacrhLoading && handleSubmit(e)}
               className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    search_btn_journey
@@ -1437,11 +1853,206 @@ export default function JourneyReplayComp() {
                 <button>Search</button>
               </div>
             </div>
+            {/* <button
+              style={{
+                marginLeft: "40%",
+                backgroundColor: "green",
+                color: "white",
+              }}
+              onClick={() =>
+                handleDivClickTwo(
+                  "2024-06-20T00:00:00.000",
+                  "2024-06-20T23:59:59.999"
+                )
+              }
+            >
+              SEARCH
+            </button> */}
+            {/* <div
+              onClick={handleSubmitTwo}
+              className={` grid grid-cols-12  h-10 bg-green py-2 px-4 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white cursor-pointer    search_btn_journey
+                    ${
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "today") ||
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "yesterday") ||
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "week") ||
+                      (Ignitionreport?.VehicleReg &&
+                        Ignitionreport?.period === "custom" &&
+                        Ignitionreport?.toDateTime &&
+                        Ignitionreport?.fromDateTime)
+                        ? ""
+                        : "opacity-50 cursor-not-allowed"
+                    }`}
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <div className="col-span-3">
+                <svg
+                  className="lg:h-18 lg:w-10 md:h-12 md:w-12 sm:h-10 sm:w-10 h-12 w-12 py-3 px-2  text-white"
+                  // width="24"
+                  // height="24"
+                  viewBox="0 0 24 24"
+                  strokeWidth="4"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  {" "}
+                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                  <circle cx="10" cy="10" r="7" />{" "}
+                  <line x1="21" y1="21" x2="15" y2="15" />
+                </svg>
+              </div>
+              <div className="lg:col-span-8 md:col-span-8">
+                <button>SearchS</button>
+              </div>
+            </div> */}
+            {/* <button
+              onClick={handleSubmit}
+              className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
+                        ${
+                          (Ignitionreport.VehicleReg &&
+                            Ignitionreport.period === "today") ||
+                          (Ignitionreport.VehicleReg &&
+                            Ignitionreport.period === "yesterday") ||
+                          (Ignitionreport.VehicleReg &&
+                            Ignitionreport.period === "week") ||
+                          (Ignitionreport.VehicleReg &&
+                            Ignitionreport.period === "custom" &&
+                            Ignitionreport.toDateTime &&
+                            Ignitionreport.fromDateTime)
+                            ? ""
+                            : "opacity-50 cursor-not-allowed"
+                        }`}
+            >
+              Search
+            </button> */}
           </div>
-        </div>
 
+          {/* <div className="xl:col-span-3 lg:col-span-1 md:col-span-12 col-span-12 journey_replay_harsh">
+            {" "}
+          </div>
+          {TravelHistoryresponse?.length > 0 && (
+            <div className="xl:col-span-1 lg:col-span-2  md:col-span-12 col-span-6  -mt-1 journey_replay_harsh_child  ">
+              <div className="grid grid-cols-12  ">
+                <div className="col-span-2">
+                  <Image
+                    src={markerA}
+                    alt="harshIcon"
+                    className="h-6 journay_HarshAcceleration"
+                  />
+                  <Image src={markerB} alt="harshIcon" className="h-6 mt-1 " />
+                </div>
+                <div className="col-span-10 text-sm font-semibold">
+                  location Start
+                  <br></br>
+                  <p className="mt-3">Location End</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+
+          <div className="xl:col-span-1  lg:col-span-2 md:col-span-1 col-span-6 mt-1 -ms-5 mb-3 journey_replay_harsh_acce">
+            {TravelHistoryresponse?.filter((item: any) => {
+              return (
+                item.vehicleEvents.filter(
+                  (items: any) => items.Event === "HarshAcceleration"
+                ).length > 0
+              );
+            }).length > 0 && (
+              <div className="grid grid-cols-12">
+                <div className="col-span-2">
+                  <Image
+                    src={HarshAccelerationIcon}
+                    alt="harshIcon "
+                    className="h-6 journay_HarshAcceleration"
+                  />
+                </div>
+                <div className="col-span-10 text-sm font-semibold">
+                  Harsh Acc.. (x
+                  {TravelHistoryresponse.reduce((count, item) => {
+                    return (
+                      count +
+                      item.vehicleEvents.filter(
+                        (items: any) => items.Event === "HarshAcceleration"
+                      ).length
+                    );
+                  }, 0)}
+                  )
+                </div>
+              </div>
+            )}
+            {TravelHistoryresponse?.filter((item: any) => {
+              return (
+                item.vehicleEvents.filter(
+                  (items: any) => items.Event === "HarshCornering"
+                ).length > 0
+              );
+            }).length > 0 && (
+              <div className="grid grid-cols-12">
+                <div className="col-span-2">
+                  <Image
+                    src={HarshCornerningIcon}
+                    alt="harshIcon "
+                    className="h-6 journay_HarshAcceleration"
+                  />
+                </div>
+                <div className="col-span-10 text-sm font-semibold">
+                  Harsh Corn.. (x
+                  {TravelHistoryresponse.reduce((count, item) => {
+                    return (
+                      count +
+                      item.vehicleEvents.filter(
+                        (items: any) => items.Event === "HarshCornering"
+                      ).length
+                    );
+                  }, 0)}
+                  )
+                </div>
+              </div>
+            )}
+
+            {TravelHistoryresponse?.filter((item: any) => {
+              return (
+                item.vehicleEvents.filter(
+                  (items: any) => items.Event == "HarshAcceleration"//"HarshBreak"
+                ).length > 0
+              );
+            }).length > 0 && (
+              <div className="grid grid-cols-12">
+                <div className="col-span-2">
+                  <Image
+                    src={harshAcceleration}
+                    alt="harshIcon"
+                    className="h-6 mt-1 journay_HarshAcceleration"
+                  />
+                </div>
+                <div className="col-span-10 text-sm">
+                  <p className="mt-2 font-semibold">
+                    Harsh Break (x
+                    {TravelHistoryresponse.reduce((count, item) => {
+                      return (
+                        count +
+                        item.vehicleEvents.filter(
+                          (items: any) => items.Event === "HarshAcceleration"
+                        ).length
+                      );
+                    }, 0)}
+                    )
+                  </p>
+                </div>
+              </div>
+            )}
+
+            
+          </div>
+           */}
+        </div>
         <div className="grid lg:grid-cols-5   md:grid-cols-12 sm:grid-cols-12 grid-cols-1 journey_sidebar">
-          <div className="xl:col-span-1 lg:col-span-1 md:col-span-5 sm:col-span-12 col-span-4 trips_journey">
+          <div className="xl:col-span-1 lg:col-span-2 md:col-span-5 sm:col-span-12 col-span-4 trips_journey">
             <p className="bg-green px-4 py-1 text-white font-semibold journey_sidebar_text flex items-center">
               Trips ({dataresponse?.length})
             </p>
@@ -1960,343 +2571,428 @@ export default function JourneyReplayComp() {
                 ))}
             </div>
           </div>
-
-          <div className="xl:col-span-4 lg:col-span-4 md:col-span-7 sm:col-span-12 col-span-4 journey_map"
+          <div
+            className="xl:col-span-4 lg:col-span-3 md:col-span-7 sm:col-span-12 col-span-4 journey_map"
             style={{ position: "relative" }}
           >
             <div onClick={() => {
               setMapcenterToFly(null);
-            }}
-              className="relative"
-            >
+
+            }}>
               <div onClick={handleuserclick}>
+
                 {mapcenter !== null && (
-                  session?.MapType == "Google" ?
-                    (
-                     <div className="journey_map">
-                       <GoogleLiveMap
-                         polylinedata={polylinedata.map((item) => {
-                           return { lat: item[0], lng: item[1] }
-                         })}
-                         TravelHistoryresponse={TravelHistoryresponse}
-                         loadingMap={loadingMap}
-                         mapcenter={mapcenter}
-                         minZoom={minzoom}
-                         maxZoom={maxzoom}
-                         zoom={zoom}
-                         carPosition={carPosition}
-                         getCurrentAngle={getCurrentAngle}                        
-                         zoomToFly={zoomToFly}
-                         mapcenterToFly={mapcenterToFly}
-                         isPlaying={isPlaying}
-                         isPaused={isPaused}
-                         vehicleType={vehicleType}
-                         lat={lat}
-                         lng={lng}
-                         userclick={userclick}
-                       />
-                      </div>
+                  <MapContainer
+                    id="map"
+                    zoom={zoom}
+                    center={mapcenter}
+                    className="z-0 journey_map"
+                    minZoom={minzoom}
+                    maxZoom={maxzoom}
+                  >
+                    {session?.MapType == "Google" ? (
+                      <TileLayer
+                        url={`https://{s}.googleapis.com/maps/vt?lyrs=m&x={x}&y={y}&z={z}&key=AIzaSyBy7miP3sEBauim4z2eh5ufzcC8YItPyBo`}
+                        subdomains={['mt0', 'mt1', 'mt2', 'mt3']} // Google tile servers
+                        attribution="Google Maps"
+                      />
+                    ) : (
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
+                      />
+                    )}
+                    {/* <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
+                  /> */}
 
-                        
-                        ) :
-                        (
+                    {loadingMap ? (
+                      <Polyline
+                        pathOptions={{ color: "red", weight: 6 }}
+                        positions={polylinedata}
+                      />
+                    ) : null}
+                    {isPlaying ? (
+                      <SetViewOnClick coords={mapcenter} zoom={zoom} />
+                    ) : isPaused ? (
+                      <SetViewOnClick coords={mapcenter} zoom={zoom} />
+                    )
+                      :
 
-                        <MapContainer
-                          id="map"
-                          zoom={zoom}
-                          center={mapcenter}
-                          className="z-0 journey_map"
-                          minZoom={minzoom}
-                          maxZoom={maxzoom}
-                        >
-                          <TileLayer
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright"></a>'
-                          />
+                      (
+                        <SetViewfly coords={mapcenterToFly} zoom={zoomToFly} />
+                      )
+                    }
+                    {loadingMap
+                      ? carPosition && (
+                        <Marker
+                          position={carPosition}
+                          icon={createMarkerIcon(getCurrentAngle())}
+                        ></Marker>
+                      )
+                      : ""}
 
-
-                          {loadingMap ? (
-                            <Polyline
-                              pathOptions={{ color: "red", weight: 6 }}
-                              positions={polylinedata}
-                            />
-                          ) : null}
-                          {isPlaying ? (
-                            <SetViewOnClick coords={mapcenter} zoom={zoom} />
-                          ) : isPaused ? (
-                            <SetViewOnClick coords={mapcenter} zoom={zoom} />
-                          )
-                            :
-
-                            (
-                              <SetViewfly coords={mapcenterToFly} zoom={zoomToFly} />
-                            )
-                          }
-                          {loadingMap
-                            ? carPosition && (
-                              <Marker
-                                position={carPosition}
-                                icon={createMarkerIcon(getCurrentAngle())}
-                              ></Marker>
-                            )
-                            : ""}
-
-                          {lat && lng && (
-                            <Marker
-                              position={[lat, lng]}
-                              icon={
-                                new L.Icon({
-                                  iconUrl:
-                                    "https://img.icons8.com/fluency/48/000000/stop-sign.png",
-                                  iconAnchor: [22, 47],
-                                  popupAnchor: [1, -34],
-                                })
-                              }
-                            ></Marker>
-                          )}
-                          {TravelHistoryresponse?.length > 0 && (
-                            <div>
-                              {loadingMap ? (
-                                <Marker
-                                  position={[
-                                    TravelHistoryresponse[0].lat,
-                                    TravelHistoryresponse[0].lng,
-                                  ]}
-                                  icon={
-                                    new L.Icon({
-                                      iconUrl:
-                                        "https://img.icons8.com/fluent/48/000000/marker-a.png",
-                                      iconAnchor: [22, 47],
-                                      popupAnchor: [1, -34],
-                                    })
-                                  }
-                                ></Marker>
-                              ) : (
-                                ""
-                              )}
-
-                              {loadingMap ? (
-                                <Marker
-                                  position={[
-                                    TravelHistoryresponse[
-                                      TravelHistoryresponse?.length - 1
-                                    ].lat,
-                                    TravelHistoryresponse[
-                                      TravelHistoryresponse?.length - 1
-                                    ].lng,
-                                  ]}
-                                  icon={
-                                    new L.Icon({
-                                      iconUrl:
-                                        "https://img.icons8.com/fluent/48/000000/marker-b.png",
-                                      iconAnchor: [22, 47],
-                                      popupAnchor: [1, -34],
-                                    })
-                                  }
-                                ></Marker>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          )}
-
-                          {TravelHistoryresponse?.map((item) => {
-                            if (item.vehicleEvents.length > 0) {
-                              return item.vehicleEvents.map((items) => {
-                                if (items.Event === "HarshBreak") {
-                                  return loadingMap ? (
-                                    <Marker
-                                      position={[item.lat, item.lng]}
-                                      icon={
-                                        new L.Icon({
-                                          iconUrl:
-                                            "https://img.icons8.com/color/48/000000/brake-discs.png",
-                                          iconSize: [40, 40],
-                                          iconAnchor: [16, 37],
-                                        })
-                                      }
-                                    >
-                                      {harshPopUp && <Popup>Harsh Break</Popup>}
-                                    </Marker>
-                                  ) : (
-                                    ""
-                                  );
-                                }
-                                if (items.Event === "HarshAcceleration") {
-                                  return loadingMap ? (
-                                    <Marker
-                                      position={[item.lat, item.lng]}
-                                      icon={
-                                        new L.Icon({
-                                          iconUrl:
-                                            "https://img.icons8.com/nolan/64/speed-up.png",
-                                          iconSize: [30, 30],
-                                          iconAnchor: [16, 37],
-                                        })
-                                      }
-                                    >
-                                      {harshPopUp && (
-                                        <Popup>Harsh Acceleration</Popup>
-                                      )}
-                                    </Marker>
-                                  ) : (
-                                    ""
-                                  );
-                                }
-                                if (items.Event === "HarshCornering") {
-                                  return loadingMap ? (
-                                    <Marker
-                                      position={[item.lat, item.lng]}
-                                      icon={
-                                        new L.Icon({
-                                          iconUrl: HarshCornerningIcon.src,
-                                          iconSize: [30, 30],
-                                          iconAnchor: [16, 37],
-                                        })
-                                      }
-                                    >
-                                      {harshPopUp && (
-                                        <Popup>Harsh Cornering</Popup>
-                                      )}
-                                    </Marker>
-                                  ) : (
-                                    ""
-                                  );
-                                }
-                              });
+                    {lat && lng && (
+                      <Marker
+                        position={[lat, lng]}
+                        icon={
+                          new L.Icon({
+                            iconUrl:
+                              "https://img.icons8.com/fluency/48/000000/stop-sign.png",
+                            iconAnchor: [22, 47],
+                            popupAnchor: [1, -34],
+                          })
+                        }
+                      ></Marker>
+                    )}
+                    {TravelHistoryresponse?.length > 0 && (
+                      <div>
+                        {loadingMap ? (
+                          <Marker
+                            position={[
+                              TravelHistoryresponse[0].lat,
+                              TravelHistoryresponse[0].lng,
+                            ]}
+                            icon={
+                              new L.Icon({
+                                iconUrl:
+                                  "https://img.icons8.com/fluent/48/000000/marker-a.png",
+                                iconAnchor: [22, 47],
+                                popupAnchor: [1, -34],
+                              })
                             }
-                          })}
+                          ></Marker>
+                        ) : (
+                          ""
+                        )}
+
+                        {loadingMap ? (
+                          <Marker
+                            position={[
+                              TravelHistoryresponse[
+                                TravelHistoryresponse?.length - 1
+                              ].lat,
+                              TravelHistoryresponse[
+                                TravelHistoryresponse?.length - 1
+                              ].lng,
+                            ]}
+                            icon={
+                              new L.Icon({
+                                iconUrl:
+                                  "https://img.icons8.com/fluent/48/000000/marker-b.png",
+                                iconAnchor: [22, 47],
+                                popupAnchor: [1, -34],
+                              })
+                            }
+                          ></Marker>
+                        ) : (
+                          ""
+                        )}
+                      </div>
+                    )}
+
+                    {TravelHistoryresponse?.map((item) => {
+                      if (item.vehicleEvents.length > 0) {
+                        return item.vehicleEvents.map((items) => {
+                          if (items.Event === "HarshBreak") {
+                            return loadingMap ? (
+                              <Marker
+                                position={[item.lat, item.lng]}
+                                icon={
+                                  new L.Icon({
+                                    iconUrl:
+                                      "https://img.icons8.com/color/48/000000/brake-discs.png",
+                                    iconSize: [40, 40],
+                                    iconAnchor: [16, 37],
+                                  })
+                                }
+                              >
+                                {harshPopUp && <Popup>Harsh Break</Popup>}
+                              </Marker>
+                            ) : (
+                              ""
+                            );
+                          }
+                          if (items.Event === "HarshAcceleration") {
+                            return loadingMap ? (
+                              <Marker
+                                position={[item.lat, item.lng]}
+                                icon={
+                                  new L.Icon({
+                                    iconUrl:
+                                      "https://img.icons8.com/nolan/64/speed-up.png",
+                                    iconSize: [30, 30],
+                                    iconAnchor: [16, 37],
+                                  })
+                                }
+                              >
+                                {harshAccPopUp && (
+                                  <Popup>Harsh Acceleration</Popup>
+                                )}
+                              </Marker>
+                            ) : (
+                              ""
+                            );
+                          }
+                          if (items.Event === "HarshCornering") {
+                            return loadingMap ? (
+                              <Marker
+                                position={[item.lat, item.lng]}
+                                icon={
+                                  new L.Icon({
+                                    iconUrl: HarshCornerningIcon.src,
+                                    iconSize: [30, 30],
+                                    iconAnchor: [16, 37],
+                                  })
+                                }
+                              >
+                                {harshAccPopUp && (
+                                  <Popup>Harsh Cornering</Popup>
+                                )}
+                              </Marker>
+                            ) : (
+                              ""
+                            );
+                          }
+                        });
+                      }
+                    })}
 
 
 
 
 
-
-                        </MapContainer>
-
-                        )
+                  </MapContainer>
                 )}
 
-                      </div>
-
+              </div>
             </div>
+            {/* 
+            {isChecked && TravelHistoryresponse?.length > 0 && (
+    <div className="absolute top-0 right-0 p-4 bg-white rounded-lg shadow-lg">
+     
+      <div className="xl:col-span-1 lg:col-span-2 md:col-span-12 col-span-6 -mt-1 journey_replay_harsh_child">
+        <div className="grid grid-cols-12">
+          <div className="col-span-2">
+            <Image
+              src={markerA}
+              alt="startIcon"
+              className="h-6 journay_HarshAcceleration"
+            />
+            <Image src={markerB} alt="endIcon" className="h-6 mt-1 " />
+          </div>
+          <div className="col-span-10 text-sm font-semibold">
+            Location Start
+            <br />
+            <p className="mt-3">Location End</p>
+          </div>
+        </div>
+      </div>
 
-              {hidediv && (
-                <>
-                  <div >
+   
+      <div className="xl:col-span-1 lg:col-span-2 md:col-span-1 col-span-6 mt-1 -ms-5 mb-3 journey_replay_harsh_acce">
+        {TravelHistoryresponse?.filter((item) =>
+          item.vehicleEvents.some(
+            (event) => event.Event === "HarshAcceleration"
+          )
+        ).length > 0 && (
+          <div className="grid grid-cols-12">
+            <div className="col-span-2">
+              <Image
+                src={HarshAccelerationIcon}
+                alt="harshAccelerationIcon"
+                className="h-6 journay_HarshAcceleration"
+              />
+            </div>
+            <div className="col-span-10 text-sm font-semibold">
+              Harsh Acc.. (x
+              {TravelHistoryresponse.reduce((count, item) =>
+                count +
+                item.vehicleEvents.filter(
+                  (event) => event.Event === "HarshAcceleration"
+                ).length
+              , 0)}
+              )
+            </div>
+          </div>
+        )}
 
-                    <div className="absolute flex items-start lg:top-4 lg:left-20 left-12 top-6 space-x-4">
-                      <div className="xl:col-span-2 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6 stop_journey max-w-xs lg:max-w-sm">
-                        <div
-                          className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg rounded-md cursor-pointer"
-                          onClick={() => stopDetailsOpen && handleShowDetails()}
-                        >
-                          <div className="lg:col-span-11 md:col-span-10 sm:col-span-10 col-span-11 stop_details_responsive">
-                            <p className="text-white lg:px-2 ps-1 text-lg text_responsive mr-24">
-                              Stop Details ({loadingMap ? stopWithSecond.length : ""})
-                            </p>
-                          </div>
-                          <div className="col-span-1 mt-1 lg:-ms-2 md:-ms-1 -ms-2">
-                            {getShowICon ? (
-                              <svg
-                                className="h-5 w-5 text-white"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                strokeWidth="2"
-                                stroke="currentColor"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path stroke="none" d="M0 0h24v24H0z" />
-                                <line x1="5" y1="12" x2="19" y2="12" />
-                              </svg>
-                            ) : (
-                              <svg
-                                className="h-5 w-5 text-white"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                strokeWidth="2"
-                                stroke="currentColor"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path stroke="none" d="M0 0h24v24H0z" />
-                                <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
-                                <path d="M4 16v2a2 2 0 0 0 2 2h2" />
-                                <path d="M16 4h2a2 2 0 0 1 2 2v2" />
-                                <path d="M16 20h2a2 2 0 0 0 2 -2v-2" />
-                                <circle cx="12" cy="12" r="3" />
-                              </svg>
-                            )}
-                          </div>
-                        </div>
-                        {getShowdetails && (
-                          <div className={`bg-white overflow-y-scroll resposive_stop_details ${stopWithSecond.length > 1 ? "lg:h-60 md:h-60 sm:h-60 h-24" : ""}`}>
-                            {stopWithSecond?.map((item: any) => {
-                              let isActive = item.date === selectedItemId;
-                              return loadingMap ? (
-                                <div
-                                  key={item.date}
-                                  onClick={() => handleItemClick(item)}
-                                  className={`cursor-pointer ${isActive ? 'bg-[#e1f0e3]' : ''}`}
-                                >
-                                  <p className="text-black font-popins px-2 py-2 text-sm word-wrap">
-                                    {/* <b>{item?.address?.display_name?.substring(0, 50)}</b>
-                 */}
-                                    <b>{item?.address?.display_name}</b>
-                                  </p>
-                                  <div className="grid grid-cols-12">
-                                    <div className="lg:col-span-1 md:col-span-2 sm:col-span-6 col-span-2"></div>
-                                    <div className="lg:col-span-8 md:col-span-8 sm:col-span-8 col-span-9 mx-2 text-center text-red text-bold px-1 w-full text-sm border-2 border-red stop_details_time">
-                                      {item?.date?.slice(11, 19)}, {item?.time}
-                                    </div>
-                                  </div>
-                                  <br />
-                                  <hr className="text-gray" />
-                                </div>
-                              ) : null;
-                            })}
-                          </div>
-                        )}
-                      </div>
-                      <div onClick={handleFocus}
-                        className="relative  cursor-pointer"
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
+        {TravelHistoryresponse?.filter((item) =>
+          item.vehicleEvents.some(
+            (event) => event.Event === "HarshCornering"
+          )
+        ).length > 0 && (
+          <div className="grid grid-cols-12">
+            <div className="col-span-2">
+              <Image
+                src={HarshCornerningIcon}
+                alt="harshCorneringIcon"
+                className="h-6 journay_HarshAcceleration"
+              />
+            </div>
+            <div className="col-span-10 text-sm font-semibold">
+              Harsh Corn.. (x
+              {TravelHistoryresponse.reduce((count, item) =>
+                count +
+                item.vehicleEvents.filter(
+                  (event) => event.Event === "HarshCornering"
+                ).length
+              , 0)}
+              )
+            </div>
+          </div>
+        )}
+
+        {TravelHistoryresponse?.filter((item) =>
+          item.vehicleEvents.some(
+            (event) => event.Event === "HarshBreak"
+          )
+        ).length > 0 && (
+          <div className="grid grid-cols-12">
+            <div className="col-span-2">
+              <Image
+                src={harshAcceleration}
+                alt="harshBreakIcon"
+                className="h-6 mt-1 journay_HarshAcceleration"
+              />
+            </div>
+            <div className="col-span-10 text-sm">
+              <p className="mt-2 font-semibold">
+                Harsh Break (x
+                {TravelHistoryresponse.reduce((count, item) =>
+                  count +
+                  item.vehicleEvents.filter(
+                    (event) => event.Event === "HarshBreak"
+                  ).length
+                , 0)}
+                )
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+            
+            
+            */}
+            {hidediv && (
+              <>
+                <div >
+
+                  <div className="absolute flex items-start lg:top-4 lg:left-20 left-12 top-6 space-x-4">
+                    <div className="xl:col-span-2 lg:col-span-4 md:col-span-5 sm:col-span-3 col-span-6 stop_journey max-w-xs lg:max-w-sm">
+                      <div
+                        className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 bg-green py-2 shadow-lg rounded-md cursor-pointer"
+                        onClick={() => stopDetailsOpen && handleShowDetails()}
                       >
-                        {isPlaying && userclick && (
-
-                          <>
-                            <Image src={FocusIconNew} alt="buttonIcon" className="h-11 p-1 bg-green" style={{
-                              borderRadius: '10px',
-                              /*  borderColor: 'green', */
-                              borderWidth: '0px',
-                              width: '44px',
-                              borderStyle: 'solid',
-                              /* backgroundColor: 'bg-green', */
-                            }} />
-
-                            {isHovered && (
-                              <>
-                                <div className="absolute top-0 left-full ml-2 bg-green text-white p-2 rounded-md whitespace-nowrap">
-                                  Focus
-                                </div>
-
-
-                              </>
-                            )}
-                          </>
-                        )}
+                        <div className="lg:col-span-11 md:col-span-10 sm:col-span-10 col-span-11 stop_details_responsive">
+                          <p className="text-white lg:px-2 ps-1 text-lg text_responsive mr-24">
+                            Stop Details ({loadingMap ? stopWithSecond.length : ""})
+                          </p>
+                        </div>
+                        <div className="col-span-1 mt-1 lg:-ms-2 md:-ms-1 -ms-2">
+                          {getShowICon ? (
+                            <svg
+                              className="h-5 w-5 text-white"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              strokeWidth="2"
+                              stroke="currentColor"
+                              fill="none"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path stroke="none" d="M0 0h24v24H0z" />
+                              <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                          ) : (
+                            <svg
+                              className="h-5 w-5 text-white"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              strokeWidth="2"
+                              stroke="currentColor"
+                              fill="none"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path stroke="none" d="M0 0h24v24H0z" />
+                              <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
+                              <path d="M4 16v2a2 2 0 0 0 2 2h2" />
+                              <path d="M16 4h2a2 2 0 0 1 2 2v2" />
+                              <path d="M16 20h2a2 2 0 0 0 2 -2v-2" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                          )}
+                        </div>
                       </div>
+                      {getShowdetails && (
+                        <div className={`bg-white overflow-y-scroll resposive_stop_details ${stopWithSecond.length > 1 ? "lg:h-60 md:h-60 sm:h-60 h-24" : ""}`}>
+                          {stopWithSecond?.map((item: any) => {
+                            let isActive = item.date === selectedItemId;
+                            return loadingMap ? (
+                              <div
+                                key={item.date}
+                                onClick={() => handleItemClick(item)}
+                                className={`cursor-pointer ${isActive ? 'bg-[#e1f0e3]' : ''}`}
+                              >
+                                <p className="text-black font-popins px-2 py-2 text-sm">
+                                  {/* <b>{item?.address?.display_name?.substring(0, 50)}</b>
+                 */}
+                                  <b>{item?.address?.display_name}</b>
+                                </p>
+                                <div className="grid grid-cols-12">
+                                  <div className="lg:col-span-1 md:col-span-2 sm:col-span-6 col-span-2"></div>
+                                  <div className="lg:col-span-8 md:col-span-8 sm:col-span-8 col-span-9 mx-2 text-center text-red text-bold px-1 w-full text-sm border-2 border-red stop_details_time">
+                                    {item?.date?.slice(11, 19)}, {item?.time}
+                                  </div>
+                                </div>
+                                <br />
+                                <hr className="text-gray" />
+                              </div>
+                            ) : null;
+                          })}
+                        </div>
+                      )}
+                    </div>
+                    <div onClick={handleFocus}
+                      className="relative  cursor-pointer"
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      {isPlaying && userclick && (
+
+                        <>
+                          <Image src={FocusIconNew} alt="buttonIcon" className="h-11 p-1 bg-green" style={{
+                            borderRadius: '10px',
+                            /*  borderColor: 'green', */
+                            borderWidth: '0px',
+                            width: '44px',
+                            borderStyle: 'solid',
+                            /* backgroundColor: 'bg-green', */
+                          }} />
+
+                          {isHovered && (
+                            <>
+                              <div className="absolute top-0 left-full ml-2 bg-green text-white p-2 rounded-md whitespace-nowrap">
+                                Focus
+                              </div>
+
+
+                            </>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
+                </div>
 
 
-                  {/* <div
+                {/* <div
       className="grid grid-cols-1 absolute lg:top-100 xl:top-100 md:top-100 left-10 top-5  py-1 cursor-pointer"
       onClick={handleFocus}
       /* style={{
@@ -2328,54 +3024,66 @@ export default function JourneyReplayComp() {
      
     </div>
 </div> */}
-                </>
-              )}
+              </>
+            )}
 
-              <div className="grid lg:grid-cols-10 grid-cols-10" id="speed_meter">
-                <div className="col-span-2  lg:w-52 md:w-44 sm:w-44 w-48 rounded-md ">
-                  {isPlaying || isPaused ? (
-                    <div>
-                      <Speedometer
-                        value={
-                          getSpeedAndDistance()?.speed?.includes("Mph")
-                            ? getSpeedAndDistance()?.speed?.replace("Mph", "")
-                            : getSpeedAndDistance()?.speed?.replace("Kph", "")
-                        }
-                        max={140}
-                        angle={160}
-                        fontFamily="squada-one"
-                        accentColor="#00B56C"
-                        width={200}
-                      // segmentColors="green"
-                      >
-                        <Background angle={180} />
-                        <Arc />
-                        <Needle />
-                        <Progress />
-                        <Marks />
-                      </Speedometer>
-                      <p className="text-white text-sm px-2 py-1 -mt-16 w-full bg-bgPlatBtn rounded-md">
-                        Distance: {getSpeedAndDistance()?.distanceCovered}
-                      </p>
-                    </div>
-                  ) : null}
+            <div className="grid lg:grid-cols-10 grid-cols-10" id="speed_meter">
+              <div className="col-span-2  lg:w-52 md:w-44 sm:w-44 w-48 rounded-md ">
+                {isPlaying || isPaused ? (
+                  <div>
+                    {/* <ReactSpeedometer
+                      width={120}
+                      height={90}
+                      maxValue={180}
+                      value={getSpeedAndDistance()?.speed.replace("Mph", "")}
+                      needleColor="#00b56c"
+                      startColor="green"
+                      segments={1}
+                      endColor="blue"
+                      needleTransitionDuration={100}
+                      segmentColors={["#3a4848"]}
+                    /> */}
+                    <Speedometer
+                      value={
+                        getSpeedAndDistance()?.speed?.includes("Mph")
+                          ? getSpeedAndDistance()?.speed?.replace("Mph", "")
+                          : getSpeedAndDistance()?.speed?.replace("Kph", "")
+                      }
+                      max={140}
+                      angle={160}
+                      fontFamily="squada-one"
+                      accentColor="#00B56C"
+                      width={200}
+                    // segmentColors="green"
+                    >
+                      <Background angle={180} />
+                      <Arc />
+                      <Needle />
+                      <Progress />
+                      <Marks />
+                    </Speedometer>
+                    <p className="text-white text-sm px-2 py-1 -mt-16 w-full bg-bgPlatBtn rounded-md">
+                      Distance: {getSpeedAndDistance()?.distanceCovered}
+                    </p>
+                  </div>
+                ) : null}
 
-                  {isPlaying || isPaused ? (
-                    <p
-                      className="bg-bgPlatBtn text-white mt-3 w-full px-2 py-3 rounded-md
+                {isPlaying || isPaused ? (
+                  <p
+                    className="bg-bgPlatBtn text-white mt-3 w-full px-2 py-3 rounded-md
                   trip_address
                   "
-                    >
-                      {addressTravelHistory?.slice(0, 3).map((item, index) => (
-                        <div key={index}>{<p>{item}</p>}</div>
-                      ))}
-                    </p>
-                  ) : (
-                    ""
-                  )}
-                  {isPlaying && (
-                    <div>
-                      {/* <Speedometer
+                  >
+                    {addressTravelHistory?.slice(0, 3).map((item, index) => (
+                      <div key={index}>{<p>{item}</p>}</div>
+                    ))}
+                  </p>
+                ) : (
+                  ""
+                )}
+                {isPlaying && (
+                  <div>
+                    {/* <Speedometer
                       value={getSpeedAndDistance()?.speed.replace("Mph", "")}
                       max={140}
                       angle={160}
@@ -2397,7 +3105,202 @@ export default function JourneyReplayComp() {
                 )}
               </div>
             </div>
+            {/*   {hidediv && (
+            <div
+          
+              className="absolute xl:left-56 lg:left-10 xl:bottom-8 lg:bottom-8 md:bottom-8 sm:bottom-8  bottom-2  left-1 mr-48
+              journey_replay_center_box
+              "
+            >
+              <div className="grid xl:grid-cols-3 lg:grid-cols-3 md:grid-3 grid-cols-3 lg:gap-3 gap-2 ">
+               
+                <div className="xl:col-span-4 lg:col-span-8 col-span-12  journey_replay_slider ">
+                  <div className="grid lg:grid-cols-12 grid-cols-12 gap-1 lg:py-5 py-2 mt-8 pt-4 lg:pt-4 rounded-md  mx-2 px-5 bg-white space-x-4 ">
+                    <div
+                      className="lg:col-span-10 md:col-span-9 col-span-8 journey_replay_slider_res"
+                      // style={{ height: "4vh" }}
+                    >
+                      <Slider
+                        value={currentPositionIndex}
+                  
+                        onChange={handleChangeValueSlider}
+                        color="secondary"
+                        style={{
+                          color: "#00B56C",
+                          cursor: isPlaying ? "pointer" : "not-allowed",
+                        }}
+                        max={polylinedata.length}
+                        disabled={isPlaying ? false : true}
+                       
+                      />
+                      <div
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <div className="grid grid-cols-12 ">
+                          <div className="col-span-5 ">
+                            {isDynamicTime.TripStartTimeLabel}
+                          </div>
+                 
+                          <div className="col-span-6 play_pause_icon">
+                            <Tooltip content="Pause" className="bg-black">
+                              <button
+                                onClick={() => pausebtn && pauseTick()}
+                                className={`${
+                                  pausebtn
+                                    ? "cursor-pointer"
+                                    : "cursor-not-allowed"
+                                }`}
+                              >
+                                <svg
+                                  className="h-5 w-5 lg:mx-2 lg:ms-5 md:mx-3 sm:mx-3 md:ms-4 sm:ms-6 mx-1"
+                                  // style={{
+                                  //   color: stopVehicle === true ? "gray" : "white",
+                                  // }}
+                                  style={{
+                                    color: isPauseColor ? "green" : "black",
+                                  }}
+                                  fill={isPauseColor ? "none" : "none"}
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth="2"
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  {" "}
+                                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                                  <line x1="4" y1="4" x2="4" y2="20" />{" "}
+                                  <line x1="20" y1="4" x2="20" y2="20" />{" "}
+                                  <rect
+                                    x="9"
+                                    y="6"
+                                    width="6"
+                                    height="12"
+                                    rx="2"
+                                  />
+                                </svg>
+                              </button>
+                            </Tooltip>
+                            <Tooltip content="Play" className="bg-black">
+                              <button
+                                onClick={() => playbtn && tick()}
+                                className={`${
+                                  playbtn
+                                    ? "cursor-pointer"
+                                    : "cursor-not-allowed"
+                                }`}
+                              >
+                                <svg
+                                  className="h-5 w-5  lg:mx-2  md:mx-3 sm:mx-3 mx-1"
+                                  viewBox="0 0 24 24"
+                                  style={{
+                                    color: isPlaying ? "green" : "black",
+                                  }}
+                                  fill={isPlaying ? "green" : "black"}
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  {" "}
+                                  <polygon points="5 3 19 12 5 21 5 3" />
+                                </svg>
+                              </button>
+                            </Tooltip>
+                            <Tooltip content="Stop" Stop Details="bg-black">
+                              <button
+                                onClick={() => stopbtn && stopTick()}
+                                className={`${
+                                  stopbtn
+                                    ? "cursor-pointer"
+                                    : "cursor-not-allowed"
+                                }`}
+                              >
+                                <svg
+                                  className="h-4 w-4 lg:mx-2 md:mx-3 sm:mx-3 mx-1"
+                                  width="24"
+                                  style={{
+                                    color: stopVehicle ? "green" : "black",
+                                  }}
+                                  fill={stopVehicle ? "green" : "black    "}
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth="2"
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  {" "}
+                                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                                  <rect
+                                    x="4"
+                                    y="4"
+                                    width="16"
+                                    height="16"
+                                    rx="2"
+                                  />
+                                </svg>
+                              </button>
+                            </Tooltip>
+                          </div>
+                          <div className="col-span-1">
+                            {isDynamicTime.TripEndTimeLabel}
+                          </div>
+                        </div>
+                      </div>
+                    
+                    </div>
 
+                    <div className="lg:col-span-2 md:col-span-3 col-span-4 mt-2 select_journey_speed">
+                      {isPlaying && (
+                       
+                        <Select
+                          onChange={(e: any) => setSpeedFactor(Number(e.value))}
+                          options={SpeedOption}
+                          placeholder="4x"
+                          isSearchable={false}
+                          className="rounded-md h-10 -mt-3 w-full outline-green border border-grayLight"
+                          defaultValue={SpeedOption[2]}
+                          styles={{
+                            control: (provided, state) => ({
+                              ...provided,
+                              border: "none",
+                              boxShadow: state.isFocused ? null : null,
+                            }),
+                            menu: (provided, state) => ({
+                              ...provided,
+                              zIndex: 9999, // Ensure the menu appears above other elements
+                              position: "absolute",
+                              top: "auto",
+                              bottom: "100%", // Position the menu above the select input
+                            }),
+                            option: (provided, state) => ({
+                              ...provided,
+                              backgroundColor: state.isSelected
+                                ? "#00B56C"
+                                : state.isFocused
+                                ? "white"
+                                : "transparent",
+                              color: state.isSelected
+                                ? "white"
+                                : state.isFocused
+                                ? "black"
+                                : "black",
+                              "&:hover": {
+                                backgroundColor: "#00B56C",
+                                color: "white",
+                              },
+                            }),
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            )} */}
             {hideicondiv && hidediv && (
               <div
                 className="grid grid-cols-1 absolute lg:top-10 xl:top-10 md:top-10 top-5 right-10 bg-bgLight py-2 px-2 cursor-pointer"
@@ -2681,6 +3584,13 @@ export default function JourneyReplayComp() {
 
 
             )}
+            {/* {isPlaying && userclick && (  */}
+
+
+
+
+
+
 
           </div>
 

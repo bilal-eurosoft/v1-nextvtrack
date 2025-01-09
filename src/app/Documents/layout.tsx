@@ -2,8 +2,8 @@ import PostLoginLayout from "../../components/Layouts/PostLoginLayout";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "VTrack Notifications",
-  description: "Events and Notifications",
+  title: "VTrack Documents",
+  description: "Manage Documents",
 };
 
 export default function RootLayout({

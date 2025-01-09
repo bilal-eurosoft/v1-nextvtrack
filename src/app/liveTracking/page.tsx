@@ -13,6 +13,7 @@ import { useSession } from "next-auth/react";
 import { socket } from "@/utils/socket";
 import countCars from "@/utils/countCars";
 import LiveSidebar from "@/components/LiveTracking/LiveSidebar";
+import { useSearchParams } from "next/navigation";
 const LiveMap = dynamic(() => import("@/components/LiveTracking/LiveMap"), {  
   ssr: false,
 });
@@ -24,6 +25,8 @@ const LiveTracking = () => {
   }
   const carData = useRef<VehicleData[]>([]);
   const [updatedData, setUpdateData] = useState<VehicleData[]>([]);
+  const searchParams = useSearchParams();  
+  const vehicleReg = searchParams.get("vehicleReg")?.replaceAll("%", " ");
 
   const [clientSettings, setClientSettings] = useState<ClientSettings[]>([]);
   const [position, setPosition] = useState({ top: 0, left: 0 });
@@ -39,11 +42,11 @@ const LiveTracking = () => {
   //   new Date()
   // );
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleData | null>(
-    null
+    {vehicleReg}||null
   );
-  const [selectedOdoVehicle, setSelectedOdoVehicle] = useState(
-    null
-  );
+  // const [selectedOdoVehicle, setSelectedOdoVehicle] = useState(
+  //   null
+  // );
   const [userVehicle, setuserVehicle] = useState([]);
   const [unselectVehicles, setunselectVehicles] = useState(false);
   const [zoom, setZoom] = useState(10);
@@ -122,7 +125,7 @@ const LiveTracking = () => {
             carData.current = uniqueData;
           }
           
-          // setIsFirstTimeFetchedFromGraphQL(true);
+          
         }
         // const clientSettingData = await getClientSettingByClinetIdAndToken({
         //   token: session?.accessToken,
@@ -195,7 +198,7 @@ const LiveTracking = () => {
   //             carData.current = uniqueData;
   //           }
 
-  //           setIsFirstTimeFetchedFromGraphQL(true);
+  
   //         }
   //       }
   //       // if (elapsedTimeInSeconds <= fetchTimeoutGraphQL) {
@@ -284,8 +287,8 @@ useEffect(()=>{
           setZoom={setZoom}
           setShowZones={setShowZones}
           // setShowZonePopUp={setShowZonePopUp}
-          setSelectedOdoVehicle={setSelectedOdoVehicle}
-          selectedOdoVehicle={selectedOdoVehicle}
+          // setSelectedOdoVehicle={setSelectedOdoVehicle}
+          // selectedOdoVehicle={selectedOdoVehicle}
           setPosition={setPosition}
         />
         {carData?.current?.length !== 0 && (
@@ -302,7 +305,7 @@ useEffect(()=>{
             zoom={zoom}
             setShowZones={setShowZones}
             showZones={showZones}
-            selectedOdoVehicle={selectedOdoVehicle}
+            // selectedOdoVehicle={selectedOdoVehicle}
             position={position}
           />
         )}

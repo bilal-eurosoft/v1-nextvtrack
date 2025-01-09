@@ -1,5 +1,8 @@
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from 'react';
-const NotificationDropdown = ({ notifications,loading }) => {
+const NotificationDropdown = ({ notifications,loading,toggleNotifications }) => {
+  const  router = useRouter()
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredNotifications, setFilteredNotifications] = useState(notifications);
   // Helper function to get colors based on event type
@@ -139,13 +142,18 @@ const NotificationDropdown = ({ notifications,loading }) => {
               const { background, border, color } = getEventStyle(notification.event);
               return (
                 <div
-                  className="p-2 border-l-4 rounded-lg  w-[255px]"
+                  className="p-2 border-l-4 rounded-lg  w-[255px] cursor-pointer"
                   style={{
                     backgroundColor: background,
                     borderColor: border,
                     color: color,
                   }}
                   key={notification.clientId || notification.event}
+                  onClick={()=>{
+                    toggleNotifications()
+router.push("NotificationTab")
+                    
+                  }}
                 >
                   <div className="flex items-center">
                     <div className="ml-3 flex-1">

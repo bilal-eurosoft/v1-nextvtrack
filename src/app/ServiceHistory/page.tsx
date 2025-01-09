@@ -1,30 +1,227 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { FaRegFileAlt, FaWrench } from "react-icons/fa"; // Example ico
 import {
-  getVehicleDataByClientIdForOdometer,
   handleServiceHistoryRequest,
   vehicleListByClientId,
+  handleServicesRequest,
+  getVehicleDataByClientId,
+  getevents,
 } from "@/utils/API_CALLS";
-import Select from "react-select";
 import { DeviceAttach } from "@/types/vehiclelistreports";
-import { MuiPickersUtilsProvider, DatePicker,TimePicker  } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
-import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
 import "./assign.css";
-import AccessTimeIcon from '@mui/icons-material/AccessTime'; // Import the time icon
+import Graph from "@/components/servicehistory/graph"; // Import the time icon
 // Assuming there's an API service to get the service data
-import moment from 'moment';
+import { FaCogs } from "react-icons/fa";
+import { socket } from "@/utils/socket";
+import uniqueDataByIMEIAndLatestTimestamp from "@/utils/uniqueDataByIMEIAndLatestTimestamp";
+import DocumentTab from '@/components/servicehistory/document'
+import MaintenanceTab from '@/components/servicehistory/maintenance'
+import ServiceTab from '@/components/servicehistory/services'
 
-export default function ServiceHistory() {
+export default function Work() {
   const router = useRouter();
   const { data: session } = useSession();
 
   if (!session?.ServiceHistory) {
     router.push("/liveTracking");
   }
+
+  // State to store the service data, modal visibility, pagination info, and form data
+
+  //jo state is page pr rakhni hai wo yahan
+
+
+  const [isOnline, setIsOnline] = useState(false);
+  const [piedata, setpiedata] = useState([]);
+  const [bardata, setbardata] = useState([]);
+  const [linedata, setlinedata] = useState([]);
+  const [socketdata, setsocketdata] = useState<VehicleData[]>([]);
+
+  // const [vehicles, setVehicles] = useState<any[]>([]);
+  const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
+
+  const [selectedvehicle, setselectedvehicle] = useState();
+  const [singleVehicleDetail, setsingleVehicleDetail] = useState([]);
+
+  // const [serviceHistory, setserviceHistory] = useState<any[]>([]);
+
+  const [alldataofservices, setalldataofservices] = useState<any[]>([]);
+  const [alldataofmaintenance, setalldataofmaintenance] = useState<any[]>([]);
+  const [alldataofdocumentation, setalldataofdocumentation] = useState<any[]>([]);
+
+  const [viewMode, setViewMode] = useState("card"); // "card" or "table"
+  const [activeTab, setActiveTab] = useState("services"); // "card" or "table"
+
+  const [simpleservices, setsimpleServices] = useState<any[]>([]);
+  const initialsimpleservicesForm = {
+    service: "",
+    other: "",
+  };
+  const [simpleservicesForm, setsimpleservicesForm] = useState(
+    initialsimpleservicesForm
+  );
+  const [modalOpenNew, setModalOpenNew] = useState(false);
+  const [services, setServices] = useState<any[]>([]);
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+
+  const [isFirstTimeFetchedFromGraphQL, setIsFirstTimeFetchedFromGraphQL] =
+    useState(false);
+
+  // jo functions is page pr rakhny hai yahn wo aingy
+
+  useEffect(() => {
+    async function dataFetchHandler() {
+      if (session?.clientId) {
+        const clientVehicleData = await getVehicleDataByClientId(
+          session?.clientId
+        );
+        if (clientVehicleData?.data?.Value) {
+          let parsedData = JSON.parse(
+            clientVehicleData?.data?.Value
+          )?.cacheList;
+          let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
+
+
+          setsocketdata([...uniqueData, ...vehicleList].reduce((acc, curr) => {
+            const existing = acc.find(item => item.vehicleReg === curr.vehicleReg);
+
+            if (existing) {
+              // Update the existing entry with the maximum values
+              existing.service = Math.max(existing.service, curr.service);
+              existing.document = Math.max(existing.document, curr.document);
+            } else {
+              // Add a new entry if it doesn't exist
+              acc.push({ ...curr });
+            }
+
+            return acc;
+          }, []));
+          setpiedata(
+            uniqueData.map((item) => {
+              return {
+                name: item.vehicleReg,
+                distance: Number(item.distance?.split(" ")[0]) || 0,
+              };
+            })
+          );
+          setbardata(
+            uniqueData.filter((i) => { return i.tripcount != 0 && i.tripcount != null })
+              .map((item) => {
+                return {
+                  name: item.vehicleReg,
+                  tripcount: Number(item?.tripcount) || 0,
+                };
+              })
+          );
+        }
+      }
+    }
+    dataFetchHandler();
+  }, [isFirstTimeFetchedFromGraphQL, vehicleList]);
+  const fetchTimeoutGraphQL = 60 * 1000; //60 seconds
+  useEffect(() => {
+    setIsOnline(navigator.onLine);
+  }, []);
+  useEffect(() => {
+    let interval = setInterval(() => {
+      setIsFirstTimeFetchedFromGraphQL((prev) => !prev);
+    }, fetchTimeoutGraphQL); // Runs every fetchTimeoutGraphQL seconds
+    return () => {
+      clearInterval(interval); // Clean up the interval on component unmount
+    };
+  }, [isOnline, session?.clientId]);
+  useEffect(() => {
+    if (activeTab == null) {
+
+      vehicleListData()
+    }
+  }, [activeTab])
+  useEffect(() => {
+    if (isOnline && session?.clientId) {
+      try {
+        socket.io.opts.query = { clientId: session?.clientId };
+        socket.connect();
+        socket.on(
+          "message",
+          async (data: { cacheList: VehicleData[] } | null | undefined) => {
+            if (data === null || data === undefined) {
+              return;
+            }
+
+            const uniqueData = uniqueDataByIMEIAndLatestTimestamp(
+              data?.cacheList
+            );
+
+            setpiedata(
+              uniqueData.map((item) => {
+                return {
+                  name: item.vehicleReg,
+                  distance: Number(item?.distance?.split(" ")[0]) || 0,
+                };
+              })
+            );
+            setbardata(
+              uniqueData.filter((i) => { return i.tripcount != 0 && i.tripcount != null })
+                .map((item) => {
+                  return {
+                    name: item.vehicleReg,
+                    tripcount: Number(item?.tripcount) || 0,
+                  };
+                })
+            );
+          }
+        );
+      } catch (err) { }
+    }
+    if (!isOnline) {
+      socket.disconnect();
+    }
+    return () => {
+      socket.disconnect();
+    };
+  }, [isOnline, session?.clientId]);
+
+  async function getEventsdata() {
+    let data = (await getevents(session?.clientId, session?.accessToken)).data;
+
+    if (data.length != 0) {
+      // setlinedata(
+      //   socketdata.map((item) => {
+      //     return {
+      //       name: item.vehicleReg,
+      //       "Harsh Acceleration": 0,
+      //       "Harsh Break": 0,
+      //       "Harsh Cornering": 0,
+      //     };
+      //   })
+      // );
+      setlinedata(data);
+    }
+  }
+  useEffect(() => {
+    getEventsdata();
+  }, [socketdata]);
+
+  {
+    /* vehciles ki list */
+  }
+  const vehicleListData = async () => {
+    if (session) {
+      const Data = await vehicleListByClientId({
+        token: session.accessToken,
+        clientId: session?.clientId,
+      });
+      setVehicleList(Data.data);
+    }
+  };
+  useEffect(() => {
+    vehicleListData();
+  }, []);
+
   const fetchServicesFromAPI = async () => {
     if (session) {
       try {
@@ -41,1134 +238,851 @@ export default function ServiceHistory() {
     }
   };
 
-  // State to store the service data, modal visibility, pagination info, and form data
-  const [services, setServices] = useState<any[]>([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [vehicles, setVehicles] = useState<any[]>([]);
-  const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
-  const [SelectedServiceId, setSelectedServiceId] = useState();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [editModal, seteditModal] = useState(false);
-  const [serviceType, setserviceType] = useState<String>();
 
-  const [disabledbutton, setdisabledbutton] = useState(false)
-  const [formData, setFormData] = useState({
-    id: "",
-    serviceTitle: "",
-    vehicleReg: "",
-    serviceType: "",
-    targetValue: null,
-    pushnotification: false,
-    sms: false,
-    email: false,
-    clientId: session?.clientId ?? "", // Default to empty string if undefined
-  vehicleId:  "",  // Assumed to come from session
-  });
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [filteredServices, setFilteredServices] = useState([]); 
-  
-  const [TimeValue, setTimeValue] = useState(null);
-  const [currentMileageByApi, setcurrentMileageByApi] =
-    useState<Number>();
-  const [error, setError] = useState<string | null>(null);
-  const initialFormData = {
-    id: "",
-    serviceTitle: "",
-    vehicleReg: "",
-    serviceType: "",
-    targetValue: null,
-    pushnotification: false,
-    sms: false,
-    email: false,
-    clientId: session?.clientId ?? "", // Default to empty string if undefined
-    vehicleId:  "",  // Assumed to come from session
-
+  //card wali services hai
+  const fetchServices = async () => {
+    if (session) {
+      try {
+        const Data = await handleServicesRequest({
+          token: session.accessToken,
+          method: "GET",
+        });
+        setsimpleServices(Data.data);
+        return Data.data;
+      } catch (error) {
+        toast.error("Failed to load services.");
+        return [];
+      }
+    }
   };
 
+  const AddfetchServices = async (data) => {
+    data.clientId = session?.clientId;
+
+    if (session) {
+      try {
+        const Data = await handleServicesRequest({
+          token: session.accessToken,
+          method: "POST",
+          payload: data,
+        });
+        if (Data.success == true) {
+          await fetchServices();
+          toast.success("Data Saved Succesfully");
+          setModalOpenNew(false);
+        }
+        return Data;
+      } catch (error) {
+        toast.error("Failed to load services.");
+        return [];
+      }
+    }
+  };
+
+
+
+  const DeleteServices = async (id) => {
+    if (session) {
+      try {
+        const Data = await handleServicesRequest({
+          token: session.accessToken,
+          method: "DELETE",
+          payload: { id: id },
+        });
+        if (Data.success == true) {
+          await fetchServices();
+          toast.success("Data Saved Succesfully");
+        }
+        return;
+      } catch (error) {
+        toast.error("Failed to load services.");
+        return [];
+      }
+    }
+  };
+
+  useEffect(() => {
+    const loadsimpleServices = async () => {
+      try {
+        const fetchedServices = await fetchServices();
+        if (fetchedServices.length > 0) {
+          setsimpleServices(fetchedServices);
+        } else {
+          setsimpleServices([]); // Empty data set
+        }
+      } catch (error) {
+        toast.error("Failed to load services.");
+        setsimpleServices([]); // In case of error, set to empty
+      }
+    };
+    loadsimpleServices();
+  }, []);
+
+
+
   // Fetch services on page load (or reload)
+  //all table table service,maintenance, documentation
   useEffect(() => {
     const loadServices = async () => {
       try {
         const fetchedServices = await fetchServicesFromAPI();
+
+        setServices(fetchedServices)
         if (fetchedServices.length > 0) {
-          setServices(fetchedServices);
-          setFilteredServices(fetchedServices); 
-        } else {
-          setServices([]); // Empty data set
-          setFilteredServices([]); 
+          // setserviceHistory(fetchedServices);
+          setalldataofdocumentation(fetchedServices.filter((i) => { return i.dataType === 'Documentation' }))
+          setalldataofmaintenance(fetchedServices.filter((i) => { return i.dataType === 'Maintenance' }))
+
+          setalldataofservices(fetchedServices.filter((i) => { return i.dataType === 'Service' }))
+
+          // fetchedServices.forEach((service: any) => {
+          //   if (service.dataType === 'Documentation') {
+          //     setalldataofdocumentation((prevData) => [...prevData, service]);
+          //   } else if (service.dataType === 'Maintenance') {
+          //     setalldataofmaintenance((prevData) => [...prevData, service]);
+          //   } else {
+          //     setalldataofservices((prevData) => [...prevData, service]);
+          //   }
+          // });
+
         }
-        setCurrentPage(1);
       } catch (error) {
         toast.error("Failed to load services.");
-        setServices([]); // In case of error, set to empty
+        // setserviceHistory([]); // In case of error, set to empty
       }
     };
     loadServices();
   }, []);
 
-  /*  const fetchMileage = async () => {
-    try {
-      setLoading(true);
-      // Make the API request (replace with your actual API URL)
-      const response = await fetch('https://yourapi.com/mileage');
-      const data = await response.json();
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      // Assuming the API response has the mileage value
-      if (data && data.mileage) {
-        setFormData((prevState) => ({
-          ...prevState,
-          current: data.mileage, // Pre-filling the 'current' field with the API value
-        }));
-      }
-    } catch (error) {
-      console.error("Error fetching mileage:", error);
-    } finally {
-      setLoading(false);
-    }
-  }; */
+  const handleSubmitservice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setsimpleservicesForm(initialsimpleservicesForm);
+    await AddfetchServices(simpleservicesForm);
+  };
 
-  /*   useEffect(() => {
-    // Trigger the API call only if 'Milagewise' is selected
-    if (formData.serviceType === 'Milagewise') {
-      fetchMileage();
-    }
-  }, [formData.serviceType]); */
-
-  useEffect(() => {
-    const vehicleListData = async () => {
-      if (session) {
-        const Data = await vehicleListByClientId({
-          token: session.accessToken,
-          clientId: session?.clientId,
-        });
-        
-        setVehicleList(Data.data);
-        const vehicleOptions = Data.data.map((vehicle: any) => ({
-          value: vehicle.vehicleReg, // Assuming `vehicleReg` is the unique identifier
-          label: vehicle.vehicleReg, // Or any field you'd like to display as label
-        }));
-        setVehicles(vehicleOptions);
-      }
-    };
-    vehicleListData();
-  }, []);
-
-  // Handle input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputserviceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-   
-    // Handle changes for the "current" input field
-    if (name === "targetValue") {
-      // Clear error when valid input is provided
-      if (
-        value === "" ||
-        (Number(value) && Number(value) > currentMileageByApi)
-      ) {
-        setFormData((prev) => ({
-          ...prev,
-          [name]: value,
-        }));
-        setError(null);
-      } else {
-       
-        setError(
-          `Targeted Mileage is greater than current i.e ${currentMileageByApi}`
-        );
-      }
-    }
 
-    // Handle changes for other fields (e.g., "difference")
-    else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-  };
-
-  useEffect(() => {
-    // Update the current date when the component mounts
-    setCurrentDate(new Date());
-  }, []);
-  const handleDateChange = (newDate) => {
-    // Ensure that the selected date is either valid or null
-    const formattedDate = newDate ? newDate.toISOString().split("T")[0] : null;
-
-    setFormData((prev) => ({
+    setsimpleservicesForm((prev) => ({
       ...prev,
-      targetValue: formattedDate, // Update state with formatted date or null
+      [name]: value,
     }));
   };
-  const currentDatea = moment().toDate(); // Get the current date and time
-  const currentTime = moment(); // Get the current time (without date)
 
-  const handleTimeChange = (time) => {
-    const selectedDate = formData.targetValue ? moment(formData.targetValue) : moment();
-    const selectedTime = moment(time);
 
-    // If the selected date is today and time is before the current time, show an error
-    if (selectedDate.isSame(currentTime, 'day') && selectedTime.isBefore(currentTime, 'minute')) {
-      toast.error('You cannot select the current or previous time for today.');
-      return;
-    }
-
-    // If the selected date is in the future, no restrictions on time
-    if (selectedDate.isAfter(currentTime, 'day') || selectedDate.isSame(currentTime, 'day')) {
-      setTimeValue(time)
-    }
-    else{
-      setTimeValue(null)
-    }
-  };
-  
-  
-
-  // Handle service type change (dynamic fields for Mileage/DateTime)
-  const serviceTypeOptions = [
-    { value: "Datewise", label: "Datewise" },
-    { value: "Milagewise", label: "Milagewise" },
-  ];
-
-  const handleServiceTypeChange = async (option: { value: any }) => {
-   
-
-    if (formData.vehicleReg) {
-      setFormData((prev) => ({
-        ...prev,
-        serviceType: option?.value,
-      }));
-    } else {
-      return toast.error("first select vehicle");
-    }
-
-    if (option?.value === "Milagewise") {
-      // Example API call to fetch mileage (use actual endpoint)
-      const fetchedMileage = await getVehicleDataByClientIdForOdometer(
-        session?.clientId
-      );
-
-      let newdata = fetchedMileage.filter(
-        (item) => item.vehicleReg === formData.vehicleReg
-      );
-      let mileage = newdata[0].odometer;
-      setcurrentMileageByApi(mileage);
-      if (mileage == null) {
-        setdisabledbutton(true)
-        return toast.error("This vehicle has no any mileage value!");
-      }
-    }
-
+  const handleCardClick = (e) => {
+    setselectedvehicle(e);
+    const vehicle = vehicleList.filter((item) => item.vehicleReg == e);
+    setsingleVehicleDetail(vehicle);
+    setActiveTab("services");
   };
 
-  // Handle form submit (for adding or updating services)
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // Check if all required fields are filled
-    if (!formData.serviceTitle) {
-      toast.error("Service Title is required!");
-      return; // Stop the form submission if validation fails
-    }
-    if (!formData.vehicleReg) {
-      toast.error("Vehicle Registration is required!");
-      return; // Stop the form submission if validation fails
-    }
-    if (!formData.serviceType) {
-      toast.error("Service Type is required!");
-      return; // Stop the form submission if validation fails
-    }
-    if (formData.serviceType === "Milagewise" && !formData.targetValue ) {
-      toast.error("Current Milage is required!");
-      return; // Stop the form submission if validation fails
-    }
-    if (formData.serviceType === "Datewise" && !formData.targetValue && !TimeValue) {
-      toast.error("Current Date/Time is required!");
-      return; // Stop the form submission if validation fails
-    }
-    if(TimeValue == null){
-      toast.error("Time is required!");
-      return;
-    }
-    if(formData.serviceType === "Datewise" && TimeValue){
-
-      // Assuming TimeValue contains the new time to append
-  let timeObj = new Date(TimeValue);
-  
-  // Get the time part in 'HH:mm:ss' format
-  let timeString = timeObj.toLocaleTimeString('en-GB', { hour12: false });
-  
-  // Split the targetValue at the first 'T'
-  let datePart = formData.targetValue.split('T')[0];
-  
-  // Now append the new time to the datePart
-  let completeDateTime = `${datePart}T${timeString}`;
-  
-  // Update the formData.targetValue
-  formData.targetValue = completeDateTime;
-    }
-    
-    // If all required fields are filled, proceed with the form submission
-    try {
-
-      if (formData._id) {
-        // Update existing service (API call to update)
-        const { _id, ...rest } = formData;
-
-        // Create the new data object with id field instead of _id
-        const data = {
-          id: _id, // Renaming _id to id
-          ...rest, // Spread the remaining fields from formData
-        };
-       
-        let Data = await updateService(data);
-        if (Data.success == true) {
-          toast.success("Service updated!");
-          setModalOpen(false);
-          const updatedServices = await fetchServicesFromAPI();
-          setServices(updatedServices);
-          setFilteredServices(updatedServices); 
-          setCurrentPage(1);
-          
-        } else {
-          toast.error(Data.message);
-          return;
-        }
-      } else {
-        // Add new service (API call to add)
-        let Data = await addService(formData);
-        if (Data.success == true) {
-          setModalOpen(false);
-          toast.success("Service added!");
-          const updatedServices = await fetchServicesFromAPI();
-          setServices(updatedServices);
-          setFilteredServices(updatedServices); 
-          setFormData(initialFormData)
-          
-          setCurrentPage(1);
-        } else {
-          toast.error(Data.message);
-        }
-      }
-
-      // Reset form data and close modal
-      setFormData({
-        id: "",
-        serviceTitle: "",
-        vehicleReg: "",
-        serviceType: "",
-        targetValue: null,
-        pushnotification: false,
-        sms: false,
-        email: false,
-        clientId: session?.clientId ?? "",
-        vehicleId: "",
-      });
-      setTimeValue(null)
-      setModalOpen(false);
-    } catch (error) {
-      toast.error("An error occurred while saving the service.");
-    }
+  const hanldecancelVehicle = () => {
+    // setFilteredServices(services);
+    setActiveTab(null);
+    setselectedvehicle(null);
   };
 
-
-
-
-  // Add service (example API function)
-  const addService = async (serviceData: any) => {
-    if (session) {
-    
-      const Data = await handleServiceHistoryRequest({
-        token: session.accessToken,
-        method: "POST",
-        body: serviceData,
-      });
-
-      return Data;
-  
-     
-    }
-   
-    
-  };
-
-
-  const updateService = async (serviceData: any) => {
-
-    if (session) {
-      const Data = await handleServiceHistoryRequest({
-        token: session.accessToken,
-        method: "PUT",
-        body: serviceData,
-      });
-
-      return Data;
-    }
-  };
-
-  
-/*   const handleDelete = async (id: string) => {
-    if (session) {
-      let data = {
-        id: id,
-      };
-
-      const Data = await handleServiceHistoryRequest({
-        token: session.accessToken,
-        method: "DELETE",
-        body: data,
-      });
-
-      if (Data) {
-        const updatedServices = await fetchServicesFromAPI();
-        setServices(updatedServices);
-        toast.success("Service deleted!");
-      } else {
-        toast.error("Failed to delete service.");
-      }
-    }
-  }; */
-
-  // const opendeleteModal = (serviceId: string) => {
-   
-  //   setIsModalOpen(true);
-  //   setserviceType("Delete");
-  //   setSelectedServiceId(serviceId);
-   
+  // const initialFormData: VehicleData = {
+  //   clientId: "",
+  //   vehicleId: "",
+  //   serviceTitle: "",
+  //   reminderDay: 0,
+  //   reminderMilage: 0,
+  //   expiryDay: 0,
+  //   expiryMilage: 0,
+  //   lastMilage: 0,
+  //   lastDate: "",
+  //   expiryDate: "",
+  //   dataType: "",
+  //   maintenanceType: "",
+  //   file: "",
+  //   filename: "",
+  //   documentType: "",
+  //   issueDate: "",
+  //   sms: false,
+  //   email: false,
+  //   pushnotification: false,
+  //   status: "",
+  //   documents: [],
   // };
+  // const [formData, setFormData] = useState<VehicleData>(initialFormData);
 
-
-  const handleInputChangeSelect = (selectedOption: any) => {
-    let singleVehicle: any;
-    if (selectedOption?.value) {
-      singleVehicle = vehicleList.find(
-        (item) => item.vehicleReg == selectedOption.value
-      );
-    }
-   /*  if (singleVehicle == null || undefined) {
-      setNomileage(false);
-    } else {
-      if (singleVehicle?.odometer == false) {
-        setNomileage(true);
-      }
-    } */
-  
-    setFormData((prev) => ({
-      ...prev,
-      serviceType: "",
-
-      vehicleReg: selectedOption ? selectedOption.value : null, // Update vehicleReg in formData
-      clientId: singleVehicle?.clientId,
-      vehicleId: singleVehicle?._id,
-    }));
-  };
-
-  // Handle rows per page change
-  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newRowsPerPage = Number(e.target.value);
-    setRowsPerPage(newRowsPerPage);
-    setCurrentPage(1); // Reset to page 1 when rows per page is changed
-  };
-
-  const handlePageChange = (direction: string) => {
-    const totalPages = Math.ceil(services.length / rowsPerPage);
-
-    if (direction === "next" && currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    } else if (direction === "prev" && currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  
-
-  // Open the update modal with the selected service's data
-  const openUpdateModal = (service: any) => {
-    // seteditModal(true);
-    setserviceType("Update");
-    setFormData(service);
-    if( service.serviceType=="Datewise"){
-
-      let TimePart = service.targetValue.split('T')[1];
-       const timeParts = TimePart.split(":"); 
-       const dateWithTime = new Date();
-       dateWithTime.setHours(timeParts[0], timeParts[1], timeParts[2]);
-       setTimeValue(dateWithTime)
-    }
-    setModalOpen(true);
+  interface VehicleData {
+    clientId: string;
+    vehicleId: string;
+    serviceTitle: string;
+    reminderDay: number;
+    reminderMilage: number;
+    expiryDay: number;
+    expiryMilage: number;
+    lastMilage: number;
+    lastDate: string;
+    dataType: string;
+    sms: boolean;
+    email: boolean;
+    pushnotification: boolean;
+    isExpiryDateSelected: boolean;
+    isExpiryMileageSelected: boolean;
+    isReminderDateSelected: boolean;
+    isReminderMileageSelected: boolean;
+    isLastDateSelected: boolean;
+    isLastMileageSelected: boolean;
+    documents: Array;
   }
 
-  const openConfirmationModal = (
-    serviceId: React.SetStateAction<undefined>
-  ) => {
-    setSelectedServiceId(serviceId);
-    setIsModalOpen(true);
-    setserviceType("Update");
-  };
-
-  const closeConfirmationModal = () => {
-    setIsModalOpen(false);
-    // setSelectedServiceId(null);
-  };
-
-  const handleConfirmUpdate = async () => {
-    if (serviceType == "Delete") {
-      if (session) {
-        let data = {
-          id: SelectedServiceId,
-        };
-
-        const Data = await handleServiceHistoryRequest({
-          token: session.accessToken,
-          method: "DELETE",
-          body: data,
-        });
-
-        if (Data.success == true) {
-          const updatedServices = await fetchServicesFromAPI();
-          setServices(updatedServices);
-          setFilteredServices(updatedServices); 
-          toast.success("Service deleted!");
-          closeConfirmationModal();
-         
-        } else {
-          toast.error("Failed to delete service.");
-        }
-      }
-    } else {
-     // let getData = services.filter((item) => item._id == SelectedServiceId);
-      let bodyData = {
-        id: SelectedServiceId,
-        status: "complete",
-        // isNotified: true
-      };
-     
-      if (session) {
-        const Data = await handleServiceHistoryRequest({
-          token: session.accessToken,
-          method: "PUT",
-          body: bodyData,
-        });
-        if (Data?.success == true) {
-          closeConfirmationModal();
-          toast.success("Service updated!");
-          const updatedServices = await fetchServicesFromAPI();
-          setServices(updatedServices);
-          setFilteredServices(updatedServices); 
-          setCurrentPage(1);
-        } else {
-          toast.error(Data?.message);
-        }
-
-        return Data;
-      }
-    }
-  };
-
-  //  }
+  // const initialServiceFormData: VehicleData = {
+  //   clientId: "",
+  //   vehicleId: "",
+  //   serviceTitle: "",
+  //   reminderDay: 0,
+  //   reminderMilage: 0,
+  //   expiryDay: 0,
+  //   expiryMilage: 0,
+  //   lastMilage: 0,
+  //   lastDate: "",
+  //   dataType: "",
+  //   sms: false,
+  //   email: false,
+  //   pushnotification: false,
+  //   isExpiryDateSelected: false,
+  //   isExpiryMileageSelected: false,
+  //   isReminderDateSelected: false,
+  //   isReminderMileageSelected: false,
+  //   isLastDateSelected: false,
+  //   isLastMileageSelected: false,
+  //   documents: [],
+  // };
+  // const [serviceFormData, setServiceFormData] = useState<VehicleData>(
+  //   initialServiceFormData
+  // );
 
 
-  // Handle search change
-  const handleSearchChange = (e) => {
-    e.preventDefault();
-    const query = e.target.value.toLowerCase();
-  
+  // const [filteredServices, setFilteredServices] = useState([]);
 
-    if (query === "") {
-      setFilteredServices(services); // Show all services again
-    } else {
-      const filtered = services.filter((item) =>
-        Object.values(item) 
-          .some((value) =>
-            value && value.toString().toLowerCase().includes(query) 
-          )
-      );
-      setFilteredServices(filtered); 
-    }
-
-    setCurrentPage(1); // Reset pagination to page 1 after search
-  };
-
-  // Paginate the filtered services
-  const paginatedServices = filteredServices.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredServices.length / rowsPerPage);
-  if (currentPage > totalPages) {
-    setCurrentPage(totalPages); // If the current page exceeds the total pages, reset to the last page
-  }
-  
   return (
-
-    <div className="bg-[#F7FAFC] pt-[1.5px]">
-      
-      <p className="bg-[#00B56C] px-4 py-1 text-center text-2xl sm:text-xl text-white font-bold">
-    Service History
-  </p>
-  
-  {/* Toast Notifications */}
-  <Toaster position="top-center" reverseOrder={false} />
-  
-  <div className="px-6">
-    {/* Main Action Section */}
-    <div className="my-4 flex flex-wrap justify-between items-center gap-4">
-      {/* Add Service Button */}
-      <button
-        onClick={() => setModalOpen(true)}
-        className="bg-[#00B56C] text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:shadow-lg w-full sm:w-auto"
-      >
-        <svg
-          width="24px"
-          height="24px"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          stroke="#ffffff"
-          strokeWidth="2"
-          className="mr-2 w-6 h-6"
-        >
-          <line
-            fill="none"
-            stroke="#ffffff"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            x1="12"
-            x2="12"
-            y1="19"
-            y2="5"
-          />
-          <line
-            fill="none"
-            stroke="#ffffff"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            x1="5"
-            x2="19"
-            y1="12"
-            y2="12"
-          />
-        </svg>
-        Add Service
-      </button>
-
-      {/* Search Box */}
-      <div className="relative w-full max-w-xs">
-        <input
-          type="text"
-          className="w-full px-4 py-2 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B56C] transition duration-300 ease-in-out"
-          placeholder="Search services..."
-          onChange={handleSearchChange}
-        />
-        <svg
-          width="20px"
-          height="20px"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          stroke="#00B56C"
-          strokeWidth="2"
-          className="absolute top-1/2 right-3 transform -translate-y-1/2 w-5 h-5"
-        >
-          <circle cx="10.5" cy="10.5" r="7.5" />
-          <line x1="16" y1="16" x2="22" y2="22" />
-        </svg>
-      </div>
-    </div>
-  
-         
-        
-
-       
-<div className={`relative ${isModalOpen ? "backdrop-blur-sm" : ""}`}>
-  <div
-    className={`bg-white shadow-md rounded-lg ${
-      rowsPerPage > 10 ? "overflow-y-auto max-h-[680px] relative" : ""
-    }`}
-  >
-    <div className="overflow-x-auto"> {/* Enable horizontal scrolling */}
-      <table className="min-w-full table-auto">
-        <thead
-          className={`bg-[#E2E8F0] ${
-            rowsPerPage > 10 ? "sticky top-0 z-10" : ""
-          }`}
-        >
-          <tr>
-            <th className="px-2 py-1 text-center">S.No</th>
-            <th className="px-2 py-1 text-left">Service Title</th>
-            <th className="px-2 py-1 text-left">Vehicle Reg</th>
-            <th className="px-2 py-1 text-left">Service Type</th>
-            <th className="px-2 py-1 text-left">Targeted Date</th>
-            <th className="px-2 py-1 text-left">Targeted Mileage</th>
-            <th className="px-2 py-1 text-left">Status</th>
-            <th className="px-2 py-1 text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white">
-          {services.length === 0 ? (
-            <tr>
-              <td
-                colSpan="8"
-                className="px-4 py-2 text-center text-gray-500"
+    <div>
+      <p className="bg-green px-4 border-t-2  text-center text-2xl sm:text-xl text-white font-bold">
+        Service History
+      </p>
+      {selectedvehicle && singleVehicleDetail && (
+        <div className="pl-1">
+          {/* Back Button and Title */}
+          <div className="flex items-center mt-6 pl-8">
+            <button
+              onClick={() => hanldecancelVehicle()}
+              className="flex items-center text-[#00B56C] hover:text-[#008C47]"
+            >
+              {/* Back Arrow Icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                version="1.0"
+                width="14"
+                height="14"
+                viewBox="0 0 512 512"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+                transform="rotate(180)"
               >
-                No Data Found
-              </td>
-            </tr>
-          ) : (
-            paginatedServices.map((service, index) => (
-              <tr key={index} className="border-b hover:bg-[#D1FAE5]">
-                <td className="px-2 py-1 text-center">
-                  {(currentPage - 1) * rowsPerPage + index + 1}
-                </td>
-                <td className="px-2 py-1 text-left">{service.serviceTitle}</td>
-                <td className="px-2 py-1 text-left">{service.vehicleReg}</td>
-                <td className="px-2 py-1 text-left">{service.serviceType}</td>
+                <g
+                  transform="translate(0,512) scale(0.1,-0.1)"
+                  fill="green"
+                  stroke="none"
+                >
+                  <path
+                    d="M2716 5110 c-83 -26 -131 -135 -95 -214 7 -14 451 -506 988 -1093
+        l977 -1068 -2231 -5 c-2092 -5 -2232 -6 -2262 -22 -100 -55 -109 -194 -17
+        -264 l37 -29 2238 -5 2238 -5 -976 -1075 c-536 -591 -981 -1087 -989 -1102
+        -34 -65 -8 -152 59 -202 38 -28 126 -28 164 0 38 28 2230 2442 2249 2476 18
+        34 18 90 0 131 -15 33 -2201 2426 -2246 2459 -31 21 -95 30 -134 18z"
+                  />
+                </g>
+              </svg>
+              <span className="text-lg pl-4 ">Vehicle</span>
+            </button>
+          </div>
+          {singleVehicleDetail.map((item, index) => (
+            <>
+              {/* Vehicle Details Section */}
+              <div className="pl-8 pt-4">
+                {/* Vehicle Reg - Big Text */}
+                <p className="text-5xl font-bold text-black">
+                  {item.vehicleReg}
+                </p>
 
-                {service.serviceType === "Datewise" ? (
-                  <td className="px-2 py-1 text-left">
-                    {service.targetValue
-                      ? service.targetValue.split("T").map((part, index) => {
-                          if (index === 1) {
-                            // Convert to 12-hour time format
-                            let timeObj = new Date("1970-01-01T" + part);
-                            let time12Hour = timeObj.toLocaleTimeString("en-US", {
-                              hour12: true,
-                            });
-                            return time12Hour;
-                          }
-                          return part; // Date part remains unchanged
-                        }).join(" ")
-                      : "-"}
-                  </td>
-                ) : (
-                  <td className="px-2 py-1 text-left">-</td>
-                )}
+                {/* Make, Model, Year - Small Text */}
+                <div className="mb-8 flex space-x-4">
+                  <span className="text-sm font-medium text-gray">
+                    {item.vehicleMake}
+                  </span>
+                  <span className="text-sm font-medium text-gray">
+                    {item.vehicleModel}
+                  </span>
+                  <span className="text-sm font-medium text-gray">
+                    {item.vehicleType}
+                  </span>
+                </div>
+              </div>
+            </>
+          ))}
+        </div>
+      )}
 
-                {service.serviceType === "Milagewise" ? (
-                  <td className="px-2 py-1 text-left">
-                    {service.targetValue ? service.targetValue : "-"}
-                  </td>
-                ) : (
-                  <td className="px-2 py-1 text-left">-</td>
-                )}
+      {/* Toast Notifications */}
+      <Toaster position="top-center" reverseOrder={false} />
 
-                {service.status === "complete" ? (
-                  <td className="px-2 py-1 text-left">
-                    {service.status.charAt(0).toUpperCase() +
-                      service.status.slice(1)}
-                  </td>
-                ) : (
-                  <td className="px-2 py-1 relative text-left">
-                    <span
-                      className="text-[#E53E3E]  underline group cursor-pointer"
-                      onClick={() => openConfirmationModal(service._id)}
+      <div
+        className={`${!selectedvehicle ? "grid grid-cols-12 gap-4 bg-white" : ""
+          }`}
+      >
+        <div className={`px-8  ${!selectedvehicle ? "col-span-9" : ""}`}>
+          {/* inner side of cards */}
+          {selectedvehicle && (
+            <>
+              {/* Show icons for Maintenance Log, Services, and Documentation */}
+              <div className="flex justify-start items-center border-b border-gray-200 mb-4 ">
+                {/* Services Tab */}
+                <button
+                  onClick={() => setActiveTab("services")}
+                  className={`px-4 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${activeTab === "services"
+                    ? "bg-[#00B56C] text-white"
+                    : "bg-transparent hover:bg-[#D1FAE5] "
+                    }`}
+                >
+                  <span className="service-icon">
+                    <FaCogs className="w-5 h-5" /> {/* Gears icon */}
+                  </span>
+                  Services
+                </button>
+
+                <button
+                  onClick={() => setActiveTab("maintenance")}
+                  className={`px-4 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${activeTab === "maintenance"
+                    ? "bg-[#00B56C] text-white"
+                    : "bg-transparent hover:bg-[#D1FAE5]"
+                    }`}
+                >
+                  {/* Icon for maintenance with rotated arrow */}
+                  <svg
+                    width="20px"
+                    height="20px"
+                    viewBox="0 0 512 512"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    className="mr-2 w-5 h-5"
+                  >
+                    <g
+                      transform="translate(0,512) scale(0.1,-0.1)"
+                      fill={`${activeTab === "maintenance" ? "white" : "black"
+                        }`}
+                      stroke="none"
                     >
-                      {service.status.charAt(0).toUpperCase() +
-                        service.status.slice(1)}
+                      <path
+                        d="M3595 5109 c-93 -13 -239 -52 -333 -90 -339 -135 -621 -424 -751
+        -769 -112 -298 -117 -585 -16 -926 5 -17 -170 -180 -1128 -1046 -624 -565
+        -1159 -1054 -1190 -1088 -64 -72 -116 -164 -149 -270 -19 -63 -23 -95 -22
+        -205 0 -148 21 -228 89 -352 50 -90 178 -218 268 -268 123 -68 203 -88 352
+        -89 110 -1 142 3 205 22 106 33 198 84 270 149 34 31 523 566 1088 1190 866
+        958 1029 1133 1046 1128 213 -63 389 -84 564 -67 341 34 626 171 858 415 182
+        191 292 403 351 677 37 177 17 524 -37 630 -32 62 -92 89 -167 75 -33 -6 -77
+        -45 -323 -290 l-285 -283 -259 52 c-175 35 -262 56 -267 66 -5 8 -31 128 -58
+        265 l-50 250 284 285 c245 246 284 290 290 323 14 74 -13 135 -75 167 -87 44
+        -393 71 -555 49z m-42 -492 c-174 -175 -202 -209 -209 -243 -6 -30 9 -123 66
+        -409 40 -203 79 -385 88 -403 28 -62 46 -68 444 -147 205 -41 385 -75 401 -75
+        51 0 90 30 286 223 l193 192 -6 -70 c-16 -167 -70 -331 -157 -471 -63 -101
+        -196 -242 -286 -303 -304 -203 -665 -243 -996 -112 -90 36 -139 39 -184 12
+        -17 -11 -520 -559 -1116 -1218 -867 -958 -1095 -1204 -1138 -1230 -226 -135
+        -513 -38 -611 207 -17 43 -22 75 -22 150 0 111 23 182 82 256 20 25 568 525
+        1217 1112 649 587 1190 1083 1202 1101 31 46 29 94 -7 184 -87 219 -101 448
+        -39 676 88 328 333 592 654 707 97 34 223 61 299 63 l40 1 -201 -203z"
+                      />
+                      <path
+                        d="M671 873 c-60 -30 -93 -111 -71 -177 14 -45 69 -93 115 -102 49 -9
+      119 19 146 58 46 64 30 165 -33 211 -37 27 -114 32 -157 10z"
+                      />
+                    </g>
+                  </svg>
+                  Maintenance Log
+                </button>
 
-                      <div className="absolute left-0 top-full  hidden group-hover:block z-20">
-                        <div className="text-xs font-semibold bg-[#D1FAE5] text-[#E53E3E] p-2 rounded-md mb-1 text-left">
-                          Click to update the status
-                        </div>
-                      </div>
-                    </span>
-                  </td>
-                )}
-                </tr>))
+                <button
+                  onClick={() => {
+                    setActiveTab("documentation");
+                    // setFormData({ ...formData, dataType: "Documentation" });
+                  }}
+                  className={`px-4 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${activeTab === "documentation"
+                    ? "bg-[#00B56C] text-white"
+                    : "bg-transparent hover:bg-[#D1FAE5]"
+                    }`}
+                >
+
+                  <svg
+                    width="24px"
+                    height="24px"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="2"
+                    className="mr-2 w-6 h-6"
+                  >
+                    {/* Documentation Icon */}
+                    <rect
+                      x="5"
+                      y="3"
+                      width="14"
+                      height="18"
+                      stroke={
+                        activeTab === "documentation" ? "white" : "black"
+                      }
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                    <line
+                      x1="13"
+                      y1="3"
+                      x2="13"
+                      y2="9"
+                      stroke={
+                        activeTab === "documentation" ? "white" : "black"
+                      }
+                      strokeWidth="2"
+                    />
+                    <line
+                      x1="13"
+                      y1="9"
+                      x2="19"
+                      y2="9"
+                      stroke={
+                        activeTab === "documentation" ? "white" : "black"
+                      }
+                      strokeWidth="2"
+                    />
+                  </svg>
+
+                  Upload Documents
+                </button>
+              </div>
+
+              {activeTab === "documentation" && (
+                <>
+
+                  <DocumentTab documentationdata={alldataofdocumentation} singleVehicleDetail={singleVehicleDetail} />
+
+                </>
               )}
-</tbody>
-</table>
-</div>
+              {activeTab === "maintenance" && (
+                <>
+                  <MaintenanceTab maintenancedata={alldataofmaintenance} singleVehicleDetail={singleVehicleDetail} />
+                </>
+              )}
+              {activeTab === "services" && (
+                <>
+                  <ServiceTab servicedata={alldataofservices} singleVehicleDetail={singleVehicleDetail} />
+                </>
+              )}
+            </>
+          )}
 
-        {modalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg w-96">
-              <h3 className="text-xl font-bold mb-4 text-center">
-                {formData._id ? "Update Service" : "Add Service"}
-              </h3>
-              <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">
-                    Service Title
-                  </label>
-                  <input
-                    type="text"
-                    name="serviceTitle"
-                    value={formData.serviceTitle}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-[#CBD5E0] rounded-lg"
-                    placeholder="Oil Changing / Tuning, etc."
-                    required
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">
-                    Vehicle Registration
-                  </label>
-                  <Select
-                    value={
-                      formData.vehicleReg
-                        ? {
-                            value: formData.vehicleReg,
-                            label: formData.vehicleReg,
-                          }
-                        : null
-                    }
-                    onChange={handleInputChangeSelect}
-                    options={vehicles}
-                    placeholder="Pick Vehicle"
-                    isClearable
-                    isSearchable
-                    className="rounded-md w-full outline-green border border-grayLight hover:border-green"
-                    styles={{
-                      control: (provided, state) => ({
-                        ...provided,
-                        border: "none",
-                        boxShadow: state.isFocused ? null : null,
-                      }),
-                      option: (provided, state) => ({
-                        ...provided,
-                        backgroundColor: state.isSelected
-                          ? "#00B56C"
-                          : state.isFocused
-                          ? "#e1f0e3"
-                          : "transparent",
-                        color: state.isSelected
-                          ? "white"
-                          : state.isFocused
-                          ? "black"
-                          : "black",
-                        "&:hover": {
-                          backgroundColor: "#e1f0e3",
-                          color: "black",
-                        },
-                      }),
-                    }}
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">
-                    Service Type
-                  </label>
-                  <Select
-                    value={serviceTypeOptions.find(
-                      (option) => option.value === formData.serviceType
-                    )} // Find the selected option from options
-                    onChange={handleServiceTypeChange}
-                    options={serviceTypeOptions}
-                    placeholder="Select Service Type"
-                    isClearable
-                    isSearchable
-                    noOptionsMessage={() => "No options available"}
-                    className="rounded-md w-full outline-green border border-grayLight hover:border-green"
-                    styles={{
-                      control: (provided, state) => ({
-                        ...provided,
-                        border: "none",
-                        boxShadow: state.isFocused ? null : null,
-                      }),
-                      option: (provided, state) => ({
-                        ...provided,
-                        backgroundColor: state.isSelected
-                          ? "#00B56C"
-                          : state.isFocused
-                          ? "#e1f0e3"
-                          : "transparent",
-                        color: state.isSelected
-                          ? "white"
-                          : state.isFocused
-                          ? "black"
-                          : "black",
-                        "&:hover": {
-                          backgroundColor: "#e1f0e3",
-                          color: "black",
-                        },
-                      }),
-                    }}
-                  />
-                </div>
+          {/*  inner side of cards  */}
+          {/* Main Action Section */}
+          {!selectedvehicle && (
+            <div className="flex justify-start items-center border-b border-gray-200 mt-8  rounded-md">
+              {/* Services Tab */}
 
-                {formData.serviceType === "Datewise" && (
-                  <div className="mb-4 ml-1">
-                    <label className="block text-sm font-medium">
-                      Alert Date & Time
-                    </label>
-                   
+              <button
+                onClick={() => setViewMode("card")}
+                className={`px-8 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${viewMode === "card"
+                  ? "bg-[#00B56C] text-white"
+                  : "bg-transparent hover:bg-[#D1FAE5]"
+                  }`}
+              >
+                Vehicles
+              </button>
 
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <DatePicker
-        value={formData.targetValue || null}
-        onChange={handleDateChange}
-        format="MM/dd/yyyy"
-        variant="dialog"
-        placeholder="Start Date"
-        minDate={currentDate} // Prevent selecting past dates
-        autoOk
-        inputProps={{ readOnly: true }}
-        style={{
-          marginTop: '2%',
-          width: '160px',
-          border: '1px solid #ccc',
-          borderRadius: '5px',
-          padding: '10px',
-          fontSize: '14px',
-        }}
-        InputProps={{
-          endAdornment: (
-            <EventIcon
-              style={{ width: '20px', height: '20px' }}
-              className="text-gray"
-            />
-          ),
-        }}
-        DialogProps={{
-          PaperProps: {
-            style: {
-              backgroundColor: '#f4f6f8',
-              borderRadius: '10px',
-              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)',
-            },
-          },
-        }}
-      />
-      <TimePicker
-        value={TimeValue || null}
-        onChange={handleTimeChange}
-        format="HH:mm:ss"
-        variant="dialog"
-        autoOk
-        placeholder="Alert time"
-        inputProps={{ readOnly: true }}
-        style={{
-          marginTop: '2%',
-          width: '160px',
-          border: '1px solid #ccc',
-          borderRadius: '5px',
-          padding: '10px',
-          fontSize: '14px',
-        }}
-        disabled={!formData.targetValue} 
-        InputProps={{
-          endAdornment: (
-            <AccessTimeIcon
-              style={{ width: '20px', height: '20px' }}
-              className="text-gray"
-            />
-          ),
-          style: {
-            backgroundColor: 'white',
-          },
-        }}
-        DialogProps={{
-          PaperProps: {
-            style: {
-              backgroundColor: '#f4f6f8',
-              borderRadius: '10px',
-              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)',
-            },
-          },
-        }}
-      />
-    </MuiPickersUtilsProvider>
+              <button
+                onClick={() => setViewMode("table")}
+                className={`px-8 py-2 text-sm font-medium rounded-t-md flex items-center gap-2  ${viewMode === "table"
+                  ? "bg-[#00B56C] text-white"
+                  : "bg-transparent hover:bg-[#D1FAE5] "
+                  }`}
+              >
+                Services
+              </button>
+            </div>
+          )}
+
+          {!selectedvehicle && (
+            <div className="  rounded-md shadow px-4 py-[1rem] mt-4">
+              {viewMode === "table" && (
+                <button
+                  onClick={() => setModalOpenNew(true)}
+                  className="mr-auto mb-4 px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 bg-[#00B56C] text-white hover:bg-[#028B4A] transition-all"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="20px"
+                    height="20px"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="2"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      fill="none"
+                      stroke="#ffffff"
+                      strokeWidth="2"
+                      d="M12 5v14M5 12h14"
+                    />
+                  </svg>
+                  Create service
+                </button>
+              )}
+              <div className=" ">
+                {/* Display Vehicles in Card View */}
+                {viewMode === "card" && (
+                  <div
+                    className="overflow-y-auto max-h-[290px] min-h-[300px]"
+                    style={{ boxSizing: "border-box" }}
+                  >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                      {socketdata.map((vehicle, index) => (
+                        <div
+                          key={vehicle.vehicleReg}
+                          onClick={() => handleCardClick(vehicle.vehicleReg)}
+                          className="relative border-l-8 justify-between bg-white p-[1.1rem] rounded-lg h-auto flex items-start  cursor-pointer"
+                          style={{
+                            borderLeftColor:
+                              vehicle.vehicleStatus === "Parked"
+                                ? "#FF0000" // Red for parked
+                                : vehicle.vehicleStatus === "Moving"
+                                  ? "#00B56C" // Green for moving
+                                  : vehicle.vehicleStatus === "Pause"
+                                    ? "#eec40f" // Yellow for paused
+                                    : "#808080", // Gray for other statuses
+                          }}
+                        >
+                          {/* Left side: Vehicle Reg and SVG */}
+                          <div className="flex flex-col items-start ">
+                            {/* Vehicle Registration on top */}
+                            <h2 className="text-xl mb-4">
+                              {vehicle.vehicleReg}
+                            </h2>
+
+                            {/* SVG below the vehicle registration */}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill={
+                                vehicle.vehicleStatus === "Parked"
+                                  ? "#FF0000" // Red for parked
+                                  : vehicle.vehicleStatus === "Moving"
+                                    ? "#00B56C" // Green for moving
+                                    : vehicle.vehicleStatus === "Pause"
+                                      ? "#eec40f" // Yellow for paused
+                                      : "#808080" // Gray for other statuses
+                              }
+                              viewBox="0 0 15 15"
+                              className="w-12 h-12"
+                              style={{
+                                flexShrink: 0, // Prevent the SVG from shrinking
+                              }}
+                            >
+                              <path d="M12.6,8.7,11.5,6.5a1.05,1.05,0,0,0-.9-.5H4.4a1.05,1.05,0,0,0-.9.5L2.4,8.7,1.16,9.852a.5.5,0,0,0-.16.367V14.5a.5.5,0,0,0,.5.5h2c.2,0,.5-.2.5-.4V14h7v.5c0,.2.2.5.4.5h2.1a.5.5,0,0,0,.5-.5V10.219a.5.5,0,0,0-.16-.367ZM4.5,7h6l1,2h-8ZM5,11.6c0,.2-.3.4-.5.4H2.4c-.2,0-.4-.3-.4-.5V10.4c.1-.3.3-.5.6-.4l2,.4c.2,0,.4.3.4.5Zm8-.1c0,.2-.2.5-.4.5H10.5c-.2,0-.5-.2-.5-.4v-.7c0-.2.2-.5.4-.5l2-.4c.3-.1.5.1.6.4ZM14,2V3a1.009,1.009,0,0,1-1.017,1H5.348A2.549,2.549,0,0,1,1,3.5H3.5v-2H1A2.549,2.549,0,0,1,5.348,1h7.635A1.009,1.009,0,0,1,14,2Z" />
+                            </svg>
+                          </div>
+
+                          {/* Right side: Buttons stacked vertically */}
+                          <div className="flex flex-col justify-between  space-y-2 ">
+                            {/* Button 1 - Redirect */}
+                            <button
+                              onClick={() =>
+                                router.push(
+                                  `/liveTracking?vehicleReg=${vehicle.vehicleReg}`
+                                )
+                              }
+                              className="flex items-center justify-center p-1 bg-[#f3f4f6] text-black rounded-md hover:bg-[#D1FAE5]"
+                            >
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                style={{
+                                  color: "black",
+                                }}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                              </svg>
+                            </button>
+
+                            {/* Button 2 - Wrench */}
+                            <button
+                              // onClick={() => router.push(`/liveTracking?vehicleReg=${vehicle.vehicleReg}`)}
+                              className="flex items-center justify-center p-1 bg-[#f3f4f6] text-black rounded-md gap-2 hover:bg-[#D1FAE5]"
+                            >
+                              <FaCogs className="text-black text-sm" />
+                              {vehicle.service ? vehicle.service : "0"}
+                            </button>
+
+                            {/* Button 3 - File */}
+                            <button
+                              // onClick={() => router.push(`/liveTracking?vehicleReg=${vehicle.vehicleReg}`)}
+                              className="flex items-center justify-center p-1 bg-[#f3f4f6] text-black rounded-md gap-2 hover:bg-[#D1FAE5]"
+                            >
+                              <FaRegFileAlt className="text-black text-sm" />{" "}
+                              {vehicle.document ? vehicle.document : "0"}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
-                {formData.serviceType === "Milagewise" && (
-                  <>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium ml-1">
-                      {/*   Enter Mileage at which you want to get notified */}
-                      Alert Milage
-                      </label>
-                      <input
-                        type="number"
-                        name="targetValue"
-                        value={formData.targetValue} // Ensure the value is controlled by state
-                        onChange={handleInputChange} // Handle user changes to the input field
-                        className="w-full p-2 border border-[#CBD5E0] rounded-lg"
-                        required
-                        placeholder="Mileage"
-                        disabled={disabledbutton}
-                      />
-                      {/* Display error message if there's an error */}
-                      {error && (
-                        <p className="text-red text-xs mt-1">{error}</p>
-                      )}
+                {/* Display Vehicles in Table View */}
+                {viewMode === "table" && (
+                  <div className="relative w-full bg-white overflow-x-auto max-h-[250px] min-h-[250px]">
+                    {" "}
+                    {/* Set max height for the outer div */}
+                    <div className="overflow-y-auto h-full">
+                      {" "}
+                      {/* This ensures the inner div scrolls while maintaining the height of the parent div */}
+                      <table className="min-w-full table-auto">
+                        <thead className="bg-[#E2E8F0]">
+                          <tr>
+                            <th className="px-2 py-1 text-center  w-[50px]">
+                              S.No
+                            </th>
+                            <th className="px-2 py-1 text-left">
+                              Service Title
+                            </th>
+                            <th className="px-2 py-1 text-left">
+                              Other Information
+                            </th>
+                            <th className="px-2 py-1 text-left w-[50px]">
+                              Delete
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {simpleservices.length === 0 ? (
+                            <tr>
+                              <td
+                                colSpan="3"
+                                className="px-2 py-1 text-center text-gray-500"
+                              >
+                                No data found
+                              </td>
+                            </tr>
+                          ) : (
+                            simpleservices.map((item, index) => (
+                              <tr
+                                key={item.id} // Ensure you have a unique key, here using item.id
+                                className="border-b hover:bg-[#D1FAE5]"
+                              >
+                                <td className="px-2 py-1 text-center">
+                                  {index + 1}
+                                </td>
+                                <td className="px-2 py-1 text-left">
+                                  {item.service}
+                                </td>
+                                <td className="px-2 py-1 text-left">
+                                  {item.other}
+                                </td>
+                                <td className="px-2 py-1 pl-[1.5rem] text-center">
+                                  <svg
+                                    onClick={() => DeleteServices(item._id)}
+                                    className="w-6 h-6 text-red-600 cursor-pointer hover:shadow-lg"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    version="1.0"
+                                    width="512.000000pt"
+                                    height="512.000000pt"
+                                    viewBox="0 0 512.000000 512.000000"
+                                    preserveAspectRatio="xMidYMid meet"
+                                  >
+                                    <g
+                                      transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                                      fill="#000000"
+                                      stroke="none"
+                                    >
+                                      <path d="M1801 5104 c-83 -22 -165 -71 -224 -133 -99 -104 -137 -210 -137 -383 l0 -107 -509 -3 c-497 -3 -510 -4 -537 -24 -53 -39 -69 -71 -69 -134 0 -63 16 -95 69 -134 l27 -21 2139 0 2139 0 27 21 c53 39 69 71 69 134 0 63 -16 95 -69 134 -27 20 -40 21 -537 24 l-509 3 0 107 c0 173 -38 279 -137 383 -61 64 -141 111 -228 134 -85 22 -1431 21 -1514 -1z m1485 -330 c60 -44 69 -67 72 -185 l4 -109 -801 0 -801 0 0 94 c0 102 9 137 43 175 48 52 32 51 769 48 676 -2 687 -2 714 -23z" />
+                                      <path d="M575 3826 c-41 -18 -83 -69 -90 -109 -7 -36 129 -3120 144 -3270 7 -78 16 -113 44 -170 62 -132 171 -223 306 -259 61 -16 181 -17 1581 -17 1400 0 1520 1 1581 17 135 36 244 127 306 259 28 57 37 92 44 170 16 153 151 3243 144 3275 -9 39 -52 88 -92 104 -48 20 -3923 20 -3968 0z m3735 -353 c-1 -27 -31 -721 -69 -1544 -66 -1466 -68 -1497 -90 -1532 -12 -21 -40 -44 -65 -56 -42 -21 -46 -21 -1526 -21 -1480 0 -1484 0 -1526 21 -59 28 -84 72 -90 156 -6 77 -134 2944 -134 2992 l0 31 1750 0 1750 0 0 -47z" />
+                                      <path d="M1590 3033 c-37 -14 -74 -50 -91 -88 -18 -41 -18 -59 21 -953 31 -715 42 -917 54 -939 62 -121 224 -122 283 -3 l22 45 -39 913 c-42 966 -40 941 -92 989 -40 37 -111 53 -158 36z" />
+                                      <path d="M2495 3026 c-41 -18 -83 -69 -90 -109 -3 -18 -4 -442 -3 -944 3 -903 3 -912 24 -939 39 -53 71 -69 134 -69 63 0 95 16 134 69 21 27 21 34 21 966 0 932 0 939 -21 966 -11 15 -32 37 -46 47 -33 25 -113 32 -153 13z" />
+                                      <path d="M3420 3029 c-33 -13 -68 -47 -86 -81 -11 -21 -23 -237 -54 -939 -38 -895 -39 -914 -21 -954 54 -123 224 -125 287 -4 12 23 22 211 54 941 39 894 39 913 21 953 -10 23 -33 52 -51 65 -37 26 -111 36 -150 19z" />
+                                    </g>
+                                  </svg>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
                     </div>
-                  </>
+                  </div>
                 )}
-                <label className="block text-sm font-medium mb-2 ml-2">
-                    Alert types
-                  </label>
-                <div className="mb-2 ml-2 flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.sms}
-                    onChange={(e) =>
-                      setFormData({ ...formData, sms: e.target.checked })
-                    }
-                    className="mr-2"
-                  />
-                  <label>SMS</label>
-                </div>
-                <div className="mb-2 ml-2 flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.checked })
-                    }
-                    className="mr-2"
-                  />
-                  <label>Email</label>
-                </div>
-                <div className="mb-4 ml-2 flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.pushnotification}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        pushnotification: e.target.checked,
-                      })
-                    }
-                    className="mr-2"
-                  />
-                  <label>Push Notifications</label>
-                </div>
+              </div>
+            </div>
+          )}
 
-                <div className="flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setModalOpen(false); // Close the modal
-                      // seteditModal(false);
-                      setTimeValue(null)
-                      setFormData(initialFormData); // Reset form data to initial state
-                    }}
-                    className="bg-[#E53E3E] text-white px-4 py-2 rounded-lg"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-[#00B56C] text-white px-4 py-2 rounded-lg"
-                  >
-                    Save
-                  </button>
+          {modalOpenNew && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div
+                className={`bg-white p-6 rounded-lg ${activeTab == "documentation" ? "w-[45rem]" : "w-96"
+                  }`}
+              >
+                <h3 className="text-xl font-bold mb-4 text-center">
+                  Add service 1
+                </h3>
+                <form onSubmit={handleSubmitservice}>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium">
+                      service Title
+                    </label>
+                    <input
+                      type="text"
+                      name="service"
+                      value={simpleservicesForm.service}
+                      onChange={handleInputserviceChange}
+                      className="w-full p-2 border border-[#CBD5E0] rounded-lg"
+                      placeholder="Oil Changing / Tuning, etc."
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium">Other</label>
+                    <input
+                      type="text"
+                      name="other"
+                      value={simpleservicesForm.other}
+                      onChange={handleInputserviceChange}
+                      className="w-full p-2 border border-[#CBD5E0] rounded-lg"
+                      placeholder="Any Information"
+                    />
+                  </div>
+
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setModalOpenNew(false);
+                        setsimpleservicesForm(initialsimpleservicesForm);
+
+                      }}
+                      className="bg-[#E53E3E] text-white px-4 py-2 rounded-lg"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-[#00B56C] text-white px-4 py-2 rounded-lg"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+          {/* MAin section end */}
+        </div>
+
+        {/* vehciles summary  */}
+        {!selectedvehicle && (
+          <div className="px-4 col-span-3 mt-[42px] ">
+            <div className="grid row-span-2 gap-[42px]">
+              <div className="p-2 rounded-md bg-white border border-gray p-2 w-[345px] h-[170px]">
+                <h2 className="text-lg font-bold text-gray-700 pb-8">
+                  Vehicles Service Reminder
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-red">
+                      {
+                        services?.filter(
+                          (item) =>
+                            item.dataType === "Service" &&
+                            item.status == "due"
+                        ).length
+                      }
+                    </p>
+                    <p className="text-sm font-medium">Over Due</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-yellow">
+                      {
+                        services?.filter(
+                          (item) =>
+                            item.dataType === "Service" &&
+                            item.status == "due soon"
+                        ).length
+                      }
+                    </p>
+                    <p className="text-sm font-medium">Due Soon</p>
+                  </div>
                 </div>
-              </form>
+              </div>
+
+              <div className="p-2 rounded-md bg-white border border-gray p-2 w-[345px] h-[170px]">
+                <h2 className="text-lg font-bold text-gray-700 pb-8">
+                  Documents Renewal Reminder
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-red">
+                      {
+                        services.filter(
+                          (item) =>
+                            item.dataType === "Documentation" &&
+                            item.status == "due"
+                        ).length
+                      }
+                    </p>
+                    <p className="text-sm font-medium">Over Due</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-yellow">
+                      {
+                        services.filter(
+                          (item) =>
+                            item.dataType === "Documentation" &&
+                            item.status == "due soon"
+                        ).length
+                      }
+                    </p>
+                    <p className="text-sm font-medium">Due Soon</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
-        {services.length > 5 && ( // Show pagination controls only if there are more than 10 services
-  <div className="flex justify-center mt-4">
-    <div className="flex items-center space-x-4">
-      <div className="flex items-center space-x-2">
-        <span>Rows per page: </span>
-        <select
-          className="p-2 border border-[#CBD5E0] rounded-lg"
-          value={rowsPerPage}
-          onChange={handleRowsPerPageChange}
-        >
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-        </select>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <button
-          onClick={() => handlePageChange("prev")}
-          disabled={currentPage === 1}
-          className="bg-[#00B56C] text-white px-3 py-1 rounded-lg hover:shadow-[0px_4px_6px_rgba(0,0,0,0.2)]"
-        >
-          Prev
-        </button>
-        <span>
-          Page {currentPage} of {Math.ceil(services.length / rowsPerPage)}
-        </span>
-        <button
-          onClick={() => handlePageChange("next")}
-          disabled={currentPage === Math.ceil(services.length / rowsPerPage)}
-          className="bg-[#00B56C] text-white px-3 py-1 rounded-lg hover:shadow-[0px_4px_6px_rgba(0,0,0,0.2)]"
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-{isModalOpen && (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 bg-opacity-50 backdrop-blur-sm">
-      <div className="bg-white p-6 rounded-lg w-full sm:w-1/3 z-10 max-w-lg">
-        <div className="flex items-center mb-4">
-          <div className="bg-green-500 text-white rounded-full mr-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="#ffffff"
-              width="40px"
-              height="40px"
-              viewBox="0 0 1920.00 1920.00"
-              stroke="#ffffff"
-              strokeWidth="5.76"
-            >
-              <g id="SVGRepo_bgCarrier" strokeWidth="0">
-                <rect
-                  x="0"
-                  y="0"
-                  width="1920.00"
-                  height="1920.00"
-                  rx="960"
-                  fill="#00B56C"
-                />
-              </g>
-              <g id="SVGRepo_iconCarrier">
-                <path
-                  d="M960 0c530.193 0 960 429.807 960 960s-429.807 960-960 960S0 1490.193 0 960 429.807 0 960 0Zm0 101.053c-474.384 0-858.947 384.563-858.947 858.947S485.616 1818.947 960 1818.947 1818.947 1434.384 1818.947 960 1434.384 101.053 960 101.053Zm-42.074 626.795c-85.075 39.632-157.432 107.975-229.844 207.898-10.327 14.249-10.744 22.907-.135 30.565 7.458 5.384 11.792 3.662 22.656-7.928 1.453-1.562 1.453-1.562 2.94-3.174 9.391-10.17 16.956-18.8 33.115-37.565 53.392-62.005 79.472-87.526 120.003-110.867 35.075-20.198 65.9 9.485 60.03 47.471-1.647 10.664-4.483 18.534-11.791 35.432-2.907 6.722-4.133 9.646-5.496 13.23-13.173 34.63-24.269 63.518-47.519 123.85l-1.112 2.886c-7.03 18.242-7.03 18.242-14.053 36.48-30.45 79.138-48.927 127.666-67.991 178.988l-1.118 3.008a10180.575 10180.575 0 0 0-10.189 27.469c-21.844 59.238-34.337 97.729-43.838 138.668-1.484 6.37-1.484 6.37-2.988 12.845-5.353 23.158-8.218 38.081-9.82 53.42-2.77 26.522-.543 48.24 7.792 66.493 9.432 20.655 29.697 35.43 52.819 38.786 38.518 5.592 75.683 5.194 107.515-2.048 17.914-4.073 35.638-9.405 53.03-15.942 50.352-18.932 98.861-48.472 145.846-87.52 41.11-34.26 80.008-76 120.788-127.872 3.555-4.492 3.555-4.492 7.098-8.976 12.318-15.707 18.352-25.908 20.605-36.683 2.45-11.698-7.439-23.554-15.343-19.587-3.907 1.96-7.993 6.018-14.22 13.872-4.454 5.715-6.875 8.77-9.298 11.514-9.671 10.95-19.883 22.157-30.947 33.998-18.241 19.513-36.775 38.608-63.656 65.789-13.69 13.844-30.908 25.947-49.42 35.046-29.63 14.559-56.358-3.792-53.148-36.635 2.118-21.681 7.37-44.096 15.224-65.767 17.156-47.367 31.183-85.659 62.216-170.048 13.459-36.6 19.27-52.41 26.528-72.201 21.518-58.652 38.696-105.868 55.04-151.425 20.19-56.275 31.596-98.224 36.877-141.543 3.987-32.673-5.103-63.922-25.834-85.405-22.986-23.816-55.68-34.787-96.399-34.305-45.053.535-97.607 15.256-145.963 37.783Zm308.381-388.422c-80.963-31.5-178.114 22.616-194.382 108.33-11.795 62.124 11.412 115.76 58.78 138.225 93.898 44.531 206.587-26.823 206.592-130.826.005-57.855-24.705-97.718-70.99-115.729Z"
-                  fillRule="evenodd"
-                />
-              </g>
-            </svg>
-          </div>
-          <h2 className="text-xl sm:text-lg font-semibold">
-            Confirm {serviceType === "Delete" ? "Delete" : "Update"}
-          </h2>
+      {/* Grapg */}
+      {!selectedvehicle && (
+        <div className="mx-8">
+          <Graph piedata={piedata} linedata={linedata} bardata={bardata} />
         </div>
-        <p>
-          {serviceType === "Delete" ? (
-            "Are you sure you want to Delete this service?"
-          ) : (
-            "Are you sure you want to Update this service status to \"Complete\"?"
-          )}
-        </p>
+      )}
 
-        {/* Modal Buttons */}
-        <div className="mt-4 text-right">
-          <button
-            onClick={closeConfirmationModal}
-            className="bg-[#d1d5db] px-4 py-2 rounded mr-2 hover:bg-[#e5e7eb]"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleConfirmUpdate}
-            className="bg-[#00B56C] text-white px-4 py-2 rounded hover:bg-[#4ade80]"
-          >
-            Yes, {serviceType === "Delete" ? "Delete" : "Update"}
-          </button>
-        </div>
-      </div>
     </div>
-  )}
-      </div>
-    </div>
-    </div>
-    </div>
-
 
   );
 }
