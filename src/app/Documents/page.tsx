@@ -20,10 +20,10 @@ function Documents() {
   const initialFormData: any = {
     id: "",
     title: "",
-validityperiod: 0,
-validitymileage: 0,
-reminderperiod: 0,
-assigntoallvehicle: false,
+    validityperiod: 0,
+    validitymileage: 0,
+    reminderperiod: 0,
+    assigntoallvehicle: false,
     clientId: session?.clientId,
   };
   const [formData, setFormData] = useState<any[]>(initialFormData);
@@ -55,26 +55,32 @@ assigntoallvehicle: false,
 
   }
   const handleSubmit = async (e: any) => {
-    console.log("form", formData);
     if (!formData.title) {
       toast.error("Document title is missing", { position: "top-center" })
       return
     }
-   /*  if (error != "") {
-      toast.error(error, { position: "top-center" })
+
+    if (formData.validityperiod && formData.validityperiod > 1000) {
+      toast.error("Validity Period Must be equal to or less than 1000", { position: "top-center" })
       return
-    } */
+
+    }
+    if (formData.reminderperiod && formData.reminderperiod > 1000) {
+      toast.error("Reminder Period Must be equal to or less than 1000", { position: "top-center" })
+
+      return
+
+    }
     if (documentType == "Update") {
- console.log("edit ", formData);
- const updatedFormData: any = {
-  id: formData.id,
-  title: formData.title,
-validityPeriod: formData.validityperiod,
-validityMileage: formData.validitymileage,
-reminderPeriod: formData.reminderperiod,
-allVehicle: formData.assigntoallvehicle,
-  clientId: session?.clientId,
-};
+      const updatedFormData: any = {
+        id: formData.id,
+        title: formData.title,
+        validityPeriod: parseInt(formData.validityperiod),
+        validityMileage: parseInt(formData.validitymileage),
+        reminderDay: parseInt(formData.reminderperiod),
+        allVehicle: formData.assigntoallvehicle,
+        clientId: session?.clientId,
+      };
       let response = await editDocuments(updatedFormData, session?.accessToken)
       if (response?.success) {
 
@@ -88,27 +94,16 @@ allVehicle: formData.assigntoallvehicle,
 
       }
     } else {
-    
-     
-    
       let data = new FormData()
-     
       data.append("file", file)
       data.append("clientId", session?.clientId)
       data.append("title", formData?.title)
-      data.append("validityPeriod", formData.validityperiod)
-      data.append("validityMileage", formData.validitymileage)
-      data.append("reminderDay", formData.reminderperiod)
+      data.append("validityPeriod", parseInt(formData.validityperiod))
+      data.append("validityMileage", parseInt(formData.validitymileage))
+      data.append("reminderDay", parseInt(formData.reminderperiod))
       data.append("allVehicle", formData.assigntoallvehicle)
-
-     /*  console.log("FormData contents:");
-      data.forEach((value, key) => {
-        console.log(`${key}: ${value}`);
-      }); */
-
       let response = await addDocument(data, session?.accessToken)
       if (response?.success) {
-
         toast.success(response?.message, { position: "top-center" })
         loadDocuments()
         setFormData(initialFormData)
@@ -116,13 +111,9 @@ allVehicle: formData.assigntoallvehicle,
         setFile(null)
       } else {
         toast.error(response?.message, { position: "top-center" })
-
       }
-    } 
-    
+    }
   }
-
-  
 
   const handleFileChange = async (e) => {
 
@@ -139,28 +130,30 @@ allVehicle: formData.assigntoallvehicle,
     }
   };
 
-    const handleInputChange = (e: any) => {
-      const { name, value } = e.target;
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    };
-    const handleCheckboxChange = (e: any) => {
-      const { checked } = e.target;
-      setFormData((prev) => ({
-        ...prev,
-        assigntoallvehicle: checked,
-      }));
-    };
+  const handleInputChange = (e: any) => {
+
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+
+
+  };
+  const handleCheckboxChange = (e: any) => {
+    const { checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      assigntoallvehicle: checked,
+    }));
+  };
 
 
 
 
   const openUpdateModal = (document: any) => {
-console.log("document", document);
     setdocumentType("Update");
-    //setFormData({ ...document, id: document._id });
     setFormData({
       id: document._id || "",  // Using _id from document
       title: document.title || "",  // Using title from document
@@ -220,7 +213,7 @@ console.log("document", document);
       </button>
 
 
-        {/*  table */}
+      {/*  table */}
       <div className="relative px-4">
         <div className="bg-white shadow-md overflow-y-auto rounded-lg"
           style={{ maxHeight: "40rem" }}>
@@ -255,42 +248,42 @@ console.log("document", document);
                       <td className="px-2 py-1 text-left">{document?.title}</td>
                       <td className="px-2 py-1 text-left">{document?.reminderDay}</td>
                       <td className="px-2 py-1 text-left">{document?.validityPeriod}</td>
-                  
-                     {/*  <td className="px-2 py-1 text-left">{document?.fileType?.replace("/", "-")}</td> */} 
-                     <td className="px-2 py-1 text-left">{document?.validityMileage}</td>
-                     <td className="pr-28 py-1 pr-8 text-center">
-  {document?.allVehicle ? (
-    <input
-      type="checkbox"
-      checked={document?.allVehicle}
-      readOnly
-      className="h-4 w-4 border-gray-300 rounded"
-    />
-  ) : null}
-</td>
 
-                      <td className="px-2 py-1 text-left">
-                        <div className="grid grid-cols-3">
+                      {/*  <td className="px-2 py-1 text-left">{document?.fileType?.replace("/", "-")}</td> */}
+                      <td className="px-2 py-1 text-left">{document?.validityMileage}</td>
+                      <td className="pr-28 py-1 text-center">
+                        {document?.allVehicle ? (
+                          <input
+                            type="checkbox"
+                            checked={document?.allVehicle}
+                            readOnly
+                            className="h-4 w-4 border-gray-300 rounded"
+                          />
+                        ) : null}
+                      </td>
+
+                      <td className="w-[180px]">
+                        <div className="flex justify-end mr-14  gap-2 items-center">
                           {/* Eye icon */}
-<div className='grid grid-cols-1'>
 
 
-                          {document.file !== null &&document.file !== "null" && document.file !== "" && (
-                         <svg 
-                         xmlns="http://www.w3.org/2000/svg" 
-                         xmlnsXlink="http://www.w3.org/1999/xlink" 
-                         viewBox="0 0 32 32" 
-                         xmlSpace="preserve"
-                         width="23" 
-                         height="23"
-                         onClick={() =>
-                             window.open(document.file, "_blank") // Opens the file in a new tab
-                     
-                           }
-                           className=" cursor-pointer hover:shadow-lg"
-                       >
-                         <style type="text/css">
-                           {`
+
+                          {document.file !== null && document.file !== "null" && document.file !== "" && (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              xmlnsXlink="http://www.w3.org/1999/xlink"
+                              viewBox="0 0 32 32"
+                              xmlSpace="preserve"
+                              width="23"
+                              height="23"
+                              onClick={() =>
+                                window.open(document.file, "_blank") // Opens the file in a new tab
+
+                              }
+                              className=" cursor-pointer hover:shadow-lg"
+                            >
+                              <style type="text/css">
+                                {`
                              .st0 {
                                fill: none;
                                stroke: #000000;
@@ -300,16 +293,16 @@ console.log("document", document);
                                stroke-miterlimit: 10;
                              }
                            `}
-                         </style>
-                         <path 
-                           className="st0" 
-                           d="M29,16c0,0-5.8,8-13,8S3,16,3,16s5.8-8,13-8S29,16,29,16z" 
-                         />
-                         <circle className="st0" cx="16" cy="16" r="4" />
-                       </svg>
-                     
-                        )}
-                        </div>
+                              </style>
+                              <path
+                                className="st0"
+                                d="M29,16c0,0-5.8,8-13,8S3,16,3,16s5.8-8,13-8S29,16,29,16z"
+                              />
+                              <circle className="st0" cx="16" cy="16" r="4" />
+                            </svg>
+
+                          )}
+
                           {/* Edit Icon */}
                           <svg
                             onClick={() => openUpdateModal(document)}
@@ -362,7 +355,7 @@ console.log("document", document);
 
 
 
-                {/*  modal popup */}
+      {/*  modal popup */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-96">
@@ -392,7 +385,7 @@ console.log("document", document);
               <input
                 type="text"
                 name="reminderperiod"
-                value={formData.reminderperiod > 0 ? formData.reminderperiod : null} 
+                value={formData.reminderperiod > 0 ? formData.reminderperiod : null}
                 onChange={handleInputChange}
                 onInput={(e) => {
                   // Ensures that only numeric input is allowed
@@ -411,8 +404,8 @@ console.log("document", document);
               <input
                 type="text"
                 name="validityperiod"
-            
-                value={formData.validityperiod > 0 ? formData.validityperiod : null} 
+
+                value={formData.validityperiod > 0 ? formData.validityperiod : null}
                 onChange={handleInputChange}
                 onInput={(e) => {
                   // Ensures that only numeric input is allowed
@@ -426,12 +419,12 @@ console.log("document", document);
 
             <div className="mb-4">
               <label className="block text-sm font-medium">
-              Validity Mileage
+                Validity Mileage
               </label>
               <input
                 type="text"
                 name="validitymileage"
-                value={formData.validitymileage > 0 ? formData.validitymileage : null} 
+                value={formData.validitymileage > 0 ? formData.validitymileage : null}
                 onInput={(e) => {
                   // Ensures that only numeric input is allowed
                   e.target.value = e.target.value.replace(/[^0-9]/g, "");
@@ -445,21 +438,21 @@ console.log("document", document);
 
 
             <div className="mb-4 flex items-center space-x-2 ml-2">
-  <input
-    type="checkbox"
-    id="assigntoallvehicle"
-    name="assigntoallvehicle"
-    checked={formData.assigntoallvehicle}
-    onChange={handleCheckboxChange}
-    className="h-4 w-4 border-gray-300 rounded"
-  />
-  <label
-    htmlFor="assigntoallvehicle"
-    className="text-sm font-medium cursor-pointer"
-  >
-    Assign to All Vehicle
-  </label>
-</div>
+              <input
+                type="checkbox"
+                id="assigntoallvehicle"
+                name="assigntoallvehicle"
+                checked={formData.assigntoallvehicle}
+                onChange={handleCheckboxChange}
+                className="h-4 w-4 border-gray-300 rounded"
+              />
+              <label
+                htmlFor="assigntoallvehicle"
+                className="text-sm font-medium cursor-pointer"
+              >
+                Assign to All Vehicle
+              </label>
+            </div>
 
 
 
@@ -515,7 +508,7 @@ console.log("document", document);
       )}
 
 
-        {/*  delete modal */}
+      {/*  delete modal */}
       {deleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-100">
@@ -551,7 +544,7 @@ console.log("document", document);
       )
 
       }
-          <Toaster position="top-center" reverseOrder={false} />
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   )
 }

@@ -7,7 +7,7 @@ import Select from "react-select";
 import { MuiPickersUtilsProvider, DatePicker, TimePicker } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
 import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
-import {  handleServiceHistoryRequest, handleServicesRequest, handleServiceStatus } from "@/utils/API_CALLS";
+import { handleServiceHistoryRequest, handleServicesRequest, handleServiceStatus } from "@/utils/API_CALLS";
 import { format } from 'date-fns'; // Import format from date-fns
 
 export default function Service({ servicedata, singleVehicleDetail }: any) {
@@ -17,7 +17,8 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
   const [confirmModalOpen, setconfirmModalOpen] = useState(false);
   const [serviceDataforupdate, setserviceDataforupdate] = useState();
   const [EditmodalOpen, setEditmodalOpen] = useState(false);
-  const [updateData, setupdateData] = useState(false);
+  // const [updateData, setupdateData] = useState(false);
+
   const [fetchedservicebyVehicle, setfetchedservicebyVehicle] = useState([]);
   const initialServiceFormData = {
     id: "",
@@ -51,16 +52,16 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
 
 
   useEffect(() => {
-    const d = servicedata.filter((item) => item.vehicleId === singleVehicleDetail[0]._id);
+    const d = servicedata.filter((item) => item.vehicleId === singleVehicleDetail?._id);
     setfetchedservicebyVehicle(d);
     setServiceFormData((prevData) => ({
       ...prevData,
-      clientId: singleVehicleDetail[0].clientId,
-      vehicleId: singleVehicleDetail[0]._id,
+      clientId: singleVehicleDetail?.clientId,
+      vehicleId: singleVehicleDetail?._id,
       dataType: "Service"
     }));
 
-  }, [servicedata, updateData]);
+  }, [servicedata]);
 
   // Effect to fetch services from API
   useEffect(() => {
@@ -68,8 +69,8 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
       try {
         const fetchedServices = await fetchServicesFromAPI();
         if (fetchedServices.length > 0) {
-          const filteredServices = fetchedServices.filter(
-            (service: any) => service.dataType === 'Service' && service.vehicleId === singleVehicleDetail[0]._id
+          const filteredServices = fetchedServices?.filter(
+            (service: any) => service.dataType === 'Service' && service.vehicleId === singleVehicleDetail?._id
           );
           setfetchedservicebyVehicle(filteredServices);
 
@@ -78,8 +79,6 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
         }
       } catch (error) {
         toast.error("Failed to load services.");
-      } finally {
-
       }
     };
     loadServices();
@@ -146,7 +145,7 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
         });
 
         return Data;
-        setupdateData(!updateData)
+        // setupdateData(!updateData)
       } catch (error) {
         toast.error("Failed to load services.");
         return [];
@@ -158,8 +157,8 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
     try {
       const fetchedServices = await fetchServicesFromAPI();
       if (fetchedServices.length > 0) {
-        const filteredServices = fetchedServices.filter(
-          (service: any) => service.dataType === 'Service' && service.vehicleId === singleVehicleDetail[0]._id
+        const filteredServices = fetchedServices?.filter(
+          (service: any) => service.dataType === 'Service' && service.vehicleId === singleVehicleDetail?._id
         );
         setfetchedservicebyVehicle(filteredServices);
       } else {
@@ -189,6 +188,16 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
       toast.error("Please fill all the required fields based on your selections.");
       return false;
     }
+    if (serviceFormData.isExpiryMileageSelected && Number(singleVehicleDetail.odometer1?.split(" ")[0]) >= serviceFormData.expiryMilage) {
+      toast.error(`Expiry Milage must be greater than ${Number(singleVehicleDetail.odometer1?.split(" ")[0])}`);
+      return false;
+    }
+
+    if (serviceFormData.isReminderMileageSelected && Number(singleVehicleDetail.odometer1?.split(" ")[0]) >= serviceFormData.reminderMilage) {
+      toast.error(`Reminder Milage must be greater than ${Number(singleVehicleDetail.odometer1?.split(" ")[0])}`);
+      return false;
+    }
+
     // If all required fields are filled
     return true;
   };
@@ -219,7 +228,7 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
           dataType: "Service",
 
         }
-        
+
         const Data = await handleServiceHistoryRequest({
           token: session?.accessToken,
           method: "POST",
@@ -353,7 +362,7 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
   }
 
   const handledelete = async (id) => {
-    
+
     const Data = await handleServiceHistoryRequest({
       token: session?.accessToken,
       method: "DELETE",
@@ -398,7 +407,9 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
   const handleserviceDateChange = (field: 'expiryDate' | 'reminderDate' | 'lastDate', date: Date | null) => {
 
     // const formattedDate = date ? date.toISOString().split("T")[0] : null;
-    const formattedDate = format(date, 'dd-MM-yyyy');
+    // const formattedDate = format(date, 'dd-MM-yyyy');
+    const formattedDate = date ? date.toISOString().split("T")[0] : null;
+
     // const formattedDate = format(new Date(date), 'MM-dd-yyyy');
     setServiceFormData((prevState) => ({
       ...prevState,
@@ -702,12 +713,15 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
                         </label>
                       </div>
                     </div>
-
                     {/* Mileage checkbox */}
                     <div className="flex items-center mb-4 ">
                       <div className="flex items-center mr-4">
                         <input
                           type="checkbox"
+                          disabled={
+                            Number(singleVehicleDetail?.odometer1?.split(" ")[0]) == 0 ||
+                            !singleVehicleDetail?.odometer1
+                          }
                           checked={serviceFormData.isExpiryMileageSelected}
                           onChange={(e) => handleserviceCheckboxChange('isExpiryMileageSelected', e.target.checked)}
                           id="expiry-mileage-checkbox"
@@ -727,7 +741,7 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
                         <DatePicker
                           value={serviceFormData.expiryDate ? new Date(serviceFormData.expiryDate) : null}
                           onChange={(date) => handleserviceDateChange('expiryDate', date)}
-                          format="MM/dd/yyyy"
+                          format="dd-MM-yyyy"
                           variant="dialog"
                           minDate={new Date()}
                           disabled={!serviceFormData.isExpiryDateSelected}
@@ -796,6 +810,10 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
                       <div className="flex items-center mr-4">
                         <input
                           type="checkbox"
+                          disabled={
+                            Number(singleVehicleDetail?.odometer1?.split(" ")[0]) == 0 ||
+                            !singleVehicleDetail.odometer1
+                          }
                           checked={serviceFormData.isReminderMileageSelected}
                           onChange={(e) => handleserviceCheckboxChange('isReminderMileageSelected', e.target.checked)}
                           id="reminder-mileage-checkbox"
@@ -815,7 +833,7 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
                         <DatePicker
                           value={serviceFormData.reminderDate ? new Date(serviceFormData.reminderDate) : null}
                           onChange={(date) => handleserviceDateChange('reminderDate', date)}
-                          format="MM/dd/yyyy"
+                          format="dd-MM-yyyy"
                           variant="dialog"
                           minDate={new Date()}
                           disabled={!serviceFormData.isReminderDateSelected}
@@ -869,6 +887,7 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
                       <div className="flex items-center mr-4">
                         <input
                           type="checkbox"
+
                           checked={serviceFormData.isLastDateSelected}
                           onChange={(e) => handleserviceCheckboxChange('isLastDateSelected', e.target.checked)}
                           id="last-date-checkbox"
@@ -885,6 +904,10 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
                       <div className="flex items-center mr-4">
                         <input
                           type="checkbox"
+                          disabled={
+                            Number(singleVehicleDetail?.odometer1?.split(" ")[0]) == 0 ||
+                            !singleVehicleDetail.odometer1
+                          }
                           checked={serviceFormData.isLastMileageSelected}
                           onChange={(e) => handleserviceCheckboxChange('isLastMileageSelected', e.target.checked)}
                           id="last-mileage-checkbox"
@@ -906,7 +929,7 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
                         <DatePicker
                           value={serviceFormData.lastDate ? new Date(serviceFormData.lastDate) : null}
                           onChange={(date) => handleserviceDateChange('lastDate', date)}
-                          format="MM/dd/yyyy"
+                          format="dd-MM-yyyy"
                           variant="dialog"
                           maxDate={new Date()}
                           disabled={!serviceFormData.isLastDateSelected}

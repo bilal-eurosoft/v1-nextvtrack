@@ -130,10 +130,10 @@ export async function getClientSettingByClinetIdAndToken({
 }
 export async function getNotificationsData({
   token,
-  clientId,
+  payload,
 }: {
   token: string;
-  clientId: string;
+  payload:any;
 }) {
   try {
     const response = await fetch(`${URL}/notifications`, {
@@ -142,7 +142,7 @@ export async function getNotificationsData({
         authorization: `Bearer ${token}`,
         "content-type": "application/json",
       },
-      body: `{\"clientId\":\"${clientId}\"}`,
+      body:JSON.stringify(payload),
       method: "POST",
     });
     if (!response.ok) {
@@ -158,10 +158,10 @@ export async function getNotificationsData({
 
 export async function getNotificationsDataByUserId({
   token,
-  userId,
+  payload,
 }: {
   token: string;
-  clientId: string;
+  payload: any;
 }) {
   try {
 
@@ -171,7 +171,7 @@ export async function getNotificationsDataByUserId({
         authorization: `Bearer ${token}`,
         "content-type": "application/json",
       },
-      body: `{\"userId\":\"${userId}\"}`,
+      body: JSON.stringify(payload),
       method: "POST",
     });
     if (!response.ok) {

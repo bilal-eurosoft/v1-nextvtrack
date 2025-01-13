@@ -13,7 +13,6 @@ import { format } from 'date-fns'; // Import format from date-fns
 export default function Document({ documentationdata, singleVehicleDetail }: any) {
   const { data: session } = useSession();
   const [documentType, setdocumentType] = useState<String>()
-
   const [modalOpen, setModalOpen] = useState(false);
   const [EditmodalOpen, setEditmodalOpen] = useState(false);
 
@@ -46,7 +45,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
     validityPeriod: 0,
     reminderDay: 0,
     clientId: "",
-    vehicleId: singleVehicleDetail[0]._id,
+    vehicleId: singleVehicleDetail?._id,
     sms: false,
     email: false,
     pushNotification: false,
@@ -62,13 +61,13 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
 
   useEffect(() => {
-    const d = documentationdata.filter((item) => item.vehicleId === singleVehicleDetail[0]._id);
+    const d = documentationdata.filter((item) => item.vehicleId === singleVehicleDetail?._id);
     setfetchedDocumentsbyVehicle(d);
     setLoading(false); // Data is loaded, set loading to false
 
     setFormData((prevData) => ({
       ...prevData,
-      vehicleId: singleVehicleDetail[0]._id,
+      vehicleId: singleVehicleDetail?._id,
     }));
 
   }, [documentationdata]);
@@ -79,13 +78,13 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
       try {
         const fetchedServices = await fetchServicesFromAPI();
         if (fetchedServices.length > 0) {
-          const filteredServices = fetchedServices.filter(
-            (service: any) => service.dataType === 'Documentation' && service.vehicleId === singleVehicleDetail[0]._id
+          const filteredServices = fetchedServices?.filter(
+            (service: any) => service.dataType === 'Documentation' && service.vehicleId === singleVehicleDetail?._id
           );
           setfetchedDocumentsbyVehicle(filteredServices);
           setFormData((prevData) => ({
             ...prevData,
-            vehicleId: singleVehicleDetail[0]._id,
+            vehicleId: singleVehicleDetail?._id,
           }));
 
         } else {
@@ -108,15 +107,15 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
 
 
-        const filteredServices = fetchedServices.filter(
-          (service: any) => service.dataType === 'Documentation' && service.vehicleId === singleVehicleDetail[0]._id
+        const filteredServices = fetchedServices?.filter(
+          (service: any) => service.dataType === 'Documentation' && service.vehicleId === singleVehicleDetail?._id
         );
 
 
         setfetchedDocumentsbyVehicle(filteredServices)
         setFormData((prevData) => ({
           ...prevData,
-          vehicleId: singleVehicleDetail[0]._id,
+          vehicleId: singleVehicleDetail?._id,
         }));
 
 
@@ -241,7 +240,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
       if (!file) {
         toast.error("Please upload an document", { position: "top-center" })
-
+        return
       }
 
       let data = new FormData()
@@ -314,8 +313,8 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
   
         const updatepayload = {
   
-          clientId: singleVehicleDetail[0].clientId,
-          vehicleId: singleVehicleDetail[0]._id,
+          clientId: singleVehicleDetail?.clientId,
+          vehicleId: singleVehicleDetail?._id,
           dataType: "Documentation", serviceTitle: selectedDocumentForAttach?.serviceTitle,
           filename: selectedDocumentForAttach?.filename, file: selectedDocumentForAttach?.file, documentType: selectedDocumentForAttach?.documentType,
           issueDate: selectedDocumentForAttach?.issueDate,
@@ -360,8 +359,8 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
     /* const payload = {
 
-      clientId: singleVehicleDetail[0].clientId,
-      vehicleId: singleVehicleDetail[0]._id,
+      clientId: singleVehicleDetail?.clientId,
+      vehicleId: singleVehicleDetail?._id,
       pushnotification: formData.pushNotification,
       sms: formData.sms,
       email: formData.email,
@@ -402,7 +401,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
   const handleDateChange = async (newDate, id) => {
     // Ensure that the selected date is either valid or null
-    const formattedDate = format(newDate, 'dd-MM-yyyy'); // use date-fns to format it
+    const formattedDate = format(newDate, 'yyyy-MM-dd'); // use date-fns to format it
 
 
     setdateforalert((prevData) => ({
@@ -620,10 +619,10 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
                               value={service.reminderDate ? service.reminderDate : dateforalert.id === service._id ? dateforalert.date : null} // Correct value for DatePicker
                               onChange={(date) => handleDateChange(date, service._id)} // Ensure service._id is passed correctly
-                              format="yyyy/dd/MM"
+                              format="yyyy-MM-dd" // Display format for the date
                               variant="dialog"
                               placeholder="Trigger Date"
-                              minDate={service.issueDate}
+                              minDate={new Date()}
                               maxDate={service.expiryDate}
                               autoOk
                               inputProps={{ readOnly: true }}
@@ -658,25 +657,26 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                                 service.status === "renew" ? "Renew" : ""}
                         </td>
 
-                        <td className=" pr-0 text-end m-0 w-[200px]">
-                          <div className="flex justify-center gap-2 m-0 items-end">
+                        <td className="w-[180px]">
+                          <div className="flex justify-end mr-14  gap-2 items-center">
+                            {service.file
+                              !== null && service.file !== "null"
+                              && service.file != "" &&
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                xmlnsXlink="http://www.w3.org/1999/xlink"
+                                viewBox="0 0 32 32"
+                                xmlSpace="preserve"
+                                width="23"
+                                height="23"
+                                onClick={() =>
+                                  window.open(service.file, "_blank") // Opens the file in a new tab
 
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              xmlnsXlink="http://www.w3.org/1999/xlink"
-                              viewBox="0 0 32 32"
-                              xmlSpace="preserve"
-                              width="23"
-                              height="23"
-                              onClick={() =>
-                                window.open(service.file, "_blank") // Opens the file in a new tab
-
-                              }
-                              className="cursor-pointer hover:shadow-lg"
-                              style={{ display: `${!service.file && "none"}` }}
-                            >
-                              <style type="text/css">
-                                {`
+                                }
+                                className="cursor-pointer hover:shadow-lg"
+                              >
+                                <style type="text/css">
+                                  {`
         .st0 {
           fill: none;
           stroke: #000000;
@@ -686,13 +686,14 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
           stroke-miterlimit: 10;
         }
       `}
-                              </style>
-                              <path
-                                className="st0"
-                                d="M29,16c0,0-5.8,8-13,8S3,16,3,16s5.8-8,13-8S29,16,29,16z"
-                              />
-                              <circle className="st0" cx="16" cy="16" r="4" />
-                            </svg>
+                                </style>
+                                <path
+                                  className="st0"
+                                  d="M29,16c0,0-5.8,8-13,8S3,16,3,16s5.8-8,13-8S29,16,29,16z"
+                                />
+                                <circle className="st0" cx="16" cy="16" r="4" />
+                              </svg>
+                            }
 
 
 
@@ -760,25 +761,25 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                               onClick={() => {
                                 setModalOpen(true)
                                 setdocumentType("Renew")
-                                setFile(service?.filename)
+                                // setFile(service?.filename)
                                 setFormData((prev) => ({
                                   ...prev,
                                   clientId: service.clientId,
                                   vehicleId: service.vehicleId,
-  serviceTitle: service.serviceTitle,
+                                  serviceTitle: service.serviceTitle,
                                   id: service._id,
                                   status: "renew",
                                   reminderDay: service.reminderDay,
                                   validityPeriod: service.validityPeriod,
-                                     
-                                        serviceTitle: service.serviceTitle, // Update state with formatted date or null
-                                        issueDate: service.issueDate, // Update state with formatted date or null
-                                        expiryDate: service.expiryDate, // Update state with formatted date or null
-                                        reminderDate: service.reminderDate,
-                                        sms: service.sms ? service.sms : false, // Update state with formatted date or null
-                                        email: service.email ? service.email : false, // Update state with formatted date or null
-                                    
-                                        pushNotification : service.pushNotification ? service.pushNotification : false
+
+                                  serviceTitle: service.serviceTitle, // Update state with formatted date or null
+                                  // issueDate: service.issueDate, // Update state with formatted date or null
+                                  // expiryDate: service.expiryDate, // Update state with formatted date or null
+                                  // reminderDate: service.reminderDate,
+                                  sms: service.sms ? service.sms : false, // Update state with formatted date or null
+                                  email: service.email ? service.email : false, // Update state with formatted date or null
+
+                                  pushNotification: service.pushNotification ? service.pushNotification : false
                                 }));
                               }}
                               className="cursor-pointer"
@@ -810,210 +811,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
         </div>
       </div>
 
-      {/*   {modalOpen && (
-        <>
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className={`bg-white p-6 rounded-lg w-[45rem]`}>
-              <h3 className="text-xl font-bold mb-4 text-center">
-                Attach Document
-              </h3>
-              <form onSubmit={handleSubmit}>
-
-                {!EditmodalOpen &&
-                  <>
-                    <div className="selected-documents flex flex-wrap mb-4 gap-4">
-                      {selectedDocumentsForAttach.map((document) => (
-                        <div
-                          key={document._id}
-                          className="selected-item flex items-center justify-between w-[30%] mb-2 px-3 py-2 bg-[#dcfce7] text-green-700 rounded-lg text-sm"
-                        >
-                          <span className="truncate w-[180px]">{document?.title}</span>
-
-                          <button
-                            className="text-red text-lg"
-                            onClick={() => handleRemoveDocumentForDocumenttab(document._id)}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-
-
-                    <Select
-                      value={null}
-                      onChange={handleDocumentsChangeForDocumenttab}
-                      options={selectedDocuments.filter(
-                        (option) => !selectedDocumentsForAttach.some((doc) => doc._id === option._id)
-                      ).map((doc) => ({
-                        label: doc.title, // Use the title for display
-                        value: doc._id,  // Use _id as the value
-                        ...doc, // Keep other properties for later use
-                      }))}
-                      placeholder="Select Document"
-                      isClearable
-                      isSearchable
-                      noOptionsMessage={() => 'No options available'}
-                      className="rounded-md w-full outline-green border border-grayLight hover:border-green"
-                      styles={{
-                        control: (provided, state) => ({
-                          ...provided,
-                          border: 'none',
-                          boxShadow: state.isFocused ? null : null,
-                        }),
-                        option: (provided, state) => ({
-                          ...provided,
-                          backgroundColor: state.isSelected
-                            ? '#00B56C'
-                            : state.isFocused
-                              ? '#e1f0e3'
-                              : 'transparent',
-                          color: state.isSelected
-                            ? 'white'
-                            : state.isFocused
-                              ? 'black'
-                              : 'black',
-                          '&:hover': {
-                            backgroundColor: '#e1f0e3',
-                            color: 'black',
-                          },
-                        }),
-                      }}
-                    />
-                  </>
-                }
-                {EditmodalOpen && <>
-                  <Select
-                    value={{
-                      value: selectedDocumentForAttach.id,
-                      label: selectedDocumentForAttach.serviceTitle,
-
-                    }}
-                    onChange={(e) => {
-
-
-
-                      setSelectedDocumentForAttach({
-                        id: e._id,
-                        serviceTitle: e?.title,
-                        filename: e?.fileName, file: e?.file, documentType: e?.fileType, issueDate: e?.issueDate, expiryDate: e?.expiryDate
-                      }
-
-                      )
-                    }}
-                    options={selectedDocuments.map((doc) => ({
-                      label: doc.title, // Use the title for display
-                      value: doc._id,  // Use _id as the value
-                      ...doc, // Keep other properties for later use
-                    }))}
-                    placeholder="Select Document"
-                    isClearable
-                    isSearchable
-                    noOptionsMessage={() => 'No options available'}
-                    className="rounded-md w-full outline-green border border-grayLight hover:border-green"
-                    styles={{
-                      control: (provided, state) => ({
-                        ...provided,
-                        border: 'none',
-                        boxShadow: state.isFocused ? null : null,
-                      }),
-                      option: (provided, state) => ({
-                        ...provided,
-                        backgroundColor: state.isSelected
-                          ? '#00B56C'
-                          : state.isFocused
-                            ? '#e1f0e3'
-                            : 'transparent',
-                        color: state.isSelected
-                          ? 'white'
-                          : state.isFocused
-                            ? 'black'
-                            : 'black',
-                        '&:hover': {
-                          backgroundColor: '#e1f0e3',
-                          color: 'black',
-                        },
-                      }),
-                    }}
-                  />
-                </>}
-
-
-
-
-
-                <div>
-                  <label className="block text-sm font-medium mb-2 ml-2">
-                    Alert types
-                  </label>
-                  <div className="mb-2 ml-2 flex items-center">
-                    <input
-                      type="checkbox"
-                      name="sms" // Use name attribute to reference the state
-                      checked={formData.sms} // Bind to formData.sms
-                      onChange={handleCheckboxChange} // Update the state when checkbox is clicked
-                      className="mr-2"
-                    />
-                    <label>SMS</label>
-                  </div>
-                  <div className="mb-2 ml-2 flex items-center">
-                    <input
-                      type="checkbox"
-                      name="email" // Use name attribute to reference the state
-                      checked={formData.email} // Bind to formData.email
-                      onChange={handleCheckboxChange} // Update the state when checkbox is clicked
-                      className="mr-2"
-                    />
-                    <label>Email</label>
-                  </div>
-                  <div className="mb-4 ml-2 flex items-center">
-                    <input
-                      type="checkbox"
-                      name="pushNotification" // Use name attribute to reference the state
-                      checked={formData.pushNotification} // Bind to formData.pushNotification
-                      onChange={handleCheckboxChange} // Update the state when checkbox is clicked
-                      className="mr-2"
-                    />
-                    <label>Push Notifications</label>
-                  </div>
-                </div>
-
-
-                <div className="flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setModalOpen(false); // Close the modal
-                      setEditmodalOpen(false)
-                      setFormData(initialFormData)
-                      setSelectedDocumentsForAttach([])
-                      setSelectedDocumentForAttach({
-                        id: "",
-                        serviceTitle: "",
-                        filename: "", file: "", documentType: "", issueDate: "", expiryDate: ""
-                      })
-
-                    }}
-                    className="bg-[#E53E3E] text-white px-4 py-2 rounded-lg"
-                  >
-                    Cancel
-                  </button>
-                  <button
-
-                    type="submit"
-                    className="bg-[#00B56C] text-white px-4 py-2 rounded-lg"
-                  >
-                    {
-                      EditmodalOpen ? "Update" : "Save"
-                    }
-
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </>
-      )} */}
+    
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-96">
@@ -1046,7 +844,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
               <DatePicker
                 value={formData.issueDate || null}
                 onChange={handleCreatedDateChange}
-                format="MM/dd/yyyy" // Display format for the date
+                format="yyyy-MM-dd" // Display format for the date
                 variant="dialog"
                 placeholder="Issue Date "
                 maxDate={new Date()} // Prevent selecting past dates
@@ -1088,17 +886,15 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
               />
               <label className="block text-sm font-medium">
-              Reminder Date
-            </label>
-            <DatePicker
+                Reminder Date
+              </label>
+              <DatePicker
                 value={formData.reminderDate || null}
                 onChange={handleReminderDateChange}
-                format="MM/dd/yyyy" // Display format for the date
+                format="yyyy-MM-dd" // Display format for the date
                 variant="dialog"
-                placeholder="Reminder Date "
-              //  maxDate={new Date()} // Prevent selecting past dates
-
-
+                placeholder="Reminder Date"
+                minDate={new Date()} // Prevent selecting past dates
                 autoOk
                 inputProps={{ readOnly: true }} // Make input read-only
                 style={{
@@ -1140,7 +936,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
               <DatePicker
                 value={formData.expiryDate || null}
                 onChange={handleExpiryDateChange}
-                format="MM/dd/yyyy" // Display format for the date
+                format="yyyy-MM-dd" // Display format for the date
                 variant="dialog"
                 placeholder="Expiry Date "
                 minDate={new Date()} // Prevent selecting past dates

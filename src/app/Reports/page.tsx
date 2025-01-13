@@ -152,21 +152,19 @@ export default function Reports() {
   >([]);
   const allData = useSelector((state) => state?.zone);
 
-  const firstIndex = currentPage * rowsPerPages;
-  const lastIndex = Math.min(firstIndex + rowsPerPages, trisdata.length); // Ensure lastIndex does not exceed trisdata.length
 
   const searchParams = useSearchParams();
-/*   const vehicleReg = searchParams.get("vehicleReg");
-  const event = searchParams.get("event");
-  const dateTime = searchParams.get("dateTime"); */
   const params = new URLSearchParams(searchParams.toString()); // Create a mutable copy
 
-// Retrieve the values
-const vehicleReg = params.get("vehicleReg");
-const event = params.get("event");
-const dateTime = params.get("dateTime");
+
+  const vehicleReg = params.get("vehicleReg");
+  const event = params.get("event");
+  const dateTime = params.get("dateTime");
+  const Time = params.get("Time");
 
   const [dataReady, setDataReady] = useState(false);
+  const [Highligthdate, setHighligthdate] = useState();
+  const [pdfData, setpdfData] = useState();
   const [Ignitionreport, setIgnitionreport] = useState<IgnitionReport>({
     TimeZone: session?.timezone || "",
     VehicleReg: "",
@@ -178,48 +176,51 @@ const dateTime = params.get("dateTime");
     unit: session?.unit || "",
   });
 
-  useEffect(()=>{
-    console.log( vehicleReg , event ,dateTime)
-if(vehicleReg && event && dateTime){
-  console.log("dateTime ", dateTime,"vehicleReg", vehicleReg);
-  
+  useEffect(() => {
 
-// Get today's date in ISO format (without time part)
-const today = new Date().toISOString().split('T')[0]; 
-let period
-// Check if the result date is today
-if (dateTime === today) {
-    period = "today"
-} else {
-    
-    period = "custom"
-}
-  setIgnitionreport((prevReport: any) => ({
-    ...prevReport,
-    VehicleReg: vehicleReg,
-    fromDateTime: dateTime,
-    toDateTime: dateTime,
-    period: period,
-    reportType: ["ignitionOn","ignitionOff"].includes(event)?"Events":"Events",
-    TimeZone: session?.timezone || "",
- 
-    clientId: session?.clientId || "",
-   
- 
-    unit: session?.unit || "",
+    if (vehicleReg && event && dateTime) {
 
-  }));
-  setDataReady(true); // Set this flag to true when data is available
-  // Remove the parameters from the URL
-/*   params.delete("vehicleReg");
-  params.delete("event");
-  params.delete("dateTime");
-  
-  // Update the URL (without these parameters)
-  window.history.replaceState({}, "", "?" + params.toString()); */
-  handleSubmitCustom()
-}
-  },[ session,vehicleReg , event ,dateTime])
+
+
+      let a = `${dateTime}T${Time}.000Z`
+
+      setHighligthdate(a)
+      // Get today's date in ISO format (without time part)
+      const today = new Date().toISOString().split('T')[0];
+      let period
+      // Check if the result date is today
+      if (dateTime === today) {
+        period = "today"
+      } else {
+
+        period = "custom"
+      }
+      setIgnitionreport((prevReport: any) => ({
+        ...prevReport,
+        VehicleReg: vehicleReg,
+        fromDateTime: dateTime,
+        toDateTime: dateTime,
+        period: period,
+        reportType: ["ignitionOn", "ignitionOff"].includes(event) ? "Events" : "Events",
+        TimeZone: session?.timezone || "",
+
+        clientId: session?.clientId || "",
+
+
+        unit: session?.unit || "",
+
+      }));
+      setDataReady(true); // Set this flag to true when data is available
+      // Remove the parameters from the URL
+      params.delete("vehicleReg");
+      params.delete("event");
+      params.delete("dateTime");
+      params.delete("Time");
+      // Update the URL (without these parameters)
+      window.history.replaceState({}, "", "?" + params.toString());
+      handleSubmitCustom()
+    }
+  }, [session, vehicleReg, event, dateTime])
 
   useEffect(() => {
     if (dataReady) {
@@ -227,12 +228,14 @@ if (dateTime === today) {
     }
   }, [dataReady]); // Trigger handleSubmit when the dataReady flag changes
 
-
-  const handleSubmitCustom = async()=>{
+  const firstIndex = currentPage * rowsPerPages;
+  const lastIndex = Math.min(firstIndex + rowsPerPages, trisdata.length); // Ensure lastIndex does not exceed trisdata.length
+  const filterData = trisdata.slice(firstIndex, lastIndex);
+  const handleSubmitCustom = async () => {
     const { reportType, VehicleReg, period } = Ignitionreport;
     if (reportType && VehicleReg && period) {
       let newdata = { ...Ignitionreport };
-console.log("newdata", newdata);
+
       const apiFunctions: Record<
         string,
         (data: {
@@ -248,9 +251,9 @@ console.log("newdata", newdata);
         DetailReportByStreet: IgnitionReportByDetailReport,
         IdlingActivity: IgnitionReportByIdlingActivity,
       };
-console.log("asca",newdata );
+
       if (apiFunctions[newdata.reportType]) {
-        const apiFunction = apiFunctions[newdata.reportType];
+
         if (isCustomPeriod) {
           newdata = {
             ...newdata,
@@ -272,12 +275,12 @@ console.log("asca",newdata );
             // toDateTime: "2024-02-01T23:59:59Z",
           };
         }
-        console.log("newdata221312", newdata);
+
         try {
           const response = await toast.promise(
             alleventsForNotification({
               token: session.accessToken,
-             
+
               payload: newdata,
             }),
             {
@@ -310,7 +313,7 @@ console.log("asca",newdata );
 
           if (response.success === true) {
             setTableShow(true);
-           
+            setpdfData(response.data.pdfData)
             //  setIsFormSubmitted(true);
             setTrisdata(response.data.tableData);
 
@@ -456,7 +459,10 @@ console.log("asca",newdata );
                 (eventitem: { event: string }) =>
                   eventitem
               );
+
               setTrisdata(filteredData);
+              setpdfData(response.data.pdfData)
+
               newColumnHeaders = ["event", "date", "Address"];
               setcustomHeaderTitles(newColumnHeaders);
             } else if (
@@ -488,7 +494,7 @@ console.log("asca",newdata );
 
             setColumnHeaders(newColumnHeaders);
           } else if (response.success === false) {
-            // setTrisdata(response.success);
+            setTrisdata(response.success);
             setTableShow(false);
             toast.error("No Data Found", {
               style: {
@@ -512,14 +518,14 @@ console.log("asca",newdata );
         console.error(`API function not found for ${newdata.reportType}`);
       }
     } else {
-     
+
     }
   }
 
 
   // Slice the data array to get the data for the current page
 
-  const filterData = trisdata.slice(firstIndex, lastIndex);
+
   const handleChangeRowsPerPage = (e: any) => {
     setCurrentPage(0);
     setRowsPerPage(parseInt(e.target.value, 10));
@@ -528,7 +534,7 @@ console.log("asca",newdata );
     setCurrentPage(newPage);
   };
 
- 
+
   useEffect(() => {
     const vehicleListData = async () => {
       try {
@@ -577,10 +583,6 @@ console.log("asca",newdata );
   const parsedDateTime = new Date(currentTime);
   const currenTDates = new Date();
   var moment = require("moment-timezone");
-  const formattedDateTime = `${parsedDateTime
-    .toISOString()
-    .slice(0, 10)}TO${timeOnly}`;
-  
 
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
@@ -620,7 +622,7 @@ console.log("asca",newdata );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-console.log("Ignitionreport======",Ignitionreport)
+
     if (
       Ignitionreport.reportType &&
       Ignitionreport.VehicleReg &&
@@ -657,17 +659,17 @@ console.log("Ignitionreport======",Ignitionreport)
           //   yesterday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
         }
         if (period === "week") {
-          
-        
+
+
           const startOfWeek = moment()
             .subtract(7, "days")
             .startOf("day")
             .tz(session?.timezone);
           const oneday = moment().subtract(1, "day").endOf("day")
-          .tz(session?.timezone);
+            .tz(session?.timezone);
 
           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          
+
           endDateTime =
             oneday.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
         }
@@ -696,7 +698,7 @@ console.log("Ignitionreport======",Ignitionreport)
             DetailReportByStreet: IgnitionReportByDetailReport,
             IdlingActivity: IgnitionReportByIdlingActivity,
           };
-console.log("asca",newdata );
+
           if (apiFunctions[newdata.reportType]) {
             const apiFunction = apiFunctions[newdata.reportType];
             if (isCustomPeriod) {
@@ -757,7 +759,7 @@ console.log("asca",newdata );
 
               if (response.success === true) {
                 setTableShow(true);
-               
+                setpdfData(response.data.pdfData)
                 //  setIsFormSubmitted(true);
                 setTrisdata(response.data.tableData);
 
@@ -938,7 +940,7 @@ console.log("asca",newdata );
 
                 setColumnHeaders(newColumnHeaders);
               } else if (response.success === false) {
-                // setTrisdata(response.success);
+                setTrisdata(response.success);
                 setTableShow(false);
                 toast.error("No Data Found", {
                   style: {
@@ -1030,196 +1032,204 @@ console.log("asca",newdata );
       label: item.vehicleReg,
     })) || [];
   // handle exportPdf
-  const handleExportPdf = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (
-      Ignitionreport.reportType &&
-      Ignitionreport.VehicleReg &&
-      (Ignitionreport.period === "today" ||
-        Ignitionreport.period === "yesterday" ||
-        Ignitionreport.period === "week" ||
-        (Ignitionreport.toDateTime && Ignitionreport.fromDateTime))
-    ) {
-      let startDateTime;
-      let endDateTime;
+  const handleExportPdf = async (data: any) => {
+    const buffer = Buffer.from(data, "base64");
 
-      if (session) {
-        const { reportType, VehicleReg, period } = Ignitionreport;
-        if (period === "today") {
-          const today = moment().tz(session?.timezone);
-          startDateTime =
-            today?.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          endDateTime =
-            today?.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        }
-        if (period === "yesterday") {
-          const yesterday = moment().subtract(1, "day").tz(session?.timezone);
-          startDateTime =
-            yesterday?.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
-            "Z";
-          endDateTime =
-            yesterday?.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        }
-        if (period === "week") {
-          const startOfWeek = moment()
-            .subtract(7, "days")
-            .startOf("day")
-            .tz(session?.timezone);
-          const oneday = moment().subtract(1, "day");
-          startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
-          endDateTime =
-            oneday?.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        }
-        if (period === "custom") {
-          startDateTime =
-            moment(startdate).startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
-            "Z";
-          endDateTime =
-            moment(enddate).endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
-        }
-        if (reportType && VehicleReg && period) {
-          let newdata = { ...Ignitionreport };
+    window.open(
+      URL.createObjectURL(
+        new Blob([buffer], { type: "application/pdf" })
+      )
+    );
 
-          const apiFunctions: Record<
-            string,
-            (data: {
-              token: string;
-              clientId: string;
-              payload: any;
-            }) => Promise<any>
-          > = {
-            Trip: IgnitionReportByTrip,
-            DailyActivity: IgnitionReportByDailyactivity,
-            Ignition: IgnitionReportByIgnition,
-            Events: IgnitionReportByEvents,
-            DetailReportByStreet: IgnitionReportByDetailReport,
-            IdlingActivity: IgnitionReportByIdlingActivity,
-          };
-
-          if (apiFunctions[newdata.reportType]) {
-            const apiFunction = apiFunctions[newdata.reportType];
-            if (isCustomPeriod) {
-              newdata = {
-                ...newdata,
-                fromDateTime: `${Ignitionreport.fromDateTime}T00:00:00Z`,
-                toDateTime: `${Ignitionreport.toDateTime}T23:59:59Z`,
-              };
-            } else {
-              newdata = {
-                // ...newdata,
-                unit: session?.unit,
-                reportType: 0,
-                period: period,
-                VehicleReg: VehicleReg,
-                TimeZone: session?.timezone,
-                clientId: session?.clientId,
-                fromDateTime: startDateTime,
-                toDateTime: endDateTime,
-                // fromDateTime: "2024-02-01T00:00:00Z",
-                // toDateTime: "2024-02-01T23:59:59Z",
-              };
-            }
-            try {
-              const response = await toast.promise(
-                apiFunction({
-                  token: session.accessToken,
-                  clientId: session.clientId,
-                  payload: newdata,
-                }),
-                {
-                  loading: "Loading...",
-                  success: "",
-                  error: "",
-                },
-                {
-                  style: {
-                    border: "1px solid #00B56C",
-                    padding: "16px",
-                    color: "#1A202C",
-                  },
-                  success: {
-                    duration: 10,
-                    iconTheme: {
-                      primary: "#00B56C",
-                      secondary: "#FFFAEE",
-                    },
-                  },
-                  error: {
-                    duration: 10,
-                    iconTheme: {
-                      primary: "#00B56C",
-                      secondary: "#FFFAEE",
-                    },
-                  },
-                }
-              );
-
-              if (response.success === true) {
-                const buffer = Buffer.from(response.data.pdfData, "base64");
-
-                window.open(
-                  URL.createObjectURL(
-                    new Blob([buffer], { type: "application/pdf" })
-                  )
-                );
-                toast.success(`${response.message}`, {
-                  style: {
-                    border: "1px solid #00B56C",
-                    padding: "16px",
-                    color: "#1A202C",
-                  },
-                  duration: 4000,
-                  iconTheme: {
-                    primary: "#00B56C",
-                    secondary: "#FFFAEE",
-                  },
-                });
-              } else {
-                toast.error(`${response.message}`, {
-                  style: {
-                    border: "1px solid red",
-                    padding: "16px",
-                    color: "red",
-                  },
-                  iconTheme: {
-                    primary: "red",
-                    secondary: "white",
-                  },
-                });
-              }
-            } catch (error) {
-              console.error(
-                `Error calling API for ${newdata.reportType}:`,
-                error
-              );
-            }
-          } else {
-            console.error(`API function not found for ${newdata.reportType}`);
-          }
-        } else {
-          console.error(
-            "Please fill in all three fields: reportType, VehicleReg, and period"
-          );
-
-          toast.error(
-            "Please fill in all three fields: reportType, VehicleReg, and period",
-            {
-              style: {
-                border: "1px solid #00B56C",
-                padding: "16px",
-                color: "#1A202C",
-              },
-              iconTheme: {
-                primary: "#00B56C",
-                secondary: "#FFFAEE",
-              },
-            }
-          );
-        }
-      } else {
-        return null;
-      }
-    }
+    /*  e.preventDefault();
+     if (
+       Ignitionreport.reportType &&
+       Ignitionreport.VehicleReg &&
+       (Ignitionreport.period === "today" ||
+         Ignitionreport.period === "yesterday" ||
+         Ignitionreport.period === "week" ||
+         (Ignitionreport.toDateTime && Ignitionreport.fromDateTime))
+     ) {
+       let startDateTime;
+       let endDateTime;
+ 
+       if (session) {
+         const { reportType, VehicleReg, period } = Ignitionreport;
+         if (period === "today") {
+           const today = moment().tz(session?.timezone);
+           startDateTime =
+             today?.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+           endDateTime =
+             today?.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+         }
+         if (period === "yesterday") {
+           const yesterday = moment().subtract(1, "day").tz(session?.timezone);
+           startDateTime =
+             yesterday?.clone().startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
+             "Z";
+           endDateTime =
+             yesterday?.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+         }
+         if (period === "week") {
+           const startOfWeek = moment()
+             .subtract(7, "days")
+             .startOf("day")
+             .tz(session?.timezone);
+           const oneday = moment().subtract(1, "day");
+           startDateTime = startOfWeek.format("YYYY-MM-DDTHH:mm:ss") + "Z";
+           endDateTime =
+             oneday?.clone().endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+         }
+         if (period === "custom") {
+           startDateTime =
+             moment(startdate).startOf("day").format("YYYY-MM-DDTHH:mm:ss") +
+             "Z";
+           endDateTime =
+             moment(enddate).endOf("day").format("YYYY-MM-DDTHH:mm:ss") + "Z";
+         }
+         if (reportType && VehicleReg && period) {
+           let newdata = { ...Ignitionreport };
+ 
+           const apiFunctions: Record<
+             string,
+             (data: {
+               token: string;
+               clientId: string;
+               payload: any;
+             }) => Promise<any>
+           > = {
+             Trip: IgnitionReportByTrip,
+             DailyActivity: IgnitionReportByDailyactivity,
+             Ignition: IgnitionReportByIgnition,
+             Events: IgnitionReportByEvents,
+             DetailReportByStreet: IgnitionReportByDetailReport,
+             IdlingActivity: IgnitionReportByIdlingActivity,
+           };
+ 
+           if (apiFunctions[newdata.reportType]) {
+             const apiFunction = apiFunctions[newdata.reportType];
+             if (isCustomPeriod) {
+               newdata = {
+                 ...newdata,
+                 fromDateTime: `${Ignitionreport.fromDateTime}T00:00:00Z`,
+                 toDateTime: `${Ignitionreport.toDateTime}T23:59:59Z`,
+               };
+             } else {
+               newdata = {
+                 // ...newdata,
+                 unit: session?.unit,
+                 reportType: 0,
+                 period: period,
+                 VehicleReg: VehicleReg,
+                 TimeZone: session?.timezone,
+                 clientId: session?.clientId,
+                 fromDateTime: startDateTime,
+                 toDateTime: endDateTime,
+                 // fromDateTime: "2024-02-01T00:00:00Z",
+                 // toDateTime: "2024-02-01T23:59:59Z",
+               };
+             }
+             try {
+               const response = await toast.promise(
+                 apiFunction({
+                   token: session.accessToken,
+                   clientId: session.clientId,
+                   payload: newdata,
+                 }),
+                 {
+                   loading: "Loading...",
+                   success: "",
+                   error: "",
+                 },
+                 {
+                   style: {
+                     border: "1px solid #00B56C",
+                     padding: "16px",
+                     color: "#1A202C",
+                   },
+                   success: {
+                     duration: 10,
+                     iconTheme: {
+                       primary: "#00B56C",
+                       secondary: "#FFFAEE",
+                     },
+                   },
+                   error: {
+                     duration: 10,
+                     iconTheme: {
+                       primary: "#00B56C",
+                       secondary: "#FFFAEE",
+                     },
+                   },
+                 }
+               );
+ 
+               if (response.success === true) {
+                 const buffer = Buffer.from(response.data.pdfData, "base64");
+ 
+                 window.open(
+                   URL.createObjectURL(
+                     new Blob([buffer], { type: "application/pdf" })
+                   )
+                 );
+                 toast.success(`${response.message}`, {
+                   style: {
+                     border: "1px solid #00B56C",
+                     padding: "16px",
+                     color: "#1A202C",
+                   },
+                   duration: 4000,
+                   iconTheme: {
+                     primary: "#00B56C",
+                     secondary: "#FFFAEE",
+                   },
+                 });
+               } else {
+                 toast.error(`${response.message}`, {
+                   style: {
+                     border: "1px solid red",
+                     padding: "16px",
+                     color: "red",
+                   },
+                   iconTheme: {
+                     primary: "red",
+                     secondary: "white",
+                   },
+                 });
+               }
+             } catch (error) {
+               console.error(
+                 `Error calling API for ${newdata.reportType}:`,
+                 error
+               );
+             }
+           } else {
+             console.error(`API function not found for ${newdata.reportType}`);
+           }
+         } else {
+           console.error(
+             "Please fill in all three fields: reportType, VehicleReg, and period"
+           );
+ 
+           toast.error(
+             "Please fill in all three fields: reportType, VehicleReg, and period",
+             {
+               style: {
+                 border: "1px solid #00B56C",
+                 padding: "16px",
+                 color: "#1A202C",
+               },
+               iconTheme: {
+                 primary: "#00B56C",
+                 secondary: "#FFFAEE",
+               },
+             }
+           );
+         }
+       } else {
+         return null;
+       }
+     } */
   };
   function calculateTotalDurationAndDistance(data: TripsByBucket[]): {
     duration: string;
@@ -1408,7 +1418,7 @@ console.log("asca",newdata );
                 </Select> */}
                 <div className="lg:col-span-8 md:col-span-9 sm:col-span-9  col-span-12 ">
                   <Select
-                //    value={Ignitionreport.vehicleNo}
+                    //    value={Ignitionreport.vehicleNo}
                     value={options.find(option => option?.value === Ignitionreport?.VehicleReg)}
                     onChange={handleInputChangeSelect}
                     options={options}
@@ -1428,13 +1438,13 @@ console.log("asca",newdata );
                         backgroundColor: state.isSelected
                           ? "#00B56C"
                           : state.isFocused
-                          ? "#e1f0e3"
-                          : "transparent",
+                            ? "#e1f0e3"
+                            : "transparent",
                         color: state.isSelected
                           ? "white"
                           : state.isFocused
-                          ? "black"
-                          : "black",
+                            ? "black"
+                            : "black",
                         "&:hover": {
                           backgroundColor: "#e1f0e3",
                           color: "black",
@@ -1546,7 +1556,7 @@ console.log("asca",newdata );
                           ),
                         }}
                         placeholder="Start Date"
-                        // className="xl:w-80  lg:w-80 w-auto"
+                      // className="xl:w-80  lg:w-80 w-auto"
                       />
                     </MuiPickersUtilsProvider>
                     {/* <input
@@ -1618,47 +1628,46 @@ console.log("asca",newdata );
             >
               <button
                 className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
-                        ${
-                          Ignitionreport.reportType &&
-                          Ignitionreport.VehicleReg &&
-                          (Ignitionreport.period === "today" ||
-                            Ignitionreport.period === "yesterday" ||
-                            Ignitionreport.period === "week" ||
-                            (Ignitionreport.toDateTime &&
-                              Ignitionreport.fromDateTime))
-                            ? ""
-                            : "opacity-50 cursor-not-allowed"
-                        }`}
+                        ${Ignitionreport.reportType &&
+                    Ignitionreport.VehicleReg &&
+                    (Ignitionreport.period === "today" ||
+                      Ignitionreport.period === "yesterday" ||
+                      Ignitionreport.period === "week" ||
+                      (Ignitionreport.toDateTime &&
+                        Ignitionreport.fromDateTime))
+                    ? ""
+                    : "opacity-50 cursor-not-allowed"
+                  }`}
                 // disabled={customDate}
                 type="submit"
                 //onClick={()=>{ handleSubmit()}}
                 onClick={handleSubmit}
 
-                // disabled={
-                //   !Ignitionreport.reportType ||
-                //   !Ignitionreport.VehicleReg ||
-                //   !Ignitionreport.period ||
-                //   !Ignitionreport.fromDateTime ||
-                //   !Ignitionreport.toDateTime
-                // }
+              // disabled={
+              //   !Ignitionreport.reportType ||
+              //   !Ignitionreport.VehicleReg ||
+              //   !Ignitionreport.period ||
+              //   !Ignitionreport.fromDateTime ||
+              //   !Ignitionreport.toDateTime
+              // }
               >
                 Submit
               </button>{" "}
             </div>
             <div className="xl:col-span-1 lg:col-span-2 sm:col-span-3 md:col-span-2 -ms-5 submit_report_btn">
               <button
+                type="button"
                 className={`bg-green py-2 px-5 mb-5 rounded-md shadow-md  hover:shadow-gray transition duration-500 text-white
-                ${
-                  Ignitionreport.reportType &&
-                  Ignitionreport.VehicleReg &&
-                  (Ignitionreport.period === "today" ||
-                    Ignitionreport.period === "yesterday" ||
-                    Ignitionreport.period === "week" ||
-                    (Ignitionreport.toDateTime && Ignitionreport.fromDateTime))
+                ${Ignitionreport.reportType &&
+                    Ignitionreport.VehicleReg &&
+                    (Ignitionreport.period === "today" ||
+                      Ignitionreport.period === "yesterday" ||
+                      Ignitionreport.period === "week" ||
+                      (Ignitionreport.toDateTime && Ignitionreport.fromDateTime))
                     ? ""
                     : "opacity-50 cursor-not-allowed"
-                }`}
-                onClick={handleExportPdf}
+                  }`}
+                onClick={() => handleExportPdf(pdfData)}
               >
                 Export Pdf
               </button>
@@ -1830,25 +1839,45 @@ console.log("asca",newdata );
                   </tr>
                 </thead>
                 <tbody>
-                  {filterData?.map((trip, tripIndex) => (
-                    <tr key={tripIndex}>
-                      {columnHeaders.map((header, headerIndex) => {
-                        const dataKey = header.replace(
-                          /\s+/g,
-                          ""
-                        ) as keyof TripsByBucket;
-                        return (
-                          <td
-                            key={headerIndex}
-                            className="border border-gray-300 px-4 py-2"
-                          >
-                            {header === "TripStart" ||
-                            header === "TripEnd" ||
-                            header === "date" ||
-                            header === "StartDateTime" ||
-                            header === "EndingDateTime" ? (
-                              <>
-                                {moment(trip[dataKey]).format("MMM D, YYYY")}{" "}
+
+                  {filterData?.map((trip, tripIndex) => {
+                    const date = new Date(trip.date); // Convert to Date object
+
+                    // Get UTC components and format manually
+                    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    const year = date.getUTCFullYear();
+                    const month = months[date.getUTCMonth()];
+                    const day = date.getUTCDate();
+                    const hours = String(date.getUTCHours()).padStart(2, '0');
+                    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+                    const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+
+                    const formattedDate = `${month} ${day}, ${year} ${hours}:${minutes}:${seconds}`;
+
+                    return (
+                      <tr key={tripIndex}
+                        style={{
+                          backgroundColor: trip.date === Highligthdate ? "#D1FAE5" : "white", // Highlight row if the date matches
+                        }}
+                      >
+                        {columnHeaders.map((header, headerIndex) => {
+                          const dataKey = header.replace(
+                            /\s+/g,
+                            ""
+                          ) as keyof TripsByBucket;
+                          return (
+                            <td
+                              key={headerIndex}
+                              className="border border-gray-300 px-4 py-2"
+                            >
+                              {header === "TripStart" ||
+                                header === "TripEnd" ||
+                                header === "date" ||
+                                header === "StartDateTime" ||
+                                header === "EndingDateTime" ? (
+                                <>
+                                  {formattedDate}
+                                  {/*  {moment(trip[dataKey]).format("MMM D, YYYY")}{" "}
                                 {trip[dataKey] &&
                                   trip[dataKey]
                                     .toString()
@@ -1856,26 +1885,26 @@ console.log("asca",newdata );
                                     ?.trim()
                                     ?.slice(0, -1)
                                     .trim()
-                                    .split(".")[0]}
-                              </>
-                            ) : header === "TripDuration" ? (
-                              `${trip.TripDurationHr} hrs ${trip.TripDurationMins} mins`
-                            ) : header === "DriverName" && !trip[dataKey] ? (
-                              "Driver Not Assigned"
-                            ) : (
-                              trip[dataKey]?.toString() ?? ""
-                            )}
-                            {header === "Address" && trip.OsmElement
-                              ? `${
-                                  trip.OsmElement.display_name.split(",").slice(0,3)
+                                    .split(".")[0]} */}
+                                </>
+                              ) : header === "TripDuration" ? (
+                                `${trip.TripDurationHr} hrs ${trip.TripDurationMins} mins`
+                              ) : header === "DriverName" && !trip[dataKey] ? (
+                                "Driver Not Assigned"
+                              ) : (
+                                trip[dataKey]?.toString() ?? ""
+                              )}
+                              {header === "Address" && trip.OsmElement
+                                ? `${trip.OsmElement.display_name.split(",").slice(0, 3)
                                 } `
-                              : ""}
-                            {}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
+                                : ""}
+                              { }
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
 
                   <tr
                     style={{ position: "sticky", bottom: 0, zIndex: 2 }}
@@ -1883,14 +1912,14 @@ console.log("asca",newdata );
                   >
                     {calculateTotalDurationAndDistance(trisdata) &&
                       calculateTotalDurationAndDistance(trisdata).duration !==
-                        "NaN hrs NaN mins" && (
+                      "NaN hrs NaN mins" && (
                         <td colSpan={3}>
                           <span style={{ color: "white" }}>&nbsp; Total:</span>
                         </td>
                       )}
                     {calculateTotalDurationAndDistance(trisdata) &&
                       calculateTotalDurationAndDistance(trisdata).duration !==
-                        "NaN hrs NaN mins" && (
+                      "NaN hrs NaN mins" && (
                         <td
                           colSpan={1}
                           className="border border-gray-300 px-4 py-2"
@@ -1909,7 +1938,7 @@ console.log("asca",newdata );
                     >
                       {calculateTotalDurationAndDistance(trisdata) &&
                         calculateTotalDurationAndDistance(trisdata).duration !==
-                          "NaN hrs NaN mins" && (
+                        "NaN hrs NaN mins" && (
                           <span style={{ color: "white" }}>
                             {
                               calculateTotalDurationAndDistance(trisdata)
