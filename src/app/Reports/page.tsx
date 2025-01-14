@@ -494,7 +494,7 @@ export default function Reports() {
 
             setColumnHeaders(newColumnHeaders);
           } else if (response.success === false) {
-            setTrisdata(response.success);
+           
             setTableShow(false);
             toast.error("No Data Found", {
               style: {

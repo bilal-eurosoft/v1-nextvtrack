@@ -641,8 +641,8 @@ const LiveSidebar = ({
                   const value = getNestedValue(item, attribute.key);
   
                   if (attribute.key === "gpsStatus") {
-                    const targetTimeDate = new Date(item.targetTime);
-                    const currentTimeDate = new Date(item.currentTime);
+                    const targetTimeDate = new Date(item.utctimestamp);
+                    const currentTimeDate = new Date();
                     const timeDiffMinutes = Math.abs(targetTimeDate.getTime() - currentTimeDate.getTime()) / (1000 * 60);
                     const newDivColor = timeDiffMinutes > 120 ? false : true;
                     return (

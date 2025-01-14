@@ -500,7 +500,7 @@ if(!session?.driverProfile){
   useEffect(() => {
     vehicleListData();
     RFid();
-  }, [session]);
+  }, []);
 
   const handleSearch = (event: any) => {
     const newSearchTerm = event.target.value;

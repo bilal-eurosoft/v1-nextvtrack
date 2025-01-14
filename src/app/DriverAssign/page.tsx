@@ -235,7 +235,7 @@ if(!session?.driverProfile){
   useEffect(() => {
     vehicleNum();
     vehicleName();
-  }, [session]);
+  }, []);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);

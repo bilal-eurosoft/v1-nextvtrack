@@ -268,7 +268,7 @@ function Documents() {
 
 
 
-                          {document.file !== null && document.file !== "null" && document.file !== "" && (
+                          {document.file !== undefined&&document.file !== null && document.file !== "null" && document.file !== "" && (
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               xmlnsXlink="http://www.w3.org/1999/xlink"

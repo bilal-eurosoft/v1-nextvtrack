@@ -464,7 +464,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
   const handleInputChange = (e: any) => {
     setFormData((prev) => ({
       ...prev,
-      serviceTitle: e.target.value, // Update state with formatted date or null
+      serviceTitle: e.target.value, 
     }));
   }
 
@@ -477,34 +477,30 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
 
 
-      // Add reminderDay to the date
-      const reminderDate = new Date(date); // Copy date to avoid mutation
-      reminderDate.setDate(reminderDate.getDate() + formData.reminderDay);  // Add the reminderDay to the date
+      const reminderDate = new Date(date); 
+      reminderDate.setDate(reminderDate.getDate() + formData.reminderDay);  
 
-      // Convert reminderDate to the correct format for the DatePicker
-      const reminderFormattedDate = reminderDate.toISOString().split("T")[0];  // It's already a Date object, which is what the DatePicker needs
+      const reminderFormattedDate = reminderDate.toISOString().split("T")[0]; 
 
 
 
-      // Add reminderDay to the date
-      const expiryDate = new Date(date); // Copy date to avoid mutation
-      expiryDate.setDate(expiryDate.getDate() + formData.validityPeriod);  // Add the reminderDay to the date
+     const expiryDate = new Date(date); 
+      expiryDate.setDate(expiryDate.getDate() + formData.validityPeriod); 
 
-      // Convert reminderDate to the correct format for the DatePicker
-      const expiryFormattedDate = expiryDate.toISOString().split("T")[0];  // It's already a Date object, which is what the DatePicker needs
+     const expiryFormattedDate = expiryDate.toISOString().split("T")[0]; 
 
 
 
       setFormData((prev) => ({
         ...prev,
-        issueDate: formattedDate, // Update state with formatted date or null
+        issueDate: formattedDate, 
         reminderDate: reminderFormattedDate,
         expiryDate: expiryFormattedDate
       }));
     } else {
       setFormData((prev) => ({
         ...prev,
-        issueDate: date, // Update state with formatted date or null
+        issueDate: formattedDate, 
 
       }));
     }
@@ -524,11 +520,11 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
     setFormData((prev) => ({
       ...prev,
-      expiryDate: formattedDate, // Update state with formatted date or null
+      expiryDate: formattedDate, 
     }));
   };
 
-
+  console.log("formData", formData);
   const handleFileChange = async (e) => {
 
 
@@ -704,6 +700,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                               viewBox="0 0 512.000000 512.000000"
                               preserveAspectRatio="xMidYMid meet"
                               onClick={() => {
+                               
                                 setModalOpen(true)
                                 setdocumentType("Update")
                                 setEditmodalOpen(true)
@@ -723,6 +720,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                                   pushNotification: service.pushNotification ? service.pushNotification : false
 
                                 }));
+                               
                               }}
                             >
                               <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
