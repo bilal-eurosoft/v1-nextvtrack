@@ -25,54 +25,31 @@ import ServiceTab from '@/components/servicehistory/services'
 export default function Work() {
   const router = useRouter();
   const { data: session } = useSession();
-
   if (!session?.ServiceHistory) {
     router.push("/liveTracking");
   }
-
-  // State to store the service data, modal visibility, pagination info, and form data
-
-  //jo state is page pr rakhni hai wo yahan
-
-
   const [isOnline, setIsOnline] = useState(false);
   const [piedata, setpiedata] = useState([]);
   const [bardata, setbardata] = useState([]);
   const [linedata, setlinedata] = useState([]);
   const [socketdata, setsocketdata] = useState<VehicleData[]>([]);
-
-  // const [vehicles, setVehicles] = useState<any[]>([]);
   const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
-
   const [selectedvehicle, setselectedvehicle] = useState();
-  const [singleVehicleDetail, setsingleVehicleDetail] = useState([]);
-
-  // const [serviceHistory, setserviceHistory] = useState<any[]>([]);
-
+  const [singleVehicleDetail, setsingleVehicleDetail] = useState<any>({});
   const [alldataofservices, setalldataofservices] = useState<any[]>([]);
   const [alldataofmaintenance, setalldataofmaintenance] = useState<any[]>([]);
   const [alldataofdocumentation, setalldataofdocumentation] = useState<any[]>([]);
-
   const [viewMode, setViewMode] = useState("card"); // "card" or "table"
   const [activeTab, setActiveTab] = useState("services"); // "card" or "table"
-
   const [simpleservices, setsimpleServices] = useState<any[]>([]);
   const initialsimpleservicesForm = {
     service: "",
     other: "",
   };
-  const [simpleservicesForm, setsimpleservicesForm] = useState(
-    initialsimpleservicesForm
-  );
+  const [simpleservicesForm, setsimpleservicesForm] = useState(initialsimpleservicesForm);
   const [modalOpenNew, setModalOpenNew] = useState(false);
   const [services, setServices] = useState<any[]>([]);
-  /////////////////////////////////////////////////////////////////////////////////////////////////
-
-  const [isFirstTimeFetchedFromGraphQL, setIsFirstTimeFetchedFromGraphQL] =
-    useState(false);
-
-  // jo functions is page pr rakhny hai yahn wo aingy
-
+  const [isFirstTimeFetchedFromGraphQL, setIsFirstTimeFetchedFromGraphQL] =useState(false);
   useEffect(() => {
     async function dataFetchHandler() {
       if (session?.clientId) {
@@ -84,24 +61,22 @@ export default function Work() {
             clientVehicleData?.data?.Value
           )?.cacheList;
           let uniqueData = uniqueDataByIMEIAndLatestTimestamp(parsedData);
-
-
           setsocketdata([...uniqueData, ...vehicleList].reduce((acc, curr) => {
             const existing = acc.find(item => item.vehicleReg === curr.vehicleReg);
-
             if (existing) {
               // Update the existing entry with the maximum values
-              existing.service = Math.max(existing.service, curr.service);
-              existing.document = Math.max(existing.document, curr.document);
+              existing.service = Math.max(existing.service||0, curr.service||0);
+              existing.document = Math.max(existing.document||0, curr.document||0);
             } else {
               // Add a new entry if it doesn't exist
               acc.push({ ...curr });
             }
-
             return acc;
           }, []));
           setpiedata(
-            uniqueData.map((item) => {
+            uniqueData
+            .filter((i) => { return Number(i.distance?.split(" ")[0]) >0})
+            .map((item) => {
               return {
                 name: item.vehicleReg,
                 distance: Number(item.distance?.split(" ")[0]) || 0,
@@ -187,28 +162,13 @@ export default function Work() {
 
   async function getEventsdata() {
     let data = (await getevents(session?.clientId, session?.accessToken)).data;
-
-    if (data.length != 0) {
-      // setlinedata(
-      //   socketdata.map((item) => {
-      //     return {
-      //       name: item.vehicleReg,
-      //       "Harsh Acceleration": 0,
-      //       "Harsh Break": 0,
-      //       "Harsh Cornering": 0,
-      //     };
-      //   })
-      // );
+    if (data.length != 0) {     
       setlinedata(data);
     }
   }
   useEffect(() => {
     getEventsdata();
   }, [socketdata]);
-
-  {
-    /* vehciles ki list */
-  }
   const vehicleListData = async () => {
     if (session) {
       const Data = await vehicleListByClientId({
@@ -238,8 +198,8 @@ export default function Work() {
     }
   };
 
-
-  //card wali services hai
+//get add and delete service/////
+  
   const fetchServices = async () => {
     if (session) {
       try {
@@ -258,7 +218,6 @@ export default function Work() {
 
   const AddfetchServices = async (data) => {
     data.clientId = session?.clientId;
-
     if (session) {
       try {
         const Data = await handleServicesRequest({
@@ -268,7 +227,7 @@ export default function Work() {
         });
         if (Data.success == true) {
           await fetchServices();
-          toast.success("Data Saved Succesfully");
+          toast.success(Data.message);
           setModalOpenNew(false);
         }
         return Data;
@@ -291,7 +250,7 @@ export default function Work() {
         });
         if (Data.success == true) {
           await fetchServices();
-          toast.success("Data Saved Succesfully");
+          toast.success(Data.message);
         }
         return;
       } catch (error) {
@@ -317,50 +276,32 @@ export default function Work() {
     };
     loadsimpleServices();
   }, []);
-
-
-
-  // Fetch services on page load (or reload)
-  //all table table service,maintenance, documentation
-  useEffect(() => {
-    const loadServices = async () => {
-      try {
-        const fetchedServices = await fetchServicesFromAPI();
-
-        setServices(fetchedServices)
-        if (fetchedServices.length > 0) {
-          // setserviceHistory(fetchedServices);
-          setalldataofdocumentation(fetchedServices.filter((i) => { return i.dataType === 'Documentation' }))
-          setalldataofmaintenance(fetchedServices.filter((i) => { return i.dataType === 'Maintenance' }))
-
-          setalldataofservices(fetchedServices.filter((i) => { return i.dataType === 'Service' }))
-
-          // fetchedServices.forEach((service: any) => {
-          //   if (service.dataType === 'Documentation') {
-          //     setalldataofdocumentation((prevData) => [...prevData, service]);
-          //   } else if (service.dataType === 'Maintenance') {
-          //     setalldataofmaintenance((prevData) => [...prevData, service]);
-          //   } else {
-          //     setalldataofservices((prevData) => [...prevData, service]);
-          //   }
-          // });
-
-        }
-      } catch (error) {
-        toast.error("Failed to load services.");
-        // setserviceHistory([]); // In case of error, set to empty
-      }
-    };
-    loadServices();
-  }, []);
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////////
-
   const handleSubmitservice = async (e: React.FormEvent) => {
     e.preventDefault();
     setsimpleservicesForm(initialsimpleservicesForm);
     await AddfetchServices(simpleservicesForm);
   };
+  ////////
+
+
+
+  useEffect(() => {
+    const loadServiceHistories = async () => {
+      try {
+        const fetchedServices = await fetchServicesFromAPI();        
+        setServices(fetchedServices);        
+        if (fetchedServices.length > 0) {          
+          setalldataofdocumentation(fetchedServices?.filter((i) => { return i.dataType === 'Documentation' }))
+          setalldataofmaintenance(fetchedServices?.filter((i) => { return i.dataType === 'Maintenance' }))
+          setalldataofservices(fetchedServices?.filter((i) => { return i.dataType === 'Service' }))
+        }
+      } catch (error) {
+        toast.error("Failed to load services.");        
+      }
+    };
+    loadServiceHistories();
+  }, []);
+
 
   const handleInputserviceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -374,8 +315,16 @@ export default function Work() {
 
   const handleCardClick = (e) => {
     setselectedvehicle(e);
-    const vehicle = vehicleList.filter((item) => item.vehicleReg == e);
-    setsingleVehicleDetail(vehicle);
+    let {odometer1} = socketdata.filter((item) => item.vehicleReg == e)[0]
+    let {_id,clientId,vehicleReg,vehicleMake,vehicleModel,vehicleType } = vehicleList.filter((item) => item.vehicleReg == e)[0]
+    
+    
+    setsingleVehicleDetail(
+    {
+      odometer1,_id,clientId,vehicleReg,vehicleMake,vehicleModel,vehicleType
+    }
+
+    );
     setActiveTab("services");
   };
 
@@ -431,6 +380,7 @@ export default function Work() {
     isLastDateSelected: boolean;
     isLastMileageSelected: boolean;
     documents: Array;
+    odometer1:any
   }
 
   // const initialServiceFormData: VehicleData = {
@@ -504,30 +454,29 @@ export default function Work() {
               <span className="text-lg pl-4 ">Vehicle</span>
             </button>
           </div>
-          {singleVehicleDetail.map((item, index) => (
             <>
               {/* Vehicle Details Section */}
               <div className="pl-8 pt-4">
                 {/* Vehicle Reg - Big Text */}
                 <p className="text-5xl font-bold text-black">
-                  {item.vehicleReg}
+                  {singleVehicleDetail.vehicleReg}
                 </p>
 
                 {/* Make, Model, Year - Small Text */}
                 <div className="mb-8 flex space-x-4">
                   <span className="text-sm font-medium text-gray">
-                    {item.vehicleMake}
+                    {singleVehicleDetail.vehicleMake}
                   </span>
                   <span className="text-sm font-medium text-gray">
-                    {item.vehicleModel}
+                    {singleVehicleDetail.vehicleModel}
                   </span>
                   <span className="text-sm font-medium text-gray">
-                    {item.vehicleType}
+                    {singleVehicleDetail.vehicleType}
                   </span>
                 </div>
               </div>
             </>
-          ))}
+          
         </div>
       )}
 
@@ -665,7 +614,7 @@ export default function Work() {
                     />
                   </svg>
 
-                  Upload Documents
+                  Upload Document
                 </button>
               </div>
 
@@ -681,6 +630,7 @@ export default function Work() {
                   <MaintenanceTab maintenancedata={alldataofmaintenance} singleVehicleDetail={singleVehicleDetail} />
                 </>
               )}
+              
               {activeTab === "services" && (
                 <>
                   <ServiceTab servicedata={alldataofservices} singleVehicleDetail={singleVehicleDetail} />
@@ -1047,26 +997,26 @@ export default function Work() {
                   <div className="text-center">
                     <p className="text-4xl font-bold text-red">
                       {
-                        services.filter(
+                        services?.filter(
                           (item) =>
                             item.dataType === "Documentation" &&
                             item.status == "due"
                         ).length
                       }
                     </p>
-                    <p className="text-sm font-medium">Over Due</p>
+                    <p className="text-sm font-medium">Expire</p>
                   </div>
                   <div className="text-center">
                     <p className="text-4xl font-bold text-yellow">
                       {
-                        services.filter(
+                        services?.filter(
                           (item) =>
                             item.dataType === "Documentation" &&
                             item.status == "due soon"
                         ).length
                       }
                     </p>
-                    <p className="text-sm font-medium">Due Soon</p>
+                    <p className="text-sm font-medium">Expire Soon</p>
                   </div>
                 </div>
               </div>

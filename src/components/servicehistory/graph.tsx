@@ -9,8 +9,9 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Labe
 export default function Dashboard({piedata,linedata,bardata}:any) {
     let { data: session } = useSession();
     if (!session) {
-        session = JSON.parse(localStorage?.getItem("user"));
-    }
+        session = localStorage.getItem("user")
+        session =session? JSON.parse(session):""
+      }
 const COLORS = ["#8884d8", "#82ca9d", "#74c0fc", "#688ae8", "#c33d69", "#2ea597"];
    
 const [activeIndex, setActiveIndex] = useState(null);
@@ -189,6 +190,21 @@ const handleMouseLeave = () => {
                         />
                     ))}
                                 </Bar>
+                                {/* <Bar stackId="monotone" dataKey="Over Speeding" fill="#688AE8" barSize={20} > {linedata.map((entry, index) => (
+                        <Cell
+                            key={`cell-${index}`}
+                            fill="#688AE8"
+                            z-index={1}
+                            transform={
+                                index === activeIndex
+                                    ? "scale(1.01)" // Increase the size when hovered
+                                    : "scale(1)"
+                            }
+                            onMouseEnter={() => handleMouseEnter(index)}
+                            onMouseLeave={handleMouseLeave}
+                        />
+                    ))}
+                                </Bar> */}
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
