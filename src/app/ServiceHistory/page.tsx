@@ -227,7 +227,7 @@ export default function Work() {
         });
         if (Data.success == true) {
           await fetchServices();
-          toast.success("Data Saved Succesfully");
+          toast.success(Data.message);
           setModalOpenNew(false);
         }
         return Data;
@@ -250,7 +250,7 @@ export default function Work() {
         });
         if (Data.success == true) {
           await fetchServices();
-          toast.success("Data Saved Succesfully");
+          toast.success(Data.message);
         }
         return;
       } catch (error) {
@@ -614,7 +614,7 @@ export default function Work() {
                     />
                   </svg>
 
-                  Upload Documents
+                  Upload Document
                 </button>
               </div>
 

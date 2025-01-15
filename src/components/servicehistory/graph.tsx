@@ -9,8 +9,9 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Labe
 export default function Dashboard({piedata,linedata,bardata}:any) {
     let { data: session } = useSession();
     if (!session) {
-        session = JSON.parse(localStorage?.getItem("user"));
-    }
+        session = localStorage.getItem("user")
+        session =session? JSON.parse(session):""
+      }
 const COLORS = ["#8884d8", "#82ca9d", "#74c0fc", "#688ae8", "#c33d69", "#2ea597"];
    
 const [activeIndex, setActiveIndex] = useState(null);

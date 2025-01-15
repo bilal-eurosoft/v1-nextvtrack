@@ -1,14 +1,14 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { toast, Toaster } from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
+// import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Select from "react-select";
-import { MuiPickersUtilsProvider, DatePicker, TimePicker } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
-import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
-import { getDocuments, handleServiceHistoryRequest } from "@/utils/API_CALLS";
-import { format } from 'date-fns'; // Import format from date-fns
+// import Select from "react-select";
+// import { MuiPickersUtilsProvider, DatePicker, TimePicker } from "@material-ui/pickers";
+// import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
+// import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
+import { handleServiceHistoryRequest } from "@/utils/API_CALLS";
+// import { format } from 'date-fns'; // Import format from date-fns
 
 export default function Maintenance({ maintenancedata, singleVehicleDetail }: any) {
   const { data: session } = useSession();
@@ -18,8 +18,8 @@ export default function Maintenance({ maintenancedata, singleVehicleDetail }: an
   const [fetchedMaintencebyVehicle, setfetchedMaintencebyVehicle] = useState([]);
   const initialFormData = {
     id: "",
-    clientId: "",
-    vehicleId: "",
+    clientId: singleVehicleDetail?.clientId,
+    vehicleId: singleVehicleDetail?._id,
     serviceTitle: "",
     dataType: "",
     maintenanceType: ""
@@ -152,24 +152,24 @@ export default function Maintenance({ maintenancedata, singleVehicleDetail }: an
 
   }
 
-  const openUpdateModal = (service: any) => {
+  // const openUpdateModal = (service: any) => {
 
 
-    //  setFormData(service);
-    if (service.dataType === "Maintenance") {
-      let payload = {
-        id: service._id,
-        clientId: service.clientId,
-        vehicleId: service.vehicleId,
-        dataType: "Maintenance",
-        serviceTitle: service.serviceTitle,
-        maintenanceType: service.maintenanceType
-      }
+  //   //  setFormData(service);
+  //   if (service.dataType === "Maintenance") {
+  //     let payload = {
+  //       id: service._id,
+  //       clientId: service.clientId,
+  //       vehicleId: service.vehicleId,
+  //       dataType: "Maintenance",
+  //       serviceTitle: service.serviceTitle,
+  //       maintenanceType: service.maintenanceType
+  //     }
 
-      setFormData(payload);
-      setModalOpen(true);
-    }
-  }
+  //     setFormData(payload);
+  //     setModalOpen(true);
+  //   }
+  // }
 
   const handledelete = async (id) => {
 

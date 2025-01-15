@@ -156,34 +156,34 @@ export async function getNotificationsData({
   }
 }
 
-export async function getNotificationsDataByUserId({
-  token,
-  payload,
-}: {
-  token: string;
-  payload: any;
-}) {
-  try {
+// export async function getNotificationsDataByUserId({
+//   token,
+//   payload,
+// }: {
+//   token: string;
+//   payload: any;
+// }) {
+//   try {
 
-    const response = await fetch(`${URL}/notifications`, {
-      headers: {
-        accept: "application/json, text/plain, */*",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payload),
-      method: "POST",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from the API");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
+//     const response = await fetch(`${URL}/notifications`, {
+//       headers: {
+//         accept: "application/json, text/plain, */*",
+//         authorization: `Bearer ${token}`,
+//         "content-type": "application/json",
+//       },
+//       body: JSON.stringify(payload),
+//       method: "POST",
+//     });
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch data from the API");
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
 
-    return [];
-  }
-}
+//     return [];
+//   }
+// }
 
 type ApiMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -227,7 +227,7 @@ export async function handleServiceStatus({ token,
     }
 }
 
-export async function addServiceHistory(payload: any, token: string,file) {
+export async function addServiceHistory(payload: any, token: string) {
   try {
 
     const response = await fetch(
@@ -236,7 +236,7 @@ export async function addServiceHistory(payload: any, token: string,file) {
         headers: {
           authorization: `Bearer ${token}`,
         },
-        body: file? payload:JSON.stringify(payload),
+        body: payload,
         method: "POST", // Use lowercase 'get' for method
       }
     );
@@ -251,7 +251,7 @@ export async function addServiceHistory(payload: any, token: string,file) {
   }
 }
 
-export async function renewServiceHistory(payload: any, token: string,file) {
+export async function renewServiceHistory(payload: any, token: string) {
   try {
 
     const response = await fetch(
@@ -260,7 +260,7 @@ export async function renewServiceHistory(payload: any, token: string,file) {
         headers: {
           authorization: `Bearer ${token}`,
         },
-        body: file? payload:JSON.stringify(payload),
+        body: payload,
         method: "PUT", // Use lowercase 'get' for method
       }
     );
@@ -895,8 +895,6 @@ export async function vehiclebyClientidbyimmobilising({
     return [];
   }
 }
-
-
 export async function alleventsForNotification({
   token,
   payload,

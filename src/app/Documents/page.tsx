@@ -29,10 +29,6 @@ function Documents() {
   const [formData, setFormData] = useState<any[]>(initialFormData);
   const [deleteModal, setDeleteModal] = useState(false)
   const [id, setId] = useState("")
-
-
-
-
   async function loadDocuments() {
     setdocuments((await getDocuments(session?.accessToken)).data)
   }
@@ -182,7 +178,6 @@ function Documents() {
       <p className="bg-green px-4 py-1 border-t  text-center text-2xl text-white font-bold journey_heading">
         Manage Documents
       </p>
-      {/* add docuemt button */}
       <button
         onClick={() => {
           setdocumentType("Add")
