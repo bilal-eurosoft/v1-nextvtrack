@@ -269,8 +269,8 @@ const NotificationDropdown = ({ notifications, loading, toggleNotifications }) =
 </svg>
 
                         </button>
-                        <span className="absolute w-[120px] right-[-60px] transform -translate-x-1/2 mb-1 hidden group-hover:block bg-white text-black text-xs rounded px-2 py-1 border-b-2">
-                          View Event History
+                        <span className="absolute w-[100px] right-[-60px] transform -translate-x-1/2 mb-1 hidden group-hover:block bg-white text-black text-xs rounded px-2 py-1 border-b-2">
+                            Event History
                         </span>
                       </div>
 

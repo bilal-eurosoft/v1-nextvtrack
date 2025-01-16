@@ -1840,7 +1840,8 @@ export default function Reports() {
                 </thead>
                 <tbody>
 
-                  {filterData?.map((trip, tripIndex) => {
+               {/*    {filterData?.map((trip, tripIndex) => { */}
+               {trisdata?.map((trip, tripIndex) => {
                     const date = new Date(trip.date); // Convert to Date object
 
                     // Get UTC components and format manually
@@ -1853,12 +1854,13 @@ export default function Reports() {
                     const seconds = String(date.getUTCSeconds()).padStart(2, '0');
 
                     const formattedDate = `${month} ${day}, ${year} ${hours}:${minutes}:${seconds}`;
-
+                   
                     return (
                       <tr key={tripIndex}
-                        style={{
-                          backgroundColor: trip.date === Highligthdate ? "#D1FAE5" : "white", // Highlight row if the date matches
-                        }}
+                      style={{
+                        backgroundColor: trip.date !== undefined && Highligthdate !== undefined && trip.date === Highligthdate ? "#D1FAE5" : "white", // Highlight row if the date matches
+                      }}
+                      
                       >
                         {columnHeaders.map((header, headerIndex) => {
                           const dataKey = header.replace(
@@ -1953,7 +1955,7 @@ export default function Reports() {
               </table>
             </div>
           </div>
-          <div
+         {/*  <div
             className="pagination-wrapper"
             style={{ width: "100%" }} // Set the width to 100% using inline style
           >
@@ -1967,7 +1969,7 @@ export default function Reports() {
               onRowsPerPageChange={handleChangeRowsPerPage}
               className="report_paginations_one"
             />
-          </div>
+          </div> */}
         </div>
       )}
 
