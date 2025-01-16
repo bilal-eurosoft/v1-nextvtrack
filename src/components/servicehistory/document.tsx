@@ -1,10 +1,10 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { toast, Toaster } from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+// import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Select from "react-select";
-import { MuiPickersUtilsProvider, DatePicker, TimePicker } from "@material-ui/pickers";
+// import Select from "react-select";
+import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
 import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
 import { addServiceHistory, getDocuments, handleServiceHistoryRequest, handleServiceStatus, renewServiceHistory } from "@/utils/API_CALLS";
@@ -13,20 +13,21 @@ import { format } from 'date-fns'; // Import format from date-fns
 export default function Document({ documentationdata, singleVehicleDetail }: any) {
   const { data: session } = useSession();
   const [documentType, setdocumentType] = useState<String>()
-  const [modalOpen, setModalOpen] = useState(false);
-  const [EditmodalOpen, setEditmodalOpen] = useState(false);
 
-  const [selectedDocuments, setSelectedDocuments] = useState([]);
-  const [selectedDocumentsForAttach, setSelectedDocumentsForAttach] = useState(
-    []
-  );
-  const [selectedDocumentForAttach, setSelectedDocumentForAttach] = useState(
-    {
-      id: "",
-      serviceTitle: "",
-      filename: "", file: "", documentType: "", issueDate: "", expiryDate: ""
-    }
-  );
+  const [modalOpen, setModalOpen] = useState(false);
+  // const [EditmodalOpen, setEditmodalOpen] = useState(false);
+
+  // const [selectedDocuments, setSelectedDocuments] = useState([]);
+  // const [selectedDocumentsForAttach, setSelectedDocumentsForAttach] = useState(
+  //   []
+  // );
+  // const [selectedDocumentForAttach, setSelectedDocumentForAttach] = useState(
+  //   {
+  //     id: "",
+  //     serviceTitle: "",
+  //     filename: "", file: "", documentType: "", issueDate: "", expiryDate: ""
+  //   }
+  // );
   const [confirmModalOpen, setconfirmModalOpen] = useState(false);
 
   const [fetchedDocumentsbyVehicle, setfetchedDocumentsbyVehicle] = useState([]);
@@ -157,42 +158,42 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
     }
   };
 
-  useEffect(() => {
-    const loadDocuments = async () => {
-      try {
-        const fetchedDocuments = await fetchDocumentsFromAPI();
+  // useEffect(() => {
+  //   const loadDocuments = async () => {
+  //     try {
+  //       const fetchedDocuments = await fetchDocumentsFromAPI();
 
-        if (fetchedDocuments.length > 0) {
-          setSelectedDocuments(fetchedDocuments);
+  //       if (fetchedDocuments.length > 0) {
+  //         setSelectedDocuments(fetchedDocuments);
 
-        } else {
-          setSelectedDocuments([]); // Empty data set
+  //       } else {
+  //         setSelectedDocuments([]); // Empty data set
 
-        }
-      } catch (error) {
-        toast.error("Failed to load documents.");
-        setSelectedDocuments([]); // In case of error, set to empty
-      }
-    };
-    loadDocuments();
-  }, []);
+  //       }
+  //     } catch (error) {
+  //       toast.error("Failed to load documents.");
+  //       setSelectedDocuments([]); // In case of error, set to empty
+  //     }
+  //   };
+  //   loadDocuments();
+  // }, []);
 
 
-  const handleDocumentsChangeForDocumenttab = (selectedOption) => {
-    if (selectedOption) {
-      // Add selected document if not already selected
-      if (!selectedDocumentsForAttach.some((doc) => doc._id === selectedOption._id)) {
-        setSelectedDocumentsForAttach([...selectedDocumentsForAttach, selectedOption]);
-      }
-    }
-  };
+  // const handleDocumentsChangeForDocumenttab = (selectedOption) => {
+  //   if (selectedOption) {
+  //     // Add selected document if not already selected
+  //     if (!selectedDocumentsForAttach.some((doc) => doc._id === selectedOption._id)) {
+  //       setSelectedDocumentsForAttach([...selectedDocumentsForAttach, selectedOption]);
+  //     }
+  //   }
+  // };
 
-  // Handle document removal
-  const handleRemoveDocumentForDocumenttab = (documentId) => {
-    setSelectedDocumentsForAttach((prev) =>
-      prev.filter((doc) => doc._id !== documentId)
-    );
-  };
+  // // Handle document removal
+  // const handleRemoveDocumentForDocumenttab = (documentId) => {
+  //   setSelectedDocumentsForAttach((prev) =>
+  //     prev.filter((doc) => doc._id !== documentId)
+  //   );
+  // };
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
@@ -251,6 +252,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
       data.append("serviceTitle", formData.serviceTitle)
       data.append("issueDate", formData.issueDate)
       data.append("expiryDate", formData.expiryDate)
+      data.append("reminderDate", formData.reminderDate)
       data.append("pushNotification", formData.pushNotification)
       data.append("sms", formData.sms)
       data.append("email", formData.email)
@@ -258,7 +260,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
       data.append("dataType", "Documentation")
       data.append("status", "renew")
 
-      const response = await renewServiceHistory(data, session?.accessToken, file);
+      const response = await renewServiceHistory(data, session?.accessToken);
 
       if (response?.success) {
 
@@ -287,13 +289,14 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
       data.append("serviceTitle", formData.serviceTitle)
       data.append("issueDate", formData.issueDate)
       data.append("expiryDate", formData.expiryDate)
+      data.append("reminderDate", formData.reminderDate)
       data.append("pushNotification", formData.pushNotification)
       data.append("sms", formData.sms)
       data.append("email", formData.email)
       data.append("dataType", "Documentation")
 
 
-      const response = await addServiceHistory(data, session?.accessToken, file);
+      const response = await addServiceHistory(data, session?.accessToken);
 
       if (response?.success) {
 
@@ -464,7 +467,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
   const handleInputChange = (e: any) => {
     setFormData((prev) => ({
       ...prev,
-      serviceTitle: e.target.value, 
+      serviceTitle: e.target.value,
     }));
   }
 
@@ -477,30 +480,30 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
 
 
-      const reminderDate = new Date(date); 
-      reminderDate.setDate(reminderDate.getDate() + formData.reminderDay);  
+      const reminderDate = new Date(date);
+      reminderDate.setDate(reminderDate.getDate() + formData.reminderDay);
 
-      const reminderFormattedDate = reminderDate.toISOString().split("T")[0]; 
+      const reminderFormattedDate = reminderDate.toISOString().split("T")[0];
 
 
 
-     const expiryDate = new Date(date); 
-      expiryDate.setDate(expiryDate.getDate() + formData.validityPeriod); 
+      const expiryDate = new Date(date);
+      expiryDate.setDate(expiryDate.getDate() + formData.validityPeriod);
 
-     const expiryFormattedDate = expiryDate.toISOString().split("T")[0]; 
+      const expiryFormattedDate = expiryDate.toISOString().split("T")[0];
 
 
 
       setFormData((prev) => ({
         ...prev,
-        issueDate: formattedDate, 
+        issueDate: formattedDate,
         reminderDate: reminderFormattedDate,
         expiryDate: expiryFormattedDate
       }));
     } else {
       setFormData((prev) => ({
         ...prev,
-        issueDate: formattedDate, 
+        issueDate: formattedDate,
 
       }));
     }
@@ -520,11 +523,9 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
     setFormData((prev) => ({
       ...prev,
-      expiryDate: formattedDate, 
+      expiryDate: formattedDate,
     }));
   };
-
-  console.log("formData", formData);
   const handleFileChange = async (e) => {
 
 
@@ -655,7 +656,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
 
                         <td className="w-[180px]">
                           <div className="flex justify-end mr-14  gap-2 items-center">
-                            {service.file
+                            {service.file != undefined && service.file
                               !== null && service.file !== "null"
                               && service.file != "" &&
                               <svg
@@ -700,10 +701,10 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                               viewBox="0 0 512.000000 512.000000"
                               preserveAspectRatio="xMidYMid meet"
                               onClick={() => {
-                               
+
                                 setModalOpen(true)
                                 setdocumentType("Update")
-                                setEditmodalOpen(true)
+                                // setEditmodalOpen(true)
                                 setFormData((prev) => ({
                                   ...prev,
                                   clientId: service.clientId,
@@ -720,7 +721,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                                   pushNotification: service.pushNotification ? service.pushNotification : false
 
                                 }));
-                               
+
                               }}
                             >
                               <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
@@ -809,7 +810,7 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
         </div>
       </div>
 
-    
+
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-96">
@@ -997,6 +998,11 @@ export default function Document({ documentationdata, singleVehicleDetail }: any
                       onChange={handleFileChange}
                       className="w-full pr-3 py-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
+                    {error && <p className="text-sm "
+                      style={{
+                        color: "red"
+                      }}
+                    >{error}</p>}
                     {/*  <p className="text-gray-500">No file chosen</p> */}
                   </div>
                 )}

@@ -1,9 +1,8 @@
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from 'react';
-
-
 const NotificationDropdown = ({ notifications, loading, toggleNotifications }) => {
-  const router = useRouter()
+  const  router = useRouter()
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredNotifications, setFilteredNotifications] = useState(notifications);
   // Helper function to get colors based on event type

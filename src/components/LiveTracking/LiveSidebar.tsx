@@ -80,7 +80,11 @@ const LiveSidebar = ({
 
 
 }) => {
-  const { data: session } = useSession();
+  let { data: session } = useSession();
+  if (!session) {
+    session = localStorage.getItem("user")
+    session =session? JSON.parse(session):""
+  }
 
   const [searchData, setSearchData] = useState({
     search: "",
@@ -166,15 +170,13 @@ const LiveSidebar = ({
     const t = ((p[0] - p1[0]) * dy - (p[1] - p1[1]) * dx) / (dx * dy);
     return t >= 0 && t <= 1;
   }
-   const toggleLiveCars = () => {
+  const toggleLiveCars = () => {
     setSelectedVehicle(null);
     setshowAllVehicles(true);
     setunselectVehicles(false);
     setIsActiveColor(0);
     setZoom(10);
-  }; 
-  
-  
+  };
   function timeAgo(timestamp: any) {
     const now =
       (new Date(new Date().toLocaleString("en-US", { timeZone: session?.timezone }))).getTime()
@@ -384,8 +386,8 @@ const LiveSidebar = ({
     //const filterData = carData.filter(
     //   (items) => items.vehicleId === item.vehicleId
     // );
-   /*  router.push(`/liveTracking?IMEI=${item.IMEI}`) */
-   router.push(`/liveTracking?vehicleReg=${item.vehicleReg}`)
+    router.push(`/liveTracking?vehicleReg=${item.vehicleReg}`)
+
     setSelectedVehicle(item);
     setshowAllVehicles(false);
     setIsActiveColor(item.vehicleId);
@@ -450,461 +452,462 @@ const LiveSidebar = ({
   };
 
   return (
-    <> 
-    {fullparams == "full" ? (
-      <>
-      <div className="2xl:col-span-2 xl:col-span-2 lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-5 main_sider_bar2">
-    <div className="grid grid-cols-12 bg-white lg:gap-0 gap-3 search_live_tracking2">
-      <div className="lg:col-span-7 xl:col-span-6 w-full md:col-span-6 sm:col-span-5 col-span-6 sticky top-0 ">
-        <div className="grid grid-cols-12 mt-2 vehicle_search_left">
-          <div className="lg:col-span-1 xl:col-span-1 md:col-span-1 sm:col-span-1">
-            <svg
-              className="h-5 w-5 ms-1 mt-1 text-green"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-          </div>
-          <div className="lg:col-span-11 md:col-span-11 sm:col-span-10 col-span-11 ms-2 md:ml-4">
-            <input
-              type="text"
-              name="search"
-              className="text-lg bg-transparent text-green w-full px-1 placeholder-green border-b border-black outline-none"
-              placeholder="Search"
-              required
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="grid text-center  lg:col-span-5 md:col-span-5 sm:col-span-7 col-span-6 w-full show_vehicle_left2">
-        <button
-          className="text-center mx-auto text-base md:text-sm w-full font-medium text-green mt-1"
-          onClick={toggleLiveCars}
-        >
-          Show ({carData?.length}) Vehicles
-        </button>
-      </div>
-    </div>
-  
-    <div className=" border-y-2 border-green py-1  text-white ">
-      <div className="grid grid-cols-4 text-center px-2">
-        {data.map(({ label, color, count }, index) => (
-          <div
-            key={index}
-            className="flex flex-col items-center justify-center cursor-pointer group"
-            onClick={() => handleButtonClick(index)} // Set active index on click
-          >
-            <span className="text-black font-bold text-xl group-hover:text-black">
-              {count}
-            </span>
-            <span
-              className="font-medium text-sm"
-              style={{
-                color: color, // Dynamic color
-              }}
-            >
-              {label}
-            </span>
-  
-            <div className="w-full">
-              <div
-                className="w-full group-hover:bg-black"
-                style={{
-                  backgroundColor: activeIndex === index ? color : "transparent", // Active color
-                  height: activeIndex === index ? "4px" : "2px", // Thicker line for active
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-    <div
-      className="overflow-y-scroll bg-zoneTabelBg"
-      id="scroll_side_bar_cp"
-    >
-      {filteredData?.map((item: VehicleData, index: any) => {
-        return (
-          <div
-            key={index}
-            style={{ backgroundColor: activeColor == item.vehicleId ? "#e1f0e3" : "" }}
-            className="hover:bg-[#e1f0e3] cursor-pointer pt-2"
-          >
-            <div onClick={() => handleClickVehicle(item)}>
-              <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 md:space-x-4 text-center">
-                <div className="xl:col-span-6 lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-6 ">
-                  <div className="font-popins font-semibold text-start lg:text-xl text-1xl">
-                    <p className="text-black">{item?.vehicleReg}</p>
-  
-                    <div className="">
-                      <div className="flex items-center space-x-2">
-                        <div
-                          className={`inline-block px-1 py-1 rounded-md text-sm shadow ${item?.vehicleStatus === "Moving"
-                            ? "bg-green text-white"
-                            : item?.vehicleStatus === "Parked"
-                              ? "bg-red text-white"
-                              : "bg-[#eec40f] text-white"
-                          }`}
-                        >
-                          <span>{item?.vehicleStatus || "Unknown"}</span>
-                        </div>
-  
-                        {item?.flag ? (
-                          <img
-                            src={item.flag}
-                            alt="Flag"
-                            className="h-5 w-5 object-cover"
-                          />
-                        ) : (
-                          <CountryFlag country={item.OsmElement?.address?.country} />
-                        )}
-                        {item?.vehicleStatus !== "Parked" && (
-                          <div className="lg:col-span-3 md:col-span-3 col-span-2 text-sm w-max">
-                            <p className="w-max">{item.gps.speedWithUnitDesc}</p>
-                          </div>
-                        )}
-                        {session?.timezone !== undefined ? (
-                          <ActiveStatus
-                            currentTime={new Date().toLocaleString("en-US", { timeZone: session?.timezone })}
-                            targetTime={item.timestampNotParsed}
-                            reg={item.vehicleReg}
-                          />
-                        ) : ""}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="font-popins flex items-center space-x-2 text-sm w-max">
-                    <p style={{ fontSize: "15px" }}>
-                      <strong>Last Parked:</strong> {item?.lastParked}
-                    </p>
-                  </div>
-                </div>
-  
-                <div className="xl:col-span-6 text-[13px] lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-6 sm:pl-4 lg:pl-8">
-                  <div className="border border-gray p-1 rounded-md">
-                    {timeAgo(item.timestampNotParsed?.includes("-") ? item?.timestamp : item?.timestampNotParsed)}
-                  </div>
-                  {item.defaultView === false && (
-                    <div
-                      className="flex justify-end mr-[2px]"
-                      data-tooltip-target="tooltip-right"
-                      data-tooltip-placement="right"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
+    <>
+      {fullparams == "full" ? (
+        <>
+          <div className="2xl:col-span-2 xl:col-span-2 lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-5 main_sider_bar2">
+            <div className="grid grid-cols-12 bg-white lg:gap-0 gap-3 search_live_tracking2">
+              <div className="lg:col-span-7 xl:col-span-6 w-full md:col-span-6 sm:col-span-5 col-span-6 sticky top-0 ">
+                <div className="grid grid-cols-12 mt-2 vehicle_search_left">
+                  <div className="lg:col-span-1 xl:col-span-1 md:col-span-1 sm:col-span-1">
+                    <svg
+                      className="h-5 w-5 ms-1 mt-1 text-green"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
                     >
-                      {expandedIndex === index ? (
-                        <ExpandLessIcon
-                          onClick={() => toggleExpand(null)} // Collapse when clicked
-                          className="cursor-pointer text-[#00B56C]"
-                          style={{ fontSize: "32px" }} // Increase icon size
-                        />
-                      ) : (
-                        <ExpandMoreIcon
-                          onClick={() => toggleExpand(index)} // Expand when clicked
-                          className="cursor-pointer text-[#00B56C]"
-                          style={{ fontSize: "32px" }} // Increase icon size
-                        />
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-  
-              <div className="flex justify-between items-center mt-1 text-md font-bold text-labelColor"></div>
-              {item.DriverName && (item?.vehicleStatus === "Moving" || item?.vehicleStatus === "Pause") && (
-                <p className="text-start font-bold">Driver Name: {item.DriverName.replace("undefine", "")}</p>
-              )}
-            </div>
-  
-            {expandedIndex === index && item.defaultView === false && (
-              <div className="mt-2 rounded-md bg-gray-100">
-                {allfields.map((attribute) => {
-                  const getNestedValue = (obj, path) => {
-                    const keys = path.split('.');
-                    for (let key of keys) {
-                      if (obj && obj.hasOwnProperty(key)) {
-                        obj = obj[key];
-                      } else {
-                        return undefined;
-                      }
-                    }
-                    return obj;
-                  };
-  
-                  const value = getNestedValue(item, attribute.key);
-  
-                  if (attribute.key === "gpsStatus") {
-                    const targetTimeDate = new Date(item.utctimestamp);
-                    const currentTimeDate = new Date();
-                    const timeDiffMinutes = Math.abs(targetTimeDate.getTime() - currentTimeDate.getTime()) / (1000 * 60);
-                    const newDivColor = timeDiffMinutes > 120 ? false : true;
-                    return (
-                      <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
-                        <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
-                        <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}> {newDivColor ? "On" : "Off"}</span>
-                      </p>
-                    );
-                  }
-  
-                  if (value) {
-                    return (
-                      <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
-                        <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
-                        <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}>{value}</span>
-                      </p>
-                    );
-                  }
-  
-                  return null;
-                })}
-              </div>
-            )}
-  
-            <button className="border-b-2 border-green w-full text-end"></button>
-          </div>
-        );
-      })}
-    </div>
-  </div>
-      </>
-    ) : (
-<>
-<div className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-5 main_sider_bar">
-    <div className="grid grid-cols-12 bg-white lg:gap-0 gap-3 search_live_tracking">
-      <div className="lg:col-span-7 w-full md:col-span-5 sm:col-span-5 col-span-6 sticky top-0 search_vehicle_live_tracking">
-        <div className="grid grid-cols-12 vehicle_search_left">
-          <div className="lg:col-span-1 md:col-span-1 sm:col-span-1">
-            <svg
-              className="h-5 w-5 ms-1 mt-1 text-green"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-          </div>
-          <div className="lg:col-span-11 md:col-span-11 sm:col-span-10 col-span-11 ms-2">
-            <input
-              type="text"
-              name="search"
-              className="text-lg bg-transparent text-green w-full px-1 placeholder-green border-b border-black outline-none"
-              placeholder="Search"
-              required
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="flex text-center lg:col-span-5 md:col-span-6 sm:col-span-7 col-span-6 w-full show_vehicle_left">
-        <button
-          className="text-center mx-auto text-md w-full font-medium text-green mt-1"
-          onClick={toggleLiveCars}
-        >
-          Show ({carData?.length}) Vehicles
-        </button>
-      </div>
-    </div>
-  
-    <div className="bg-zoneTabelBg border-y-2 border-green text-white vehicle_summary">
-      <div className="grid grid-cols-4 text-center px-2">
-        {data.map(({ label, color, count }, index) => (
-          <div
-            key={index}
-            className="flex flex-col items-center justify-center cursor-pointer group"
-            onClick={() => handleButtonClick(index)} // Set active index on click
-          >
-            <span className="text-black font-bold text-2xl transition-transform group-hover:text-black">
-              {count}
-            </span>
-            <span
-              className="font-medium text-sm"
-              style={{
-                color: color, // Dynamic color
-              }}
-            >
-              {label}
-            </span>
-  
-            <div className="w-full">
-              <div
-                className="w-full transition-all group-hover:bg-black"
-                style={{
-                  backgroundColor: activeIndex === index ? color : "transparent", // Active color
-                  height: activeIndex === index ? "4px" : "2px", // Thicker line for active
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-    <div
-      className="overflow-y-scroll bg-zoneTabelBg"
-      id="scroll_side_bar"
-    >
-      {filteredData?.map((item: VehicleData, index: any) => {
-        return (
-          <div
-            key={index}
-            style={{ backgroundColor: activeColor == item.vehicleId ? "#e1f0e3" : "" }}
-            className="hover:bg-[#e1f0e3] cursor-pointer pt-2"
-          >
-            <div onClick={() => handleClickVehicle(item)}>
-              <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 md:space-x-4 text-center">
-                <div className="xl:col-span-6 lg:col-span-5 md:col-span-4 sm:col-span-6 col-span-4 status_car_btn">
-                  <div className="font-popins font-semibold text-start lg:text-xl text-1xl">
-                    <p className="text-black">{item?.vehicleReg}</p>
-  
-                    <div className="">
-                      <div className="flex items-center space-x-2">
-                        <div
-                          className={`inline-block px-1 py-1 rounded-md text-sm shadow ${item?.vehicleStatus === "Moving"
-                            ? "bg-green text-white"
-                            : item?.vehicleStatus === "Parked"
-                              ? "bg-red text-white"
-                              : "bg-[#eec40f] text-white"
-                          }`}
-                        >
-                          <span>{item?.vehicleStatus || "Unknown"}</span>
-                        </div>
-  
-                        {item?.flag ? (
-                          <img
-                            src={item.flag}
-                            alt="Flag"
-                            className="h-5 w-5 object-cover"
-                          />
-                        ) : (
-                          <CountryFlag country={item.OsmElement?.address?.country} />
-                        )}
-                        {item?.vehicleStatus !== "Parked" && (
-                          <div className="lg:col-span-3 md:col-span-3 col-span-2 text-sm w-max">
-                            <p className="w-max">{item.gps.speedWithUnitDesc}</p>
-                          </div>
-                        )}
-                        {session?.timezone !== undefined ? (
-                          <ActiveStatus
-                            currentTime={new Date().toLocaleString("en-US", { timeZone: session?.timezone })}
-                            targetTime={item.timestampNotParsed}
-                            reg={item.vehicleReg}
-                          />
-                        ) : ""}
-                      </div>
-                    </div>
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
                   </div>
-                  <div className="font-popins flex items-center space-x-2 text-sm w-max">
-                    <p style={{ fontSize: "15px" }}>
-                      <strong>Last Parked:</strong> {item?.lastParked}
-                    </p>
+                  <div className="lg:col-span-11 md:col-span-11 sm:col-span-10 col-span-11 ms-2 md:ml-4">
+                    <input
+                      type="text"
+                      name="search"
+                      className="text-lg bg-transparent text-green w-full px-1 placeholder-green border-b border-black outline-none"
+                      placeholder="Search"
+                      required
+                      onChange={handleInputChange}
+                    />
                   </div>
                 </div>
-  
-                <div className="xl:col-span-6 text-[13px] lg:col-span-4 md:col-span-4 sm:col-span-6 col-span-4 pl-8">
-                  <div className="border border-gray p-1 rounded-md">
-                    {timeAgo(item.timestampNotParsed?.includes("-") ? item?.timestamp : item?.timestampNotParsed)}
-                  </div>
-                  {item.defaultView === false && (
-                    <div
-                      className="flex justify-end mr-[2px]"
-                      data-tooltip-target="tooltip-right"
-                      data-tooltip-placement="right"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
-                    >
-                      {expandedIndex === index ? (
-                        <ExpandLessIcon
-                          onClick={() => toggleExpand(null)} // Collapse when clicked
-                          className="cursor-pointer text-[#00B56C]"
-                          style={{ fontSize: "32px" }} // Increase icon size
-                        />
-                      ) : (
-                        <ExpandMoreIcon
-                          onClick={() => toggleExpand(index)} // Expand when clicked
-                          className="cursor-pointer text-[#00B56C]"
-                          style={{ fontSize: "32px" }} // Increase icon size
-                        />
-                      )}
-                    </div>
-                  )}
-                </div>
               </div>
-  
-              <div className="flex justify-between items-center mt-1 text-md font-bold text-labelColor"></div>
-              {item.DriverName && (item?.vehicleStatus === "Moving" || item?.vehicleStatus === "Pause") && (
-                <p className="text-start font-bold">Driver Name: {item.DriverName.replace("undefine", "")}</p>
-              )}
+              <div className="grid text-center  lg:col-span-5 md:col-span-5 sm:col-span-7 col-span-6 w-full show_vehicle_left2">
+                <button
+                  className="text-center mx-auto text-base md:text-sm w-full font-medium text-green mt-1"
+                  onClick={toggleLiveCars}
+                >
+                  Show ({carData?.length}) Vehicles
+                </button>
+              </div>
             </div>
-  
-            {expandedIndex === index && item.defaultView === false && (
-              <div className="mt-2 rounded-md bg-gray-100">
-                {allfields.map((attribute) => {
-                  const getNestedValue = (obj, path) => {
-                    const keys = path.split('.');
-                    for (let key of keys) {
-                      if (obj && obj.hasOwnProperty(key)) {
-                        obj = obj[key];
-                      } else {
-                        return undefined;
-                      }
-                    }
-                    return obj;
-                  };
-  
-                  const value = getNestedValue(item, attribute.key);
-  
-                  if (attribute.key === "gpsStatus") {
-                    const targetTimeDate = new Date(item.targetTime);
-                    const currentTimeDate = new Date(item.currentTime);
-                    const timeDiffMinutes = Math.abs(targetTimeDate.getTime() - currentTimeDate.getTime()) / (1000 * 60);
-                    const newDivColor = timeDiffMinutes > 120 ? false : true;
-                    return (
-                      <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
-                        <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
-                        <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}> {newDivColor ? "On" : "Off"}</span>
-                      </p>
-                    );
-                  }
-  
-                  if (value) {
-                    return (
-                      <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
-                        <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
-                        <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}>{value}</span>
-                      </p>
-                    );
-                  }
-  
-                  return null;
-                })}
-              </div>
-            )}
-  
-            <button className="border-b-2 border-green w-full text-end"></button>
-          </div>
-        );
-      })}
-    </div>
-  </div>
-</>
 
-    )}
-    
-    
-    
+            <div className=" border-y-2 border-green py-1  text-white ">
+              <div className="grid grid-cols-4 text-center px-2">
+                {data.map(({ label, color, count }, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center justify-center cursor-pointer group"
+                    onClick={() => handleButtonClick(index)} // Set active index on click
+                  >
+                    <span className="text-black font-bold text-xl group-hover:text-black">
+                      {count}
+                    </span>
+                    <span
+                      className="font-medium text-sm"
+                      style={{
+                        color: color, // Dynamic color
+                      }}
+                    >
+                      {label}
+                    </span>
+
+                    <div className="w-full">
+                      <div
+                        className="w-full group-hover:bg-black"
+                        style={{
+                          backgroundColor: activeIndex === index ? color : "transparent", // Active color
+                          height: activeIndex === index ? "4px" : "2px", // Thicker line for active
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div
+              className="overflow-y-scroll bg-zoneTabelBg"
+              id="scroll_side_bar_cp"
+            >
+              {filteredData?.map((item: VehicleData, index: any) => {
+                return (
+                  <div
+                    key={index}
+                    style={{ backgroundColor: activeColor == item.vehicleId ? "#e1f0e3" : "" }}
+                    className="hover:bg-[#e1f0e3] cursor-pointer pt-2"
+                  >
+                    <div onClick={() => handleClickVehicle(item)}>
+                      <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 md:space-x-4 text-center">
+                        <div className="xl:col-span-6 lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-6 ">
+                          <div className="font-popins font-semibold text-start lg:text-xl text-1xl">
+                            <p className="text-black">{item?.vehicleReg}</p>
+
+                            <div className="">
+                              <div className="flex items-center space-x-2">
+                                <div
+                                  className={`inline-block px-1 py-1 rounded-md text-sm shadow ${item?.vehicleStatus === "Moving"
+                                    ? "bg-green text-white"
+                                    : item?.vehicleStatus === "Parked"
+                                      ? "bg-red text-white"
+                                      : "bg-[#eec40f] text-white"
+                                    }`}
+                                >
+                                  <span>{item?.vehicleStatus || "Unknown"}</span>
+                                </div>
+
+                                {item?.flag ? (
+                                  <img
+                                    src={item.flag}
+                                    alt="Flag"
+                                    className="h-5 w-5 object-cover"
+                                  />
+                                ) : (
+                                  <CountryFlag country={item.OsmElement?.address?.country} />
+                                )}
+                                {item?.vehicleStatus !== "Parked" && (
+                                  <div className="lg:col-span-3 md:col-span-3 col-span-2 text-sm w-max">
+                                    <p className="w-max">{item.gps.speedWithUnitDesc}</p>
+                                  </div>
+                                )}
+                                {session?.timezone !== undefined ? (
+                                  <ActiveStatus
+                                    currentTime={new Date().toLocaleString("en-US", { timeZone: session?.timezone })}
+                                    targetTime={item.timestampNotParsed}
+                                    reg={item.vehicleReg}
+                                  />
+                                ) : ""}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="font-popins flex items-center space-x-2 text-sm w-max">
+                            <p style={{ fontSize: "15px" }}>
+                              <strong>Last Parked:</strong> {item?.lastParked}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="xl:col-span-6 text-[13px] lg:col-span-6 md:col-span-6 sm:col-span-6 col-span-6 sm:pl-4 lg:pl-8">
+                          <div className="border border-gray p-1 rounded-md">
+                            {timeAgo(item.timestampNotParsed?.includes("-") ? item?.timestamp : item?.timestampNotParsed)}
+                          </div>
+                          {item.defaultView === false && (
+                            <div
+                              className="flex justify-end mr-[2px]"
+                              data-tooltip-target="tooltip-right"
+                              data-tooltip-placement="right"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
+                              {expandedIndex === index ? (
+                                <ExpandLessIcon
+                                  onClick={() => toggleExpand(null)} // Collapse when clicked
+                                  className="cursor-pointer text-[#00B56C]"
+                                  style={{ fontSize: "32px" }} // Increase icon size
+                                />
+                              ) : (
+                                <ExpandMoreIcon
+                                  onClick={() => toggleExpand(index)} // Expand when clicked
+                                  className="cursor-pointer text-[#00B56C]"
+                                  style={{ fontSize: "32px" }} // Increase icon size
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center mt-1 text-md font-bold text-labelColor"></div>
+                      {item.DriverName && (item?.vehicleStatus === "Moving" || item?.vehicleStatus === "Pause") && (
+                        <p className="text-start font-bold">Driver Name: {item.DriverName.replace("undefine", "")}</p>
+                      )}
+                    </div>
+
+                    {expandedIndex === index && item.defaultView === false && (
+                      <div className="mt-2 rounded-md bg-gray-100">
+                        {allfields.map((attribute) => {
+                          const getNestedValue = (obj, path) => {
+                            const keys = path.split('.');
+                            for (let key of keys) {
+                              if (obj && obj.hasOwnProperty(key)) {
+                                obj = obj[key];
+                              } else {
+                                return undefined;
+                              }
+                            }
+                            return obj;
+                          };
+
+                          const value = getNestedValue(item, attribute.key);
+
+                          if (attribute.key === "gpsStatus") {
+                            const targetTimeDate = new Date(item.utctimestamp);
+                            const currentTimeDate = new Date();
+                            const timeDiffMinutes = Math.abs(targetTimeDate.getTime() - currentTimeDate.getTime()) / (1000 * 60);
+                            const newDivColor = timeDiffMinutes > 120 ? false : true;
+                            return (
+                              <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
+                                <strong style={{ width: "150px", marginRight: "10px" }}>{attribute?.label}:</strong>
+                                <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}> {newDivColor ? "On" : "Off"}</span>
+                              </p>
+                            );
+                          }
+
+                          if (value) {
+                            return (
+                              <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
+                                <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
+                                <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}>{value}</span>
+                              </p>
+                            );
+                          }
+
+                          return null;
+                        })}
+                      </div>
+                    )}
+
+                    <button className="border-b-2 border-green w-full text-end"></button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="xl:col-span-1 lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-5 main_sider_bar">
+            <div className="grid grid-cols-12 bg-white lg:gap-0 gap-3 search_live_tracking">
+              <div className="lg:col-span-7 w-full md:col-span-5 sm:col-span-5 col-span-6 sticky top-0 search_vehicle_live_tracking">
+                <div className="grid grid-cols-12 vehicle_search_left">
+                  <div className="lg:col-span-1 md:col-span-1 sm:col-span-1">
+                    <svg
+                      className="h-5 w-5 ms-1 mt-1 text-green"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                  </div>
+                  <div className="lg:col-span-11 md:col-span-11 sm:col-span-10 col-span-11 ms-2">
+                    <input
+                      type="text"
+                      name="search"
+                      className="text-lg bg-transparent text-green w-full px-1 placeholder-green border-b border-black outline-none"
+                      placeholder="Search"
+                      required
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="flex text-center lg:col-span-5 md:col-span-6 sm:col-span-7 col-span-6 w-full show_vehicle_left">
+                <button
+                  className="text-center mx-auto text-md w-full font-medium text-green mt-1"
+                  onClick={toggleLiveCars}
+                >
+                  Show ({carData?.length}) Vehicles
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-zoneTabelBg border-y-2 border-green text-white vehicle_summary">
+              <div className="grid grid-cols-4 text-center px-2">
+                {data.map(({ label, color, count }, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center justify-center cursor-pointer group"
+                    onClick={() => handleButtonClick(index)} // Set active index on click
+                  >
+                    <span className="text-black font-bold text-2xl transition-transform group-hover:text-black">
+                      {count}
+                    </span>
+                    <span
+                      className="font-medium text-sm"
+                      style={{
+                        color: color, // Dynamic color
+                      }}
+                    >
+                      {label}
+                    </span>
+
+                    <div className="w-full">
+                      <div
+                        className="w-full transition-all group-hover:bg-black"
+                        style={{
+                          backgroundColor: activeIndex === index ? color : "transparent", // Active color
+                          height: activeIndex === index ? "4px" : "2px", // Thicker line for active
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div
+              className="overflow-y-scroll bg-zoneTabelBg"
+              id="scroll_side_bar"
+            >
+              {filteredData?.map((item: VehicleData, index: any) => {
+                return (
+                  <div
+                    key={index}
+                    style={{ backgroundColor: activeColor == item.vehicleId ? "#e1f0e3" : "" }}
+                    className="hover:bg-[#e1f0e3] cursor-pointer pt-2"
+                  >
+                    <div onClick={() => handleClickVehicle(item)}>
+                      <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-12 grid-cols-12 md:space-x-4 text-center">
+                        <div className="xl:col-span-6 lg:col-span-5 md:col-span-4 sm:col-span-6 col-span-4 status_car_btn">
+                          <div className="font-popins font-semibold text-start lg:text-xl text-1xl">
+                            <p className="text-black">{item?.vehicleReg}</p>
+
+                            <div className="">
+                              <div className="flex items-center space-x-2">
+                                <div
+                                  className={`inline-block px-1 py-1 rounded-md text-sm shadow ${item?.vehicleStatus === "Moving"
+                                    ? "bg-green text-white"
+                                    : item?.vehicleStatus === "Parked"
+                                      ? "bg-red text-white"
+                                      : "bg-[#eec40f] text-white"
+                                    }`}
+                                >
+                                  <span>{item?.vehicleStatus || "Unknown"}</span>
+                                </div>
+
+                                {item?.flag ? (
+                                  <img
+                                    src={item.flag}
+                                    alt="Flag"
+                                    className="h-5 w-5 object-cover"
+                                  />
+                                ) : (
+                                  <CountryFlag country={item.OsmElement?.address?.country} />
+                                )}
+                                {item?.vehicleStatus !== "Parked" && (
+                                  <div className="lg:col-span-3 md:col-span-3 col-span-2 text-sm w-max">
+                                    <p className="w-max">{item.gps.speedWithUnitDesc}</p>
+                                  </div>
+                                )}
+                                {session?.timezone !== undefined ? (
+                                  <ActiveStatus
+                                    currentTime={new Date().toLocaleString("en-US", { timeZone: session?.timezone })}
+                                    targetTime={item.timestampNotParsed}
+                                    reg={item.vehicleReg}
+                                  />
+                                ) : ""}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="font-popins flex items-center space-x-2 text-sm w-max">
+                            <p style={{ fontSize: "15px" }}>
+                              <strong>Last Parked:</strong> {item?.lastParked}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="xl:col-span-6 text-[13px] lg:col-span-4 md:col-span-4 sm:col-span-6 col-span-4 pl-8">
+                          <div className="border border-gray p-1 rounded-md">
+                            {timeAgo(item.timestampNotParsed?.includes("-") ? item?.timestamp : item?.timestampNotParsed)}
+                          </div>
+                          {item.defaultView === false && (
+                            <div
+                              className="flex justify-end mr-[2px]"
+                              data-tooltip-target="tooltip-right"
+                              data-tooltip-placement="right"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
+                              {expandedIndex === index ? (
+                                <ExpandLessIcon
+                                  onClick={() => toggleExpand(null)} // Collapse when clicked
+                                  className="cursor-pointer text-[#00B56C]"
+                                  style={{ fontSize: "32px" }} // Increase icon size
+                                />
+                              ) : (
+                                <ExpandMoreIcon
+                                  onClick={() => toggleExpand(index)} // Expand when clicked
+                                  className="cursor-pointer text-[#00B56C]"
+                                  style={{ fontSize: "32px" }} // Increase icon size
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center mt-1 text-md font-bold text-labelColor"></div>
+                      {item.DriverName && (item?.vehicleStatus === "Moving" || item?.vehicleStatus === "Pause") && (
+                        <p className="text-start font-bold">Driver Name: {item.DriverName.replace("undefine", "")}</p>
+                      )}
+                    </div>
+
+                    {expandedIndex === index && item.defaultView === false && (
+                      <div className="mt-2 rounded-md bg-gray-100">
+                        {allfields.map((attribute) => {
+                          const getNestedValue = (obj, path) => {
+                            const keys = path.split('.');
+                            for (let key of keys) {
+                              if (obj && obj.hasOwnProperty(key)) {
+                                obj = obj[key];
+                              } else {
+                                return undefined;
+                              }
+                            }
+                            return obj;
+                          };
+
+                          const value = getNestedValue(item, attribute.key);
+
+                          if (attribute.key === "gpsStatus") {
+                            const targetTimeDate = new Date(item.utctimestamp);
+                            const currentTimeDate = new Date();
+                            const timeDiffMinutes = Math.abs(targetTimeDate.getTime() - currentTimeDate.getTime()) / (1000 * 60);
+                            const newDivColor = timeDiffMinutes > 120 ? false : true;
+                            return (
+                              <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
+                                <strong style={{ width: "150px", marginRight: "10px" }}>                                
+                                  {attribute.label}:</strong>
+                                <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}> {newDivColor ? "On" : "Off"}</span>
+                              </p>
+                            );
+                          }
+
+                          if (value) {
+                            return (
+                              <p key={attribute.key} style={{ display: "flex", flexWrap: "wrap", fontSize: "15px", marginBottom: "5px" }}>
+                                <strong style={{ width: "150px", marginRight: "10px" }}>{attribute.label}:</strong>
+                                <span style={{ flex: 1, wordWrap: "break-word", textAlign: "right" }}>{value}</span>
+                              </p>
+                            );
+                          }
+
+                          return null;
+                        })}
+                      </div>
+                    )}
+
+                    <button className="border-b-2 border-green w-full text-end"></button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </>
+
+      )}
+
+
+
     </>
-   
-  
+
+
   );
 };
 export default LiveSidebar;

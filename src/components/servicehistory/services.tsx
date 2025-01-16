@@ -8,7 +8,7 @@ import { MuiPickersUtilsProvider, DatePicker, TimePicker } from "@material-ui/pi
 import DateFnsUtils from "@date-io/date-fns"; // Correcting to DateFnsUtils
 import EventIcon from "@material-ui/icons/Event"; // Event icon for calendar
 import { handleServiceHistoryRequest, handleServicesRequest, handleServiceStatus } from "@/utils/API_CALLS";
-import { format } from 'date-fns'; // Import format from date-fns
+/* import { format } from 'date-fns'; // Import format from date-fns */
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
@@ -232,7 +232,7 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
           cost: serviceFormData.cost
 
         }
-
+        
         const Data = await handleServiceHistoryRequest({
           token: session?.accessToken,
           method: "POST",
@@ -370,7 +370,7 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
   }
 
   const handledelete = async (id) => {
-
+    
     const Data = await handleServiceHistoryRequest({
       token: session?.accessToken,
       method: "DELETE",
@@ -1273,7 +1273,6 @@ export default function Service({ servicedata, singleVehicleDetail }: any) {
                       <div className="flex items-center mr-4">
                         <input
                           type="checkbox"
-
                           checked={serviceFormData.isLastDateSelected}
                           onChange={(e) => handleserviceCheckboxChange('isLastDateSelected', e.target.checked)}
                           id="last-date-checkbox"

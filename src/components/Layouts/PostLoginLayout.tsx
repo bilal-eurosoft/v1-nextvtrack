@@ -22,8 +22,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import TimeCounter from "@/app/context/timer";
 import { usePathname, useSearchParams } from "next/navigation";
-import { getNotificationsData, getNotificationsDataByUserId, getZoneListByClientId } from "@/utils/API_CALLS";
-import { fetchZone } from "@/lib/slices/zoneSlice";
+import { getNotificationsData } from "@/utils/API_CALLS";
 import { useSelector } from "react-redux";
 import toast from 'react-hot-toast';
 
@@ -306,19 +305,19 @@ export default function RootLayout({
     setShowNotifications((prev) => !prev);
     setNotificationCount(0)
   };
-  function getCurrentDateInTimezone(timezone) {
-    const options = {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      timeZone: timezone
-    };
+  // function getCurrentDateInTimezone(timezone) {
+  //   const options = {
+  //     year: 'numeric',
+  //     month: '2-digit',
+  //     day: '2-digit',
+  //     timeZone: timezone
+  //   };
 
-    const dateFormatter = new Intl.DateTimeFormat('en-CA', options);
-    const formattedDate = dateFormatter.format(new Date());
+  //   const dateFormatter = new Intl.DateTimeFormat('en-CA', options);
+  //   const formattedDate = dateFormatter.format(new Date());
 
-    return formattedDate;
-  }
+  //   return formattedDate;
+  // }
   useEffect(() => {
     if (showNotifications) {
       const fetchNotifications = async () => {
@@ -326,16 +325,16 @@ export default function RootLayout({
         try {
           if (session && session.userRole === "Admin") {
 
-            const date = getCurrentDateInTimezone(session?.timezone)
+            // const date = getCurrentDateInTimezone(session?.timezone)
             const payload = {
 
 
 
-              period: "today",
-              TimeZone: session?.timezone,
+              // period: "today",
+              // TimeZone: session?.timezone,
               clientId: session?.clientId,
-              fromDateTime: `${date}T00:00:00Z`,
-              toDateTime: `${date}T23:59:59Z`,
+              // fromDateTime: `${date}T00:00:00Z`,
+              // toDateTime: `${date}T23:59:59Z`,
             }
 
             const NotificationsData = await getNotificationsData({
@@ -349,17 +348,17 @@ export default function RootLayout({
 
           }
           else {
-            const date = getCurrentDateInTimezone(session?.timezone)
+            // const date = getCurrentDateInTimezone(session?.timezone)
             const payload = {
 
               userId: session?.userId,
-              period: "today",
-              TimeZone: session?.timezone,
-              clientId: session?.clientId,
-              fromDateTime: `${date}T00:00:00Z`,
-              toDateTime: `${date}T23:59:59Z`,
+              // period: "today",
+              // TimeZone: session?.timezone,
+              // clientId: session?.clientId,
+              // fromDateTime: `${date}T00:00:00Z`,
+              // toDateTime: `${date}T23:59:59Z`,
             }
-            const NotificationsData = await getNotificationsDataByUserId({
+            const NotificationsData = await getNotificationsData({
               token: session?.accessToken,
               payload,
             });

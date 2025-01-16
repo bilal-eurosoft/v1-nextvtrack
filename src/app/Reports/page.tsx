@@ -9,16 +9,14 @@ import React, { useEffect, useState } from "react";
 import EventIcon from "@material-ui/icons/Event";
 import { Toaster, toast } from "react-hot-toast";
 // import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
+// import MenuItem from "@mui/material/MenuItem";
 import DateFnsMomemtUtils from "@date-io/moment";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "react-select";
 import { useSelector } from "react-redux";
 import "./report.css";
-
 import {
   MuiPickersUtilsProvider,
-  KeyboardDatePicker,
   DatePicker,
 } from "@material-ui/pickers";
 
@@ -47,10 +45,10 @@ export default function Reports() {
   const [vehicleList, setVehicleList] = useState<DeviceAttach[]>([]);
   const [isCustomPeriod, setIsCustomPeriod] = useState(false);
   const [showWeekDays, setShowWeekDays] = useState(true);
-  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  // const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [startdate, setstartdate] = useState(new Date());
   const [enddate, setenddate] = useState(new Date());
-  const [customDate, setcustomDate] = useState(true);
+  // const [customDate, setcustomDate] = useState(true);
   const [trisdata, setTrisdata] = useState<TripsByBucket[]>([]);
   const [rowsPerPages, setRowsPerPage] = useState(20);
   const [currentPage, setCurrentPage] = useState(0);
@@ -201,7 +199,8 @@ export default function Reports() {
         fromDateTime: dateTime,
         toDateTime: dateTime,
         period: period,
-        reportType: ["ignitionOn", "ignitionOff"].includes(event) ? "Events" : "Events",
+        reportType: "Events",
+        // reportType: ["ignitionOn", "ignitionOff"].includes(event) ? "Ignition" : "Events",        
         TimeZone: session?.timezone || "",
 
         clientId: session?.clientId || "",
@@ -230,7 +229,7 @@ export default function Reports() {
 
   const firstIndex = currentPage * rowsPerPages;
   const lastIndex = Math.min(firstIndex + rowsPerPages, trisdata.length); // Ensure lastIndex does not exceed trisdata.length
-  const filterData = trisdata.slice(firstIndex, lastIndex);
+  const filterData = trisdata?.slice(firstIndex, lastIndex);
   const handleSubmitCustom = async () => {
     const { reportType, VehicleReg, period } = Ignitionreport;
     if (reportType && VehicleReg && period) {
@@ -253,7 +252,7 @@ export default function Reports() {
       };
 
       if (apiFunctions[newdata.reportType]) {
-
+        // let apiFunction = apiFunctions[newdata.reportType]
         if (isCustomPeriod) {
           newdata = {
             ...newdata,
@@ -280,7 +279,6 @@ export default function Reports() {
           const response = await toast.promise(
             alleventsForNotification({
               token: session.accessToken,
-
               payload: newdata,
             }),
             {
@@ -574,13 +572,13 @@ export default function Reports() {
     .split(":")
     .map((part) => part.trim());
 
-  const formattedHours = hours.padStart(2, "0");
-  const formattedMinutes = minutes.padStart(2, "0");
-  const formattedSeconds = seconds.padStart(2, "0");
-  const currentDate = new Date().toISOString().split("T")[0];
-  const formattedTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+  // const formattedHours = hours.padStart(2, "0");
+  // const formattedMinutes = minutes.padStart(2, "0");
+  // const formattedSeconds = seconds.padStart(2, "0");
+  // const currentDate = new Date().toISOString().split("T")[0];
+  // const formattedTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 
-  const parsedDateTime = new Date(currentTime);
+  // const parsedDateTime = new Date(currentTime);
   const currenTDates = new Date();
   var moment = require("moment-timezone");
 
@@ -940,7 +938,7 @@ export default function Reports() {
 
                 setColumnHeaders(newColumnHeaders);
               } else if (response.success === false) {
-                setTrisdata(response.success);
+
                 setTableShow(false);
                 toast.error("No Data Found", {
                   style: {

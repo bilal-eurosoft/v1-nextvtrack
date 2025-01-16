@@ -21,7 +21,8 @@ const LiveMap = dynamic(() => import("@/components/LiveTracking/LiveMap"), {
 const LiveTracking = () => {
   let { data: session } = useSession();
   if (!session) {
-    session = JSON.parse(localStorage?.getItem("user"));
+    session = localStorage.getItem("user")
+    session =session? JSON.parse(session):""
   }
   const carData = useRef<VehicleData[]>([]);
   const [updatedData, setUpdateData] = useState<VehicleData[]>([]);
